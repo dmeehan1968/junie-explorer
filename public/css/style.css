@@ -257,7 +257,7 @@ p {
 .steps-table td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .steps-table tr:hover {
@@ -268,6 +268,11 @@ p {
 .title-container {
   display: flex;
   align-items: center;
+}
+
+/* Set minimum width for title column */
+.steps-table td:first-child {
+  min-width: 20em;
 }
 
 .summary-icon {

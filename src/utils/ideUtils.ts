@@ -254,14 +254,24 @@ export async function getSteps(ideName: string, projectName: string, taskArtifac
         // The swe_patch file is named like the artifactPath but with a swe_patch extension
         // The extension can be prefixed or suffixed with additional characters
         const matterhornFiles = fs.readdirSync(matterhornPath, { withFileTypes: true });
-        const patchFileRegex = new RegExp(`^${taskArtifactPath}\\..*swe_patch.*$`);
-        const patchFiles = matterhornFiles.filter(f => 
-          f.isFile() && patchFileRegex.test(f.name)
+
+        // Look for a patch file that includes the step ID
+        const stepSpecificRegex = new RegExp(`^${taskArtifactPath}.*step_${id}.*swe_patch.*$`);
+        let patchFiles = matterhornFiles.filter(f => 
+          f.isFile() && stepSpecificRegex.test(f.name)
         );
 
+        // If no step-specific patch file is found, fall back to the general pattern
         if (patchFiles.length === 0) {
-          console.error(`No swe_patch file found for step ${id}`);
-          return null;
+          const generalRegex = new RegExp(`^${taskArtifactPath}\\..*swe_patch.*$`);
+          patchFiles = matterhornFiles.filter(f => 
+            f.isFile() && generalRegex.test(f.name)
+          );
+
+          if (patchFiles.length === 0) {
+            console.error(`No swe_patch file found for step ${id}`);
+            return null;
+          }
         }
 
         const patchFilePath = path.join(matterhornPath, patchFiles[0].name);
