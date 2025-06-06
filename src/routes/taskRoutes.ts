@@ -1,5 +1,6 @@
 import express from 'express';
 import { getIssueWithTasks, getTaskWithSteps } from '../utils/ideUtils.js';
+import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
 
 const router = express.Router();
 
@@ -72,6 +73,24 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', asy
       return res.status(404).send('Task not found');
     }
 
+    // Calculate summary values for the footer
+    const summaryData = task.steps.reduce((acc, step) => {
+      acc.inputTokens += step.metrics.inputTokens;
+      acc.outputTokens += step.metrics.outputTokens;
+      acc.cacheTokens += step.metrics.cacheTokens;
+      acc.cost += step.metrics.cost;
+      acc.buildTime += step.metrics.buildTime;
+      acc.modelTime += step.metrics.modelTime;
+      return acc;
+    }, {
+      inputTokens: 0,
+      outputTokens: 0,
+      cacheTokens: 0,
+      cost: 0,
+      buildTime: 0,
+      modelTime: 0
+    });
+
     // Generate HTML for metrics table headers
     const metricsHeaders = `
       <th>Input Tokens</th>
@@ -132,13 +151,28 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', asy
                       <td>${step.metrics.cachedCost.toFixed(4)}</td>
                       <td>${step.metrics.buildTime.toFixed(2)}s</td>
                       <td>${step.metrics.artifactTime.toFixed(2)}s</td>
-                      <td>${step.metrics.modelTime.toFixed(2)}s</td>
-                      <td>${step.metrics.modelCachedTime.toFixed(2)}s</td>
+                      <td>${formatMilliseconds(step.metrics.modelTime)}</td>
+                      <td>${formatMilliseconds(step.metrics.modelCachedTime)}</td>
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
                     </tr>
                   `).join('')}
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <td><strong>Total</strong></td>
+                    <td><strong>${summaryData.inputTokens}</strong></td>
+                    <td><strong>${summaryData.outputTokens}</strong></td>
+                    <td><strong>${summaryData.cacheTokens}</strong></td>
+                    <td><strong>${summaryData.cost.toFixed(4)}</strong></td>
+                    <td></td>
+                    <td><strong>${formatSeconds(summaryData.buildTime)}</strong></td>
+                    <td></td>
+                    <td><strong>${formatMilliseconds(summaryData.modelTime)}</strong></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
             `
             : '<p>No steps found for this task</p>'

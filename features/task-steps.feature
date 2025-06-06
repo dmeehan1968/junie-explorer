@@ -29,3 +29,16 @@ Feature: Task Steps Page
       | Model Cached Time |
       | Requests        |
       | Cached Requests |
+    And the model time value should be displayed as HH:MM:SS.MS
+    And the model cached time value should be displayed as HH:MM:SS.MS
+
+  Scenario: Table footer with summary information
+    Given I am on the steps page for a task
+    Then I should see a footer row in the table with summary information
+    And the footer row should include:
+      | Sum of input tokens |
+      | Sum of output tokens |
+      | Sum of cache tokens |
+      | Sum of cost |
+      | Sum of build time (formatted as HH:MM:SS) |
+      | Sum of model time (formatted as HH:MM:SS.MS) |

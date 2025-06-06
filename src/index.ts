@@ -24,6 +24,6 @@ app.use('/', taskRoutes);
 
 // Start the server
 app.listen(PORT, () => {
+  console.log(`JetBrains Path: ${jetBrainsPath}`);
   console.log(`Server is running on http://localhost:${PORT}`);
-  console.log(`Looking for JetBrains IDEs in: ${jetBrainsPath}`);
 });
