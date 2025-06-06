@@ -11,45 +11,120 @@ interface OutputFormatter {
   formatAggregatedStatistics(aggregatedTable: Record<string, Record<string, any>>): void;
   formatStepsTable(stepsTable: Record<string, Record<string, any>>): void;
   formatSeparator(): void;
+  cleanup(): void;
+}
+
+// Base class for output formatters that handles writing to stdout or a file
+abstract class BaseOutputFormatter implements OutputFormatter {
+  protected outputStream: fs.WriteStream | null = null;
+
+  constructor(outputPath?: string) {
+    if (outputPath) {
+      try {
+        this.outputStream = fs.createWriteStream(outputPath);
+      } catch (error) {
+        console.error(`Error creating output file ${outputPath}: ${error}`);
+        process.exit(1);
+      }
+    }
+  }
+
+  protected write(data: string): void {
+    if (this.outputStream) {
+      this.outputStream.write(data + '\n');
+    } else {
+      console.log(data);
+    }
+  }
+
+  /**
+   * Close the output stream if it exists
+   */
+  public cleanup(): void {
+    if (this.outputStream) {
+      this.outputStream.end();
+    }
+  }
+
+  abstract formatHeader(): void;
+  abstract formatSummaryTable(summaryTable: any[]): void;
+  abstract formatTaskHeader(analysis: TaskAnalysis): void;
+  abstract formatAggregatedStatistics(aggregatedTable: Record<string, Record<string, any>>): void;
+  abstract formatStepsTable(stepsTable: Record<string, Record<string, any>>): void;
+  abstract formatSeparator(): void;
 }
 
 // Console output formatter implementation
-class ConsoleOutputFormatter implements OutputFormatter {
+class ConsoleOutputFormatter extends BaseOutputFormatter {
   formatHeader(): void {
-    console.log('Task Analysis Results');
-    console.log('====================\n');
+    this.write('Task Analysis Results');
+    this.write('====================\n');
   }
 
   formatSummaryTable(summaryTable: any[]): void {
-    console.log('Summary Table:');
-    console.table(summaryTable);
-    console.log('\n');
+    this.write('Summary Table:');
+    // console.table doesn't work with file output, so we need to format the table manually if using a file
+    if (this.outputStream) {
+      // Simple table formatting for file output
+      const keys = Object.keys(summaryTable[0] || {});
+      this.write(keys.join('\t'));
+      for (const row of summaryTable) {
+        this.write(keys.map(key => row[key]).join('\t'));
+      }
+    } else {
+      console.table(summaryTable);
+    }
+    this.write('\n');
   }
 
   formatTaskHeader(analysis: TaskAnalysis): void {
-    console.log(`Task: ${analysis.taskId}`);
-    if (analysis.name) console.log(`Name: ${analysis.name}`);
-    if (analysis.created) console.log(`Created: ${analysis.created}`);
-    if (analysis.state) console.log(`State: ${analysis.state}`);
-    console.log('Aggregated Statistics:');
+    this.write(`Task: ${analysis.taskId}`);
+    if (analysis.name) this.write(`Name: ${analysis.name}`);
+    if (analysis.created) this.write(`Created: ${analysis.created}`);
+    if (analysis.state) this.write(`State: ${analysis.state}`);
+    this.write('Aggregated Statistics:');
   }
 
   formatAggregatedStatistics(aggregatedTable: Record<string, Record<string, any>>): void {
-    console.table(aggregatedTable);
+    if (this.outputStream) {
+      // Simple table formatting for file output
+      for (const key in aggregatedTable) {
+        this.write(`${key}:`);
+        const stats = aggregatedTable[key];
+        for (const statKey in stats) {
+          this.write(`  ${statKey}: ${stats[statKey]}`);
+        }
+      }
+    } else {
+      console.table(aggregatedTable);
+    }
   }
 
   formatStepsTable(stepsTable: Record<string, Record<string, any>>): void {
-    console.log('\nIndividual Steps:');
-    console.table(stepsTable);
+    this.write('\nIndividual Steps:');
+    if (this.outputStream) {
+      // Simple table formatting for file output
+      const stepNames = Object.keys(stepsTable);
+      if (stepNames.length > 0) {
+        const statKeys = Object.keys(stepsTable[stepNames[0]] || {});
+        this.write(['Step', ...statKeys].join('\t'));
+        for (const stepName of stepNames) {
+          const stats = stepsTable[stepName];
+          this.write([stepName, ...statKeys.map(key => stats[key])].join('\t'));
+        }
+      }
+    } else {
+      console.table(stepsTable);
+    }
   }
 
   formatSeparator(): void {
-    console.log('\n-------------------\n');
+    this.write('\n-------------------\n');
   }
 }
 
 // JSON output formatter implementation
-class JsonOutputFormatter implements OutputFormatter {
+class JsonOutputFormatter extends BaseOutputFormatter {
   private data: any = {
     summary: null,
     tasks: []
@@ -96,8 +171,208 @@ class JsonOutputFormatter implements OutputFormatter {
   formatSeparator(): void {
     // After processing each task, output the current JSON data
     if (this.data.tasks.length === this.data.summary.length - 1) { // -1 for the TOTAL row
-      console.log(JSON.stringify(this.data, null, 2));
+      this.write(JSON.stringify(this.data, null, 2));
     }
+  }
+}
+
+// HTML output formatter implementation
+class HtmlOutputFormatter extends BaseOutputFormatter {
+  private html: string[] = [];
+  private currentTaskHtml: string[] = [];
+
+  formatHeader(): void {
+    // Reset HTML content
+    this.html = [];
+
+    // Start HTML document with CSS styles
+    this.html.push(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Junie Task Analysis Results</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .task-section {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+    }
+    .total-row {
+      font-weight: bold;
+      background-color: #e9f7ef;
+    }
+  </style>
+</head>
+<body>
+  <h1>Task Analysis Results</h1>`);
+  }
+
+  formatSummaryTable(summaryTable: any[]): void {
+    this.html.push('<h2>Summary Table</h2>');
+    this.html.push('<table>');
+
+    // Table headers
+    if (summaryTable.length > 0) {
+      const headers = Object.keys(summaryTable[0]);
+      this.html.push('<tr>');
+      for (const header of headers) {
+        this.html.push(`<th>${header}</th>`);
+      }
+      this.html.push('</tr>');
+
+      // Table rows
+      for (let i = 0; i < summaryTable.length; i++) {
+        const row = summaryTable[i];
+        // Add special class for the TOTAL row
+        const isTotal = row.name === 'TOTAL';
+        this.html.push(`<tr${isTotal ? ' class="total-row"' : ''}>`);
+        for (const header of headers) {
+          this.html.push(`<td>${row[header]}</td>`);
+        }
+        this.html.push('</tr>');
+      }
+    }
+
+    this.html.push('</table>');
+  }
+
+  formatTaskHeader(analysis: TaskAnalysis): void {
+    // Start a new task section
+    this.currentTaskHtml = [];
+    this.currentTaskHtml.push('<div class="task-section">');
+    this.currentTaskHtml.push(`<h2>Task: ${analysis.taskId}</h2>`);
+
+    if (analysis.name) this.currentTaskHtml.push(`<p><strong>Name:</strong> ${analysis.name}</p>`);
+    if (analysis.created) this.currentTaskHtml.push(`<p><strong>Created:</strong> ${analysis.created}</p>`);
+    if (analysis.state) this.currentTaskHtml.push(`<p><strong>State:</strong> ${analysis.state}</p>`);
+
+    this.currentTaskHtml.push('<h3>Aggregated Statistics</h3>');
+  }
+
+  formatAggregatedStatistics(aggregatedTable: Record<string, Record<string, any>>): void {
+    this.currentTaskHtml.push('<table>');
+
+    // Table headers
+    const statKeys = Object.keys(aggregatedTable);
+    if (statKeys.length > 0) {
+      const firstStat = aggregatedTable[statKeys[0]];
+      const headers = ['Statistic', ...Object.keys(firstStat)];
+
+      this.currentTaskHtml.push('<tr>');
+      for (const header of headers) {
+        this.currentTaskHtml.push(`<th>${header}</th>`);
+      }
+      this.currentTaskHtml.push('</tr>');
+
+      // Table rows
+      for (const statKey of statKeys) {
+        this.currentTaskHtml.push('<tr>');
+        this.currentTaskHtml.push(`<td>${statKey}</td>`);
+
+        const stat = aggregatedTable[statKey];
+        for (const key in stat) {
+          this.currentTaskHtml.push(`<td>${stat[key]}</td>`);
+        }
+
+        this.currentTaskHtml.push('</tr>');
+      }
+    }
+
+    this.currentTaskHtml.push('</table>');
+  }
+
+  formatStepsTable(stepsTable: Record<string, Record<string, any>>): void {
+    this.currentTaskHtml.push('<h3>Individual Steps</h3>');
+    this.currentTaskHtml.push('<table>');
+
+    // Get all step names and statistic keys
+    const stepNames = Object.keys(stepsTable);
+
+    if (stepNames.length > 0) {
+      const firstStep = stepsTable[stepNames[0]];
+      const statKeys = Object.keys(firstStep);
+
+      // Table headers
+      this.currentTaskHtml.push('<tr>');
+      this.currentTaskHtml.push('<th>Step</th>');
+      for (const key of statKeys) {
+        this.currentTaskHtml.push(`<th>${key}</th>`);
+      }
+      this.currentTaskHtml.push('</tr>');
+
+      // Table rows
+      for (const stepName of stepNames) {
+        this.currentTaskHtml.push('<tr>');
+        this.currentTaskHtml.push(`<td>${stepName}</td>`);
+
+        const stats = stepsTable[stepName];
+        for (const key of statKeys) {
+          this.currentTaskHtml.push(`<td>${stats[key]}</td>`);
+        }
+
+        this.currentTaskHtml.push('</tr>');
+      }
+    }
+
+    this.currentTaskHtml.push('</table>');
+  }
+
+  formatSeparator(): void {
+    // Close the current task section and add it to the main HTML
+    this.currentTaskHtml.push('</div>');
+    this.html.push(this.currentTaskHtml.join('\n'));
+
+    // If this is the last task, output the complete HTML
+    if (this.html.length > 0) {
+      // Close the HTML document
+      this.html.push('</body></html>');
+      this.write(this.html.join('\n'));
+
+      // Reset HTML content after writing
+      this.html = [];
+    }
+  }
+
+  cleanup(): void {
+    // Make sure we close the HTML document if it hasn't been closed yet
+    if (this.html.length > 0 && !this.html[this.html.length - 1].includes('</html>')) {
+      this.html.push('</body></html>');
+      this.write(this.html.join('\n'));
+    }
+
+    // Call parent cleanup to close the output stream
+    super.cleanup();
   }
 }
 interface Statistic {
@@ -587,16 +862,21 @@ function displayResults(analyses: TaskAnalysis[], formatters: OutputFormatter[])
 }
 
 /**
- * Create an output formatter based on the format name
- * @param format The name of the output format
+ * Create an output formatter based on the format configuration
+ * @param formatConfig The format configuration object
  * @returns An instance of the appropriate OutputFormatter
  */
-function createFormatter(format: string): OutputFormatter | null {
-  switch (format.toLowerCase()) {
+function createFormatter(formatConfig: FormatConfig): OutputFormatter | null {
+  const format = formatConfig.format.toLowerCase();
+  const outputPath = formatConfig.outputPath;
+
+  switch (format) {
     case 'console':
-      return new ConsoleOutputFormatter();
+      return new ConsoleOutputFormatter(outputPath);
     case 'json':
-      return new JsonOutputFormatter();
+      return new JsonOutputFormatter(outputPath);
+    case 'html':
+      return new HtmlOutputFormatter(outputPath);
     default:
       console.error(`Unknown output format: ${format}`);
       return null;
@@ -604,24 +884,47 @@ function createFormatter(format: string): OutputFormatter | null {
 }
 
 /**
+ * Interface for format configuration
+ */
+interface FormatConfig {
+  format: string;
+  outputPath?: string;
+}
+
+/**
  * Parse command line arguments
  * @returns Object containing parsed arguments
  */
-function parseArgs(): { formats: string[] } {
+function parseArgs(): { formats: FormatConfig[] } {
   const args = process.argv.slice(2);
-  const result = { formats: ['console'] }; // Default to console output
+  const result: { formats: FormatConfig[] } = { formats: [{ format: 'console' }] }; // Default to console output
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--format' || args[i] === '-f') {
       if (i + 1 < args.length) {
         // Replace the default format with the specified formats
-        if (result.formats[0] === 'console' && result.formats.length === 1) {
+        if (result.formats.length === 1 && result.formats[0].format === 'console') {
           result.formats = [];
         }
 
         // Split by comma to allow multiple formats
-        const formats = args[i + 1].split(',');
-        result.formats.push(...formats);
+        const formatSpecs = args[i + 1].split(',');
+
+        for (const spec of formatSpecs) {
+          // Check if the format includes a file path (format:filepath)
+          const parts = spec.split(':');
+          if (parts.length === 1) {
+            // No file path specified, just the format
+            result.formats.push({ format: parts[0] });
+          } else {
+            // Format with file path
+            result.formats.push({ 
+              format: parts[0], 
+              outputPath: parts.slice(1).join(':') // Rejoin in case the path contains colons
+            });
+          }
+        }
+
         i++; // Skip the next argument as we've already processed it
       }
     }
@@ -639,8 +942,8 @@ function main(): void {
 
   // Create formatters
   const formatters: OutputFormatter[] = [];
-  for (const format of args.formats) {
-    const formatter = createFormatter(format);
+  for (const formatConfig of args.formats) {
+    const formatter = createFormatter(formatConfig);
     if (formatter) {
       formatters.push(formatter);
     }
@@ -678,7 +981,16 @@ function main(): void {
 
   // Display results using the specified formatters
   displayResults(analyses, formatters);
+
+  // Clean up formatters (close file streams)
+  for (const formatter of formatters) {
+    formatter.cleanup();
+  }
 }
 
 // Run the main function
-main();
+try {
+  main();
+} catch(error) {
+  console.log(error)
+}

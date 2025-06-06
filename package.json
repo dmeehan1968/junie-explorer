@@ -5,16 +5,18 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "analyze": "node --loader ts-node/esm --no-warnings src/task-analysis.ts"
+    "analyze": "node --loader ts-node/esm --no-warnings src/task-analysis.ts",
+    "analyze:html": "node --loader ts-node/esm --no-warnings src/task-analysis.ts --format html:docs/index.html"
   },
   "bin": {
     "junie-explorer": "dist/task-analysis.js"
   },
   "description": "A tool for analyzing Junie task data with support for multiple output formats",
-  "usage": "junie-explorer [--format|-f <format1,format2,...>]",
+  "usage": "junie-explorer [--format|-f <format1[:filepath],format2[:filepath],...>]",
   "formats": {
-    "console": "Default format that outputs tables to the console",
-    "json": "Outputs data in JSON format"
+    "console": "Default format that outputs tables to the console or to a file if filepath is specified",
+    "json": "Outputs data in JSON format to stdout or to a file if filepath is specified",
+    "html": "Outputs data as a single self-contained HTML file to stdout or to a file if filepath is specified"
   },
   "devDependencies": {
     "@types/node": "^22.15.30",

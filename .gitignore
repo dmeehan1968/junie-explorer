@@ -10,3 +10,4 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+/docs/index.html
