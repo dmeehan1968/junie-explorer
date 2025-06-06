@@ -305,13 +305,19 @@ function formatMillisecondsToTime(milliseconds: number): string {
  * @param analyses Array of task analyses
  * @returns Summary table with required columns
  */
-function generateSummaryTable(analyses: TaskAnalysis[]): Record<string, Record<string, any>> {
-  const summaryTable: Record<string, Record<string, any>> = {};
+function generateSummaryTable(analyses: TaskAnalysis[]): any[] {
+  const summaryTable: any[] = [];
 
   for (const analysis of analyses) {
     const stats = analysis.aggregatedStatistics;
-    summaryTable[analysis.taskId] = {
+    // Extract the suffix number from the taskId (which is in the format "UUID NN")
+    const promptMatch = analysis.taskId.match(/ (\d+)$/);
+    // Convert to number, use 0 as fallback for consistency in data type
+    const prompt = promptMatch ? parseInt(promptMatch[1], 10) : 0;
+
+    summaryTable.push({
       'name': analysis.name || 'N/A',
+      'prompt': prompt,
       'created': analysis.created || 'N/A',
       'state': analysis.state || 'N/A',
       'modelTime': stats.modelTime ? formatMillisecondsToTime(stats.modelTime.sum) : '00:00:00.000',
@@ -319,7 +325,7 @@ function generateSummaryTable(analyses: TaskAnalysis[]): Record<string, Record<s
       'outputTokens': stats.outputTokens ? formatNumber(stats.outputTokens.sum) : 0,
       'cacheCreateInputTokens': stats.cacheCreateInputTokens ? formatNumber(stats.cacheCreateInputTokens.sum) : 0,
       'cost': stats.cost ? formatNumber(stats.cost.sum) : 0
-    };
+    });
   }
 
   return summaryTable;
