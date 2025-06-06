@@ -13,7 +13,11 @@ junie-explorer/
 ├── src/                     # Source code
 │   ├── index.ts             # Main application entry point
 │   ├── matterhorn.ts        # Interface definitions
-│   └── test.ts              # Test utilities
+│   ├── test.ts              # Test utilities
+│   ├── routes/              # Route handlers
+│   │   └── homeRoutes.ts    # Homepage route handler
+│   └── utils/               # Utility functions
+│       └── ideUtils.ts      # IDE directory utilities
 ├── dist/                    # Compiled JavaScript (generated)
 ├── package.json             # Project dependencies and scripts
 ├── tsconfig.json            # TypeScript configuration
