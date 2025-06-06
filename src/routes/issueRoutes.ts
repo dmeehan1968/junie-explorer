@@ -32,11 +32,13 @@ router.get('/ide/:ideName/project/:projectName', async (req, res) => {
             ${project.issues.length > 0 
               ? project.issues.map(issue => `
                 <li class="issue-item">
-                  <div class="issue-header">
-                    <div class="issue-name">${issue.name}</div>
-                    <div class="issue-date">${issue.created.toLocaleString()}</div>
-                  </div>
-                  <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
+                  <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
+                    <div class="issue-header">
+                      <div class="issue-name">${issue.name}</div>
+                      <div class="issue-date">${issue.created.toLocaleString()}</div>
+                    </div>
+                    <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
+                  </a>
                 </li>
               `).join('')
               : '<li>No issues found for this project</li>'

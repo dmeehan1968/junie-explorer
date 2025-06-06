@@ -55,6 +55,8 @@ export interface Task {
   id: number;        // index
   created: Date;
   artifactPath: string;
+  // from context.description
+  description: string;
   steps: Step[];
 }
 

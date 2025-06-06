@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { IDE, Project, Issue } from '../matterhorn.js';
+import { IDE, Project, Issue, Task } from '../matterhorn.js';
 
 // Get username from environment variable
 const username = process.env.USER;
@@ -137,6 +137,87 @@ export async function getProjectWithIssues(ideName: string, projectName: string)
     };
   } catch (error) {
     console.error(`Error getting project with issues for ${projectName} in IDE ${ideName}:`, error);
+    return null;
+  }
+}
+
+// Function to get tasks for a specific issue
+export async function getTasks(ideName: string, projectName: string, issueId: string): Promise<Task[]> {
+  try {
+    const idePath = path.join(jetBrainsPath, ideName);
+    const projectPath = path.join(idePath, 'projects', projectName);
+    const issuePath = path.join(projectPath, 'matterhorn', '.matterhorn', 'issues', `chain-${issueId}`);
+
+    const exists = await fs.pathExists(issuePath);
+    if (!exists) {
+      console.error(`Issue path does not exist: ${issuePath}`);
+      return [];
+    }
+
+    const files = fs.readdirSync(issuePath, { withFileTypes: true });
+
+    // Filter for task-*.json files
+    const taskFiles = files
+      .filter(file => file.isFile() && file.name.startsWith('task-') && file.name.endsWith('.json'));
+
+    // Read and parse each task file
+    const taskPromises = taskFiles.map(async (file) => {
+      try {
+        const filePath = path.join(issuePath, file.name);
+        const data = await fs.readJson(filePath);
+
+        // Extract index from filename (task-<index>.json)
+        const id = parseInt(file.name.replace('task-', '').replace('.json', ''), 10);
+
+        const task: Task = {
+          id,
+          created: new Date(data.created || Date.now()),
+          artifactPath: data.artifactPath || '',
+          description: data.context?.description || '',
+          steps: [] // We're not loading steps for the tasks page
+        };
+
+        return task;
+      } catch (error) {
+        console.error(`Error reading task file ${file.name}:`, error);
+        return null;
+      }
+    });
+
+    const tasks = await Promise.all(taskPromises);
+
+    // Filter out any null values
+    const validTasks: Task[] = tasks.filter((task): task is Task => task !== null);
+
+    // Sort by index or creation date
+    return validTasks.sort((a, b) => a.id - b.id);
+  } catch (error) {
+    console.error(`Error reading tasks for issue ${issueId} in project ${projectName} in IDE ${ideName}:`, error);
+    return [];
+  }
+}
+
+// Function to get a specific issue with its tasks
+export async function getIssueWithTasks(ideName: string, projectName: string, issueId: string): Promise<Issue | null> {
+  try {
+    // First get the issue details
+    const issues = await getIssues(ideName, projectName);
+    const issue = issues.find(i => i.id === issueId);
+
+    if (!issue) {
+      console.error(`Issue ${issueId} not found in project ${projectName} in IDE ${ideName}`);
+      return null;
+    }
+
+    // Then get the tasks for this issue
+    const tasks = await getTasks(ideName, projectName, issueId);
+
+    return {
+      ...issue,
+      tasks
+    };
+  } catch (error) {
+    console.error(`Error getting issue with tasks for ${issueId} in project ${projectName} in IDE ${ideName}:`, error);
     return null;
   }
 }
