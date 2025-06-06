@@ -7,6 +7,8 @@ Junie Explorer is a full-stack web application built with Node.js and TypeScript
 ```
 junie-explorer/
 ├── .junie/                  # Project documentation and guidelines
+├── features/                # Gherkin feature files for requirements documentation
+│   └── homepage.feature     # Homepage requirements specification
 ├── public/                  # Static assets
 │   └── css/                 # CSS stylesheets
 │       └── style.css        # Main stylesheet
@@ -71,6 +73,20 @@ The application is designed to be run locally, but could be deployed to a server
 1. Build the application with `npm run build`
 2. Start the server with `npm start`
 3. Access the application at `http://localhost:3000` (or configured port)
+
+## Requirements Documentation
+Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth and documentation for the expected behavior of the application.
+
+### Feature Files
+- Feature files use the Gherkin syntax to describe application behavior in a human-readable format
+- Each feature file contains scenarios that outline specific user interactions and expected outcomes
+- The `features/homepage.feature` file describes the expected behavior of the application's homepage
+
+### Using Feature Files
+- Feature files should be consulted when implementing new features or modifying existing ones
+- They serve as acceptance criteria for the application's functionality
+- No step definitions or testing tools should be created at this time - the feature files are purely for documentation purposes
+- When implementing features, developers should ensure their code satisfies all scenarios described in the relevant feature files
 
 ## Future Enhancements
 Potential areas for improvement:
