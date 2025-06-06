@@ -34,7 +34,7 @@ router.get('/ide/:ideName/project/:projectName', async (req, res) => {
                 <li class="issue-item">
                   <div class="issue-header">
                     <div class="issue-name">${issue.name}</div>
-                    <div class="issue-date">${issue.created.toLocaleDateString()}</div>
+                    <div class="issue-date">${issue.created.toLocaleString()}</div>
                   </div>
                   <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
                 </li>
