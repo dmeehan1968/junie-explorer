@@ -956,11 +956,12 @@ function main(): void {
   }
 
   // Path to the fixtures directory
-  const junieLogsPath = path.join('/Users/dmeehan/Library/Caches/JetBrains/WebStorm2025.1/projects/junie-explorer.8cd3e64c');
+  const junieLogsPath = path.join('/Users/dmeehan/Library/Caches/JetBrains/WebStorm2025.1/projects');
 
   // Path to the .matterhorn directory
   const matterhornPath = path.join(
     junieLogsPath,
+    'junie-explorer.8cd3e64c',
     'matterhorn',
     '.matterhorn'
   );
