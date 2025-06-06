@@ -326,6 +326,45 @@ function generateSummaryTable(analyses: TaskAnalysis[]): Record<string, Record<s
 }
 
 /**
+ * Generate a table with all steps for a task
+ * @param steps Array of step statistics
+ * @returns Table with steps as rows and statistics as columns
+ */
+function generateStepsTable(steps: StepStatistics[]): Record<string, Record<string, any>> {
+  const stepsTable: Record<string, Record<string, any>> = {};
+
+  // Get all unique statistic keys across all steps
+  const allKeys = new Set<string>();
+  for (const step of steps) {
+    for (const key in step.statistics) {
+      allKeys.add(key);
+    }
+  }
+
+  // Create rows for each step
+  for (const step of steps) {
+    const stepName = step.stepName;
+    stepsTable[stepName] = {};
+
+    // Add columns for each statistic
+    for (const key of allKeys) {
+      if (key in step.statistics) {
+        // Format modelTime as HH:MM:SS.MS
+        if (key === 'modelTime') {
+          stepsTable[stepName][key] = formatMillisecondsToTime(step.statistics[key]);
+        } else {
+          stepsTable[stepName][key] = formatNumber(step.statistics[key]);
+        }
+      } else {
+        stepsTable[stepName][key] = 'N/A';
+      }
+    }
+  }
+
+  return stepsTable;
+}
+
+/**
  * Format and display the analysis results
  * @param analyses Array of task analyses
  */
@@ -374,22 +413,9 @@ function displayResults(analyses: TaskAnalysis[]): void {
 
     console.log('\nIndividual Steps:');
 
-    // Create a table for each step's statistics
-    for (const step of analysis.steps) {
-      console.log(`  ${step.stepName}:`);
-
-      const stepTable: Record<string, any> = {};
-      for (const key in step.statistics) {
-        // Format modelTime as HH:MM:SS.MS
-        if (key === 'modelTime') {
-          stepTable[key] = formatMillisecondsToTime(step.statistics[key]);
-        } else {
-          stepTable[key] = formatNumber(step.statistics[key]);
-        }
-      }
-
-      console.table(stepTable);
-    }
+    // Create a single table with all steps as columns
+    const stepsTable = generateStepsTable(analysis.steps);
+    console.table(stepsTable);
 
     console.log('\n-------------------\n');
   }
