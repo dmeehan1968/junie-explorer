@@ -237,12 +237,40 @@ function formatNumber(value: number): number {
 }
 
 /**
+ * Generate a summary table with specific statistics for all tasks
+ * @param analyses Array of task analyses
+ * @returns Summary table with required columns
+ */
+function generateSummaryTable(analyses: TaskAnalysis[]): Record<string, Record<string, number>> {
+  const summaryTable: Record<string, Record<string, number>> = {};
+
+  for (const analysis of analyses) {
+    const stats = analysis.aggregatedStatistics;
+    summaryTable[analysis.taskId] = {
+      'modelTime': stats.modelTime ? formatNumber(stats.modelTime.sum) : 0,
+      'inputTokens': stats.inputTokens ? formatNumber(stats.inputTokens.sum) : 0,
+      'outputTokens': stats.outputTokens ? formatNumber(stats.outputTokens.sum) : 0,
+      'cacheCreateInputTokens': stats.cacheCreateInputTokens ? formatNumber(stats.cacheCreateInputTokens.sum) : 0,
+      'cost': stats.cost ? formatNumber(stats.cost.sum) : 0
+    };
+  }
+
+  return summaryTable;
+}
+
+/**
  * Format and display the analysis results
  * @param analyses Array of task analyses
  */
 function displayResults(analyses: TaskAnalysis[]): void {
   console.log('Task Analysis Results');
   console.log('====================\n');
+
+  // Display summary table
+  console.log('Summary Table:');
+  const summaryTable = generateSummaryTable(analyses);
+  console.table(summaryTable);
+  console.log('\n');
 
   for (const analysis of analyses) {
     console.log(`Task: ${analysis.taskId}`);
