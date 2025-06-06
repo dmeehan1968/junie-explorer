@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Import types and formatters
-import { TaskAnalysis, Statistic, StatisticsMap, StepStatistics } from './types.js';
+import { TaskAnalysis, StatisticsMap, StepStatistics } from './types.js';
 import { OutputFormatter, createFormatter, FormatConfig } from './formatters/index.js';
 
 /**
@@ -175,11 +175,6 @@ class StatisticsAnalyzer {
     for (const step of stepStatistics) {
       for (const key in step.statistics) {
         const value = step.statistics[key];
-
-        // Skip if not a number
-        if (typeof value !== 'number') {
-          continue;
-        }
 
         // Create entry if it doesn't exist
         if (!result[key]) {
