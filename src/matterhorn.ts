@@ -7,7 +7,8 @@
  * <IDE> is read from the filesystem
  */
 
-interface IDE {
+export interface IDE {
+  name: string
   projects: Project[]
 }
 
@@ -19,7 +20,7 @@ interface IDE {
  * <project-name> is read from the filesystem
  */
 
-interface Project {
+export interface Project {
   name: string
   issues: Issue[]
 }
@@ -33,7 +34,7 @@ interface Project {
  * <UUID> is read from the filesystem
  */
 
-interface Issue {
+export interface Issue {
   id: string  // UUID
   name: string  // short summary of what was requested
   created: Date
@@ -50,7 +51,7 @@ interface Issue {
  * <index> is read from the filesystem
  */
 
-interface Task {
+export interface Task {
   id: number        // index
   created: Date
   artifactPath: string
@@ -68,7 +69,7 @@ interface Task {
  * swe_next_step is part of the file extension and can be prefixed or suffixed with other text
  */
 
-interface Step {
+export interface Step {
   id: string
 
   // Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>.*swe_patch*
@@ -84,7 +85,7 @@ interface Step {
   metrics: Metrics
 }
 
-interface JunieMetrics {
+export interface JunieMetrics {
   totalArtifactBuildTimeSeconds: number,
   artifactTime: number,
   modelTime: number,
@@ -104,7 +105,7 @@ interface JunieMetrics {
 
  * Output in this order
  */
-interface Metrics {
+export interface Metrics {
   inputTokens: number,
   outputTokens: number,
   cacheTokens: number,  // renamed from cacheCreateInputTokens
