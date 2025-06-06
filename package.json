@@ -1,12 +1,20 @@
 {
   "name": "junie-explorer",
   "version": "1.0.0",
-  "description": "",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "analyze": "node --loader ts-node/esm --no-warnings src/task-analysis.ts"
+  },
+  "bin": {
+    "junie-explorer": "dist/task-analysis.js"
+  },
+  "description": "A tool for analyzing Junie task data with support for multiple output formats",
+  "usage": "junie-explorer [--format|-f <format1,format2,...>]",
+  "formats": {
+    "console": "Default format that outputs tables to the console",
+    "json": "Outputs data in JSON format"
   },
   "devDependencies": {
     "@types/node": "^22.15.30",

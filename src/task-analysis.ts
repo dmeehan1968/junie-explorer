@@ -3,7 +3,103 @@
 import fs from 'fs';
 import path from 'path';
 
-// Define interfaces for our data structures
+// Define interfaces for our data structures and output formatters
+interface OutputFormatter {
+  formatHeader(): void;
+  formatSummaryTable(summaryTable: any[]): void;
+  formatTaskHeader(analysis: TaskAnalysis): void;
+  formatAggregatedStatistics(aggregatedTable: Record<string, Record<string, any>>): void;
+  formatStepsTable(stepsTable: Record<string, Record<string, any>>): void;
+  formatSeparator(): void;
+}
+
+// Console output formatter implementation
+class ConsoleOutputFormatter implements OutputFormatter {
+  formatHeader(): void {
+    console.log('Task Analysis Results');
+    console.log('====================\n');
+  }
+
+  formatSummaryTable(summaryTable: any[]): void {
+    console.log('Summary Table:');
+    console.table(summaryTable);
+    console.log('\n');
+  }
+
+  formatTaskHeader(analysis: TaskAnalysis): void {
+    console.log(`Task: ${analysis.taskId}`);
+    if (analysis.name) console.log(`Name: ${analysis.name}`);
+    if (analysis.created) console.log(`Created: ${analysis.created}`);
+    if (analysis.state) console.log(`State: ${analysis.state}`);
+    console.log('Aggregated Statistics:');
+  }
+
+  formatAggregatedStatistics(aggregatedTable: Record<string, Record<string, any>>): void {
+    console.table(aggregatedTable);
+  }
+
+  formatStepsTable(stepsTable: Record<string, Record<string, any>>): void {
+    console.log('\nIndividual Steps:');
+    console.table(stepsTable);
+  }
+
+  formatSeparator(): void {
+    console.log('\n-------------------\n');
+  }
+}
+
+// JSON output formatter implementation
+class JsonOutputFormatter implements OutputFormatter {
+  private data: any = {
+    summary: null,
+    tasks: []
+  };
+
+  private currentTask: any = null;
+
+  formatHeader(): void {
+    // Reset data for new output
+    this.data = {
+      summary: null,
+      tasks: []
+    };
+  }
+
+  formatSummaryTable(summaryTable: any[]): void {
+    this.data.summary = summaryTable;
+  }
+
+  formatTaskHeader(analysis: TaskAnalysis): void {
+    this.currentTask = {
+      taskId: analysis.taskId,
+      name: analysis.name,
+      created: analysis.created,
+      state: analysis.state,
+      aggregatedStatistics: null,
+      steps: null
+    };
+    this.data.tasks.push(this.currentTask);
+  }
+
+  formatAggregatedStatistics(aggregatedTable: Record<string, Record<string, any>>): void {
+    if (this.currentTask) {
+      this.currentTask.aggregatedStatistics = aggregatedTable;
+    }
+  }
+
+  formatStepsTable(stepsTable: Record<string, Record<string, any>>): void {
+    if (this.currentTask) {
+      this.currentTask.steps = stepsTable;
+    }
+  }
+
+  formatSeparator(): void {
+    // After processing each task, output the current JSON data
+    if (this.data.tasks.length === this.data.summary.length - 1) { // -1 for the TOTAL row
+      console.log(JSON.stringify(this.data, null, 2));
+    }
+  }
+}
 interface Statistic {
   min: number;
   max: number;
@@ -442,64 +538,120 @@ function generateStepsTable(steps: StepStatistics[]): Record<string, Record<stri
 /**
  * Format and display the analysis results
  * @param analyses Array of task analyses
+ * @param formatters Array of output formatters to use
  */
-function displayResults(analyses: TaskAnalysis[]): void {
-  console.log('Task Analysis Results');
-  console.log('====================\n');
+function displayResults(analyses: TaskAnalysis[], formatters: OutputFormatter[]): void {
+  for (const formatter of formatters) {
+    formatter.formatHeader();
 
-  // Display summary table
-  console.log('Summary Table:');
-  const summaryTable = generateSummaryTable(analyses);
-  console.table(summaryTable);
-  console.log('\n');
+    // Display summary table
+    const summaryTable = generateSummaryTable(analyses);
+    formatter.formatSummaryTable(summaryTable);
 
-  for (const analysis of analyses) {
-    console.log(`Task: ${analysis.taskId}`);
-    if (analysis.name) console.log(`Name: ${analysis.name}`);
-    if (analysis.created) console.log(`Created: ${analysis.created}`);
-    if (analysis.state) console.log(`State: ${analysis.state}`);
-    console.log('Aggregated Statistics:');
+    for (const analysis of analyses) {
+      formatter.formatTaskHeader(analysis);
 
-    // Create a table for aggregated statistics
-    const aggregatedTable: Record<string, Record<string, any>> = {};
+      // Create a table for aggregated statistics
+      const aggregatedTable: Record<string, Record<string, any>> = {};
 
-    for (const key in analysis.aggregatedStatistics) {
-      const stat = analysis.aggregatedStatistics[key];
+      for (const key in analysis.aggregatedStatistics) {
+        const stat = analysis.aggregatedStatistics[key];
 
-      // Format modelTime as HH:MM:SS.MS
-      if (key === 'modelTime') {
-        aggregatedTable[key] = {
-          'Min': formatMillisecondsToTime(stat.min),
-          'Max': formatMillisecondsToTime(stat.max),
-          'Sum': formatMillisecondsToTime(stat.sum),
-          'Avg': formatMillisecondsToTime(stat.avg)
-        };
-      } else {
-        aggregatedTable[key] = {
-          'Min': formatNumber(stat.min),
-          'Max': formatNumber(stat.max),
-          'Sum': formatNumber(stat.sum),
-          'Avg': formatNumber(stat.avg)
-        };
+        // Format modelTime as HH:MM:SS.MS
+        if (key === 'modelTime') {
+          aggregatedTable[key] = {
+            'Min': formatMillisecondsToTime(stat.min),
+            'Max': formatMillisecondsToTime(stat.max),
+            'Sum': formatMillisecondsToTime(stat.sum),
+            'Avg': formatMillisecondsToTime(stat.avg)
+          };
+        } else {
+          aggregatedTable[key] = {
+            'Min': formatNumber(stat.min),
+            'Max': formatNumber(stat.max),
+            'Sum': formatNumber(stat.sum),
+            'Avg': formatNumber(stat.avg)
+          };
+        }
+      }
+
+      formatter.formatAggregatedStatistics(aggregatedTable);
+
+      // Create a single table with all steps as columns
+      const stepsTable = generateStepsTable(analysis.steps);
+      formatter.formatStepsTable(stepsTable);
+
+      formatter.formatSeparator();
+    }
+  }
+}
+
+/**
+ * Create an output formatter based on the format name
+ * @param format The name of the output format
+ * @returns An instance of the appropriate OutputFormatter
+ */
+function createFormatter(format: string): OutputFormatter | null {
+  switch (format.toLowerCase()) {
+    case 'console':
+      return new ConsoleOutputFormatter();
+    case 'json':
+      return new JsonOutputFormatter();
+    default:
+      console.error(`Unknown output format: ${format}`);
+      return null;
+  }
+}
+
+/**
+ * Parse command line arguments
+ * @returns Object containing parsed arguments
+ */
+function parseArgs(): { formats: string[] } {
+  const args = process.argv.slice(2);
+  const result = { formats: ['console'] }; // Default to console output
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--format' || args[i] === '-f') {
+      if (i + 1 < args.length) {
+        // Replace the default format with the specified formats
+        if (result.formats[0] === 'console' && result.formats.length === 1) {
+          result.formats = [];
+        }
+
+        // Split by comma to allow multiple formats
+        const formats = args[i + 1].split(',');
+        result.formats.push(...formats);
+        i++; // Skip the next argument as we've already processed it
       }
     }
-
-    console.table(aggregatedTable);
-
-    console.log('\nIndividual Steps:');
-
-    // Create a single table with all steps as columns
-    const stepsTable = generateStepsTable(analysis.steps);
-    console.table(stepsTable);
-
-    console.log('\n-------------------\n');
   }
+
+  return result;
 }
 
 /**
  * Main function
  */
 function main(): void {
+  // Parse command line arguments
+  const args = parseArgs();
+
+  // Create formatters
+  const formatters: OutputFormatter[] = [];
+  for (const format of args.formats) {
+    const formatter = createFormatter(format);
+    if (formatter) {
+      formatters.push(formatter);
+    }
+  }
+
+  // If no valid formatters, exit
+  if (formatters.length === 0) {
+    console.error('No valid output formats specified.');
+    process.exit(1);
+  }
+
   // Path to the fixtures directory
   const junieLogsPath = path.join('/Users/dmeehan/Library/Caches/JetBrains/WebStorm2025.1/projects/junie-explorer.8cd3e64c');
 
@@ -524,8 +676,8 @@ function main(): void {
     process.exit(1);
   }
 
-  // Display results
-  displayResults(analyses);
+  // Display results using the specified formatters
+  displayResults(analyses, formatters);
 }
 
 // Run the main function
