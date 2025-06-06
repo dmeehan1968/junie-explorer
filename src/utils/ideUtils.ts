@@ -250,9 +250,13 @@ export async function getSteps(ideName: string, projectName: string, taskArtifac
         const idMatch = file.name.match(/step_(\d+)/);
         const id = idMatch ? idMatch[1] : '0';
 
-        // Find corresponding swe_patch file
-        const patchFiles = files.filter(f =>
-          f.isFile() && f.name.match(/\..*swe_patch.*/) && f.name.startsWith(`step_${id}`)
+        // Find corresponding swe_patch file in the matterhornPath directory
+        // The swe_patch file is named like the artifactPath but with a swe_patch extension
+        // The extension can be prefixed or suffixed with additional characters
+        const matterhornFiles = fs.readdirSync(matterhornPath, { withFileTypes: true });
+        const patchFileRegex = new RegExp(`^${taskArtifactPath}\\..*swe_patch.*$`);
+        const patchFiles = matterhornFiles.filter(f => 
+          f.isFile() && patchFileRegex.test(f.name)
         );
 
         if (patchFiles.length === 0) {
@@ -260,7 +264,7 @@ export async function getSteps(ideName: string, projectName: string, taskArtifac
           return null;
         }
 
-        const patchFilePath = path.join(stepsPath, patchFiles[0].name);
+        const patchFilePath = path.join(matterhornPath, patchFiles[0].name);
         const data = await fs.readJson(patchFilePath);
 
         // Extract step data
