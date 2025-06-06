@@ -226,6 +226,17 @@ class TaskAnalyzer {
 }
 
 /**
+ * Format a number with up to 4 decimal places
+ * @param value The number to format
+ * @returns Formatted number as string
+ */
+function formatNumber(value: number): string {
+  // For integers or numbers with fewer than 4 decimal places, this will show only the necessary digits
+  // For numbers with more than 4 decimal places, it will round to 4 decimal places
+  return Number.isInteger(value) ? value.toString() : value.toFixed(4);
+}
+
+/**
  * Format and display the analysis results
  * @param analyses Array of task analyses
  */
@@ -237,21 +248,33 @@ function displayResults(analyses: TaskAnalysis[]): void {
     console.log(`Task: ${analysis.taskId}`);
     console.log('Aggregated Statistics:');
 
+    // Create a table for aggregated statistics
+    const aggregatedTable: Record<string, Record<string, string>> = {};
+
     for (const key in analysis.aggregatedStatistics) {
       const stat = analysis.aggregatedStatistics[key];
-      console.log(`  ${key}:`);
-      console.log(`    Min: ${stat.min}`);
-      console.log(`    Max: ${stat.max}`);
-      console.log(`    Sum: ${stat.sum}`);
-      console.log(`    Avg: ${stat.avg.toFixed(2)}`);
+      aggregatedTable[key] = {
+        'Min': formatNumber(stat.min),
+        'Max': formatNumber(stat.max),
+        'Sum': formatNumber(stat.sum),
+        'Avg': formatNumber(stat.avg)
+      };
     }
 
+    console.table(aggregatedTable);
+
     console.log('\nIndividual Steps:');
+
+    // Create a table for each step's statistics
     for (const step of analysis.steps) {
       console.log(`  ${step.stepName}:`);
+
+      const stepTable: Record<string, string> = {};
       for (const key in step.statistics) {
-        console.log(`    ${key}: ${step.statistics[key]}`);
+        stepTable[key] = formatNumber(step.statistics[key]);
       }
+
+      console.table(stepTable);
     }
 
     console.log('\n-------------------\n');
