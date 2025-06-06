@@ -308,6 +308,12 @@ function formatMillisecondsToTime(milliseconds: number): string {
 function generateSummaryTable(analyses: TaskAnalysis[]): any[] {
   const summaryTable: any[] = [];
 
+  // Initialize sums
+  let totalInputTokens = 0;
+  let totalOutputTokens = 0;
+  let totalCacheCreateInputTokens = 0;
+  let totalCost = 0;
+
   for (const analysis of analyses) {
     const stats = analysis.aggregatedStatistics;
     // Extract the suffix number from the taskId (which is in the format "UUID NN")
@@ -315,18 +321,43 @@ function generateSummaryTable(analyses: TaskAnalysis[]): any[] {
     // Convert to number, use 0 as fallback for consistency in data type
     const prompt = promptMatch ? parseInt(promptMatch[1], 10) : 0;
 
+    // Get values for the current row
+    const inputTokens = stats.inputTokens ? stats.inputTokens.sum : 0;
+    const outputTokens = stats.outputTokens ? stats.outputTokens.sum : 0;
+    const cacheCreateInputTokens = stats.cacheCreateInputTokens ? stats.cacheCreateInputTokens.sum : 0;
+    const cost = stats.cost ? stats.cost.sum : 0;
+
+    // Add to totals
+    totalInputTokens += inputTokens;
+    totalOutputTokens += outputTokens;
+    totalCacheCreateInputTokens += cacheCreateInputTokens;
+    totalCost += cost;
+
     summaryTable.push({
       'name': analysis.name || 'N/A',
       'prompt': prompt,
       'created': analysis.created || 'N/A',
       'state': analysis.state || 'N/A',
       'modelTime': stats.modelTime ? formatMillisecondsToTime(stats.modelTime.sum) : '00:00:00.000',
-      'inputTokens': stats.inputTokens ? formatNumber(stats.inputTokens.sum) : 0,
-      'outputTokens': stats.outputTokens ? formatNumber(stats.outputTokens.sum) : 0,
-      'cacheCreateInputTokens': stats.cacheCreateInputTokens ? formatNumber(stats.cacheCreateInputTokens.sum) : 0,
-      'cost': stats.cost ? formatNumber(stats.cost.sum) : 0
+      'inputTokens': formatNumber(inputTokens),
+      'outputTokens': formatNumber(outputTokens),
+      'cacheCreateInputTokens': formatNumber(cacheCreateInputTokens),
+      'cost': formatNumber(cost)
     });
   }
+
+  // Add footer row with totals
+  summaryTable.push({
+    'name': 'TOTAL',
+    'prompt': '',
+    'created': '',
+    'state': '',
+    'modelTime': '',
+    'inputTokens': formatNumber(totalInputTokens),
+    'outputTokens': formatNumber(totalOutputTokens),
+    'cacheCreateInputTokens': formatNumber(totalCacheCreateInputTokens),
+    'cost': formatNumber(totalCost)
+  });
 
   return summaryTable;
 }
