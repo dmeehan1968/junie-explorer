@@ -112,6 +112,32 @@ class FileSystem {
       return null;
     }
   }
+
+  /**
+   * Read task title from the .webstorm_swe_patch file if it exists
+   * @param matterhornPath Path to the .matterhorn directory
+   * @param taskId Task ID (directory name)
+   * @returns Title from the patch file, or undefined if not found or no title in the file
+   */
+  static readTaskTitleFromPatch(matterhornPath: string, taskId: string): string | undefined {
+    try {
+      const patchFilePath = path.join(matterhornPath, `${taskId}.webstorm_swe_patch`);
+
+      if (!fs.existsSync(patchFilePath)) {
+        // No patch file exists, return undefined
+        return undefined;
+      }
+
+      const content = fs.readFileSync(patchFilePath, 'utf8');
+      const data = JSON.parse(content);
+
+      // Return the content.title if it exists
+      return data.content?.title;
+    } catch (error) {
+      console.error(`Error reading patch file for ${taskId}: ${error}`);
+      return undefined;
+    }
+  }
 }
 
 /**
@@ -239,9 +265,13 @@ class TaskAnalyzer {
       const taskId = path.basename(taskDirPath);
       const metadata = FileSystem.readTaskMetadata(matterhornPath, taskId);
 
+      // Check if there's a patch file with a title
+      const patchTitle = FileSystem.readTaskTitleFromPatch(matterhornPath, taskId);
+
       return {
         taskId: taskId,
-        name: metadata?.name,
+        // Use patch title if available, otherwise use metadata name
+        name: patchTitle !== undefined ? patchTitle : metadata?.name,
         created: metadata?.created,
         state: metadata?.state,
         aggregatedStatistics: StatisticsAnalyzer.aggregateStatistics(stepStatistics),
@@ -471,13 +501,12 @@ function displayResults(analyses: TaskAnalysis[]): void {
  */
 function main(): void {
   // Path to the fixtures directory
-  const fixturesPath = path.join(process.cwd(), 'fixtures');
+  const junieLogsPath = path.join('/Users/dmeehan/Library/Caches/JetBrains/WebStorm2025.1/projects/junie-explorer.8cd3e64c');
 
   // Path to the .matterhorn directory
   const matterhornPath = path.join(
-    fixturesPath, 
-    'junie-explorer', 
-    'matterhorn', 
+    junieLogsPath,
+    'matterhorn',
     '.matterhorn'
   );
 
