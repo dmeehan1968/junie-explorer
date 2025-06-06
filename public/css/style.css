@@ -34,6 +34,7 @@ p {
   color: #666;
 }
 
+/* IDE List Styles */
 .ide-list {
   list-style: none;
 }
@@ -58,12 +59,58 @@ p {
   color: #2980b9;
 }
 
+.ide-link {
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+
+/* Project List Styles */
+.project-list {
+  list-style: none;
+}
+
+.project-item {
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #27ae60;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.project-item:hover {
+  background-color: #eef7ff;
+  transform: translateX(5px);
+}
+
+.project-name {
+  font-weight: bold;
+  font-size: 18px;
+  color: #27ae60;
+}
+
+/* Navigation */
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #3498db;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 15px;
   }
-  
-  .ide-item {
+
+  .ide-item, .project-item {
     padding: 10px;
   }
 }

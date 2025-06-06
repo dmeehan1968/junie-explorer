@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const ideDirectories = await getIDEDirectories();
-    
+
     // Generate HTML
     const html = `
       <!DOCTYPE html>
@@ -22,12 +22,14 @@ router.get('/', async (req, res) => {
         <div class="container">
           <h1>JetBrains IDE Explorer</h1>
           <p>Directories found in: ${jetBrainsPath}</p>
-          
+
           <ul class="ide-list">
             ${ideDirectories.length > 0 
               ? ideDirectories.map(ide => `
                 <li class="ide-item">
-                  <div class="ide-name">${ide.name}</div>
+                  <a href="/ide/${encodeURIComponent(ide.name)}" class="ide-link">
+                    <div class="ide-name">${ide.name}</div>
+                  </a>
                 </li>
               `).join('')
               : '<li>No JetBrains IDE directories found</li>'
@@ -37,7 +39,7 @@ router.get('/', async (req, res) => {
       </body>
       </html>
     `;
-    
+
     res.send(html);
   } catch (error) {
     console.error('Error generating homepage:', error);

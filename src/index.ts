@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import homeRoutes from './routes/homeRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 import { jetBrainsPath } from './utils/ideUtils.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,6 +16,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Register routes
 app.use('/', homeRoutes);
+app.use('/', projectRoutes);
 
 // Start the server
 app.listen(PORT, () => {
