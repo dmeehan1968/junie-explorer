@@ -270,10 +270,6 @@ p {
   align-items: center;
 }
 
-/* Set minimum width for title column */
-.steps-table td:first-child {
-  min-width: 20em;
-}
 
 .summary-icon {
   margin-left: 8px;

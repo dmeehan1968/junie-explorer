@@ -74,12 +74,6 @@ export interface Task {
 export interface Step {
   id: string;
 
-  // Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>.*swe_patch*
-  // field: content.title
-  // swe_patch is part of the file extension and can be prefixed or suffixed with other text
-  title: string;
-  // field: content.output
-  summary: string;
   // field: statistics
   junieMetrics: JunieMetrics;
 

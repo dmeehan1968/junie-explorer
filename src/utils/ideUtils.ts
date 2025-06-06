@@ -256,8 +256,6 @@ export async function getSteps(ideName: string, projectName: string, taskArtifac
         // Extract step data
         return {
           id,
-          title: `Step ${id}`,
-          summary: '',
           junieMetrics: data.statistics || {},
           metrics: {
             inputTokens: data.statistics?.inputTokens || 0,

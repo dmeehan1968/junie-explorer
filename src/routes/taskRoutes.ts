@@ -113,7 +113,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', asy
               <table class="steps-table">
                 <thead>
                   <tr>
-                    <th>Title</th>
+                    <th>Step</th>
                     ${metricsHeaders}
                   </tr>
                 </thead>
@@ -122,9 +122,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', asy
                     <tr>
                       <td>
                         <div class="title-container">
-                          ${step.title}
-                          <span class="summary-icon" title="Click to view summary">ℹ️</span>
-                          <div class="summary-popup">${step.summary}</div>
+                          ${step.id}
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
@@ -146,36 +144,6 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', asy
             : '<p>No steps found for this task</p>'
           }
         </div>
-        <script>
-          document.addEventListener('DOMContentLoaded', function() {
-            // Add click event listeners to all summary icons
-            const summaryIcons = document.querySelectorAll('.summary-icon');
-
-            summaryIcons.forEach(icon => {
-              icon.addEventListener('click', function(e) {
-                e.stopPropagation(); // Prevent event from bubbling up
-
-                // Hide all other popups first
-                document.querySelectorAll('.summary-popup').forEach(popup => {
-                  if (popup !== this.nextElementSibling) {
-                    popup.style.display = 'none';
-                  }
-                });
-
-                // Toggle the display of this popup
-                const popup = this.nextElementSibling;
-                popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
-              });
-            });
-
-            // Add click event listener to document to close popups when clicking outside
-            document.addEventListener('click', function() {
-              document.querySelectorAll('.summary-popup').forEach(popup => {
-                popup.style.display = 'none';
-              });
-            });
-          });
-        </script>
       </body>
       </html>
     `;
