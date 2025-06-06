@@ -134,7 +134,7 @@ class StatisticsAnalyzer {
       }
 
       return {
-        stepName: path.basename(stepFilePath),
+        stepName: path.basename(stepFilePath, path.extname(stepFilePath)),
         statistics: data.statistics
       };
     } catch (error) {
