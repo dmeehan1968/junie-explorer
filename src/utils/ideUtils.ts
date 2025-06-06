@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { IDE, Project, Issue, Task } from '../matterhorn.js';
+import { IDE, Project, Issue, Task, Step } from '../matterhorn.js'
 
 // Get username from environment variable
 const username = process.env.USER;
@@ -218,6 +218,120 @@ export async function getIssueWithTasks(ideName: string, projectName: string, is
     };
   } catch (error) {
     console.error(`Error getting issue with tasks for ${issueId} in project ${projectName} in IDE ${ideName}:`, error);
+    return null;
+  }
+}
+
+// Function to get steps for a specific task
+export async function getSteps(ideName: string, projectName: string, taskArtifactPath: string): Promise<Step[]> {
+  try {
+    const idePath = path.join(jetBrainsPath, ideName);
+    const projectPath = path.join(idePath, 'projects', projectName);
+    const matterhornPath = path.join(projectPath, 'matterhorn', '.matterhorn');
+    const stepsPath = path.join(matterhornPath, taskArtifactPath);
+
+    const exists = await fs.pathExists(stepsPath);
+    if (!exists) {
+      console.error(`Steps path does not exist: ${stepsPath}`);
+      return [];
+    }
+
+    // Read all files in the directory
+    const files = fs.readdirSync(stepsPath, { withFileTypes: true });
+
+    // Filter for step_*.swe_next_step* files
+    const stepFiles = files
+      .filter(file => file.isFile() && file.name.match(/step_\d+.*swe_next_step/));
+
+    // Read and parse each step file
+    const stepPromises = stepFiles.map(async (file) => {
+      try {
+        // Extract step ID from filename (step_<id>.*)
+        const idMatch = file.name.match(/step_(\d+)/);
+        const id = idMatch ? idMatch[1] : '0';
+
+        // Find corresponding swe_patch file
+        const patchFiles = files.filter(f => 
+          f.isFile() && f.name.includes('swe_patch') && f.name.startsWith(`step_${id}`)
+        );
+
+        if (patchFiles.length === 0) {
+          console.error(`No swe_patch file found for step ${id}`);
+          return null;
+        }
+
+        const patchFilePath = path.join(stepsPath, patchFiles[0].name);
+        const data = await fs.readJson(patchFilePath);
+
+        // Extract step data
+        const step = {
+          id,
+          title: data.content?.title || `Step ${id}`,
+          summary: data.content?.output || '',
+          junieMetrics: data.statistics || {},
+          metrics: {
+            inputTokens: data.statistics?.inputTokens || 0,
+            outputTokens: data.statistics?.outputTokens || 0,
+            cacheTokens: data.statistics?.cacheCreateInputTokens || 0,
+            cost: data.statistics?.cost || 0,
+            cachedCost: data.statistics?.cachedCost || 0,
+            buildTime: data.statistics?.totalArtifactBuildTimeSeconds || 0,
+            artifactTime: data.statistics?.artifactTime || 0,
+            modelTime: data.statistics?.modelTime || 0,
+            modelCachedTime: data.statistics?.modelCachedTime || 0,
+            requests: data.statistics?.requests || 0,
+            cachedRequests: data.statistics?.cachedRequests || 0
+          }
+        };
+
+        return step;
+      } catch (error) {
+        console.error(`Error reading step file ${file.name}:`, error);
+        return null;
+      }
+    });
+
+    const steps = await Promise.all(stepPromises);
+
+    // Filter out any null values
+    const validSteps = steps.filter(step => step !== null);
+
+    // Sort by step ID
+    return validSteps.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+  } catch (error) {
+    console.error(`Error reading steps for task with artifact path ${taskArtifactPath} in project ${projectName} in IDE ${ideName}:`, error);
+    return [];
+  }
+}
+
+// Function to get a specific task with its steps
+export async function getTaskWithSteps(ideName: string, projectName: string, issueId: string, taskId: number): Promise<Task | null> {
+  try {
+    // First get the issue with tasks
+    const issue = await getIssueWithTasks(ideName, projectName, issueId);
+
+    if (!issue) {
+      console.error(`Issue ${issueId} not found in project ${projectName} in IDE ${ideName}`);
+      return null;
+    }
+
+    // Find the specific task
+    const task = issue.tasks.find(t => t.id === taskId);
+
+    if (!task) {
+      console.error(`Task ${taskId} not found in issue ${issueId} in project ${projectName} in IDE ${ideName}`);
+      return null;
+    }
+
+    // Get steps for this task
+    const steps = await getSteps(ideName, projectName, task.artifactPath);
+
+    return {
+      ...task,
+      steps
+    };
+  } catch (error) {
+    console.error(`Error getting task with steps for task ${taskId} in issue ${issueId} in project ${projectName} in IDE ${ideName}:`, error);
     return null;
   }
 }
