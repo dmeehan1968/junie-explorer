@@ -285,6 +285,22 @@ function formatNumber(value: number): number {
 }
 
 /**
+ * Format milliseconds as HH:MM:SS.MS
+ * @param milliseconds The milliseconds to format
+ * @returns Formatted time string
+ */
+function formatMillisecondsToTime(milliseconds: number): string {
+  // Calculate hours, minutes, seconds, and remaining milliseconds
+  const hours = Math.floor(milliseconds / 3600000);
+  const minutes = Math.floor((milliseconds % 3600000) / 60000);
+  const seconds = Math.floor((milliseconds % 60000) / 1000);
+  const ms = milliseconds % 1000;
+
+  // Format as HH:MM:SS.MS
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+}
+
+/**
  * Generate a summary table with specific statistics for all tasks
  * @param analyses Array of task analyses
  * @returns Summary table with required columns
@@ -298,7 +314,7 @@ function generateSummaryTable(analyses: TaskAnalysis[]): Record<string, Record<s
       'name': analysis.name || 'N/A',
       'created': analysis.created || 'N/A',
       'state': analysis.state || 'N/A',
-      'modelTime': stats.modelTime ? formatNumber(stats.modelTime.sum) : 0,
+      'modelTime': stats.modelTime ? formatMillisecondsToTime(stats.modelTime.sum) : '00:00:00.000',
       'inputTokens': stats.inputTokens ? formatNumber(stats.inputTokens.sum) : 0,
       'outputTokens': stats.outputTokens ? formatNumber(stats.outputTokens.sum) : 0,
       'cacheCreateInputTokens': stats.cacheCreateInputTokens ? formatNumber(stats.cacheCreateInputTokens.sum) : 0,
@@ -331,16 +347,27 @@ function displayResults(analyses: TaskAnalysis[]): void {
     console.log('Aggregated Statistics:');
 
     // Create a table for aggregated statistics
-    const aggregatedTable: Record<string, Record<string, number>> = {};
+    const aggregatedTable: Record<string, Record<string, any>> = {};
 
     for (const key in analysis.aggregatedStatistics) {
       const stat = analysis.aggregatedStatistics[key];
-      aggregatedTable[key] = {
-        'Min': formatNumber(stat.min),
-        'Max': formatNumber(stat.max),
-        'Sum': formatNumber(stat.sum),
-        'Avg': formatNumber(stat.avg)
-      };
+
+      // Format modelTime as HH:MM:SS.MS
+      if (key === 'modelTime') {
+        aggregatedTable[key] = {
+          'Min': formatMillisecondsToTime(stat.min),
+          'Max': formatMillisecondsToTime(stat.max),
+          'Sum': formatMillisecondsToTime(stat.sum),
+          'Avg': formatMillisecondsToTime(stat.avg)
+        };
+      } else {
+        aggregatedTable[key] = {
+          'Min': formatNumber(stat.min),
+          'Max': formatNumber(stat.max),
+          'Sum': formatNumber(stat.sum),
+          'Avg': formatNumber(stat.avg)
+        };
+      }
     }
 
     console.table(aggregatedTable);
@@ -351,9 +378,14 @@ function displayResults(analyses: TaskAnalysis[]): void {
     for (const step of analysis.steps) {
       console.log(`  ${step.stepName}:`);
 
-      const stepTable: Record<string, number> = {};
+      const stepTable: Record<string, any> = {};
       for (const key in step.statistics) {
-        stepTable[key] = formatNumber(step.statistics[key]);
+        // Format modelTime as HH:MM:SS.MS
+        if (key === 'modelTime') {
+          stepTable[key] = formatMillisecondsToTime(step.statistics[key]);
+        } else {
+          stepTable[key] = formatNumber(step.statistics[key]);
+        }
       }
 
       console.table(stepTable);
