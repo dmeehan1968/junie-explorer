@@ -276,7 +276,7 @@ export async function getSteps(ideName: string, projectName: string, taskArtifac
           metrics: {
             inputTokens: data.statistics?.inputTokens || 0,
             outputTokens: data.statistics?.outputTokens || 0,
-            cacheTokens: data.statistics?.cacheCreateInputTokens || 0,
+            cacheTokens: data.statistics?.cacheCreateInputTokens !== undefined ? data.statistics.cacheCreateInputTokens : 0,
             cost: data.statistics?.cost || 0,
             cachedCost: data.statistics?.cachedCost || 0,
             buildTime: data.statistics?.totalArtifactBuildTimeSeconds || 0,

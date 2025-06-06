@@ -264,6 +264,34 @@ p {
   background-color: #f5f5f5;
 }
 
+/* Summary icon and popup styles */
+.title-container {
+  display: flex;
+  align-items: center;
+}
+
+.summary-icon {
+  margin-left: 8px;
+  cursor: pointer;
+  color: #3498db;
+  font-size: 16px;
+}
+
+.summary-popup {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  max-width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .task-link {
   text-decoration: none;
   color: inherit;
