@@ -228,12 +228,12 @@ class TaskAnalyzer {
 /**
  * Format a number with up to 4 decimal places
  * @param value The number to format
- * @returns Formatted number as string
+ * @returns Formatted number
  */
-function formatNumber(value: number): string {
-  // For integers or numbers with fewer than 4 decimal places, this will show only the necessary digits
-  // For numbers with more than 4 decimal places, it will round to 4 decimal places
-  return Number.isInteger(value) ? value.toString() : value.toFixed(4);
+function formatNumber(value: number): number {
+  // For integers, return as is
+  // For decimals, round to 4 decimal places
+  return Number.isInteger(value) ? value : Number(value.toFixed(4));
 }
 
 /**
@@ -249,7 +249,7 @@ function displayResults(analyses: TaskAnalysis[]): void {
     console.log('Aggregated Statistics:');
 
     // Create a table for aggregated statistics
-    const aggregatedTable: Record<string, Record<string, string>> = {};
+    const aggregatedTable: Record<string, Record<string, number>> = {};
 
     for (const key in analysis.aggregatedStatistics) {
       const stat = analysis.aggregatedStatistics[key];
@@ -269,7 +269,7 @@ function displayResults(analyses: TaskAnalysis[]): void {
     for (const step of analysis.steps) {
       console.log(`  ${step.stepName}:`);
 
-      const stepTable: Record<string, string> = {};
+      const stepTable: Record<string, number> = {};
       for (const key in step.statistics) {
         stepTable[key] = formatNumber(step.statistics[key]);
       }
