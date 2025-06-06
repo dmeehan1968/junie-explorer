@@ -27,5 +27,5 @@ Feature: IDE Projects Page
 
   Scenario: Navigating back to homepage
     Given the user is on an IDE projects page
-    When the user clicks on a "Back to Home" link
+    When the user clicks on the "Home" link in the breadcrumb navigation
     Then the user should be taken back to the homepage

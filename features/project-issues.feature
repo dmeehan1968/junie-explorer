@@ -24,7 +24,7 @@ Feature: Project Issues
 
   Scenario: Navigating back to projects list
     Given the user is on a project issues page
-    When the user clicks on the "Back to Projects" link
+    When the user clicks on the IDE name link in the breadcrumb navigation
     Then the user should be redirected to the IDE projects page
 
   Scenario: Responsive design on different devices

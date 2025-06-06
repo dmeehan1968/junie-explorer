@@ -27,7 +27,14 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', async (req, res)
       <body>
         <div class="container">
           <h1>${issue.name} Tasks</h1>
-          <p><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}" class="back-link">Back to Issues</a></p>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName} Projects</a></li>
+              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName} Issues</a></li>
+              <li class="breadcrumb-item active">${issue.name} Tasks</li>
+            </ol>
+          </nav>
 
           <div class="issue-details">
             <div class="issue-created">Created: ${issue.created.toLocaleString()}</div>
@@ -119,7 +126,15 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', asy
       <body>
         <div class="container">
           <h1>Steps for Task ${task.id}</h1>
-          <p><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" class="back-link">Back to Tasks</a></p>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName} Projects</a></li>
+              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName} Issues</a></li>
+              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">Tasks</a></li>
+              <li class="breadcrumb-item active">Steps for Task ${task.id}</li>
+            </ol>
+          </nav>
 
           <div class="task-details">
             <div class="task-created">Created: ${task.created.toLocaleString()}</div>

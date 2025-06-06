@@ -8,7 +8,7 @@ Feature: Issue Tasks Page
     When I click on an issue directory
     Then I should be taken to a page showing tasks for that issue
     And the tasks should be listed in order by index or creation date
-    And I should see a link to navigate back to the issues page
+    And I should see breadcrumb navigation with links to Home, IDE Projects, and Project Issues
 
   Scenario: Task information display
     Given I am on the tasks page for an issue

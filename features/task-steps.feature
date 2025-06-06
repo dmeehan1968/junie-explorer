@@ -8,7 +8,7 @@ Feature: Task Steps Page
     When I click on a task directory
     Then I should be taken to a page showing steps for that task
     And the steps should be listed in a table format
-    And I should see a link to navigate back to the tasks page
+    And I should see breadcrumb navigation with links to Home, IDE Projects, Project Issues, and Tasks
 
   Scenario: Step information display
     Given I am on the steps page for a task

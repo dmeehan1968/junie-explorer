@@ -91,6 +91,44 @@ p {
 }
 
 /* Navigation */
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin-bottom: 20px;
+  padding: 8px 15px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: ">";
+  padding: 0 8px;
+  color: #6c757d;
+}
+
+.breadcrumb-item a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+  color: #6c757d;
+}
+
+/* Keep back-link for backward compatibility */
 .back-link {
   display: inline-block;
   margin-bottom: 20px;
