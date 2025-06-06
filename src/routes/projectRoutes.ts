@@ -8,11 +8,11 @@ router.get('/ide/:ideName', async (req, res) => {
   try {
     const { ideName } = req.params;
     const ide = await getIDEWithProjects(ideName);
-    
+
     if (!ide) {
       return res.status(404).send('IDE not found');
     }
-    
+
     // Generate HTML
     const html = `
       <!DOCTYPE html>
@@ -27,12 +27,14 @@ router.get('/ide/:ideName', async (req, res) => {
         <div class="container">
           <h1>${ide.name} Projects</h1>
           <p><a href="/" class="back-link">Back to Home</a></p>
-          
+
           <ul class="project-list">
             ${ide.projects.length > 0 
               ? ide.projects.map(project => `
                 <li class="project-item">
-                  <div class="project-name">${project.name}</div>
+                  <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(project.name)}" class="project-link">
+                    <div class="project-name">${project.name}</div>
+                  </a>
                 </li>
               `).join('')
               : '<li>No projects found for this IDE</li>'
@@ -42,7 +44,7 @@ router.get('/ide/:ideName', async (req, res) => {
       </body>
       </html>
     `;
-    
+
     res.send(html);
   } catch (error) {
     console.error('Error generating projects page:', error);

@@ -105,12 +105,89 @@ p {
   text-decoration: underline;
 }
 
+/* Issue List Styles */
+.issue-list {
+  list-style: none;
+}
+
+.issue-item {
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #9b59b6;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.issue-item:hover {
+  background-color: #f5eef8;
+  transform: translateX(5px);
+}
+
+.issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.issue-name {
+  font-weight: bold;
+  font-size: 18px;
+  color: #8e44ad;
+}
+
+.issue-date {
+  font-size: 14px;
+  color: #777;
+}
+
+.issue-state {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 12px;
+  border-radius: 3px;
+  background-color: #eee;
+  color: #555;
+}
+
+.issue-state {
+  background-color: #eee;
+  color: #555;
+}
+
+/* CSS doesn't support :contains, so we'll use classes in the HTML */
+.state-done {
+  background-color: #e1f5e1;
+  color: #27ae60;
+}
+
+.state-stopped {
+  background-color: #f8e1e1;
+  color: #e74c3c;
+}
+
+.project-link {
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 15px;
   }
 
-  .ide-item, .project-item {
+  .ide-item, .project-item, .issue-item {
     padding: 10px;
+  }
+
+  .issue-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .issue-date {
+    margin-top: 5px;
   }
 }

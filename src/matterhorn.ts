@@ -8,8 +8,8 @@
  */
 
 export interface IDE {
-  name: string
-  projects: Project[]
+  name: string;
+  projects: Project[];
 }
 
 /**
@@ -21,8 +21,8 @@ export interface IDE {
  */
 
 export interface Project {
-  name: string
-  issues: Issue[]
+  name: string;
+  issues: Issue[];
 }
 
 /**
@@ -35,11 +35,11 @@ export interface Project {
  */
 
 export interface Issue {
-  id: string  // UUID
-  name: string  // short summary of what was requested
-  created: Date
-  state: 'Done' | 'Stopped'
-  tasks: Task[]
+  id: string;  // UUID
+  name: string;  // short summary of what was requested
+  created: Date;
+  state: 'Done' | 'Stopped';
+  tasks: Task[];
 }
 
 /**
@@ -52,10 +52,10 @@ export interface Issue {
  */
 
 export interface Task {
-  id: number        // index
-  created: Date
-  artifactPath: string
-  steps: Step[]
+  id: number;        // index
+  created: Date;
+  artifactPath: string;
+  steps: Step[];
 }
 
 /**
@@ -70,34 +70,34 @@ export interface Task {
  */
 
 export interface Step {
-  id: string
+  id: string;
 
   // Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>.*swe_patch*
   // field: content.title
   // swe_patch is part of the file extension and can be prefixed or suffixed with other text
-  title: string
+  title: string;
   // field: content.output
-  summary: string
+  summary: string;
   // field: statistics
-  junieMetrics: JunieMetrics
+  junieMetrics: JunieMetrics;
 
   // translated from junieMetrics
-  metrics: Metrics
+  metrics: Metrics;
 }
 
 export interface JunieMetrics {
-  totalArtifactBuildTimeSeconds: number,
-  artifactTime: number,
-  modelTime: number,
-  modelCachedTime: number,
-  requests: number,
-  cachedRequests: number,
-  inputTokens: number,
-  outputTokens: number,
-  cacheInputTokens: number,
-  cacheCreateInputTokens: number,
-  cost: number,
-  cachedCost: number
+  totalArtifactBuildTimeSeconds: number;
+  artifactTime: number;
+  modelTime: number;
+  modelCachedTime: number;
+  requests: number;
+  cachedRequests: number;
+  inputTokens: number;
+  outputTokens: number;
+  cacheInputTokens: number;
+  cacheCreateInputTokens: number;
+  cost: number;
+  cachedCost: number;
 }
 
 /**
@@ -106,15 +106,15 @@ export interface JunieMetrics {
  * Output in this order
  */
 export interface Metrics {
-  inputTokens: number,
-  outputTokens: number,
-  cacheTokens: number,  // renamed from cacheCreateInputTokens
-  cost: number,
-  cachedCost: number
-  buildTime: number,    // renamed from totalArtifactBuildTimeSeconds
-  artifactTime: number,
-  modelTime: number,
-  modelCachedTime: number,
-  requests: number,
-  cachedRequests: number,
+  inputTokens: number;
+  outputTokens: number;
+  cacheTokens: number;  // renamed from cacheCreateInputTokens
+  cost: number;
+  cachedCost: number;
+  buildTime: number;    // renamed from totalArtifactBuildTimeSeconds
+  artifactTime: number;
+  modelTime: number;
+  modelCachedTime: number;
+  requests: number;
+  cachedRequests: number;
 }
