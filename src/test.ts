@@ -1,30 +1,20 @@
 import fs from 'fs-extra';
-
-// Get username from environment variable
-const username = process.env.USER;
-const jetBrainsPath = `/Users/${username}/Library/Caches/JetBrains`;
+import { getIDEDirectories, jetBrainsPath } from './utils/ideUtils.js';
 
 async function testDirectoryAccess() {
   try {
     console.log(`Testing access to: ${jetBrainsPath}`);
 
-    const exists = await fs.pathExists(jetBrainsPath);
-    if (!exists) {
-      console.error(`Path does not exist: ${jetBrainsPath}`);
+    // Use the getIDEDirectories function to get IDE directories
+    const ideDirectories = await getIDEDirectories();
+
+    if (ideDirectories.length === 0) {
+      console.log('No JetBrains IDE directories found.');
       return;
     }
 
-    console.log(`Path exists: ${jetBrainsPath}`);
-
-    const directories = fs.readdirSync(jetBrainsPath, { withFileTypes: true });
-
-    // Filter for directories only
-    const ideDirectories = directories
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
-
     console.log('JetBrains IDE directories found:');
-    ideDirectories.forEach(dir => console.log(`- ${dir}`));
+    ideDirectories.forEach(ide => console.log(`- ${ide.name}`));
 
     console.log(`\nTotal directories found: ${ideDirectories.length}`);
   } catch (error) {
