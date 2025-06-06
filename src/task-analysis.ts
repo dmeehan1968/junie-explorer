@@ -269,6 +269,14 @@ class TaskAnalyzer {
       }
     }
 
+    // Sort tasks by created date in ascending order
+    results.sort((a, b) => {
+      // Handle cases where created date might be undefined
+      if (!a.created) return -1;
+      if (!b.created) return 1;
+      return new Date(a.created).getTime() - new Date(b.created).getTime();
+    });
+
     return results;
   }
 }
