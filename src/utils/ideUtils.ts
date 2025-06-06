@@ -251,8 +251,8 @@ export async function getSteps(ideName: string, projectName: string, taskArtifac
         const id = idMatch ? idMatch[1] : '0';
 
         // Find corresponding swe_patch file
-        const patchFiles = files.filter(f => 
-          f.isFile() && f.name.includes('swe_patch') && f.name.startsWith(`step_${id}`)
+        const patchFiles = files.filter(f =>
+          f.isFile() && f.name.match(/\..*swe_patch.*/) && f.name.startsWith(`step_${id}`)
         );
 
         if (patchFiles.length === 0) {
