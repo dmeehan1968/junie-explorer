@@ -137,9 +137,18 @@ class StatisticsAnalyzer {
         return null;
       }
 
+      const statistics: StepStatistics['statistics'] = Object.entries(data.statistics).reduce((acc, [key, value]) => {
+        switch (key) {
+          case 'cacheInputTokens': return acc                                         // drop
+          case 'totalArtifactBuildTimeSeconds': return { ...acc, buildTime: value }   // rename key
+          case 'cacheCreateInputTokens': return { ...acc, cacheTokens: value }        // rename key
+          default: return { ...acc, [key]: value }                                    // retain
+        }
+      }, {} as StepStatistics['statistics'])
+
       return {
         stepName: path.basename(stepFilePath, path.extname(stepFilePath)),
-        statistics: data.statistics
+        statistics: statistics,
       };
     } catch (error) {
       console.error(`Error extracting statistics from ${stepFilePath}: ${error}`);
@@ -174,7 +183,7 @@ class StatisticsAnalyzer {
     // Process each step
     for (const step of stepStatistics) {
       for (const key in step.statistics) {
-        const value = step.statistics[key];
+        const value = step.statistics[key as keyof StepStatistics['statistics']];
 
         // Create entry if it doesn't exist
         if (!result[key]) {
@@ -322,7 +331,7 @@ function generateSummaryTable(analyses: TaskAnalysis[]): any[] {
   // Initialize sums
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
-  let totalCacheCreateInputTokens = 0;
+  let totalCacheTokens = 0;
   let totalCost = 0;
 
   for (const analysis of analyses) {
@@ -335,13 +344,13 @@ function generateSummaryTable(analyses: TaskAnalysis[]): any[] {
     // Get values for the current row
     const inputTokens = stats.inputTokens ? stats.inputTokens.sum : 0;
     const outputTokens = stats.outputTokens ? stats.outputTokens.sum : 0;
-    const cacheCreateInputTokens = stats.cacheCreateInputTokens ? stats.cacheCreateInputTokens.sum : 0;
+    const cacheTokens = stats.cacheTokens ? stats.cacheTokens.sum : 0;
     const cost = stats.cost ? stats.cost.sum : 0;
 
     // Add to totals
     totalInputTokens += inputTokens;
     totalOutputTokens += outputTokens;
-    totalCacheCreateInputTokens += cacheCreateInputTokens;
+    totalCacheTokens += cacheTokens;
     totalCost += cost;
 
     summaryTable.push({
@@ -352,22 +361,19 @@ function generateSummaryTable(analyses: TaskAnalysis[]): any[] {
       'modelTime': stats.modelTime ? formatMillisecondsToTime(stats.modelTime.sum) : '00:00:00.000',
       'inputTokens': formatNumber(inputTokens),
       'outputTokens': formatNumber(outputTokens),
-      'cacheCreateInputTokens': formatNumber(cacheCreateInputTokens),
-      'cost': formatNumber(cost)
+      'cacheTokens': formatNumber(cacheTokens),
+      'cost': formatNumber(cost),
     });
   }
 
   // Add footer row with totals
   summaryTable.push({
     'name': 'TOTAL',
-    'prompt': '',
-    'created': '',
-    'state': '',
-    'modelTime': '',
+    // NB: omitted keys for columns we aren't outputting
     'inputTokens': formatNumber(totalInputTokens),
     'outputTokens': formatNumber(totalOutputTokens),
-    'cacheCreateInputTokens': formatNumber(totalCacheCreateInputTokens),
-    'cost': formatNumber(totalCost)
+    'cacheTokens': formatNumber(totalCacheTokens),
+    'cost': formatNumber(totalCost),
   });
 
   return summaryTable;
@@ -401,7 +407,7 @@ function generateStepsTable(steps: StepStatistics[]): Record<string, Record<stri
         if (key === 'modelTime') {
           stepsTable[stepName][key] = formatMillisecondsToTime(step.statistics[key]);
         } else {
-          stepsTable[stepName][key] = formatNumber(step.statistics[key]);
+          stepsTable[stepName][key] = formatNumber(step.statistics[key as keyof StepStatistics['statistics']]);
         }
       } else {
         stepsTable[stepName][key] = 'N/A';
