@@ -22,6 +22,9 @@ interface StepStatistics {
 
 interface TaskAnalysis {
   taskId: string;
+  name?: string;
+  created?: string;
+  state?: string;
   aggregatedStatistics: StatisticsMap;
   steps: StepStatistics[];
 }
@@ -69,6 +72,44 @@ class FileSystem {
     } catch (error) {
       console.error(`Error finding step files in ${taskDirPath}: ${error}`);
       return [];
+    }
+  }
+
+  /**
+   * Read task metadata from the issues directory
+   * @param matterhornPath Path to the .matterhorn directory
+   * @param taskId Task ID (UUID)
+   * @returns Object containing name, created, and state fields, or null if not found
+   */
+  static readTaskMetadata(matterhornPath: string, taskId: string): { name?: string, created?: string, state?: string } | null {
+    try {
+      // Extract UUID from taskId (which is the directory name like "UUID NN")
+      const uuidMatch = taskId.match(/^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/);
+      if (!uuidMatch) {
+        console.warn(`Could not extract UUID from task ID: ${taskId}`);
+        return null;
+      }
+
+      const uuid = uuidMatch[1];
+      const issuesPath = path.join(matterhornPath, 'issues');
+      const metadataFilePath = path.join(issuesPath, `chain-${uuid}.json`);
+
+      if (!fs.existsSync(metadataFilePath)) {
+        console.warn(`Metadata file not found: ${metadataFilePath}`);
+        return null;
+      }
+
+      const content = fs.readFileSync(metadataFilePath, 'utf8');
+      const data = JSON.parse(content);
+
+      return {
+        name: data.name,
+        created: data.created,
+        state: data.state
+      };
+    } catch (error) {
+      console.error(`Error reading task metadata for ${taskId}: ${error}`);
+      return null;
     }
   }
 }
@@ -169,9 +210,10 @@ class TaskAnalyzer {
   /**
    * Analyze a task directory
    * @param taskDirPath Path to the task directory
+   * @param matterhornPath Path to the .matterhorn directory
    * @returns Task analysis result
    */
-  static analyzeTask(taskDirPath: string): TaskAnalysis | null {
+  static analyzeTask(taskDirPath: string, matterhornPath: string): TaskAnalysis | null {
     try {
       const stepFiles = FileSystem.findStepFiles(taskDirPath);
 
@@ -194,8 +236,14 @@ class TaskAnalyzer {
         return null;
       }
 
+      const taskId = path.basename(taskDirPath);
+      const metadata = FileSystem.readTaskMetadata(matterhornPath, taskId);
+
       return {
-        taskId: path.basename(taskDirPath),
+        taskId: taskId,
+        name: metadata?.name,
+        created: metadata?.created,
+        state: metadata?.state,
         aggregatedStatistics: StatisticsAnalyzer.aggregateStatistics(stepStatistics),
         steps: stepStatistics
       };
@@ -215,7 +263,7 @@ class TaskAnalyzer {
     const results: TaskAnalysis[] = [];
 
     for (const taskDir of taskDirs) {
-      const analysis = this.analyzeTask(taskDir);
+      const analysis = this.analyzeTask(taskDir, matterhornPath);
       if (analysis) {
         results.push(analysis);
       }
@@ -241,12 +289,15 @@ function formatNumber(value: number): number {
  * @param analyses Array of task analyses
  * @returns Summary table with required columns
  */
-function generateSummaryTable(analyses: TaskAnalysis[]): Record<string, Record<string, number>> {
-  const summaryTable: Record<string, Record<string, number>> = {};
+function generateSummaryTable(analyses: TaskAnalysis[]): Record<string, Record<string, any>> {
+  const summaryTable: Record<string, Record<string, any>> = {};
 
   for (const analysis of analyses) {
     const stats = analysis.aggregatedStatistics;
     summaryTable[analysis.taskId] = {
+      'name': analysis.name || 'N/A',
+      'created': analysis.created || 'N/A',
+      'state': analysis.state || 'N/A',
       'modelTime': stats.modelTime ? formatNumber(stats.modelTime.sum) : 0,
       'inputTokens': stats.inputTokens ? formatNumber(stats.inputTokens.sum) : 0,
       'outputTokens': stats.outputTokens ? formatNumber(stats.outputTokens.sum) : 0,
@@ -274,6 +325,9 @@ function displayResults(analyses: TaskAnalysis[]): void {
 
   for (const analysis of analyses) {
     console.log(`Task: ${analysis.taskId}`);
+    if (analysis.name) console.log(`Name: ${analysis.name}`);
+    if (analysis.created) console.log(`Created: ${analysis.created}`);
+    if (analysis.state) console.log(`State: ${analysis.state}`);
     console.log('Aggregated Statistics:');
 
     // Create a table for aggregated statistics
