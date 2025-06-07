@@ -22,10 +22,25 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${project.name} Issues</title>
         <link rel="stylesheet" href="/css/style.css">
+        <script>
+          function reloadPage() {
+            const button = document.getElementById('reload-button');
+            if (button) {
+              button.disabled = true;
+              button.classList.add('loading');
+              setTimeout(() => {
+                window.location.href = '/refresh';
+              }, 100);
+            }
+          }
+        </script>
       </head>
       <body>
         <div class="container">
-          <h1>Project: ${project.name}</h1>
+          <div class="header-container">
+            <h1>Project: ${project.name}</h1>
+            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+          </div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
@@ -33,7 +48,6 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
               <li class="breadcrumb-item active">${project.name}</li>
             </ol>
           </nav>
-          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <ul class="issue-list">
             ${project.issues.length > 0 

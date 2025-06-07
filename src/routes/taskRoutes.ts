@@ -23,10 +23,25 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${issue.name} Tasks</title>
         <link rel="stylesheet" href="/css/style.css">
+        <script>
+          function reloadPage() {
+            const button = document.getElementById('reload-button');
+            if (button) {
+              button.disabled = true;
+              button.classList.add('loading');
+              setTimeout(() => {
+                window.location.href = '/refresh';
+              }, 100);
+            }
+          }
+        </script>
       </head>
       <body>
         <div class="container">
-          <h1>Issue: ${issue.name}</h1>
+          <div class="header-container">
+            <h1>Issue: ${issue.name}</h1>
+            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+          </div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
@@ -35,7 +50,6 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
               <li class="breadcrumb-item active">${issue.name}</li>
             </ol>
           </nav>
-          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <div class="issue-details">
             <div class="issue-created">Created: ${issue.created.toLocaleString()}</div>
@@ -123,10 +137,25 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task ${task.id} Steps</title>
         <link rel="stylesheet" href="/css/style.css">
+        <script>
+          function reloadPage() {
+            const button = document.getElementById('reload-button');
+            if (button) {
+              button.disabled = true;
+              button.classList.add('loading');
+              setTimeout(() => {
+                window.location.href = '/refresh';
+              }, 100);
+            }
+          }
+        </script>
       </head>
       <body>
         <div class="container">
-          <h1>Steps for Task ${task.id}</h1>
+          <div class="header-container">
+            <h1>Steps for Task ${task.id}</h1>
+            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+          </div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
@@ -136,7 +165,6 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
               <li class="breadcrumb-item active">Steps for Task ${task.id}</li>
             </ol>
           </nav>
-          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <div class="task-details">
             <div class="task-created">Created: ${task.created.toLocaleString()}</div>

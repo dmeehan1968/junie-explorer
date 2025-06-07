@@ -18,12 +18,26 @@ router.get('/', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>JetBrains IDE Explorer</title>
         <link rel="stylesheet" href="/css/style.css">
+        <script>
+          function reloadPage() {
+            const button = document.getElementById('reload-button');
+            if (button) {
+              button.disabled = true;
+              button.classList.add('loading');
+              setTimeout(() => {
+                window.location.href = '/refresh';
+              }, 100);
+            }
+          }
+        </script>
       </head>
       <body>
         <div class="container">
-          <h1>JetBrains IDE Explorer</h1>
+          <div class="header-container">
+            <h1>JetBrains IDE Explorer</h1>
+            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+          </div>
           <p>Directories found in: ${jetBrainsPath}</p>
-          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <ul class="ide-list">
             ${ideDirectories.length > 0 
