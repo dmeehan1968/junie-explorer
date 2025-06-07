@@ -188,13 +188,13 @@ p {
 /* Spinner for reload button */
 .reload-button.loading {
   position: relative;
-  padding-left: 40px;
+  padding-right: 60px;
 }
 
 .reload-button.loading::before {
   content: "";
   position: absolute;
-  left: 12px;
+  right: 12px;
   top: 50%;
   width: 16px;
   height: 16px;
