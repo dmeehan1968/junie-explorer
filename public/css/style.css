@@ -391,6 +391,14 @@ p {
   border-radius: 2px;
 }
 
+/* Ensure list markers appear inside their containers in markdown content */
+.task-description ul,
+.task-description ol {
+  padding-left: 20px;
+  margin-bottom: 20px;
+  margin-left: 0;
+}
+
 .issue-details {
   background-color: #f9f9f9;
   padding: 15px;
