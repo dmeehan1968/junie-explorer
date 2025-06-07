@@ -26,13 +26,13 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', async (req, res)
       </head>
       <body>
         <div class="container">
-          <h1>${issue.name} Tasks</h1>
+          <h1>Issue: ${issue.name}</h1>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">Home</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName} Projects</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName} Issues</a></li>
-              <li class="breadcrumb-item active">${issue.name} Tasks</li>
+              <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
+              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName}</a></li>
+              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
+              <li class="breadcrumb-item active">${issue.name}</li>
             </ol>
           </nav>
 
