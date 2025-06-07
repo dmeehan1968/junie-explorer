@@ -447,6 +447,17 @@ p {
   border-radius: 4px;
 }
 
+/* Graph Container Styles */
+.graph-container {
+  width: 100%;
+  height: 400px;
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 /* Step Totals Table Styles */
 .step-totals-table {
   width: 100%;

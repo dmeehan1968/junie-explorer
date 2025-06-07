@@ -87,6 +87,65 @@ const generateIssueMetricsTable = (issue: Issue): string => {
 `;
 };
 
+// Function to prepare data for the cost over time graph
+function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[], timeUnit: string } {
+  // Sort issues by creation date
+  const sortedIssues = [...issues].sort((a, b) => a.created.getTime() - b.created.getTime());
+
+  // Find min and max dates
+  const minDate = sortedIssues.length > 0 ? sortedIssues[0].created : new Date();
+  const maxDate = sortedIssues.length > 0 ? sortedIssues[sortedIssues.length - 1].created : new Date();
+
+  // Calculate the date range in milliseconds
+  const dateRange = maxDate.getTime() - minDate.getTime();
+
+  // Determine the appropriate time unit based on the date range
+  let timeUnit = 'day'; // default
+
+  // Constants for time calculations
+  const HOUR = 60 * 60 * 1000;
+  const DAY = 24 * HOUR;
+  const WEEK = 7 * DAY;
+  const MONTH = 30 * DAY;
+  const YEAR = 365 * DAY;
+
+  if (dateRange < DAY) {
+    timeUnit = 'hour';
+  } else if (dateRange < WEEK) {
+    timeUnit = 'day';
+  } else if (dateRange < MONTH) {
+    timeUnit = 'week';
+  } else if (dateRange < YEAR) {
+    timeUnit = 'month';
+  } else {
+    timeUnit = 'year';
+  }
+
+  // Create datasets for each issue
+  const datasets = sortedIssues.map((issue, index) => {
+    const issueMetrics = calculateIssueSummary(issue.tasks);
+
+    // Generate a color based on index
+    const hue = (index * 137) % 360; // Use golden ratio to spread colors
+    const color = `hsl(${hue}, 70%, 60%)`;
+
+    return {
+      label: issue.name,
+      data: [{ x: issue.created.toISOString(), y: issueMetrics.cost }],
+      borderColor: color,
+      backgroundColor: color,
+      fill: false,
+      tension: 0.1
+    };
+  });
+
+  return {
+    labels: [minDate.toISOString(), maxDate.toISOString()],
+    datasets,
+    timeUnit
+  };
+}
+
 // Project issues page route
 router.get('/ide/:ideName/project/:projectName', (req, res) => {
   try {
@@ -97,6 +156,9 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
       return res.status(404).send('Project not found');
     }
 
+    // Prepare graph data
+    const graphData = prepareGraphData(project.issues);
+
     // Generate HTML
     const html = `
       <!DOCTYPE html>
@@ -106,6 +168,31 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${project.name} Issues</title>
         <link rel="stylesheet" href="/css/style.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+        <script>
+          // Define a minimal locale object to satisfy the adapter requirements
+          window._locale = {
+            code: 'en-US',
+            formatLong: {
+              date: (options) => {
+                return options.width === 'short' ? 'MM/dd/yyyy' : 'MMMM d, yyyy';
+              }
+            },
+            localize: {
+              month: (n) => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][n],
+              day: (n) => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][n],
+              ordinalNumber: (n) => n
+            },
+            formatRelative: () => '',
+            match: {},
+            options: { weekStartsOn: 0 }
+          };
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+        <script>
+          // Define the chart data as a global variable
+          window.chartData = ${JSON.stringify(graphData)};
+        </script>
         <script>
           function reloadPage() {
             const button = document.getElementById('reload-button');
@@ -117,6 +204,106 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
               }, 100);
             }
           }
+
+          // Initialize the cost over time graph when the page loads
+          window.onload = function() {
+            // Add a small delay to ensure all scripts are loaded
+            setTimeout(function() {
+            try {
+              const ctx = document.getElementById('costOverTimeChart').getContext('2d');
+              // Use a global variable to avoid JSON parsing issues
+              const chartData = window.chartData;
+              const timeUnit = chartData.timeUnit;
+
+              // For debugging
+              console.log('Chart data:', chartData);
+              console.log('Time unit:', timeUnit);
+
+              // Create chart configuration
+              const config = {
+                type: 'line',
+                data: {
+                  labels: chartData.labels,
+                  datasets: chartData.datasets.map(dataset => ({
+                    label: dataset.label,
+                    data: dataset.data,
+                    borderColor: dataset.borderColor,
+                    backgroundColor: dataset.backgroundColor,
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointHitRadius: 10,
+                    borderWidth: 2
+                  }))
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  elements: {
+                    point: {
+                      radius: 4,
+                      hitRadius: 10,
+                      hoverRadius: 6
+                    },
+                    line: {
+                      tension: 0.1
+                    }
+                  },
+                  scales: {
+                    x: {
+                      type: 'time',
+                      time: {
+                        unit: timeUnit,
+                        displayFormats: {
+                          hour: 'HH:mm',
+                          day: 'MMM d',
+                          week: 'MMM d',
+                          month: 'MMM yyyy',
+                          year: 'yyyy'
+                        },
+                        tooltipFormat: 'MMM d, yyyy HH:mm'
+                      },
+                      title: {
+                        display: true,
+                        text: 'Date'
+                      },
+                      adapters: {
+                        date: {
+                          locale: window._locale
+                        }
+                      }
+                    },
+                    y: {
+                      title: {
+                        display: true,
+                        text: 'Cost ($)'
+                      },
+                      beginAtZero: true
+                    }
+                  },
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: 'Issue Cost Over Time',
+                      font: {
+                        size: 16
+                      }
+                    },
+                    legend: {
+                      display: false
+                    }
+                  }
+                }
+              };
+
+              // Create the chart
+              new Chart(ctx, config);
+            } catch (error) {
+              console.error('Error creating chart:', error);
+            }
+            }, 100); // 100ms delay
+          };
         </script>
       </head>
       <body>
@@ -132,6 +319,10 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
               <li class="breadcrumb-item active">${project.name}</li>
             </ol>
           </nav>
+
+          <div class="graph-container">
+            <canvas id="costOverTimeChart"></canvas>
+          </div>
 
           <ul class="issue-list">
             ${project.issues.length > 0 
