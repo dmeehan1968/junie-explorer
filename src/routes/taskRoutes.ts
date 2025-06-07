@@ -1,8 +1,82 @@
 import express from 'express';
 import { getIssue, getTask } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
+import { Step, Metrics } from '../matterhorn.js';
 
 const router = express.Router();
+
+// Helper function to calculate summary data for a task's steps
+function calculateStepSummary(steps: Step[]): Metrics {
+  return steps.reduce((acc: Metrics, step: Step) => {
+    acc.inputTokens += step.metrics.inputTokens;
+    acc.outputTokens += step.metrics.outputTokens;
+    acc.cacheTokens += step.metrics.cacheTokens;
+    acc.cost += step.metrics.cost;
+    acc.cachedCost += step.metrics.cachedCost;
+    acc.buildTime += step.metrics.buildTime;
+    acc.artifactTime += step.metrics.artifactTime;
+    acc.modelTime += step.metrics.modelTime;
+    acc.modelCachedTime += step.metrics.modelCachedTime;
+    acc.requests += step.metrics.requests;
+    acc.cachedRequests += step.metrics.cachedRequests;
+    return acc;
+  }, {
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheTokens: 0,
+    cost: 0,
+    cachedCost: 0,
+    buildTime: 0,
+    artifactTime: 0,
+    modelTime: 0,
+    modelCachedTime: 0,
+    requests: 0,
+    cachedRequests: 0
+  });
+}
+
+// Generate HTML for metrics table headers
+const metricsHeaders = `
+  <th>Input Tokens</th>
+  <th>Output Tokens</th>
+  <th>Cache Tokens</th>
+  <th>Cost</th>
+  <th>Cached Cost</th>
+  <th>Build Time</th>
+  <th>Artifact Time</th>
+  <th>Model Time</th>
+  <th>Model Cached Time</th>
+  <th>Requests</th>
+  <th>Cached Requests</th>
+`;
+
+// Function to generate HTML for step totals table
+const generateStepTotalsTable = (summaryData: Metrics): string => `
+  <table class="step-totals-table">
+    <thead>
+      <tr>
+        <th>Totals</th>
+        ${metricsHeaders}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Total</strong></td>
+        <td><strong>${summaryData.inputTokens}</strong></td>
+        <td><strong>${summaryData.outputTokens}</strong></td>
+        <td><strong>${summaryData.cacheTokens}</strong></td>
+        <td><strong>${summaryData.cost.toFixed(4)}</strong></td>
+        <td><strong>${summaryData.cachedCost.toFixed(4)}</strong></td>
+        <td><strong>${formatSeconds(summaryData.buildTime)}</strong></td>
+        <td><strong>${formatSeconds(summaryData.artifactTime)}</strong></td>
+        <td><strong>${formatMilliseconds(summaryData.modelTime)}</strong></td>
+        <td><strong>${formatMilliseconds(summaryData.modelCachedTime)}</strong></td>
+        <td><strong>${summaryData.requests}</strong></td>
+        <td><strong>${summaryData.cachedRequests}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+`;
 
 // Issue tasks page route
 router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
@@ -58,18 +132,26 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
 
           <ul class="task-list">
             ${issue.tasks.length > 0 
-              ? issue.tasks.map(task => `
-                <li class="task-item">
-                  <div class="task-header">
-                    <div class="task-id">${task.id === 0 ? 'Initial Request' : `Follow up ${task.id}`}</div>
-                    <div class="task-date">Created: ${task.created.toLocaleString()}</div>
-                  </div>
-                  <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id}" class="task-link">
-                    <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
-                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
-                  </a>
-                </li>
-              `).join('')
+              ? issue.tasks.map(task => {
+                  // Calculate step totals for this task
+                  const stepTotals = calculateStepSummary(task.steps);
+
+                  return `
+                    <li class="task-item">
+                      <div class="task-header">
+                        <div class="task-id">${task.id === 0 ? 'Initial Request' : `Follow up ${task.id}`}</div>
+                        <div class="task-date">Created: ${task.created.toLocaleString()}</div>
+                      </div>
+                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id}" class="task-link">
+                        <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
+                        ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                      </a>
+                      <div class="task-details">
+                        ${generateStepTotalsTable(stepTotals)}
+                      </div>
+                    </li>
+                  `;
+                }).join('')
               : '<li>No tasks found for this issue</li>'
             }
           </ul>
@@ -96,47 +178,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
     }
 
     // Calculate summary values for the footer
-    const summaryData = task.steps.reduce((acc, step) => {
-      acc.inputTokens += step.metrics.inputTokens;
-      acc.outputTokens += step.metrics.outputTokens;
-      acc.cacheTokens += step.metrics.cacheTokens;
-      acc.cost += step.metrics.cost;
-      acc.cachedCost += step.metrics.cachedCost;
-      acc.buildTime += step.metrics.buildTime;
-      acc.artifactTime += step.metrics.artifactTime;
-      acc.modelTime += step.metrics.modelTime;
-      acc.modelCachedTime += step.metrics.modelCachedTime;
-      acc.requests += step.metrics.requests;
-      acc.cachedRequests += step.metrics.cachedRequests;
-      return acc;
-    }, {
-      inputTokens: 0,
-      outputTokens: 0,
-      cacheTokens: 0,
-      cost: 0,
-      cachedCost: 0,
-      buildTime: 0,
-      artifactTime: 0,
-      modelTime: 0,
-      modelCachedTime: 0,
-      requests: 0,
-      cachedRequests: 0
-    });
-
-    // Generate HTML for metrics table headers
-    const metricsHeaders = `
-      <th>Input Tokens</th>
-      <th>Output Tokens</th>
-      <th>Cache Tokens</th>
-      <th>Cost</th>
-      <th>Cached Cost</th>
-      <th>Build Time</th>
-      <th>Artifact Time</th>
-      <th>Model Time</th>
-      <th>Model Cached Time</th>
-      <th>Requests</th>
-      <th>Cached Requests</th>
-    `;
+    const summaryData = calculateStepSummary(task.steps);
 
     // Generate HTML
     const html = `

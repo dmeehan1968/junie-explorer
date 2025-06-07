@@ -16,3 +16,17 @@ Feature: Issue Tasks Page
       | Task ID      |
       | Created Date |
       | Artifact Path|
+      | Step Totals  |
+    And the step totals should be displayed in a table format
+    And the step totals table should include:
+      | Input Tokens    |
+      | Output Tokens   |
+      | Cache Tokens    |
+      | Cost            |
+      | Cached Cost     |
+      | Build Time      |
+      | Artifact Time   |
+      | Model Time      |
+      | Model Cached Time |
+      | Requests        |
+      | Cached Requests |
