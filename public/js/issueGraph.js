@@ -32,7 +32,20 @@ window.onload = function() {
   // Add a small delay to ensure all scripts are loaded
   setTimeout(function() {
     try {
-      const ctx = document.getElementById('costOverTimeChart').getContext('2d');
+      const chartElement = document.getElementById('costOverTimeChart');
+      // Only initialize the chart if the element exists (i.e., there are issues)
+      if (!chartElement) {
+        console.log('No chart element found - chart will not be initialized');
+        return;
+      }
+
+      // Check if chartData exists (it won't if there are no issues)
+      if (!window.chartData) {
+        console.log('No chart data available - chart will not be initialized');
+        return;
+      }
+
+      const ctx = chartElement.getContext('2d');
       // Use a global variable to avoid JSON parsing issues
       const chartData = window.chartData;
       const timeUnit = chartData.timeUnit;

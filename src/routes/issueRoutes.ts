@@ -175,10 +175,13 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-        <script>
-          // Define the chart data as a global variable
-          window.chartData = ${JSON.stringify(graphData)};
-        </script>
+        ${project.issues.length > 0 
+          ? `<script>
+              // Define the chart data as a global variable
+              window.chartData = ${JSON.stringify(graphData)};
+            </script>`
+          : ''
+        }
         <script src="/js/issueGraph.js"></script>
       </head>
       <body>
@@ -195,9 +198,12 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
             </ol>
           </nav>
 
-          <div class="graph-container">
-            <canvas id="costOverTimeChart"></canvas>
-          </div>
+          ${project.issues.length > 0 
+            ? `<div class="graph-container">
+                <canvas id="costOverTimeChart"></canvas>
+              </div>`
+            : ''
+          }
 
           <ul class="issue-list">
             ${project.issues.length > 0 
