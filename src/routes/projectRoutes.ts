@@ -98,33 +98,6 @@ function calculateProjectMetrics(issues: Issue[]): Metrics {
   });
 }
 
-// Function to generate HTML for project metrics table
-const generateProjectMetricsTable = (project: { name: string, issues: Issue[] }): string => {
-  if (project.issues.length === 0) {
-    return '';
-  }
-
-  const projectMetrics = calculateProjectMetrics(project.issues);
-  // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = projectMetrics.buildTime + projectMetrics.modelTime/1000 + projectMetrics.artifactTime + projectMetrics.modelCachedTime/1000;
-
-  return `
-  <div class="project-metrics">
-    <div class="issue-count">Issues: ${project.issues.length}</div>
-    <table class="step-totals-table">
-      <tbody>
-        <tr>
-          <td>Input Tokens: ${projectMetrics.inputTokens}</td>
-          <td>Output Tokens: ${projectMetrics.outputTokens}</td>
-          <td>Cache Tokens: ${projectMetrics.cacheTokens}</td>
-          <td>Cost: ${projectMetrics.cost.toFixed(4)}</td>
-          <td>Total Time: ${formatSeconds(totalTime)}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-`;
-};
 
 // Projects page route
 router.get('/ide/:ideName', (req, res) => {
@@ -171,19 +144,50 @@ router.get('/ide/:ideName', (req, res) => {
             </ol>
           </nav>
 
-          <ul class="project-list">
+          <table class="project-table">
+            <thead>
+              <tr>
+                <th>Project Name</th>
+                <th>Issue Count</th>
+                <th>Input Tokens</th>
+                <th>Output Tokens</th>
+                <th>Cache Tokens</th>
+                <th>Cost</th>
+                <th>Total Time</th>
+              </tr>
+            </thead>
+            <tbody>
             ${ide.projects.length > 0 
-              ? ide.projects.map(project => `
-                <li class="project-item">
-                  <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(project.name)}" class="project-link">
-                    <div class="project-name">${project.name}</div>
-                  </a>
-                  ${generateProjectMetricsTable(project)}
-                </li>
-              `).join('')
-              : '<li>No projects found for this IDE</li>'
+              ? ide.projects.map(project => {
+                  const issueCount = project.issues.length;
+                  if (issueCount === 0) {
+                    return `
+                      <tr>
+                        <td><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(project.name)}">${project.name}</a></td>
+                        <td>0</td>
+                        <td colspan="5">&nbsp;</td>
+                      </tr>
+                    `;
+                  } else {
+                    const projectMetrics = calculateProjectMetrics(project.issues);
+                    const totalTime = projectMetrics.buildTime + projectMetrics.modelTime/1000 + projectMetrics.artifactTime + projectMetrics.modelCachedTime/1000;
+                    return `
+                      <tr>
+                        <td><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(project.name)}">${project.name}</a></td>
+                        <td>${issueCount}</td>
+                        <td>${projectMetrics.inputTokens}</td>
+                        <td>${projectMetrics.outputTokens}</td>
+                        <td>${projectMetrics.cacheTokens}</td>
+                        <td>${projectMetrics.cost.toFixed(4)}</td>
+                        <td>${formatSeconds(totalTime)}</td>
+                      </tr>
+                    `;
+                  }
+                }).join('')
+              : '<tr><td colspan="7">No projects found for this IDE</td></tr>'
             }
-          </ul>
+            </tbody>
+          </table>
         </div>
       </body>
       </html>

@@ -17,10 +17,9 @@ Feature: IDE Projects Page
   Scenario: Viewing IDE projects page with projects
     Given there are projects for a specific JetBrains IDE
     When the user visits the projects page for that IDE
-    Then the user should see a list of all projects for that IDE
-    And each project should display its name
-    And each project should display a count of its issues
-    And each project should display a summary table with totals for all issues
+    Then the user should see a table of all projects for that IDE
+    And the table should have columns for Project Name, Issue Count, Input Tokens, Output Tokens, Cache Tokens, Cost, and Total Time
+    And projects with 0 issues should only display the project name and issue count
 
   Scenario: Viewing IDE projects page with no projects
     Given there are no projects for a specific JetBrains IDE
