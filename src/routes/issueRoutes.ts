@@ -139,12 +139,10 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
                   return `
                     <li class="issue-item">
                       <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
-                        <table class="issue-table">
-                          <tr>
-                            <td class="issue-name">${issue.name}</td>
-                            <td class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</td>
-                          </tr>
-                        </table>
+                        <div class="issue-container">
+                          <div class="issue-name">${issue.name}</div>
+                          <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
+                        </div>
                       </a>
                       <div class="issue-metrics">
                         ${generateIssueMetricsTable(issue)}

@@ -247,44 +247,60 @@ p {
   transform: translateX(5px);
 }
 
-/* Issue table styles */
-.issue-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Issue container styles */
+.issue-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 5px;
-  table-layout: fixed;
-}
-
-.issue-table td {
-  padding: 8px;
-  text-align: center;
-  vertical-align: middle;
+  position: relative;
 }
 
 .issue-name {
   font-weight: bold;
   font-size: 18px;
   color: #8e44ad;
+  flex: 1;
+  padding: 8px;
+  padding-right: 15px; /* Add gap between title and button */
 }
 
 .issue-state {
-  padding: 3px 8px;
+  padding: 5px 10px;
   font-size: 12px;
-  border-radius: 3px;
+  border-radius: 4px;
   background-color: #eee;
   color: #555;
-  text-align: right;
+  text-align: center;
+  white-space: nowrap;
+  margin-top: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
 }
 
 /* CSS doesn't support :contains, so we'll use classes in the HTML */
 .state-done {
-  background-color: #e1f5e1;
-  color: #27ae60;
+  background-color: #27ae60;
+  color: white;
+  border: 1px solid #219a52;
 }
 
 .state-stopped {
-  background-color: #f8e1e1;
-  color: #e74c3c;
+  background-color: #e74c3c;
+  color: white;
+  border: 1px solid #d62c1a;
+}
+
+.state-in-progress {
+  background-color: #3498db;
+  color: white;
+  border: 1px solid #2980b9;
+}
+
+.state-new {
+  background-color: #f39c12;
+  color: white;
+  border: 1px solid #d35400;
 }
 
 .project-link, .issue-link {
@@ -453,6 +469,7 @@ p {
   padding: 8px;
   border-bottom: 1px solid #ddd;
   vertical-align: middle;
+  text-align: center;
 }
 
 .step-totals-table tr:hover {
