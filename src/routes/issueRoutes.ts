@@ -88,7 +88,7 @@ const generateIssueMetricsTable = (issue: Issue): string => {
 };
 
 // Function to prepare data for the cost over time graph
-function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[], timeUnit: string } {
+function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
   // Sort issues by creation date
   const sortedIssues = [...issues].sort((a, b) => a.created.getTime() - b.created.getTime());
 
@@ -101,6 +101,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
   // Determine the appropriate time unit based on the date range
   let timeUnit = 'day'; // default
+  let stepSize = 1;
 
   // Constants for time calculations
   const HOUR = 60 * 60 * 1000;
@@ -111,6 +112,9 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
   if (dateRange < DAY) {
     timeUnit = 'hour';
+  } else if (dateRange < DAY*2) {
+    timeUnit = 'hour';
+    stepSize = 3;
   } else if (dateRange < WEEK) {
     timeUnit = 'day';
   } else if (dateRange < MONTH) {
@@ -142,7 +146,8 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
   return {
     labels: [minDate.toISOString(), maxDate.toISOString()],
     datasets,
-    timeUnit
+    timeUnit,
+    stepSize,
   };
 }
 
@@ -214,10 +219,7 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
               // Use a global variable to avoid JSON parsing issues
               const chartData = window.chartData;
               const timeUnit = chartData.timeUnit;
-
-              // For debugging
-              console.log('Chart data:', chartData);
-              console.log('Time unit:', timeUnit);
+              const stepSize = chartData.stepSize;
 
               // Create chart configuration
               const config = {
@@ -255,6 +257,7 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
                       type: 'time',
                       time: {
                         unit: timeUnit,
+                        stepSize: stepSize,
                         displayFormats: {
                           hour: 'HH:mm',
                           day: 'MMM d',
