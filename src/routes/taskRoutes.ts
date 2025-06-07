@@ -1,14 +1,14 @@
 import express from 'express';
-import { getIssueWithTasks, getTaskWithSteps } from '../utils/ideUtils.js';
+import { getIssue, getTask } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
 
 const router = express.Router();
 
 // Issue tasks page route
-router.get('/ide/:ideName/project/:projectName/issue/:issueId', async (req, res) => {
+router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
   try {
     const { ideName, projectName, issueId } = req.params;
-    const issue = await getIssueWithTasks(ideName, projectName, issueId);
+    const issue = getIssue(ideName, projectName, issueId);
 
     if (!issue) {
       return res.status(404).send('Issue not found');
@@ -35,6 +35,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', async (req, res)
               <li class="breadcrumb-item active">${issue.name}</li>
             </ol>
           </nav>
+          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <div class="issue-details">
             <div class="issue-created">Created: ${issue.created.toLocaleString()}</div>
@@ -71,10 +72,10 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', async (req, res)
 });
 
 // Task steps page route
-router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', async (req, res) => {
+router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
     const { ideName, projectName, issueId, taskId } = req.params;
-    const task = await getTaskWithSteps(ideName, projectName, issueId, parseInt(taskId, 10));
+    const task = getTask(ideName, projectName, issueId, parseInt(taskId, 10));
 
     if (!task) {
       return res.status(404).send('Task not found');
@@ -128,13 +129,14 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', asy
           <h1>Steps for Task ${task.id}</h1>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName} Projects</a></li>
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName} Issues</a></li>
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">Tasks</a></li>
               <li class="breadcrumb-item active">Steps for Task ${task.id}</li>
             </ol>
           </nav>
+          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <div class="task-details">
             <div class="task-created">Created: ${task.created.toLocaleString()}</div>

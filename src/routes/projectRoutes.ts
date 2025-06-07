@@ -1,13 +1,13 @@
 import express from 'express';
-import { getIDEWithProjects } from '../utils/ideUtils.js';
+import { getIDE } from '../utils/appState.js';
 
 const router = express.Router();
 
 // Projects page route
-router.get('/ide/:ideName', async (req, res) => {
+router.get('/ide/:ideName', (req, res) => {
   try {
     const { ideName } = req.params;
-    const ide = await getIDEWithProjects(ideName);
+    const ide = getIDE(ideName);
 
     if (!ide) {
       return res.status(404).send('IDE not found');
@@ -32,6 +32,7 @@ router.get('/ide/:ideName', async (req, res) => {
               <li class="breadcrumb-item active">${ide.name}</li>
             </ol>
           </nav>
+          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <ul class="project-list">
             ${ide.projects.length > 0 

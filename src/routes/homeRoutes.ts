@@ -1,12 +1,13 @@
 import express from 'express';
-import { getIDEDirectories, jetBrainsPath } from '../utils/ideUtils.js';
+import { jetBrainsPath } from '../utils/ideUtils.js';
+import { getIDEs } from '../utils/appState.js';
 
 const router = express.Router();
 
 // Homepage route
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   try {
-    const ideDirectories = await getIDEDirectories();
+    const ideDirectories = getIDEs();
 
     // Generate HTML
     const html = `
@@ -22,6 +23,7 @@ router.get('/', async (req, res) => {
         <div class="container">
           <h1>JetBrains IDE Explorer</h1>
           <p>Directories found in: ${jetBrainsPath}</p>
+          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <ul class="ide-list">
             ${ideDirectories.length > 0 

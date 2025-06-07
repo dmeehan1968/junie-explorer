@@ -143,6 +143,24 @@ p {
   text-decoration: underline;
 }
 
+/* Refresh button */
+.refresh-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.refresh-button:hover {
+  background-color: #2980b9;
+  text-decoration: none;
+}
+
 /* Issue List Styles */
 .issue-list {
   list-style: none;

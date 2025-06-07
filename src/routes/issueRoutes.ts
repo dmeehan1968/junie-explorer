@@ -1,13 +1,13 @@
 import express from 'express';
-import { getProjectWithIssues } from '../utils/ideUtils.js';
+import { getProject } from '../utils/appState.js';
 
 const router = express.Router();
 
 // Project issues page route
-router.get('/ide/:ideName/project/:projectName', async (req, res) => {
+router.get('/ide/:ideName/project/:projectName', (req, res) => {
   try {
     const { ideName, projectName } = req.params;
-    const project = await getProjectWithIssues(ideName, projectName);
+    const project = getProject(ideName, projectName);
 
     if (!project) {
       return res.status(404).send('Project not found');
@@ -33,6 +33,7 @@ router.get('/ide/:ideName/project/:projectName', async (req, res) => {
               <li class="breadcrumb-item active">${project.name}</li>
             </ol>
           </nav>
+          <p><a href="/refresh" class="refresh-button">Refresh</a></p>
 
           <ul class="issue-list">
             ${project.issues.length > 0 
