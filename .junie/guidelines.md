@@ -7,19 +7,37 @@ Junie Explorer is a full-stack web application built with Node.js and TypeScript
 ```
 junie-explorer/
 ├── .junie/                  # Project documentation and guidelines
+│   └── guidelines.md        # Project guidelines and documentation
 ├── features/                # Gherkin feature files for requirements documentation
-│   └── homepage.feature     # Homepage requirements specification
+│   ├── homepage.feature     # Homepage requirements specification
+│   ├── issue-cost-graph.feature # Issue cost graph requirements
+│   ├── project-issues.feature # Project issues page requirements
+│   ├── projects.feature     # Projects page requirements
+│   ├── refresh-button.feature # Refresh button functionality requirements
+│   ├── task-steps.feature   # Task steps page requirements
+│   └── tasks.feature        # Tasks page requirements
+├── fixtures/                # Test fixtures for the application
+│   └── junie-explorer/      # Junie Explorer specific test data
 ├── public/                  # Static assets
-│   └── css/                 # CSS stylesheets
-│       └── style.css        # Main stylesheet
+│   ├── css/                 # CSS stylesheets
+│   │   └── style.css        # Main stylesheet
+│   └── js/                  # JavaScript files
+│       └── issueGraph.js    # Client-side script for issue graph visualization
 ├── src/                     # Source code
+│   ├── chart.d.ts           # Type definitions for chart library
 │   ├── index.ts             # Main application entry point
-│   ├── matterhorn.ts        # Interface definitions
+│   ├── matterhorn.ts        # Interface definitions for data model
 │   ├── test.ts              # Test utilities
+│   ├── testDateFormat.ts    # Date formatting test utilities
 │   ├── routes/              # Route handlers
-│   │   └── homeRoutes.ts    # Homepage route handler
+│   │   ├── homeRoutes.ts    # Homepage route handler
+│   │   ├── issueRoutes.ts   # Issue page route handler
+│   │   ├── projectRoutes.ts # Project page route handler
+│   │   └── taskRoutes.ts    # Task page route handler
 │   └── utils/               # Utility functions
-│       └── ideUtils.ts      # IDE directory utilities
+│       ├── appState.ts      # Application state management
+│       ├── jetBrainsPath.ts # JetBrains path utilities
+│       └── timeUtils.ts     # Time and date utilities
 ├── dist/                    # Compiled JavaScript (generated)
 ├── package.json             # Project dependencies and scripts
 ├── tsconfig.json            # TypeScript configuration
