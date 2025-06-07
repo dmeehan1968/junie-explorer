@@ -269,38 +269,37 @@ p {
   padding: 5px 10px;
   font-size: 12px;
   border-radius: 4px;
-  background-color: #eee;
+  background-color: #f8f8f8;
   color: #555;
   text-align: center;
   white-space: nowrap;
   margin-top: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   font-weight: bold;
 }
 
 /* CSS doesn't support :contains, so we'll use classes in the HTML */
 .state-done {
-  background-color: #27ae60;
-  color: white;
-  border: 1px solid #219a52;
+  background-color: #e6f7ef;
+  color: #27ae60;
+  border: 1px solid #d4f0e2;
 }
 
 .state-stopped {
-  background-color: #e74c3c;
-  color: white;
-  border: 1px solid #d62c1a;
+  background-color: #fbeae9;
+  color: #e74c3c;
+  border: 1px solid #f8d6d3;
 }
 
 .state-in-progress {
-  background-color: #3498db;
-  color: white;
-  border: 1px solid #2980b9;
+  background-color: #e8f4fb;
+  color: #3498db;
+  border: 1px solid #d6eaf8;
 }
 
 .state-new {
-  background-color: #f39c12;
-  color: white;
-  border: 1px solid #d35400;
+  background-color: #fef5e7;
+  color: #f39c12;
+  border: 1px solid #fdebd0;
 }
 
 .project-link, .issue-link {
