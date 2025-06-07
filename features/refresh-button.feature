@@ -7,20 +7,38 @@ Feature: Reload Button
     Given the application has access to the JetBrains cache directory
     And the user has a web browser
 
-  Scenario: Reload button placement
+  Scenario: Reload button visibility
     When the user visits the homepage
     Then the user should see a "Reload" button in the top right of the page
-    And the button should be right-aligned on the same row as the page title
-    And if the page title is long, it should wrap without affecting the reload button position
 
-  Scenario: Reload button functionality
+  Scenario: Reload button alignment
+    When the user visits the homepage
+    Then the button should be right-aligned on the same row as the page title
+
+  Scenario: Reload button with long page titles
+    When the user visits a page with a long title
+    Then the page title should wrap without affecting the reload button position
+
+  Scenario: Reload button click prevention
     When the user clicks the "Reload" button
     Then the button should be disabled to prevent multiple clicks
-    And the button should display a spinner to indicate loading
-    And the page should reload with fresh data
 
-  Scenario: Reload button appearance
+  Scenario: Reload button loading indicator
+    When the user clicks the "Reload" button
+    Then the button should display a spinner to indicate loading
+
+  Scenario: Page data refresh
+    When the user clicks the "Reload" button
+    Then the page should reload with fresh data
+
+  Scenario: Reload button visual appearance
     When the user visits the homepage
     Then the "Reload" button should have a clear, clickable appearance
-    And the button should visually indicate when it is disabled
-    And the button should display a spinner when loading
+
+  Scenario: Reload button disabled state
+    When the "Reload" button is disabled
+    Then the button should visually indicate its disabled state
+
+  Scenario: Reload button loading state
+    When the "Reload" button is in loading state
+    Then the button should display a spinner

@@ -3,21 +3,33 @@ Feature: Task Steps Page
   I want to click on task directories to navigate to a page showing steps for that task
   So that I can explore the steps available for each task
 
-  Scenario: Viewing steps for a task
+  Scenario: Navigating to task steps page
     Given I am on the tasks page for an issue
     When I click on a task directory
     Then I should be taken to a page showing steps for that task
-    And the steps should be listed in a table format
-    And I should see breadcrumb navigation with links to Home, IDE Projects, Project Issues, and Tasks
 
-  Scenario: Step information display
+  Scenario: Viewing steps in table format
+    Given I am on the steps page for a task
+    Then the steps should be listed in a table format
+
+  Scenario: Breadcrumb navigation on steps page
+    Given I am on the steps page for a task
+    Then I should see breadcrumb navigation with links to Home, IDE Projects, Project Issues, and Tasks
+
+  Scenario: Step table column structure
     Given I am on the steps page for a task
     Then I should see a table with the following columns:
       | Title   |
       | Summary |
       | Metrics |
-    And the metrics should be displayed in columns rather than rows
-    And the metrics should include:
+
+  Scenario: Metrics display format
+    Given I am on the steps page for a task
+    Then the metrics should be displayed in columns rather than rows
+
+  Scenario: Available metrics in step table
+    Given I am on the steps page for a task
+    Then the metrics should include:
       | Input Tokens    |
       | Output Tokens   |
       | Cache Tokens    |
@@ -29,13 +41,22 @@ Feature: Task Steps Page
       | Model Cached Time |
       | Requests        |
       | Cached Requests |
-    And the model time value should be displayed as HH:MM:SS.MS
-    And the model cached time value should be displayed as HH:MM:SS.MS
 
-  Scenario: Table footer with summary information
+  Scenario: Model time display format
+    Given I am on the steps page for a task
+    Then the model time value should be displayed as HH:MM:SS.MS
+
+  Scenario: Model cached time display format
+    Given I am on the steps page for a task
+    Then the model cached time value should be displayed as HH:MM:SS.MS
+
+  Scenario: Table footer presence
     Given I am on the steps page for a task
     Then I should see a footer row in the table with summary information
-    And the footer row should include:
+
+  Scenario: Table footer content
+    Given I am on the steps page for a task with a footer row
+    Then the footer row should include:
       | Sum of input tokens |
       | Sum of output tokens |
       | Sum of cache tokens |

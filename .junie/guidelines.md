@@ -89,6 +89,9 @@ Requirements for this project are documented using Gherkin feature files located
 - When implementing features, developers should ensure their code satisfies all scenarios described in the relevant feature files
 - When code changes are made, make sure that the relevant feature files are updated to reflect new functionality
 
+### Gherkin Scenarios
+- Avoid lengthy 'then/and' steps, this indicates that the scenario is too complex and should be split into more focussed scenarios
+
 ## Future Enhancements
 Potential areas for improvement:
 - Add detailed views for individual IDE directories
