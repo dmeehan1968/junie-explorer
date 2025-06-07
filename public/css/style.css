@@ -313,6 +313,24 @@ p {
   border: 1px solid #fdebd0;
 }
 
+.state-finished {
+  background-color: #e8f8f5;
+  color: #1abc9c;
+  border: 1px solid #d1f2eb;
+}
+
+.state-running {
+  background-color: #ebf5fb;
+  color: #3498db;
+  border: 1px solid #d6eaf8;
+}
+
+.state-declined {
+  background-color: #f7f7f7;
+  color: #7f8c8d;
+  border: 1px solid #e5e5e5;
+}
+
 .project-link, .issue-link {
   text-decoration: none;
   display: block;

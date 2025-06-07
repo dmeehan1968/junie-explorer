@@ -25,6 +25,11 @@ Feature: Project Issues
     Given the user is viewing a list of project issues
     Then each issue should display its name, status, and simplified metrics in a table format
 
+  Scenario: Issue status display
+    Given the user is viewing a list of project issues
+    Then issues can have status of "Done", "Stopped", "Finished", "Running", or "Declined"
+    And each status should be displayed with a distinct color
+
   Scenario: Issue table layout
     Given the user is viewing a list of project issues
     Then the timestamp should be in the first column of the table

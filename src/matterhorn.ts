@@ -38,7 +38,7 @@ export interface Issue {
   id: string;  // UUID
   name: string;  // short summary of what was requested
   created: Date;
-  state: 'Done' | 'Stopped';
+  state: 'Done' | 'Stopped' | 'Finished' | 'Running' | 'Declined';
   tasks: Task[];
 }
 
