@@ -11,3 +11,4 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+/images/

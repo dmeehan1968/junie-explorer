@@ -2,6 +2,7 @@ import express from 'express';
 import { getIssue, getTask } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
 import { Step, Metrics } from '../matterhorn.js';
+import { marked } from 'marked';
 
 const router = express.Router();
 
@@ -136,7 +137,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
                       </div>
                       <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id}" class="task-link">
                         <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
-                        ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                        ${task.description ? `<div class="task-description">${marked(task.description)}</div>` : ''}
                       </a>
                       <div class="task-details">
                         ${generateStepTotalsTable(stepTotals)}
@@ -213,7 +214,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
           <div class="task-details">
             <div class="task-created">Created: ${task.created.toLocaleString()}</div>
             <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
-            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+            ${task.description ? `<div class="task-description">${marked(task.description)}</div>` : ''}
           </div>
 
           ${task.steps.length > 0 
