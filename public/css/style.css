@@ -247,11 +247,18 @@ p {
   transform: translateX(5px);
 }
 
-.issue-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Issue table styles */
+.issue-table {
+  width: 100%;
+  border-collapse: collapse;
   margin-bottom: 5px;
+  table-layout: fixed;
+}
+
+.issue-table td {
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .issue-name {
@@ -260,23 +267,13 @@ p {
   color: #8e44ad;
 }
 
-.issue-date {
-  font-size: 14px;
-  color: #777;
-}
-
 .issue-state {
-  display: inline-block;
   padding: 3px 8px;
   font-size: 12px;
   border-radius: 3px;
   background-color: #eee;
   color: #555;
-}
-
-.issue-state {
-  background-color: #eee;
-  color: #555;
+  text-align: right;
 }
 
 /* CSS doesn't support :contains, so we'll use classes in the HTML */
@@ -474,10 +471,6 @@ p {
   .issue-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .issue-date {
-    margin-top: 5px;
   }
 
   .steps-table {

@@ -1,7 +1,7 @@
 import express from 'express';
 import { getProject } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
-import { Step, Metrics, Task } from '../matterhorn.js';
+import { Step, Metrics, Task, Issue } from '../matterhorn.js'
 
 const router = express.Router();
 
@@ -66,18 +66,20 @@ function calculateIssueSummary(tasks: Task[]): Metrics {
 }
 
 // Function to generate HTML for issue metrics table
-const generateIssueMetricsTable = (summaryData: Metrics): string => {
+const generateIssueMetricsTable = (issue: Issue): string => {
+  const issueMetrics = calculateIssueSummary(issue.tasks);
   // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = summaryData.buildTime + summaryData.modelTime/1000 + summaryData.artifactTime + summaryData.modelCachedTime/1000;
+  const totalTime = issueMetrics.buildTime + issueMetrics.modelTime/1000 + issueMetrics.artifactTime + issueMetrics.modelCachedTime/1000;
 
   return `
   <table class="step-totals-table">
     <tbody>
       <tr>
-        <td>Input Tokens: ${summaryData.inputTokens}</td>
-        <td>Output Tokens: ${summaryData.outputTokens}</td>
-        <td>Cache Tokens: ${summaryData.cacheTokens}</td>
-        <td>Cost: ${summaryData.cost.toFixed(4)}</td>
+        <td>${issue.created.toLocaleString()}</td>
+        <td>Input Tokens: ${issueMetrics.inputTokens}</td>
+        <td>Output Tokens: ${issueMetrics.outputTokens}</td>
+        <td>Cache Tokens: ${issueMetrics.cacheTokens}</td>
+        <td>Cost: ${issueMetrics.cost.toFixed(4)}</td>
         <td>Total Time: ${formatSeconds(totalTime)}</td>
       </tr>
     </tbody>
@@ -134,20 +136,18 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
           <ul class="issue-list">
             ${project.issues.length > 0 
               ? project.issues.map(issue => {
-                  // Calculate metrics summary for this issue
-                  const issueMetrics = calculateIssueSummary(issue.tasks);
-
                   return `
                     <li class="issue-item">
                       <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
-                        <div class="issue-header">
-                          <div class="issue-name">${issue.name}</div>
-                          <div class="issue-date">${issue.created.toLocaleString()}</div>
-                        </div>
-                        <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
+                        <table class="issue-table">
+                          <tr>
+                            <td class="issue-name">${issue.name}</td>
+                            <td class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</td>
+                          </tr>
+                        </table>
                       </a>
                       <div class="issue-metrics">
-                        ${generateIssueMetricsTable(issueMetrics)}
+                        ${generateIssueMetricsTable(issue)}
                       </div>
                     </li>
                   `;

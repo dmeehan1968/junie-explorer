@@ -23,7 +23,14 @@ Feature: Project Issues
 
   Scenario: Viewing issue details
     Given the user is viewing a list of project issues
-    Then each issue should display its name, creation date, and simplified metrics
+    Then each issue should display its name, status, and simplified metrics in a table format
+
+  Scenario: Issue table layout
+    Given the user is viewing a list of project issues
+    Then the timestamp should be in the first column of the table
+    And the status should be right-aligned to the right of the issue title
+    And the table columns should be equally divided in width
+    And the cell text should be horizontally centered
 
   Scenario: Viewing issue metrics
     Given the user is viewing issue details
