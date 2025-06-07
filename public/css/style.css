@@ -90,6 +90,17 @@ p {
   color: #27ae60;
 }
 
+.project-metrics {
+  margin-top: 10px;
+}
+
+.issue-count {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
 /* Navigation */
 .breadcrumb {
   display: flex;
