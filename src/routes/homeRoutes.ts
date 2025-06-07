@@ -1,5 +1,5 @@
 import express from 'express';
-import { jetBrainsPath } from '../utils/ideUtils.js';
+import { jetBrainsPath } from '../utils/jetBrainsPath.js';
 import { getIDEs } from '../utils/appState.js';
 
 const router = express.Router();

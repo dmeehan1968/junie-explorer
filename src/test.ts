@@ -1,12 +1,15 @@
-import fs from 'fs-extra';
-import { getIDEDirectories, jetBrainsPath } from './utils/ideUtils.js';
+import { jetBrainsPath } from './utils/jetBrainsPath.js';
+import { initializeAppState, getIDEs } from './utils/appState.js';
 
 async function testDirectoryAccess() {
   try {
     console.log(`Testing access to: ${jetBrainsPath}`);
 
-    // Use the getIDEDirectories function to get IDE directories
-    const ideDirectories = await getIDEDirectories();
+    // Initialize the app state
+    await initializeAppState();
+
+    // Get IDE directories from the app state
+    const ideDirectories = getIDEs();
 
     if (ideDirectories.length === 0) {
       console.log('No JetBrains IDE directories found.');
@@ -23,4 +26,4 @@ async function testDirectoryAccess() {
 }
 
 // Run the test
-testDirectoryAccess();
+await testDirectoryAccess();

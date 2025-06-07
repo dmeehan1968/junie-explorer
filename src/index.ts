@@ -5,7 +5,7 @@ import homeRoutes from './routes/homeRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import issueRoutes from './routes/issueRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
-import { jetBrainsPath } from './utils/ideUtils.js';
+import { jetBrainsPath } from './utils/jetBrainsPath.js';
 import { initializeAppState, refreshAppState } from './utils/appState.js';
 
 const __filename = fileURLToPath(import.meta.url);

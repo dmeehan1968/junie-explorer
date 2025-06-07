@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { IDE, Issue, Project, Step, Task } from '../matterhorn.js';
-import { jetBrainsPath } from './ideUtils.js';
+import { jetBrainsPath } from './jetBrainsPath.js';
 
 // The in-memory app state
 let appState: IDE[] = [];
@@ -12,7 +12,6 @@ export async function scanFileSystem(): Promise<IDE[]> {
     console.log('Scanning file system...');
     const exists = await fs.pathExists(jetBrainsPath);
     if (!exists) {
-      console.error(`Path does not exist: ${jetBrainsPath}`);
       return [];
     }
 
@@ -47,7 +46,6 @@ async function getProjectsForIDE(ideName: string): Promise<Project[]> {
 
     const exists = await fs.pathExists(projectsPath);
     if (!exists) {
-      console.error(`Projects path does not exist: ${projectsPath}`);
       return [];
     }
 
@@ -83,7 +81,6 @@ async function getIssuesForProject(ideName: string, projectName: string): Promis
 
     const exists = await fs.pathExists(issuesPath);
     if (!exists) {
-      console.error(`Issues path does not exist: ${issuesPath}`);
       return [];
     }
 
@@ -142,7 +139,6 @@ async function getTasksForIssue(ideName: string, projectName: string, issueId: s
 
     const exists = await fs.pathExists(issuePath);
     if (!exists) {
-      console.error(`Issue path does not exist: ${issuePath}`);
       return [];
     }
 
@@ -206,7 +202,6 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
 
     const exists = await fs.pathExists(stepsPath);
     if (!exists) {
-      console.error(`Steps path does not exist: ${stepsPath}`);
       return [];
     }
 
