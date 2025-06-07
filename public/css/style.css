@@ -147,7 +147,7 @@ p {
 .header-container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 20px;
   border-bottom: 2px solid #eee;
   padding-bottom: 10px;
@@ -155,6 +155,7 @@ p {
 
 .header-container h1 {
   margin-bottom: 0;
+  margin-right: 2em;
   border-bottom: none;
   padding-bottom: 0;
   flex: 1;
