@@ -2,6 +2,7 @@ import express from 'express';
 import { getProject } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
 import { Step, Metrics, Task, Issue } from '../matterhorn.js'
+import { marked } from 'marked';
 
 const router = express.Router();
 
