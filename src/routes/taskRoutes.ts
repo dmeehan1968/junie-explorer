@@ -35,7 +35,7 @@ function calculateStepSummary(steps: Step[]): Metrics {
   });
 }
 
-// Generate HTML for metrics table headers
+// Generate HTML for metrics table headers (used only for steps table, not for totals)
 const metricsHeaders = `
   <th>Input Tokens</th>
   <th>Output Tokens</th>
@@ -51,32 +51,24 @@ const metricsHeaders = `
 `;
 
 // Function to generate HTML for step totals table
-const generateStepTotalsTable = (summaryData: Metrics): string => `
+const generateStepTotalsTable = (summaryData: Metrics): string => {
+  // Calculate total time as sum of build time, model time, artifact time and model cached time
+  const totalTime = summaryData.buildTime + summaryData.modelTime/1000 + summaryData.artifactTime + summaryData.modelCachedTime/1000;
+
+  return `
   <table class="step-totals-table">
-    <thead>
-      <tr>
-        <th>Totals</th>
-        ${metricsHeaders}
-      </tr>
-    </thead>
     <tbody>
       <tr>
-        <td><strong>Total</strong></td>
-        <td><strong>${summaryData.inputTokens}</strong></td>
-        <td><strong>${summaryData.outputTokens}</strong></td>
-        <td><strong>${summaryData.cacheTokens}</strong></td>
-        <td><strong>${summaryData.cost.toFixed(4)}</strong></td>
-        <td><strong>${summaryData.cachedCost.toFixed(4)}</strong></td>
-        <td><strong>${formatSeconds(summaryData.buildTime)}</strong></td>
-        <td><strong>${formatSeconds(summaryData.artifactTime)}</strong></td>
-        <td><strong>${formatMilliseconds(summaryData.modelTime)}</strong></td>
-        <td><strong>${formatMilliseconds(summaryData.modelCachedTime)}</strong></td>
-        <td><strong>${summaryData.requests}</strong></td>
-        <td><strong>${summaryData.cachedRequests}</strong></td>
+        <td>Input Tokens: ${summaryData.inputTokens}</td>
+        <td>Output Tokens: ${summaryData.outputTokens}</td>
+        <td>Cache Tokens: ${summaryData.cacheTokens}</td>
+        <td>Cost: ${summaryData.cost.toFixed(4)}</td>
+        <td>Total Time: ${formatSeconds(totalTime)}</td>
       </tr>
     </tbody>
   </table>
 `;
+};
 
 // Issue tasks page route
 router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {

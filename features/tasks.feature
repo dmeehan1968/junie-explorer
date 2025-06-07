@@ -23,10 +23,5 @@ Feature: Issue Tasks Page
       | Output Tokens   |
       | Cache Tokens    |
       | Cost            |
-      | Cached Cost     |
-      | Build Time      |
-      | Artifact Time   |
-      | Model Time      |
-      | Model Cached Time |
-      | Requests        |
-      | Cached Requests |
+      | Total Time      |
+    And the step totals table should have a single row with column headers
