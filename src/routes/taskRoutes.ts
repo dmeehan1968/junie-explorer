@@ -101,16 +101,26 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
       acc.outputTokens += step.metrics.outputTokens;
       acc.cacheTokens += step.metrics.cacheTokens;
       acc.cost += step.metrics.cost;
+      acc.cachedCost += step.metrics.cachedCost;
       acc.buildTime += step.metrics.buildTime;
+      acc.artifactTime += step.metrics.artifactTime;
       acc.modelTime += step.metrics.modelTime;
+      acc.modelCachedTime += step.metrics.modelCachedTime;
+      acc.requests += step.metrics.requests;
+      acc.cachedRequests += step.metrics.cachedRequests;
       return acc;
     }, {
       inputTokens: 0,
       outputTokens: 0,
       cacheTokens: 0,
       cost: 0,
+      cachedCost: 0,
       buildTime: 0,
-      modelTime: 0
+      artifactTime: 0,
+      modelTime: 0,
+      modelCachedTime: 0,
+      requests: 0,
+      cachedRequests: 0
     });
 
     // Generate HTML for metrics table headers
@@ -210,12 +220,13 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
                     <td><strong>${summaryData.outputTokens}</strong></td>
                     <td><strong>${summaryData.cacheTokens}</strong></td>
                     <td><strong>${summaryData.cost.toFixed(4)}</strong></td>
-                    <td></td>
+                    <td><strong>${summaryData.cachedCost.toFixed(4)}</strong></td>
                     <td><strong>${formatSeconds(summaryData.buildTime)}</strong></td>
-                    <td></td>
+                    <td><strong>${formatSeconds(summaryData.artifactTime)}</strong></td>
                     <td><strong>${formatMilliseconds(summaryData.modelTime)}</strong></td>
-                    <td></td>
-                    <td></td>
+                    <td><strong>${formatMilliseconds(summaryData.modelCachedTime)}</strong></td>
+                    <td><strong>${summaryData.requests}</strong></td>
+                    <td><strong>${summaryData.cachedRequests}</strong></td>
                   </tr>
                 </tfoot>
               </table>

@@ -40,5 +40,10 @@ Feature: Task Steps Page
       | Sum of output tokens |
       | Sum of cache tokens |
       | Sum of cost |
+      | Sum of cached cost |
       | Sum of build time (formatted as HH:MM:SS) |
+      | Sum of artifact time (formatted as HH:MM:SS) |
       | Sum of model time (formatted as HH:MM:SS.MS) |
+      | Sum of model cached time (formatted as HH:MM:SS.MS) |
+      | Sum of requests |
+      | Sum of cached requests |

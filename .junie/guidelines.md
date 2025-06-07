@@ -87,8 +87,8 @@ Requirements for this project are documented using Gherkin feature files located
 - They serve as acceptance criteria for the application's functionality
 - No step definitions or testing tools should be created at this time - the feature files are purely for documentation purposes
 - When implementing features, developers should ensure their code satisfies all scenarios described in the relevant feature files
-- When updating requirements for existing code and respective features, make sure the features are also updates to stay in sync
-- 
+- When code changes are made, make sure that the relevant feature files are updated to reflect new functionality
+
 ## Future Enhancements
 Potential areas for improvement:
 - Add detailed views for individual IDE directories
