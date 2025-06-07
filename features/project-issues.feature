@@ -13,7 +13,9 @@ Feature: Project Issues
     Then the user should be redirected to a project issues page
     And the user should see a page titled with the project name
     And the user should see a list of all issues for that project
-    And each issue should display its name and creation date
+    And each issue should display its name, creation date, and simplified metrics
+    And the simplified metrics should show the totals for the issue's tasks
+    And the metrics should include Input Tokens, Output Tokens, Cache Tokens, Cost, and Total Time
 
   Scenario: Viewing project issues with no issues
     Given there is a project with no issues

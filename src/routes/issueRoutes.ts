@@ -1,7 +1,89 @@
 import express from 'express';
 import { getProject } from '../utils/appState.js';
+import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
+import { Step, Metrics, Task } from '../matterhorn.js';
 
 const router = express.Router();
+
+// Helper function to calculate summary data for all steps in all tasks of an issue
+function calculateIssueSummary(tasks: Task[]): Metrics {
+  return tasks.reduce((acc: Metrics, task: Task) => {
+    // Calculate metrics for each task's steps
+    const taskMetrics = task.steps.reduce((stepAcc: Metrics, step: Step) => {
+      stepAcc.inputTokens += step.metrics.inputTokens;
+      stepAcc.outputTokens += step.metrics.outputTokens;
+      stepAcc.cacheTokens += step.metrics.cacheTokens;
+      stepAcc.cost += step.metrics.cost;
+      stepAcc.cachedCost += step.metrics.cachedCost;
+      stepAcc.buildTime += step.metrics.buildTime;
+      stepAcc.artifactTime += step.metrics.artifactTime;
+      stepAcc.modelTime += step.metrics.modelTime;
+      stepAcc.modelCachedTime += step.metrics.modelCachedTime;
+      stepAcc.requests += step.metrics.requests;
+      stepAcc.cachedRequests += step.metrics.cachedRequests;
+      return stepAcc;
+    }, {
+      inputTokens: 0,
+      outputTokens: 0,
+      cacheTokens: 0,
+      cost: 0,
+      cachedCost: 0,
+      buildTime: 0,
+      artifactTime: 0,
+      modelTime: 0,
+      modelCachedTime: 0,
+      requests: 0,
+      cachedRequests: 0
+    });
+
+    // Add task metrics to issue metrics
+    acc.inputTokens += taskMetrics.inputTokens;
+    acc.outputTokens += taskMetrics.outputTokens;
+    acc.cacheTokens += taskMetrics.cacheTokens;
+    acc.cost += taskMetrics.cost;
+    acc.cachedCost += taskMetrics.cachedCost;
+    acc.buildTime += taskMetrics.buildTime;
+    acc.artifactTime += taskMetrics.artifactTime;
+    acc.modelTime += taskMetrics.modelTime;
+    acc.modelCachedTime += taskMetrics.modelCachedTime;
+    acc.requests += taskMetrics.requests;
+    acc.cachedRequests += taskMetrics.cachedRequests;
+
+    return acc;
+  }, {
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheTokens: 0,
+    cost: 0,
+    cachedCost: 0,
+    buildTime: 0,
+    artifactTime: 0,
+    modelTime: 0,
+    modelCachedTime: 0,
+    requests: 0,
+    cachedRequests: 0
+  });
+}
+
+// Function to generate HTML for issue metrics table
+const generateIssueMetricsTable = (summaryData: Metrics): string => {
+  // Calculate total time as sum of build time, model time, artifact time and model cached time
+  const totalTime = summaryData.buildTime + summaryData.modelTime/1000 + summaryData.artifactTime + summaryData.modelCachedTime/1000;
+
+  return `
+  <table class="step-totals-table">
+    <tbody>
+      <tr>
+        <td>Input Tokens: ${summaryData.inputTokens}</td>
+        <td>Output Tokens: ${summaryData.outputTokens}</td>
+        <td>Cache Tokens: ${summaryData.cacheTokens}</td>
+        <td>Cost: ${summaryData.cost.toFixed(4)}</td>
+        <td>Total Time: ${formatSeconds(totalTime)}</td>
+      </tr>
+    </tbody>
+  </table>
+`;
+};
 
 // Project issues page route
 router.get('/ide/:ideName/project/:projectName', (req, res) => {
@@ -51,17 +133,25 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
 
           <ul class="issue-list">
             ${project.issues.length > 0 
-              ? project.issues.map(issue => `
-                <li class="issue-item">
-                  <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
-                    <div class="issue-header">
-                      <div class="issue-name">${issue.name}</div>
-                      <div class="issue-date">${issue.created.toLocaleString()}</div>
-                    </div>
-                    <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
-                  </a>
-                </li>
-              `).join('')
+              ? project.issues.map(issue => {
+                  // Calculate metrics summary for this issue
+                  const issueMetrics = calculateIssueSummary(issue.tasks);
+
+                  return `
+                    <li class="issue-item">
+                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
+                        <div class="issue-header">
+                          <div class="issue-name">${issue.name}</div>
+                          <div class="issue-date">${issue.created.toLocaleString()}</div>
+                        </div>
+                        <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
+                      </a>
+                      <div class="issue-metrics">
+                        ${generateIssueMetricsTable(issueMetrics)}
+                      </div>
+                    </li>
+                  `;
+                }).join('')
               : '<li>No issues found for this project</li>'
             }
           </ul>
