@@ -11,4 +11,4 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
-/images/
+/.junie-context/
