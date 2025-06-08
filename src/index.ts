@@ -5,6 +5,7 @@ import homeRoutes from './routes/homeRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import issueRoutes from './routes/issueRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import notFoundRoutes from './routes/notFoundRoutes.js';
 import { jetBrainsPath } from './utils/jetBrainsPath.js';
 import { initializeAppState, refreshAppState } from './utils/appState.js';
 
@@ -30,31 +31,7 @@ app.use('/', issueRoutes);
 app.use('/', taskRoutes);
 
 // Add not found page (must be after routes)
-app.use((req, res, next) => {
-  res.status(404).send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Page Not Found</title>
-      <link rel="stylesheet" href="/css/style.css">
-    </head>
-    <body>
-      <div class="container">
-        <h1>Page Not Found</h1>
-        <p>The page you are looking for does not exist or is no longer available.</p>
-        <p>The file system structure may have changed. <a href="/refresh">Refresh</a> to update the app state.</p>
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-          </ol>
-        </nav>
-      </div>
-    </body>
-    </html>
-  `);
-});
+app.use(notFoundRoutes);
 
 // Initialize app state and start the server
 initializeAppState().then(() => {

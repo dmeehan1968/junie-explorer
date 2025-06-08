@@ -32,6 +32,7 @@ junie-explorer/
 │   ├── routes/              # Route handlers
 │   │   ├── homeRoutes.ts    # Homepage route handler
 │   │   ├── issueRoutes.ts   # Issue page route handler
+│   │   ├── notFoundRoutes.ts # Not found page route handler
 │   │   ├── projectRoutes.ts # Project page route handler
 │   │   └── taskRoutes.ts    # Task page route handler
 │   └── utils/               # Utility functions
