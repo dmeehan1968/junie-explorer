@@ -79,6 +79,9 @@ export interface Step {
 
   // translated from junieMetrics
   metrics: Metrics;
+
+  // timestamp from file creation date
+  createdAt: Date;
 }
 
 export interface JunieMetrics {

@@ -38,20 +38,12 @@ function calculateStepSummary(steps: Step[]): Metrics {
 
 // Function to prepare data for the metrics over time graph
 function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
-  // Create a timestamp for each step (we don't have actual timestamps for steps, so we'll create them)
-  // Assume steps are in chronological order and each step takes about 30 seconds
-  const baseTime = new Date();
-  baseTime.setMinutes(baseTime.getMinutes() - (steps.length * 0.5)); // Start 30 seconds * steps.length ago
-
-  const stepTimes = steps.map((step, index) => {
-    const stepTime = new Date(baseTime);
-    stepTime.setSeconds(stepTime.getSeconds() + (index * 30)); // Each step is 30 seconds apart
-    return stepTime;
-  });
+  // Use the actual timestamps from the step data
+  const stepTimes = steps.map(step => step.createdAt);
 
   // Find min and max dates
-  const minDate = stepTimes.length > 0 ? stepTimes[0] : new Date();
-  const maxDate = stepTimes.length > 0 ? stepTimes[stepTimes.length - 1] : new Date();
+  const minDate = stepTimes.length > 0 ? new Date(Math.min(...stepTimes.map(date => date.getTime()))) : new Date();
+  const maxDate = stepTimes.length > 0 ? new Date(Math.max(...stepTimes.map(date => date.getTime()))) : new Date();
 
   // Calculate the date range in milliseconds
   const dateRange = maxDate.getTime() - minDate.getTime();
@@ -79,13 +71,13 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
   }
 
   // Create datasets for cost and aggregate tokens
-  const costData = steps.map((step, index) => ({
-    x: stepTimes[index].toISOString(),
+  const costData = steps.map(step => ({
+    x: step.createdAt.toISOString(),
     y: step.metrics.cost
   }));
 
-  const tokenData = steps.map((step, index) => ({
-    x: stepTimes[index].toISOString(),
+  const tokenData = steps.map(step => ({
+    x: step.createdAt.toISOString(),
     y: step.metrics.inputTokens + step.metrics.outputTokens + step.metrics.cacheTokens
   }));
 
@@ -111,7 +103,7 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
   ];
 
   return {
-    labels: stepTimes.map(time => time.toISOString()),
+    labels: steps.map(step => step.createdAt.toISOString()),
     datasets,
     timeUnit,
     stepSize,

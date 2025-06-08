@@ -40,6 +40,7 @@ window.onload = function() {
       const timeUnit = chartData.timeUnit;
       const stepSize = chartData.stepSize;
 
+      console.log(timeUnit, stepSize)
       // Create chart configuration
       const config = {
         type: 'line',

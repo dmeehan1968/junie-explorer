@@ -222,6 +222,10 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
         const filePath = path.join(stepsPath, file.name);
         const data = await fs.readJson(filePath);
 
+        // Get file stats to extract creation time
+        const stats = fs.statSync(filePath);
+        const createdAt = stats.birthtime;
+
         // Extract step data
         return {
           id,
@@ -239,6 +243,7 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
             requests: data.statistics?.requests || 0,
             cachedRequests: data.statistics?.cachedRequests || 0,
           },
+          createdAt,
         };
       } catch (error) {
         console.error(`Error reading step file ${file.name}:`, error);
