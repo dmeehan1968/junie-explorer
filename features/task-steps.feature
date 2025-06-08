@@ -3,6 +3,14 @@ Feature: Task Steps Page
   I want to click on task directories to navigate to a page showing steps for that task
   So that I can explore the steps available for each task
 
+  Scenario: Metrics graph on task steps page
+    Given I am on the steps page for a task
+    Then I should see a graph showing cost and token metrics over time
+    And the graph should show cost as one line
+    And the graph should show aggregate of input, output, and cache tokens as another line
+    And the graph should have points connected by lines
+    And the x-axis tick marks should be adjusted for short timeframes
+
   Scenario: Navigating to task steps page
     Given I am on the tasks page for an issue
     When I click on a task directory

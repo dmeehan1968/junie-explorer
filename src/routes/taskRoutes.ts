@@ -36,6 +36,88 @@ function calculateStepSummary(steps: Step[]): Metrics {
   });
 }
 
+// Function to prepare data for the metrics over time graph
+function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
+  // Create a timestamp for each step (we don't have actual timestamps for steps, so we'll create them)
+  // Assume steps are in chronological order and each step takes about 30 seconds
+  const baseTime = new Date();
+  baseTime.setMinutes(baseTime.getMinutes() - (steps.length * 0.5)); // Start 30 seconds * steps.length ago
+
+  const stepTimes = steps.map((step, index) => {
+    const stepTime = new Date(baseTime);
+    stepTime.setSeconds(stepTime.getSeconds() + (index * 30)); // Each step is 30 seconds apart
+    return stepTime;
+  });
+
+  // Find min and max dates
+  const minDate = stepTimes.length > 0 ? stepTimes[0] : new Date();
+  const maxDate = stepTimes.length > 0 ? stepTimes[stepTimes.length - 1] : new Date();
+
+  // Calculate the date range in milliseconds
+  const dateRange = maxDate.getTime() - minDate.getTime();
+
+  // Determine the appropriate time unit based on the date range
+  let timeUnit = 'minute'; // default for task steps (usually short timeframe)
+  let stepSize = 1;
+
+  // Constants for time calculations
+  const MINUTE = 60 * 1000;
+  const HOUR = 60 * MINUTE;
+
+  if (dateRange < MINUTE * 5) {
+    timeUnit = 'second';
+    stepSize = 30;
+  } else if (dateRange < MINUTE * 30) {
+    timeUnit = 'minute';
+    stepSize = 1;
+  } else if (dateRange < HOUR) {
+    timeUnit = 'minute';
+    stepSize = 5;
+  } else {
+    timeUnit = 'hour';
+    stepSize = 1;
+  }
+
+  // Create datasets for cost and aggregate tokens
+  const costData = steps.map((step, index) => ({
+    x: stepTimes[index].toISOString(),
+    y: step.metrics.cost
+  }));
+
+  const tokenData = steps.map((step, index) => ({
+    x: stepTimes[index].toISOString(),
+    y: step.metrics.inputTokens + step.metrics.outputTokens + step.metrics.cacheTokens
+  }));
+
+  const datasets = [
+    {
+      label: 'Cost',
+      data: costData,
+      borderColor: 'rgb(54, 162, 235)',
+      backgroundColor: 'rgba(54, 162, 235, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y'
+    },
+    {
+      label: 'Tokens (Input + Output + Cache)',
+      data: tokenData,
+      borderColor: 'rgb(255, 99, 132)',
+      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1'
+    }
+  ];
+
+  return {
+    labels: stepTimes.map(time => time.toISOString()),
+    datasets,
+    timeUnit,
+    stepSize,
+  };
+}
+
 // Generate HTML for metrics table headers (used only for steps table, not for totals)
 const metricsHeaders = `
   <th>Input Tokens</th>
@@ -173,6 +255,9 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
     // Calculate summary values for the footer
     const summaryData = calculateStepSummary(task.steps);
 
+    // Prepare graph data
+    const graphData = prepareStepGraphData(task.steps);
+
     // Generate HTML
     const html = `
       <!DOCTYPE html>
@@ -182,6 +267,16 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task ${task.id} Steps</title>
         <link rel="stylesheet" href="/css/style.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+        ${task.steps.length > 0 
+          ? `<script>
+              // Define the chart data as a global variable
+              window.chartData = ${JSON.stringify(graphData)};
+            </script>`
+          : ''
+        }
+        <script src="/js/taskStepGraph.js"></script>
         <script>
           function reloadPage() {
             const button = document.getElementById('reload-button');
@@ -216,6 +311,13 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
             <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
             ${task.description ? `<div class="task-description">${marked(task.description)}</div>` : ''}
           </div>
+
+          ${task.steps.length > 0 
+            ? `<div class="graph-container">
+                <canvas id="stepMetricsChart"></canvas>
+              </div>`
+            : ''
+          }
 
           ${task.steps.length > 0 
             ? `
