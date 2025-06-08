@@ -55,19 +55,42 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
   // Constants for time calculations
   const MINUTE = 60 * 1000;
   const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
+  const WEEK = 7 * DAY;
+  const MONTH = 30 * DAY;
+  const YEAR = 365 * DAY;
+
+  // Minimum number of labels we want to display
+  const MIN_LABELS = 5;
 
   if (dateRange < MINUTE * 5) {
     timeUnit = 'second';
-    stepSize = 30;
-  } else if (dateRange < MINUTE * 30) {
-    timeUnit = 'minute';
-    stepSize = 1;
+    // Calculate step size to ensure at least MIN_LABELS labels
+    stepSize = Math.max(1, Math.floor(dateRange / (1000 * MIN_LABELS)));
   } else if (dateRange < HOUR) {
     timeUnit = 'minute';
-    stepSize = 5;
-  } else {
+    // Calculate step size to ensure at least MIN_LABELS labels
+    stepSize = Math.max(1, Math.floor(dateRange / (MINUTE * MIN_LABELS)));
+  } else if (dateRange < DAY) {
     timeUnit = 'hour';
-    stepSize = 1;
+    // Calculate step size to ensure at least MIN_LABELS labels
+    stepSize = Math.max(1, Math.floor(dateRange / (HOUR * MIN_LABELS)));
+  } else if (dateRange < WEEK) {
+    timeUnit = 'day';
+    // Calculate step size to ensure at least MIN_LABELS labels
+    stepSize = Math.max(1, Math.floor(dateRange / (DAY * MIN_LABELS)));
+  } else if (dateRange < MONTH) {
+    timeUnit = 'week';
+    // Calculate step size to ensure at least MIN_LABELS labels
+    stepSize = Math.max(1, Math.floor(dateRange / (WEEK * MIN_LABELS)));
+  } else if (dateRange < YEAR) {
+    timeUnit = 'month';
+    // Calculate step size to ensure at least MIN_LABELS labels
+    stepSize = Math.max(1, Math.floor(dateRange / (MONTH * MIN_LABELS)));
+  } else {
+    timeUnit = 'year';
+    // Calculate step size to ensure at least MIN_LABELS labels
+    stepSize = Math.max(1, Math.floor(dateRange / (YEAR * MIN_LABELS)));
   }
 
   // Create datasets for cost and aggregate tokens
