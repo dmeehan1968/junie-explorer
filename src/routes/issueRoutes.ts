@@ -76,7 +76,7 @@ const generateIssueMetricsTable = (issue: Issue): string => {
   <table class="step-totals-table">
     <tbody>
       <tr>
-        <td>${issue.created.toLocaleString()}</td>
+        <td>${new Date(issue.created).toLocaleString()}</td>
         <td>Input Tokens: ${issueMetrics.inputTokens}</td>
         <td>Output Tokens: ${issueMetrics.outputTokens}</td>
         <td>Cache Tokens: ${issueMetrics.cacheTokens}</td>
@@ -91,11 +91,11 @@ const generateIssueMetricsTable = (issue: Issue): string => {
 // Function to prepare data for the cost over time graph
 function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
   // Sort issues by creation date
-  const sortedIssues = [...issues].sort((a, b) => a.created.getTime() - b.created.getTime());
+  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
 
   // Find min and max dates
-  const minDate = sortedIssues.length > 0 ? sortedIssues[0].created : new Date();
-  const maxDate = sortedIssues.length > 0 ? sortedIssues[sortedIssues.length - 1].created : new Date();
+  const minDate = sortedIssues.length > 0 ? new Date(sortedIssues[0].created) : new Date();
+  const maxDate = sortedIssues.length > 0 ? new Date(sortedIssues[sortedIssues.length - 1].created) : new Date();
 
   // Calculate the date range in milliseconds
   const dateRange = maxDate.getTime() - minDate.getTime();
@@ -136,7 +136,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
     return {
       label: issue.name,
-      data: [{ x: issue.created.toISOString(), y: issueMetrics.cost }],
+      data: [{ x: issue.created, y: issueMetrics.cost }],
       borderColor: color,
       backgroundColor: color,
       fill: false,
@@ -211,7 +211,7 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
               ? project.issues.map(issue => {
                   return `
                     <li class="issue-item">
-                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
+                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id.id)}" class="issue-link">
                         <div class="issue-container">
                           <div class="issue-name">${issue.name}</div>
                           <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>

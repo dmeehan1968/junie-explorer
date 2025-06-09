@@ -35,7 +35,9 @@ export interface Project {
  */
 
 export interface Issue {
-  id: string;  // UUID
+  id: {
+    id: string;  // UUID
+  };
   name: string;  // short summary of what was requested
   created: Date;
   state: 'Done' | 'Stopped' | 'Finished' | 'Running' | 'Declined';

@@ -216,7 +216,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
           </nav>
 
           <div class="issue-details">
-            <div class="issue-created">Created: ${issue.created.toLocaleString()}</div>
+            <div class="issue-created">Created: ${new Date(issue.created).toLocaleString()}</div>
             <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
           </div>
 

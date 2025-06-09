@@ -96,17 +96,13 @@ async function getIssuesForProject(ideName: string, projectName: string): Promis
         const filePath = path.join(issuesPath, file.name);
         const data = await fs.readJson(filePath);
 
-        // Extract UUID from filename (chain-<UUID>.json)
-        const id = file.name.replace('chain-', '').replace('.json', '');
-
         // Get tasks for this issue
-        const tasks = await getTasksForIssue(ideName, projectName, id);
+        const issueId = data.id.id;
+        const tasks = await getTasksForIssue(ideName, projectName, issueId);
 
         const issue: Issue = {
-          id,
-          name: data.name || 'Unnamed Issue',
-          created: new Date(data.created || Date.now()),
-          state: data.state || 'Unknown',
+          ...data,
+          created: new Date(data.created),
           tasks,
         };
 
@@ -287,7 +283,7 @@ export function getProject(ideName: string, projectName: string): Project | unde
 export function getIssue(ideName: string, projectName: string, issueId: string): Issue | undefined {
   const project = getProject(ideName, projectName);
   if (!project) return undefined;
-  return project.issues.find(issue => issue.id === issueId);
+  return project.issues.find(issue => issue.id.id === issueId);
 }
 
 // Get a specific task by IDE name, project name, issue ID, and task ID
