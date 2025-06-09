@@ -1,8 +1,7 @@
 import express from 'express';
 import { getIDE } from '../utils/appState.js';
 import { formatSeconds } from '../utils/timeUtils.js';
-import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js';
-import { Metrics, Step, Task, Issue } from '../matterhorn.js';
+import { calculateProjectMetrics } from '../utils/metricsUtils.js';
 
 const router = express.Router();
 

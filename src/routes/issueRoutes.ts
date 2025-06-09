@@ -2,7 +2,7 @@ import express from 'express';
 import { getProject } from '../utils/appState.js';
 import { formatSeconds } from '../utils/timeUtils.js';
 import { calculateIssueSummary } from '../utils/metricsUtils.js';
-import { Step, Metrics, Task, Issue } from '../matterhorn.js'
+import { Issue } from '../matterhorn.js'
 
 const router = express.Router();
 

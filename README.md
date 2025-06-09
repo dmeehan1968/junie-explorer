@@ -84,7 +84,6 @@ junie-explorer/
 │   ├── index.ts             # Main application entry point
 │   ├── matterhorn.ts        # Interface definitions for data model
 │   ├── test.ts              # Test utilities
-│   ├── testDateFormat.ts    # Date formatting test utilities
 │   ├── routes/              # Route handlers
 │   │   ├── homeRoutes.ts    # Homepage route handler
 │   │   ├── issueRoutes.ts   # Issue page route handler
