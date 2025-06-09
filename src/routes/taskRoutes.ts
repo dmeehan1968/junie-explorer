@@ -1,6 +1,7 @@
 import express from 'express';
 import { getIssue, getTask } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
+import { calculateStepSummary } from '../utils/metricsUtils.js';
 import { Step, Metrics } from '../matterhorn.js';
 import { marked } from 'marked';
 
@@ -16,35 +17,6 @@ function escapeHtml(text: string): string {
 
 const router = express.Router();
 
-// Helper function to calculate summary data for a task's steps
-function calculateStepSummary(steps: Step[]): Metrics {
-  return steps.reduce((acc: Metrics, step: Step) => {
-    acc.inputTokens += step.metrics.inputTokens;
-    acc.outputTokens += step.metrics.outputTokens;
-    acc.cacheTokens += step.metrics.cacheTokens;
-    acc.cost += step.metrics.cost;
-    acc.cachedCost += step.metrics.cachedCost;
-    acc.buildTime += step.metrics.buildTime;
-    acc.artifactTime += step.metrics.artifactTime;
-    acc.modelTime += step.metrics.modelTime;
-    acc.modelCachedTime += step.metrics.modelCachedTime;
-    acc.requests += step.metrics.requests;
-    acc.cachedRequests += step.metrics.cachedRequests;
-    return acc;
-  }, {
-    inputTokens: 0,
-    outputTokens: 0,
-    cacheTokens: 0,
-    cost: 0,
-    cachedCost: 0,
-    buildTime: 0,
-    artifactTime: 0,
-    modelTime: 0,
-    modelCachedTime: 0,
-    requests: 0,
-    cachedRequests: 0
-  });
-}
 
 // Function to prepare data for the metrics over time graph
 function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {

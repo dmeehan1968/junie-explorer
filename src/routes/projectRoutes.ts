@@ -1,102 +1,11 @@
 import express from 'express';
 import { getIDE } from '../utils/appState.js';
 import { formatSeconds } from '../utils/timeUtils.js';
+import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js';
 import { Metrics, Step, Task, Issue } from '../matterhorn.js';
 
 const router = express.Router();
 
-// Helper function to calculate summary data for all steps in all tasks of an issue
-function calculateIssueSummary(tasks: Task[]): Metrics {
-  return tasks.reduce((acc: Metrics, task: Task) => {
-    // Calculate metrics for each task's steps
-    const taskMetrics = task.steps.reduce((stepAcc: Metrics, step: Step) => {
-      stepAcc.inputTokens += step.metrics.inputTokens;
-      stepAcc.outputTokens += step.metrics.outputTokens;
-      stepAcc.cacheTokens += step.metrics.cacheTokens;
-      stepAcc.cost += step.metrics.cost;
-      stepAcc.cachedCost += step.metrics.cachedCost;
-      stepAcc.buildTime += step.metrics.buildTime;
-      stepAcc.artifactTime += step.metrics.artifactTime;
-      stepAcc.modelTime += step.metrics.modelTime;
-      stepAcc.modelCachedTime += step.metrics.modelCachedTime;
-      stepAcc.requests += step.metrics.requests;
-      stepAcc.cachedRequests += step.metrics.cachedRequests;
-      return stepAcc;
-    }, {
-      inputTokens: 0,
-      outputTokens: 0,
-      cacheTokens: 0,
-      cost: 0,
-      cachedCost: 0,
-      buildTime: 0,
-      artifactTime: 0,
-      modelTime: 0,
-      modelCachedTime: 0,
-      requests: 0,
-      cachedRequests: 0
-    });
-
-    // Add task metrics to issue metrics
-    acc.inputTokens += taskMetrics.inputTokens;
-    acc.outputTokens += taskMetrics.outputTokens;
-    acc.cacheTokens += taskMetrics.cacheTokens;
-    acc.cost += taskMetrics.cost;
-    acc.cachedCost += taskMetrics.cachedCost;
-    acc.buildTime += taskMetrics.buildTime;
-    acc.artifactTime += taskMetrics.artifactTime;
-    acc.modelTime += taskMetrics.modelTime;
-    acc.modelCachedTime += taskMetrics.modelCachedTime;
-    acc.requests += taskMetrics.requests;
-    acc.cachedRequests += taskMetrics.cachedRequests;
-
-    return acc;
-  }, {
-    inputTokens: 0,
-    outputTokens: 0,
-    cacheTokens: 0,
-    cost: 0,
-    cachedCost: 0,
-    buildTime: 0,
-    artifactTime: 0,
-    modelTime: 0,
-    modelCachedTime: 0,
-    requests: 0,
-    cachedRequests: 0
-  });
-}
-
-// Function to calculate project metrics by aggregating all issue metrics
-function calculateProjectMetrics(issues: Issue[]): Metrics {
-  return issues.reduce((acc: Metrics, issue: Issue) => {
-    const issueMetrics = calculateIssueSummary(issue.tasks);
-
-    acc.inputTokens += issueMetrics.inputTokens;
-    acc.outputTokens += issueMetrics.outputTokens;
-    acc.cacheTokens += issueMetrics.cacheTokens;
-    acc.cost += issueMetrics.cost;
-    acc.cachedCost += issueMetrics.cachedCost;
-    acc.buildTime += issueMetrics.buildTime;
-    acc.artifactTime += issueMetrics.artifactTime;
-    acc.modelTime += issueMetrics.modelTime;
-    acc.modelCachedTime += issueMetrics.modelCachedTime;
-    acc.requests += issueMetrics.requests;
-    acc.cachedRequests += issueMetrics.cachedRequests;
-
-    return acc;
-  }, {
-    inputTokens: 0,
-    outputTokens: 0,
-    cacheTokens: 0,
-    cost: 0,
-    cachedCost: 0,
-    buildTime: 0,
-    artifactTime: 0,
-    modelTime: 0,
-    modelCachedTime: 0,
-    requests: 0,
-    cachedRequests: 0
-  });
-}
 
 
 // Projects page route
