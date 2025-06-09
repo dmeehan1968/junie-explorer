@@ -1,7 +1,7 @@
 import express from 'express';
 import { getIssue, getTask } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
-import { Step, Metrics } from '../matterhorn.js';
+import { Step, Metrics, Task } from '../matterhorn.js';
 import { marked } from 'marked';
 
 const router = express.Router();
@@ -324,7 +324,31 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
           <div class="task-details">
             <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
             <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
-            ${task.context?.description ? `<div class="task-description">${marked(task.context.description)}</div>` : ''}
+            <div class="task-content-container${(!task.plan || task.plan.length === 0) ? ' no-plan' : ''}">
+              ${task.context.description ? `
+                <div class="task-description">
+                  <h3>User</h3>
+                  ${marked(task.context.description)}</div>
+              ` : ''}
+              ${task.plan && task.plan.length > 0 ? `
+                <div class="task-plan">
+                  <h3>Agent</h3>
+                  <ul class="plan-list">
+                    ${task.plan.map(planItem => {
+                      let statusIcon = '';
+                      if (planItem.status === 'DONE') {
+                        statusIcon = '✅';
+                      } else if (planItem.status === 'IN_PROGRESS') {
+                        statusIcon = '🔄';
+                      } else if (planItem.status === 'PENDING') {
+                        statusIcon = '⏳';
+                      }
+                      return `<li class="plan-item plan-${planItem.status.toLowerCase()}">${statusIcon} ${planItem.description}</li>`;
+                    }).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
           </div>
 
           ${task.steps.length > 0 
