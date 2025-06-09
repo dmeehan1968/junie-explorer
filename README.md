@@ -120,5 +120,9 @@ The application uses several interfaces defined in `matterhorn.ts`:
 ## Requirements Documentation
 Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth for the expected behavior of the application.
 
+## Contributing
+
+Check out [contribution](CONTRIBUTING.md) guidelines
+
 ## License
-Private
+Apache 2.0 (See [Licence](LICENCE))
