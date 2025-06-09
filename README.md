@@ -125,4 +125,4 @@ Requirements for this project are documented using Gherkin feature files located
 Check out [contribution](CONTRIBUTING.md) guidelines
 
 ## License
-Apache 2.0 (See [Licence](LICENCE))
+Apache 2.0 (See [License](LICENSE))
