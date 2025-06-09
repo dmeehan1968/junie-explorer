@@ -487,6 +487,11 @@ p {
   padding-bottom: 15px;
 }
 
+/* Remove bottom border from the first row's cells except for the first cell (Step) */
+.steps-table thead tr:first-child th:not(:first-child) {
+  border-bottom: none;
+}
+
 /* Remove right border from the last column in the first header row */
 .steps-table thead tr:first-child th:last-child {
   border-right: none;
