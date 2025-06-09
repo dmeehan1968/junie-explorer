@@ -36,7 +36,6 @@ app.use(notFoundRoutes);
 // Initialize app state and start the server
 initializeAppState().then(() => {
   app.listen(PORT, () => {
-    console.log(`JetBrains Path: ${jetBrainsPath}`);
     console.log(`Server is running on http://localhost:${PORT}`);
   });
 });

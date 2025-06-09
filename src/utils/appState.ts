@@ -9,6 +9,7 @@ let appState: IDE[] = [];
 // Function to scan the file system and build the complete hierarchy
 export async function scanFileSystem(): Promise<IDE[]> {
   try {
+    console.log(`JetBrains Path: ${jetBrainsPath}`);
     console.log('Scanning file system...');
     const exists = await fs.pathExists(jetBrainsPath);
     if (!exists) {
