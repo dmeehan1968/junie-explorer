@@ -63,12 +63,12 @@ export interface Task {
 /**
  * Each step taken within a task
  *
- * Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>/step_<id>.*swe_next_step*
+ * Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>/step_<id>.*swe_next_step* or step_<id>.*chat_next*
  * Order by: id
  *
  * <artifactPath> comes from Task.artifactPath
  * <id> is read from the filesystem
- * swe_next_step is part of the file extension and can be prefixed or suffixed with other text
+ * swe_next_step or chat_next is part of the file extension and can be prefixed or suffixed with other text
  */
 
 export interface Step {

@@ -208,9 +208,9 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
     // Read all files in the directory
     const files = fs.readdirSync(stepsPath, { withFileTypes: true });
 
-    // Filter for step_*.swe_next_step* files
+    // Filter for step_*.swe_next_step* and step_*.chat_next* files
     const stepFiles = files
-      .filter(file => file.isFile() && file.name.match(/step_\d+.*swe_next_step/));
+      .filter(file => file.isFile() && file.name.match(/step_\d+.*(swe_next|chat_next)/));
 
     // Read and parse each step file
     const stepPromises = stepFiles.map(async (file) => {
