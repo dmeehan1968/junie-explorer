@@ -117,17 +117,17 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
 
 // Generate HTML for metrics table headers (used only for steps table, not for totals)
 const metricsHeaders = `
-  <th>Input Tokens</th>
-  <th>Output Tokens</th>
-  <th>Cache Tokens</th>
-  <th>Cost</th>
-  <th>Cached Cost</th>
-  <th>Build Time</th>
-  <th>Artifact Time</th>
-  <th>Model Time</th>
-  <th>Model Cached Time</th>
-  <th>Requests</th>
-  <th>Cached Requests</th>
+  <th>Input</th>
+  <th>Output</th>
+  <th>Cache</th>
+  <th>Default</th>
+  <th>Cached</th>
+  <th>Build</th>
+  <th>Artifact</th>
+  <th>Model</th>
+  <th>Model Cached</th>
+  <th>Default</th>
+  <th>Cached</th>
 `;
 
 // Function to generate HTML for step totals table
@@ -345,7 +345,13 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
               <table class="steps-table">
                 <thead>
                   <tr>
-                    <th>Step</th>
+                    <th rowspan="2">Step</th>
+                    <th colspan="3">Tokens</th>
+                    <th colspan="2">Costs</th>
+                    <th colspan="4">Time</th>
+                    <th colspan="2">Requests</th>
+                  </tr>
+                  <tr>
                     ${metricsHeaders}
                   </tr>
                 </thead>
