@@ -315,19 +315,9 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
               ${task.plan && task.plan.length > 0 ? `
                 <div class="task-plan">
                   <h3>Agent</h3>
-                  <ul class="plan-list">
-                    ${task.plan.map(planItem => {
-                      let statusIcon = '';
-                      if (planItem.status === 'DONE') {
-                        statusIcon = '✅';
-                      } else if (planItem.status === 'IN_PROGRESS') {
-                        statusIcon = '🔄';
-                      } else if (planItem.status === 'PENDING') {
-                        statusIcon = '⏳';
-                      }
-                      return `<li class="plan-item plan-${planItem.status.toLowerCase()}">${statusIcon} ${planItem.description}</li>`;
-                    }).join('')}
-                  </ul>
+                  <div class="plan-content">
+                    ${marked(escapeHtml(task.plan.map(planItem => planItem.description).join('\n\n')))}
+                  </div>
                 </div>
               ` : ''}
             </div>
