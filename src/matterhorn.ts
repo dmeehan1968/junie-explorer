@@ -180,7 +180,18 @@ export interface AgentState {
       content: string;
       kind: 'Assistant' | 'User';
     };
-    action: 'open_entire_file' | 'create' | 'search_replace' | 'submit' | 'mkdir' | 'ls'
+    action:
+    | 'open'
+    | 'open_entire_file'
+    | 'create'
+    | 'search_replace'
+    | 'submit'
+    | 'mkdir'
+    | 'ls'
+    | 'get_file_structure'
+    | 'scroll_down'
+    | 'scroll_up'
+    | 'undo_edit'
   }>;
   ideInitialState: {
     content: string;
