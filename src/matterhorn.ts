@@ -7,8 +7,9 @@
  * <IDE> is read from the filesystem
  */
 
-interface IDE {
-  projects: Project[]
+export interface IDE {
+  name: string;
+  projects: Project[];
 }
 
 /**
@@ -19,9 +20,9 @@ interface IDE {
  * <project-name> is read from the filesystem
  */
 
-interface Project {
-  name: string
-  issues: Issue[]
+export interface Project {
+  name: string;
+  issues: Issue[];
 }
 
 /**
@@ -33,12 +34,14 @@ interface Project {
  * <UUID> is read from the filesystem
  */
 
-interface Issue {
-  id: string  // UUID
-  name: string  // short summary of what was requested
-  created: Date
-  state: 'Done' | 'Stopped'
-  tasks: Task[]
+export interface Issue {
+  id: {
+    id: string;  // UUID
+  };
+  name: string;  // short summary of what was requested
+  created: Date;
+  state: 'Done' | 'Stopped' | 'Finished' | 'Running' | 'Declined';
+  tasks: Task[];
 }
 
 /**
@@ -50,53 +53,93 @@ interface Issue {
  * <index> is read from the filesystem
  */
 
-interface Task {
-  id: number        // index
-  created: Date
-  artifactPath: string
-  steps: Step[]
+export interface Task {
+  id: {
+    index: number;
+  };
+  created: string;
+  artifactPath: string;
+  context: {
+    description: string;
+  };
+  previousTasksInfo: {
+    agentState: AgentState;
+    patch: string;
+    sessionHistory: SessionHistory;
+  } | null;
+  finalAgentState: AgentState;
+  isDeclined: boolean;
+  plan: Array<{
+    description: string;
+    status: 'DONE' | 'IN_PROGRESS' | 'PENDING';
+  }>;
+  patch: string;
+  sessionHistory: SessionHistory;
+  steps: Step[];
 }
 
 /**
  * Each step taken within a task
  *
- * Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>/step_<id>.*swe_next_step*
+ * Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>/step_<id>.*swe_next_step* or step_<id>.*chat_next*
  * Order by: id
  *
  * <artifactPath> comes from Task.artifactPath
  * <id> is read from the filesystem
- * swe_next_step is part of the file extension and can be prefixed or suffixed with other text
+ * swe_next_step or chat_next is part of the file extension and can be prefixed or suffixed with other text
  */
 
-interface Step {
-  id: string
+export interface Step {
+  id: string;
+  title: string;
+  description: string;
+  reasoning: {
+    type: string;
+    reason: string;
+  };
+  statistics: Statistics;
+  dependencies: Array<{
+    id: string;
+    cached: boolean;
+  }>;
+  content: {
+    llmResponse: {
+      type: string;
+      content: string;
+      kind: string;
+    };
+    actionRequest: {
+      type: string;
+      name: string;
+      arguments: string;
+      description: string;
+    };
+    actionResult: {
+      type: string;
+      content: string;
+      kind: string;
+    };
+  };
 
-  // Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>/matterhorn/.matterhorn/<artifactPath>.*swe_patch*
-  // field: content.title
-  // swe_patch is part of the file extension and can be prefixed or suffixed with other text
-  title: string
-  // field: content.output
-  summary: string
-  // field: statistics
-  junieMetrics: JunieMetrics
-
-  // translated from junieMetrics
-  metrics: Metrics
+  // Derived fields
+  metrics: Metrics;
+  startTime: Date;
+  endTime: Date;
 }
 
-interface JunieMetrics {
-  totalArtifactBuildTimeSeconds: number,
-  artifactTime: number,
-  modelTime: number,
-  modelCachedTime: number,
-  requests: number,
-  cachedRequests: number,
-  inputTokens: number,
-  outputTokens: number,
-  cacheInputTokens: number,
-  cacheCreateInputTokens: number,
-  cost: number,
-  cachedCost: number
+export interface Statistics {
+  totalArtifactBuildTimeSeconds: number;
+  artifactTime: number;
+  modelTime: number;
+  modelCachedTime: number;
+  requests: number;
+  cachedRequests: number;
+  inputTokens: number;
+  outputTokens: number;
+  cacheInputTokens: number;
+  cacheCreateInputTokens: number;
+  cost: number;
+  cachedCost: number;
 }
 
 /**
@@ -104,16 +147,64 @@ interface JunieMetrics {
 
  * Output in this order
  */
-interface Metrics {
-  inputTokens: number,
-  outputTokens: number,
-  cacheTokens: number,  // renamed from cacheCreateInputTokens
-  cost: number,
-  cachedCost: number
-  buildTime: number,    // renamed from totalArtifactBuildTimeSeconds
-  artifactTime: number,
-  modelTime: number,
-  modelCachedTime: number,
-  requests: number,
-  cachedRequests: number,
+export interface Metrics {
+  inputTokens: number;
+  outputTokens: number;
+  cacheTokens: number;  // renamed from cacheCreateInputTokens
+  cost: number;
+  cachedCost: number;
+  buildTime: number;    // renamed from totalArtifactBuildTimeSeconds
+  artifactTime: number;
+  modelTime: number;
+  modelCachedTime: number;
+  requests: number;
+  cachedRequests: number;
+}
+
+export interface AgentState {
+  issue: {
+    description: string;
+    editorContext: {
+      recentFiles: string[];
+      openFiles: string[];
+    };
+    previousTasksInfo: {
+      agentState: AgentState;
+      patch: string;
+      sessionHistory: SessionHistory;
+    } | null;
+  };
+  observations: Array<{
+    element: {
+      type: string;
+      content: string;
+      kind: 'Assistant' | 'User';
+    };
+    action:
+    | 'open'
+    | 'open_entire_file'
+    | 'create'
+    | 'search_replace'
+    | 'submit'
+    | 'mkdir'
+    | 'ls'
+    | 'get_file_structure'
+    | 'scroll_down'
+    | 'scroll_up'
+    | 'undo_edit'
+  }>;
+  ideInitialState: {
+    content: string;
+    kind: string;
+  };
+}
+
+export interface SessionHistory {
+  viewedFiles: string[];
+  viewedImports: string[];
+  createdFiles: string[];
+  shownCode: Record<string, Array<{
+    first: number;
+    second: number;
+  }>>;
 }

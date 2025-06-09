@@ -1,6 +1,6 @@
-/fixtures
 /tmp
 /out-tsc
+/dist
 
 /node_modules
 npm-debug.log*
@@ -10,4 +10,4 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
-/generated/index.html
+/.junie-context/
