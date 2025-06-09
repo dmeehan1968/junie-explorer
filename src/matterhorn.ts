@@ -114,30 +114,30 @@ export interface Task {
 
 export interface Step {
   id: string;
-  title?: string;
-  description?: string;
-  reasoning?: {
+  title: string;
+  description: string;
+  reasoning: {
     type: string;
     reason: string;
   };
-  statistics?: JunieMetrics;
-  dependencies?: Array<{
+  statistics: Statistics;
+  dependencies: Array<{
     id: string;
     cached: boolean;
   }>;
-  content?: {
-    llmResponse?: {
+  content: {
+    llmResponse: {
       type: string;
       content: string;
       kind: string;
     };
-    actionRequest?: {
+    actionRequest: {
       type: string;
       name: string;
       arguments: string;
       description: string;
     };
-    actionResult?: {
+    actionResult: {
       type: string;
       content: string;
       kind: string;
@@ -145,12 +145,11 @@ export interface Step {
   };
 
   // Derived fields
-  junieMetrics: JunieMetrics;
   metrics: Metrics;
   createdAt: Date;
 }
 
-export interface JunieMetrics {
+export interface Statistics {
   totalArtifactBuildTimeSeconds: number;
   artifactTime: number;
   modelTime: number;

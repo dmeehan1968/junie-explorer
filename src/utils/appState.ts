@@ -205,15 +205,11 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
 
     // Filter for step_*.swe_next_step* and step_*.chat_next* files
     const stepFiles = files
-      .filter(file => file.isFile() && file.name.match(/step_\d+.*(swe_next|chat_next)/));
+      .filter(file => file.isFile() && file.name.match(/step_\d+\..*(swe_next|chat_next).*$/));
 
     // Read and parse each step file
     const stepPromises = stepFiles.map(async (file) => {
       try {
-        // Extract step ID from filename (step_<id>.*)
-        const idMatch = file.name.match(/step_(\d+)/);
-        const id = idMatch ? idMatch[1] : '0';
-
         const filePath = path.join(stepsPath, file.name);
         const data = await fs.readJson(filePath);
 
@@ -223,17 +219,7 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
 
         // Use the full file content for the Step interface
         return {
-          // Original file content fields
-          id: data.id || id,
-          title: data.title,
-          description: data.description,
-          reasoning: data.reasoning,
-          statistics: data.statistics,
-          dependencies: data.dependencies,
-          content: data.content,
-
-          // Derived fields for backward compatibility
-          junieMetrics: data.statistics || {},
+          ...data,
           metrics: {
             inputTokens: data.statistics?.inputTokens || 0,
             outputTokens: data.statistics?.outputTokens || 0,
@@ -260,8 +246,8 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
     // Filter out any null values
     const validSteps = steps.filter((step): step is Step => step !== null);
 
-    // Sort by step ID
-    return validSteps.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+    // Sort by step ID (lexicographically)
+    return validSteps.sort((a, b) => a.id.localeCompare(b.id));
   } catch (error) {
     console.error(`Error reading steps for task with artifact path ${taskArtifactPath} in project ${projectName} in IDE ${ideName}:`, error);
     return [];

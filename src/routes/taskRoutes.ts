@@ -344,11 +344,11 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
                   </tr>
                 </thead>
                 <tbody>
-                  ${task.steps.map(step => `
+                  ${task.steps.map((step, index) => `
                     <tr>
                       <td>
                         <div class="title-container">
-                          ${step.id}
+                          ${index + 1}
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
