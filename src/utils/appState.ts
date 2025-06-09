@@ -221,9 +221,18 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
         const stats = fs.statSync(filePath);
         const createdAt = stats.birthtime;
 
-        // Extract step data
+        // Use the full file content for the Step interface
         return {
-          id,
+          // Original file content fields
+          id: data.id || id,
+          title: data.title,
+          description: data.description,
+          reasoning: data.reasoning,
+          statistics: data.statistics,
+          dependencies: data.dependencies,
+          content: data.content,
+
+          // Derived fields for backward compatibility
           junieMetrics: data.statistics || {},
           metrics: {
             inputTokens: data.statistics?.inputTokens || 0,

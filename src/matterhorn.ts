@@ -114,14 +114,39 @@ export interface Task {
 
 export interface Step {
   id: string;
+  title?: string;
+  description?: string;
+  reasoning?: {
+    type: string;
+    reason: string;
+  };
+  statistics?: JunieMetrics;
+  dependencies?: Array<{
+    id: string;
+    cached: boolean;
+  }>;
+  content?: {
+    llmResponse?: {
+      type: string;
+      content: string;
+      kind: string;
+    };
+    actionRequest?: {
+      type: string;
+      name: string;
+      arguments: string;
+      description: string;
+    };
+    actionResult?: {
+      type: string;
+      content: string;
+      kind: string;
+    };
+  };
 
-  // field: statistics
+  // Derived fields
   junieMetrics: JunieMetrics;
-
-  // translated from junieMetrics
   metrics: Metrics;
-
-  // timestamp from file creation date
   createdAt: Date;
 }
 
