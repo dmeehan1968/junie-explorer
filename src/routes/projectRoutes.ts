@@ -1,6 +1,6 @@
 import express from 'express';
 import { getIDE } from '../utils/appState.js';
-import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
+import { formatSeconds } from '../utils/timeUtils.js';
 import { Metrics, Step, Task, Issue } from '../matterhorn.js';
 
 const router = express.Router();

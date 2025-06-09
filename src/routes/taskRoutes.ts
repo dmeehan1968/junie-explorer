@@ -1,7 +1,7 @@
 import express from 'express';
 import { getIssue, getTask } from '../utils/appState.js';
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
-import { Step, Metrics, Task } from '../matterhorn.js';
+import { Step, Metrics } from '../matterhorn.js';
 import { marked } from 'marked';
 
 // Helper function to escape HTML before markdown conversion
