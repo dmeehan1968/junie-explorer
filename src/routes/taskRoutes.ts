@@ -308,7 +308,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
       <body>
         <div class="container">
           <div class="header-container">
-            <h1>Steps for Task ${task.id.index}</h1>
+            <h1>Task ${task.id.index}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
           <nav aria-label="breadcrumb">
@@ -317,7 +317,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName} Projects</a></li>
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName} Issues</a></li>
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">Tasks</a></li>
-              <li class="breadcrumb-item active">Steps for Task ${task.id.index}</li>
+              <li class="breadcrumb-item active">Task ${task.id.index}</li>
             </ol>
           </nav>
 

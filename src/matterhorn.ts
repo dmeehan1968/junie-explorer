@@ -62,44 +62,19 @@ export interface Task {
   context: {
     description: string;
   };
-  previousTasksInfo: any | null;
-  finalAgentState: {
-    issue: {
-      description: string;
-      editorContext: {
-        recentFiles: string[];
-        openFiles: string[];
-      };
-      previousTasksInfo: any | null;
-    };
-    observations: Array<{
-      element: {
-        type: string;
-        content: string;
-        kind: string;
-      };
-      action: string;
-    }>;
-    ideInitialState: {
-      content: string;
-      kind: string;
-    };
-  };
+  previousTasksInfo: {
+    agentState: AgentState;
+    patch: string;
+    sessionHistory: SessionHistory;
+  } | null;
+  finalAgentState: AgentState;
   isDeclined: boolean;
   plan: Array<{
     description: string;
-    status: string;
+    status: 'DONE' | 'IN_PROGRESS' | 'PENDING';
   }>;
   patch: string;
-  sessionHistory: {
-    viewedFiles: string[];
-    viewedImports: string[];
-    createdFiles: string[];
-    shownCode: Record<string, Array<{
-      first: number;
-      second: number;
-    }>>;
-  };
+  sessionHistory: SessionHistory;
   steps: Step[];
 }
 
@@ -184,4 +159,41 @@ export interface Metrics {
   modelCachedTime: number;
   requests: number;
   cachedRequests: number;
+}
+
+export interface AgentState {
+  issue: {
+    description: string;
+    editorContext: {
+      recentFiles: string[];
+      openFiles: string[];
+    };
+    previousTasksInfo: {
+      agentState: AgentState;
+      patch: string;
+      sessionHistory: SessionHistory;
+    } | null;
+  };
+  observations: Array<{
+    element: {
+      type: string;
+      content: string;
+      kind: 'Assistant' | 'User';
+    };
+    action: 'open_entire_file' | 'create' | 'search_replace' | 'submit' | 'mkdir' | 'ls'
+  }>;
+  ideInitialState: {
+    content: string;
+    kind: string;
+  };
+}
+
+export interface SessionHistory {
+  viewedFiles: string[];
+  viewedImports: string[];
+  createdFiles: string[];
+  shownCode: Record<string, Array<{
+    first: number;
+    second: number;
+  }>>;
 }
