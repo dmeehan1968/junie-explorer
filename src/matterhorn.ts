@@ -52,11 +52,52 @@ export interface Issue {
  */
 
 export interface Task {
-  id: number;        // index
-  created: Date;
+  id: {
+    index: number;
+  };
+  created: string;
   artifactPath: string;
-  // from context.description
-  description: string;
+  context: {
+    description: string;
+  };
+  previousTasksInfo: any | null;
+  finalAgentState: {
+    issue: {
+      description: string;
+      editorContext: {
+        recentFiles: string[];
+        openFiles: string[];
+      };
+      previousTasksInfo: any | null;
+    };
+    observations: Array<{
+      element: {
+        type: string;
+        content: string;
+        kind: string;
+      };
+      action: string;
+    }>;
+    ideInitialState: {
+      content: string;
+      kind: string;
+    };
+  };
+  isDeclined: boolean;
+  plan: Array<{
+    description: string;
+    status: string;
+  }>;
+  patch: string;
+  sessionHistory: {
+    viewedFiles: string[];
+    viewedImports: string[];
+    createdFiles: string[];
+    shownCode: Record<string, Array<{
+      first: number;
+      second: number;
+    }>>;
+  };
   steps: Step[];
 }
 

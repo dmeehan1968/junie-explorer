@@ -229,12 +229,12 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
                   return `
                     <li class="task-item">
                       <div class="task-header">
-                        <div class="task-id">${task.id === 0 ? 'Initial Request' : `Follow up ${task.id}`}</div>
-                        <div class="task-date">Created: ${task.created.toLocaleString()}</div>
+                        <div class="task-id">${task.id.index === 0 ? 'Initial Request' : `Follow up ${task.id.index}`}</div>
+                        <div class="task-date">Created: ${new Date(task.created).toLocaleString()}</div>
                       </div>
-                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id}" class="task-link">
+                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
                         <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
-                        ${task.description ? `<div class="task-description">${marked(task.description)}</div>` : ''}
+                        ${task.context?.description ? `<div class="task-description">${marked(task.context.description)}</div>` : ''}
                       </a>
                       <div class="task-details">
                         ${generateStepTotalsTable(stepTotals)}
@@ -280,7 +280,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Task ${task.id} Steps</title>
+        <title>Task ${task.id.index} Steps</title>
         <link rel="stylesheet" href="/css/style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -308,7 +308,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
       <body>
         <div class="container">
           <div class="header-container">
-            <h1>Steps for Task ${task.id}</h1>
+            <h1>Steps for Task ${task.id.index}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
           <nav aria-label="breadcrumb">
@@ -317,14 +317,14 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName} Projects</a></li>
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName} Issues</a></li>
               <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">Tasks</a></li>
-              <li class="breadcrumb-item active">Steps for Task ${task.id}</li>
+              <li class="breadcrumb-item active">Steps for Task ${task.id.index}</li>
             </ol>
           </nav>
 
           <div class="task-details">
-            <div class="task-created">Created: ${task.created.toLocaleString()}</div>
+            <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
             <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
-            ${task.description ? `<div class="task-description">${marked(task.description)}</div>` : ''}
+            ${task.context?.description ? `<div class="task-description">${marked(task.context.description)}</div>` : ''}
           </div>
 
           ${task.steps.length > 0 

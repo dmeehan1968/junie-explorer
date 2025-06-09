@@ -154,18 +154,13 @@ async function getTasksForIssue(ideName: string, projectName: string, issueId: s
         const filePath = path.join(issuePath, file.name);
         const data = await fs.readJson(filePath);
 
-        // Extract index from filename (task-<index>.json)
-        const id = parseInt(file.name.replace('task-', '').replace('.json', ''), 10);
-
         // Get steps for this task
         const steps = await getStepsForTask(ideName, projectName, data.artifactPath || '');
 
+        // Create a task object with the full file content
         const task: Task = {
-          id,
-          created: new Date(data.created || Date.now()),
-          artifactPath: data.artifactPath || '',
-          description: data.context?.description || '',
-          steps,
+          ...data,
+          steps
         };
 
         return task;
@@ -180,8 +175,8 @@ async function getTasksForIssue(ideName: string, projectName: string, issueId: s
     // Filter out any null values
     const validTasks: Task[] = tasks.filter((task): task is Task => task !== null);
 
-    // Sort by index or creation date
-    return validTasks.sort((a, b) => a.id - b.id);
+    // Sort by index
+    return validTasks.sort((a, b) => a.id.index - b.id.index);
   } catch (error) {
     console.error(`Error reading tasks for issue ${issueId} in project ${projectName} in IDE ${ideName}:`, error);
     return [];
@@ -304,5 +299,5 @@ export function getIssue(ideName: string, projectName: string, issueId: string):
 export function getTask(ideName: string, projectName: string, issueId: string, taskId: number): Task | undefined {
   const issue = getIssue(ideName, projectName, issueId);
   if (!issue) return undefined;
-  return issue.tasks.find(task => task.id === taskId);
+  return issue.tasks.find(task => task.id.index === taskId);
 }
