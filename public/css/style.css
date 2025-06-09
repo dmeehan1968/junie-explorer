@@ -492,6 +492,19 @@ p {
   border-right: none;
 }
 
+/* Add vertical borders to the second header row where the first row's column breaks are */
+.steps-table thead tr:nth-child(2) th:nth-child(3) {
+  border-right: 1px solid #ddd;
+}
+
+.steps-table thead tr:nth-child(2) th:nth-child(5) {
+  border-right: 1px solid #ddd;
+}
+
+.steps-table thead tr:nth-child(2) th:nth-child(9) {
+  border-right: 1px solid #ddd;
+}
+
 .steps-table td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
