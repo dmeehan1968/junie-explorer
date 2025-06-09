@@ -212,7 +212,17 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
 
         // Get file stats to extract creation time
         const stats = fs.statSync(filePath);
-        const created = stats.birthtime;
+        const fileCreationTime = stats.birthtime;
+
+        // Calculate metrics
+        const artifactTime = data.statistics?.artifactTime || 0;
+        const modelTime = data.statistics?.modelTime || 0;
+        const modelCachedTime = data.statistics?.modelCachedTime || 0;
+
+        // Calculate startTime: fileCreationTime minus the sum of times (not artifactTime, which appears to be whole seconds of these)
+        const totalDeductionMs = artifactTime + modelTime + modelCachedTime;
+        const startTime = new Date(fileCreationTime.getTime() - totalDeductionMs);
+        const endTime = fileCreationTime;
 
         // Use the full file content for the Step interface
         return {
@@ -224,13 +234,14 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
             cost: data.statistics?.cost || 0,
             cachedCost: data.statistics?.cachedCost || 0,
             buildTime: data.statistics?.totalArtifactBuildTimeSeconds || 0,
-            artifactTime: data.statistics?.artifactTime || 0,
-            modelTime: data.statistics?.modelTime || 0,
-            modelCachedTime: data.statistics?.modelCachedTime || 0,
+            artifactTime: artifactTime,
+            modelTime: modelTime,
+            modelCachedTime: modelCachedTime,
             requests: data.statistics?.requests || 0,
             cachedRequests: data.statistics?.cachedRequests || 0,
           },
-          created,
+          startTime,
+          endTime,
         };
       } catch (error) {
         console.error(`Error reading step file ${file.name}:`, error);

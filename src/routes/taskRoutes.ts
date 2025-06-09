@@ -39,7 +39,7 @@ function calculateStepSummary(steps: Step[]): Metrics {
 // Function to prepare data for the metrics over time graph
 function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
   // Use the actual timestamps from the step data
-  const stepTimes = steps.map(step => step.created);
+  const stepTimes = steps.map(step => step.startTime);
 
   // Find min and max dates
   const minDate = stepTimes.length > 0 ? new Date(Math.min(...stepTimes.map(date => date.getTime()))) : new Date();
@@ -95,12 +95,12 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
 
   // Create datasets for cost and aggregate tokens
   const costData = steps.map(step => ({
-    x: step.created.toISOString(),
+    x: step.startTime.toISOString(),
     y: step.metrics.cost
   }));
 
   const tokenData = steps.map(step => ({
-    x: step.created.toISOString(),
+    x: step.startTime.toISOString(),
     y: step.metrics.inputTokens + step.metrics.outputTokens + step.metrics.cacheTokens
   }));
 
@@ -126,7 +126,7 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
   ];
 
   return {
-    labels: steps.map(step => step.created.toISOString()),
+    labels: steps.map(step => step.startTime.toISOString()),
     datasets,
     timeUnit,
     stepSize,

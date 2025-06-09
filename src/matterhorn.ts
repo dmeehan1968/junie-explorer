@@ -148,7 +148,8 @@ export interface Step {
 
   // Derived fields
   metrics: Metrics;
-  created: Date;
+  startTime: Date;
+  endTime: Date;
 }
 
 export interface Statistics {
