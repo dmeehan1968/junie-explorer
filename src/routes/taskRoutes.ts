@@ -4,6 +4,16 @@ import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
 import { Step, Metrics, Task } from '../matterhorn.js';
 import { marked } from 'marked';
 
+// Helper function to escape HTML before markdown conversion
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const router = express.Router();
 
 // Helper function to calculate summary data for a task's steps
@@ -234,7 +244,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
                       </div>
                       <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
                         <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
-                        ${task.context?.description ? `<div class="task-description">${marked(task.context.description)}</div>` : ''}
+                        ${task.context?.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                       </a>
                       <div class="task-details">
                         ${generateStepTotalsTable(stepTotals)}
@@ -328,7 +338,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
               ${task.context.description ? `
                 <div class="task-description">
                   <h3>User</h3>
-                  ${marked(task.context.description)}</div>
+                  ${marked(escapeHtml(task.context.description))}</div>
               ` : ''}
               ${task.plan && task.plan.length > 0 ? `
                 <div class="task-plan">
