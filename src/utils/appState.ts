@@ -212,7 +212,7 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
 
         // Get file stats to extract creation time
         const stats = fs.statSync(filePath);
-        const createdAt = stats.birthtime;
+        const created = stats.birthtime;
 
         // Use the full file content for the Step interface
         return {
@@ -230,7 +230,7 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
             requests: data.statistics?.requests || 0,
             cachedRequests: data.statistics?.cachedRequests || 0,
           },
-          createdAt,
+          created,
         };
       } catch (error) {
         console.error(`Error reading step file ${file.name}:`, error);
