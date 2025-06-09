@@ -9,7 +9,7 @@ let jetBrainsPath: string;
 
 switch (process.platform) {
   case 'win32': // Windows
-    jetBrainsPath = path.join(process.env.APPDATA || '', '..', 'Local', 'JetBrains', 'Cache');
+    jetBrainsPath = path.join(process.env.APPDATA || '', '..', 'Local', 'JetBrains')
     break;
   case 'darwin': // macOS
     jetBrainsPath = path.join('/Users', username, 'Library', 'Caches', 'JetBrains');
