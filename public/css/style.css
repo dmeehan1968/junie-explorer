@@ -480,6 +480,18 @@ p {
   border-bottom: 2px solid #ddd;
 }
 
+/* Style for the first header row */
+.steps-table thead tr:first-child th {
+  text-align: center;
+  border-right: 1px solid #ddd;
+  padding-bottom: 15px;
+}
+
+/* Remove right border from the last column in the first header row */
+.steps-table thead tr:first-child th:last-child {
+  border-right: none;
+}
+
 .steps-table td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
