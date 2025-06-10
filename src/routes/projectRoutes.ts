@@ -93,7 +93,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 }
 
 // Project issues page route
-router.get('/project/:projectName/issues', (req, res) => {
+router.get('/project/:projectName', (req, res) => {
   try {
     const { projectName } = req.params;
     const project = getProject(projectName);

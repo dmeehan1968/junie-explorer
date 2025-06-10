@@ -54,7 +54,7 @@ router.get('/', (req, res) => {
             ${projects.length > 0 
               ? projects.map(project => `
                 <li class="project-item" data-ides='${JSON.stringify(project.ides)}'>
-                  <a href="/project/${encodeURIComponent(project.name)}/issues" class="project-link">
+                  <a href="/project/${encodeURIComponent(project.name)}" class="project-link">
                     <div class="project-name">${project.name}</div>
                     <div class="ide-icons">
                       ${project.ides.map(ide => `

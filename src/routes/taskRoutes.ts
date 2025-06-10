@@ -181,7 +181,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
               <li class="breadcrumb-item active">${issue.name}</li>
             </ol>
           </nav>
@@ -281,7 +281,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
               <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">${issue?.name}</a></li>
               <li class="breadcrumb-item active">Task ${task.id.index}</li>
             </ol>
