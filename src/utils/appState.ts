@@ -106,7 +106,7 @@ function mergeProjectsWithIdeName(projects: Project[], ideName: string): void {
 
     if (existingProject) {
       // Merge issues from this project into the existing project
-      existingProject.issues = [...existingProject.issues, ...project.issues];
+      existingProject.issues = [...existingProject.issues, ...project.issues].sort((a, b) => b.created.getTime() - a.created.getTime());
       existingProject.ides = [...new Set(existingProject.ides.concat(ideName))];
     } else {
       // Create a new project with this IDE and add it to mergedProjects
