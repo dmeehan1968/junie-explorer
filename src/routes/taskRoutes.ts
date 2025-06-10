@@ -172,17 +172,6 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
-        <style>
-          .ide-icons {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-          }
-          .ide-icon {
-            width: 30px;
-            height: 30px;
-          }
-        </style>
       </head>
       <body>
         <div class="container">
@@ -284,17 +273,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
         <script src="/js/taskStepGraph.js"></script>
         <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
-        <style>
-          .ide-icons {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-          }
-          .ide-icon {
-            width: 30px;
-            height: 30px;
-          }
-        </style>
       </head>
       <body>
         <div class="container">

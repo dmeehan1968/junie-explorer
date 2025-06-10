@@ -31,23 +31,6 @@ router.get('/project/:projectName', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
-        <style>
-          .ide-icons {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-          }
-          .ide-icon {
-            width: 30px;
-            height: 30px;
-          }
-          .project-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-          }
-        </style>
       </head>
       <body>
         <div class="container">

@@ -126,17 +126,6 @@ router.get('/project/:projectName/issues', (req, res) => {
         <script src="/js/issueGraph.js"></script>
         <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
-        <style>
-          .ide-icons {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-          }
-          .ide-icon {
-            width: 30px;
-            height: 30px;
-          }
-        </style>
       </head>
       <body>
         <div class="container">

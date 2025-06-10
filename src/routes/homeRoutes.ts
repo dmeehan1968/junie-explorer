@@ -29,66 +29,6 @@ router.get('/', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
-        <style>
-          .ide-icons {
-            display: flex;
-            gap: 5px;
-            margin-left: auto;
-          }
-          .ide-icon {
-            width: 20px;
-            height: 20px;
-          }
-          .project-link {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-          }
-          .project-item {
-            padding: 10px 15px;
-            margin-bottom: 5px;
-          }
-          .ide-filter-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-          }
-          .ide-filter {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 5px;
-            border-radius: 4px;
-          }
-          .ide-filter:hover {
-            background-color: #eef7ff;
-          }
-          .ide-filter img {
-            width: 30px;
-            height: 30px;
-          }
-          .ide-filter-disabled img {
-            filter: grayscale(100%) opacity(50%);
-          }
-          .filter-label {
-            font-weight: bold;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-          }
-          .project-search {
-            margin-left: auto;
-          }
-          #project-search-input {
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-          }
-        </style>
       </head>
       <body>
         <div class="container">

@@ -656,6 +656,99 @@ p {
   background-color: #f5f5f5;
 }
 
+/* IDE Icons Styles */
+.ide-icons {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.ide-icon {
+  width: 30px;
+  height: 30px;
+}
+
+/* For project-link context, use smaller icons with different positioning */
+.project-link .ide-icons {
+  gap: 5px;
+  margin-left: auto;
+  margin: 0;
+}
+
+.project-link .ide-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Project Link Styles */
+.project-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-item {
+  padding: 10px 15px;
+  margin-bottom: 5px;
+}
+
+/* IDE Filter Toolbar Styles */
+.ide-filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.ide-filter {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.ide-filter:hover {
+  background-color: #eef7ff;
+}
+
+.ide-filter img {
+  width: 30px;
+  height: 30px;
+}
+
+.ide-filter-disabled img {
+  filter: grayscale(100%) opacity(50%);
+}
+
+.filter-label {
+  font-weight: bold;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.project-search {
+  margin-left: auto;
+}
+
+#project-search-input {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Project Header Styles */
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 15px;
