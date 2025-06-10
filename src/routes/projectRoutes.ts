@@ -86,14 +86,13 @@ router.get('/project/:projectName', (req, res) => {
             <thead>
               <tr>
                 <th>Issue Name</th>
-                <th>Created</th>
-                <th>State</th>
                 <th>Tasks</th>
                 <th>Input Tokens</th>
                 <th>Output Tokens</th>
                 <th>Cache Tokens</th>
                 <th>Cost</th>
                 <th>Total Time</th>
+                <th>State</th>
               </tr>
             </thead>
             <tbody>
@@ -104,14 +103,13 @@ router.get('/project/:projectName', (req, res) => {
                   return `
                     <tr>
                       <td><a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id.id)}">${issue.name}</a></td>
-                      <td>${issue.created.toLocaleString()}</td>
-                      <td>${issue.state}</td>
                       <td>${issue.tasks.length}</td>
                       <td>${issueMetrics.inputTokens}</td>
                       <td>${issueMetrics.outputTokens}</td>
                       <td>${issueMetrics.cacheTokens}</td>
                       <td>${issueMetrics.cost.toFixed(4)}</td>
                       <td>${formatSeconds(issueTotalTime)}</td>
+                      <td>${issue.state}</td>
                     </tr>
                   `;
                 }).join('')
