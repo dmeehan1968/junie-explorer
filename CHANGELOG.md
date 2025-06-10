@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-06-10
+
+### Features
+- Add project search functionality to the homepage (48ccfa6)
+- Add IDE filtering functionality to homepage (589e9d7)
+- Extract IDE filtering logic into a reusable script (c60fad7)
+- Extract reload page logic into a standalone script (c517705)
+- Add "Filter by IDE" label to filtering toolbar (2468e76)
+
+### UI Improvements
+- Reorder issue table columns for consistent state display (8fa0eda)
+- Improve project and IDE UI structure (58d5034)
+- Remove IDE list from homepage, merge projects across IDE's (e5e29e7)
+- Move inline styles to `style.css` (398d26a)
+
+### Code Improvements
+- Split `taskRoutes.ts` into `issueRoutes.ts` and `escapeHtml.ts` (c076b4f)
+- Simplify project route structure (b8f2a0e)
+- Remove project routes and unused legacy scripts (e5238ba)
+- Remove legacy IDE-based routes and methods (64a7743)
+
+### Documentation
+- Update documentation and scripts organization (e1f75fb)
+- Add new scenarios for homepage features (c1adab2)
+- Add new scenarios for project details page features (c9eed4b)
+- Remove deprecated task and issue feature files (022f4dc)
+- Add feature file for issue details page (ac0b33c)
+- Add feature file for task details page (f4947fc)
+- Update README and guidelines for feature file changes (5b73e48)
+- Clarify version tagging guidelines in release process (81046e8)
+
 ## [1.0.4] - 2025-06-10
 
 ### UI Improvements
