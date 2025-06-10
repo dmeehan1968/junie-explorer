@@ -113,14 +113,14 @@ Requirements for this project are documented using Gherkin feature files located
 ### Release a version
 
 - Check the CHANGELOG.md for the most recently mentioned version
-- Use this version (Major.minor.patch) to look for git commits since a tag with the same version
+- Use this version (Major.minor.patch) to look for git commits since a tag with the same version (version tags are prefixed `v`, e.g. v1.0.0)
 - If there are no changes since the last version tag, then your work is done.
 - Separate changes by version number (git tag) and increment the latest version (default patch) depending on the request
 - Update the package.json version to the new version
 - Update CHANGELOG.md to include the changes separated by version (use the first line of the commit and include the commit hash) 
 - Make sure the latest version release date is today (use `date` CLI to get current)
 - Commit CHANGELOG.md and package.json
-- Add a tag with the new version
+- Add a tag with the new version (prefix the version with `v`, e.g. v1.0.0)
 
 ## Future Enhancements
 Potential areas for improvement:
