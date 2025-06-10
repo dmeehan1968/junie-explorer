@@ -256,12 +256,6 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
   }
 });
 
-// Legacy route for backward compatibility
-router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
-  const { projectName, issueId } = req.params;
-  res.redirect(`/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`);
-});
-
 // Task steps page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
@@ -439,12 +433,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
     console.error('Error generating steps page:', error);
     res.status(500).send('An error occurred while generating the steps page');
   }
-});
-
-// Legacy route for backward compatibility
-router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
-  const { projectName, issueId, taskId } = req.params;
-  res.redirect(`/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${taskId}`);
 });
 
 export default router;

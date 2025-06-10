@@ -340,33 +340,14 @@ export function getMergedProjects(): Project[] {
   return mergedProjects;
 }
 
-// Get a specific IDE by name
-export function getIDE(ideName: string): IDE | undefined {
-  return appState.find(ide => ide.name === ideName);
-}
-
 // Get a specific project by name
 export function getProject(projectName: string): Project | undefined {
   return mergedProjects.find(project => project.name === projectName);
 }
 
-// Get a specific project by IDE name and project name (legacy method)
-export function getProjectByIDE(ideName: string, projectName: string): Project | undefined {
-  const ide = getIDE(ideName);
-  if (!ide) return undefined;
-  return ide.projects.find(project => project.name === projectName);
-}
-
 // Get a specific issue by project name and issue ID
 export function getIssue(projectName: string, issueId: string): Issue | undefined {
   const project = getProject(projectName);
-  if (!project) return undefined;
-  return project.issues.find(issue => issue.id.id === issueId);
-}
-
-// Get a specific issue by IDE name, project name, and issue ID (legacy method)
-export function getIssueByIDE(ideName: string, projectName: string, issueId: string): Issue | undefined {
-  const project = getProjectByIDE(ideName, projectName);
   if (!project) return undefined;
   return project.issues.find(issue => issue.id.id === issueId);
 }
@@ -378,9 +359,3 @@ export function getTask(projectName: string, issueId: string, taskId: number): T
   return issue.tasks.find(task => task.id.index === taskId);
 }
 
-// Get a specific task by IDE name, project name, issue ID, and task ID (legacy method)
-export function getTaskByIDE(ideName: string, projectName: string, issueId: string, taskId: number): Task | undefined {
-  const issue = getIssueByIDE(ideName, projectName, issueId);
-  if (!issue) return undefined;
-  return issue.tasks.find(task => task.id.index === taskId);
-}

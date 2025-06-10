@@ -159,15 +159,4 @@ router.get('/project/:projectName', (req, res) => {
   }
 });
 
-// Legacy route for backward compatibility
-router.get('/ide/:ideName', (req, res) => {
-  res.redirect('/');
-});
-
-// Legacy route for backward compatibility
-router.get('/ide/:ideName/project/:projectName', (req, res) => {
-  const { projectName } = req.params;
-  res.redirect(`/project/${encodeURIComponent(projectName)}`);
-});
-
 export default router;
