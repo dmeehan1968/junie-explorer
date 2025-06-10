@@ -7,6 +7,7 @@ let displayOption = 'both'; // Default display option (both, cost, tokens)
 function initializeProjectSelection() {
   const storedSelection = sessionStorage.getItem('selectedProjects');
   const storedDisplayOption = sessionStorage.getItem('displayOption');
+  const graphContainer = document.getElementById('projects-graph-container');
 
   // Initialize display option from session storage or default to 'both'
   if (storedDisplayOption) {
@@ -14,6 +15,10 @@ function initializeProjectSelection() {
     // Update radio buttons based on stored display option
     document.querySelector(`input[name="display-option"][value="${displayOption}"]`).checked = true;
   }
+
+  // Set initial state of graph container
+  graphContainer.classList.add('hidden');
+  graphContainer.style.display = 'block'; // Keep in DOM for animation
 
   if (storedSelection) {
     selectedProjects = JSON.parse(storedSelection);
@@ -29,8 +34,13 @@ function initializeProjectSelection() {
     // Update "Select All" checkbox
     updateSelectAllCheckbox();
 
+    // Check if any projects are selected
+    const anySelected = Object.values(selectedProjects).some(selected => selected);
+
     // Load and display the graph if projects are selected
-    loadProjectsGraph();
+    if (anySelected) {
+      loadProjectsGraph();
+    }
   } else {
     // Initialize with empty selection
     selectedProjects = {};
@@ -112,16 +122,29 @@ async function loadProjectsGraph() {
 
   // Hide graph if no projects are selected
   if (selectedProjectNames.length === 0) {
-    graphContainer.style.display = 'none';
-    if (projectsChart) {
-      projectsChart.destroy();
-      projectsChart = null;
-    }
+    // Add hidden class and remove visible class for animation
+    graphContainer.classList.add('hidden');
+    graphContainer.classList.remove('visible');
+
+    // Wait for animation to complete before destroying chart
+    setTimeout(() => {
+      if (projectsChart) {
+        projectsChart.destroy();
+        projectsChart = null;
+      }
+    }, 500); // Match the transition duration in CSS
+
     return;
   }
 
-  // Show graph container
-  graphContainer.style.display = 'block';
+  // Make sure the container is in the DOM but hidden initially if it was hidden before
+  if (graphContainer.classList.contains('hidden')) {
+    // Keep it hidden but in the DOM
+    graphContainer.style.display = 'block';
+
+    // Trigger reflow to ensure the transition works
+    void graphContainer.offsetWidth;
+  }
 
   try {
     // Fetch graph data for selected projects
@@ -130,6 +153,10 @@ async function loadProjectsGraph() {
 
     // Create or update the chart
     createProjectsChart(graphData);
+
+    // Show graph container with animation
+    graphContainer.classList.remove('hidden');
+    graphContainer.classList.add('visible');
   } catch (error) {
     console.error('Error loading graph data:', error);
   }

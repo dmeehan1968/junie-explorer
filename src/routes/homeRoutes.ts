@@ -81,7 +81,7 @@ function prepareProjectsGraphData(projects: Project[]): {
     timeUnit = 'hour';
     stepSize = 3;
   } else if (dateRange < MONTH) {
-    timeUnit = 'day';
+    // default of day
   } else if (dateRange < YEAR) {
     timeUnit = 'month';
   } else {
@@ -217,7 +217,7 @@ router.get('/', (req, res) => {
             </div>
           </div>
 
-          <div id="projects-graph-container" class="graph-container" style="display: none;">
+          <div id="projects-graph-container" class="graph-container">
             <canvas id="projectsMetricsChart"></canvas>
           </div>
 
