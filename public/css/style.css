@@ -638,6 +638,23 @@ p {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.5s ease;
+  overflow: hidden;
+}
+
+/* Animation classes for graph container */
+.graph-container.hidden {
+  height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.graph-container.visible {
+  height: 400px;
+  opacity: 1;
+  margin-bottom: 30px;
 }
 
 /* Step Totals Table Styles */
@@ -719,16 +736,69 @@ p {
   height: 20px;
 }
 
+/* Project Selection Styles */
+.project-selection-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.select-all-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.select-all-container label {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.display-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.display-options label {
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.project-checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.project-checkbox {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
 /* Project Link Styles */
 .project-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex: 1;
 }
 
 .project-item {
   padding: 10px 15px;
   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
 }
 
 /* IDE Filter Toolbar Styles */
