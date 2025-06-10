@@ -14,7 +14,11 @@ Feature: Issue Tasks Page
 
   Scenario: Breadcrumb navigation on tasks page
     Given I am on the tasks page for an issue
-    Then I should see breadcrumb navigation with links to Home, IDE Projects, and Project Issues
+    Then I should see breadcrumb navigation with links to Projects, Project Details, and Project Issues
+
+  Scenario: IDE icons display
+    Given I am on the tasks page for an issue
+    Then I should see icons for each IDE that was used with the project
 
   Scenario: Task basic information display
     Given I am on the tasks page for an issue

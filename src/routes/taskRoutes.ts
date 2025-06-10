@@ -1,5 +1,5 @@
 import express from 'express';
-import { getIssue, getTask } from '../utils/appState.js';
+import { getIssue, getTask, getIDEIcon, getProject } from '../utils/appState.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
 import { calculateStepSummary } from '../utils/metricsUtils.js';
 import { Step, Metrics } from '../matterhorn.js';
@@ -151,12 +151,13 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
 };
 
 // Issue tasks page route
-router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
+router.get('/project/:projectName/issue/:issueId', (req, res) => {
   try {
-    const { ideName, projectName, issueId } = req.params;
-    const issue = getIssue(ideName, projectName, issueId);
+    const { projectName, issueId } = req.params;
+    const project = getProject(projectName);
+    const issue = getIssue(projectName, issueId);
 
-    if (!issue) {
+    if (!project || !issue) {
       return res.status(404).send('Issue not found');
     }
 
@@ -181,6 +182,17 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
             }
           }
         </script>
+        <style>
+          .ide-icons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+          }
+          .ide-icon {
+            width: 30px;
+            height: 30px;
+          }
+        </style>
       </head>
       <body>
         <div class="container">
@@ -190,12 +202,18 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
           </div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName}</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">Issues</a></li>
               <li class="breadcrumb-item active">${issue.name}</li>
             </ol>
           </nav>
+
+          <div class="ide-icons">
+            ${project.ides.map(ide => `
+              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+            `).join('')}
+          </div>
 
           <div class="issue-details">
             <div class="issue-created">Created: ${new Date(issue.created).toLocaleString()}</div>
@@ -214,7 +232,7 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
                         <div class="task-id">${task.id.index === 0 ? 'Initial Request' : `Follow up ${task.id.index}`}</div>
                         <div class="task-date">Created: ${new Date(task.created).toLocaleString()}</div>
                       </div>
-                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
+                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
                         ${task.context?.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                       </a>
                       <div class="task-details">
@@ -238,13 +256,20 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
   }
 });
 
-// Task steps page route
-router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
-  try {
-    const { ideName, projectName, issueId, taskId } = req.params;
-    const task = getTask(ideName, projectName, issueId, parseInt(taskId, 10));
+// Legacy route for backward compatibility
+router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
+  const { projectName, issueId } = req.params;
+  res.redirect(`/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`);
+});
 
-    if (!task) {
+// Task steps page route
+router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
+  try {
+    const { projectName, issueId, taskId } = req.params;
+    const project = getProject(projectName);
+    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+
+    if (!project || !task) {
       return res.status(404).send('Task not found');
     }
 
@@ -285,6 +310,17 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
             }
           }
         </script>
+        <style>
+          .ide-icons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+          }
+          .ide-icon {
+            width: 30px;
+            height: 30px;
+          }
+        </style>
       </head>
       <body>
         <div class="container">
@@ -294,13 +330,19 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
           </div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName} Projects</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}">${projectName} Issues</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">Tasks</a></li>
+              <li class="breadcrumb-item"><a href="/">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">Issues</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">Tasks</a></li>
               <li class="breadcrumb-item active">Task ${task.id.index}</li>
             </ol>
           </nav>
+
+          <div class="ide-icons">
+            ${project.ides.map(ide => `
+              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+            `).join('')}
+          </div>
 
           <div class="task-details">
             <div class="task-meta">
@@ -397,6 +439,12 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
     console.error('Error generating steps page:', error);
     res.status(500).send('An error occurred while generating the steps page');
   }
+});
+
+// Legacy route for backward compatibility
+router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
+  const { projectName, issueId, taskId } = req.params;
+  res.redirect(`/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${taskId}`);
 });
 
 export default router;

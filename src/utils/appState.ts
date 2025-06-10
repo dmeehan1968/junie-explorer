@@ -5,6 +5,24 @@ import { jetBrainsPath } from './jetBrainsPath.js';
 
 // The in-memory app state
 let appState: IDE[] = [];
+let mergedProjects: Project[] = [];
+
+/**
+ * Get the icon URL for a JetBrains IDE
+ * @param ideName The name of the IDE (e.g., WebStorm2025.1)
+ * @returns The URL to the IDE icon
+ */
+export function getIDEIcon(ideName: string): string {
+  // Remove version number from IDE name (e.g., WebStorm2025.1 -> WebStorm)
+  const baseIdeName = ideName.replace(/\d+(\.\d+)*$/, '');
+
+  // If the base IDE name is empty, return a generic question mark icon
+  if (!baseIdeName) {
+    return 'https://resources.jetbrains.com/storage/products/company/brand/logos/unknown_icon.svg';
+  }
+
+  return `https://resources.jetbrains.com/storage/products/company/brand/logos/${baseIdeName}_icon.svg`;
+}
 
 // Function to scan the file system and build the complete hierarchy
 export async function scanFileSystem(): Promise<IDE[]> {
@@ -32,11 +50,44 @@ export async function scanFileSystem(): Promise<IDE[]> {
       } satisfies IDE;
     });
 
-    return await Promise.all(idePromises);
+    const ideArray = await Promise.all(idePromises);
+
+    // Merge projects with the same name across IDEs
+    mergedProjects = mergeProjects(ideArray);
+
+    return ideArray;
   } catch (error) {
     console.error('Error scanning file system:', error);
     return [];
   }
+}
+
+// Function to merge projects with the same name across IDEs
+function mergeProjects(ides: IDE[]): Project[] {
+  const projectMap = new Map<string, Project>();
+
+  // Iterate through all IDEs and their projects
+  for (const ide of ides) {
+    for (const project of ide.projects) {
+      const existingProject = projectMap.get(project.name);
+
+      if (existingProject) {
+        // Merge issues from this project into the existing project
+        existingProject.issues = [...existingProject.issues, ...project.issues];
+        // Add this IDE to the list of IDEs for this project
+        existingProject.ides.push(ide.name);
+      } else {
+        // Create a new project with this IDE
+        projectMap.set(project.name, {
+          ...project,
+          ides: [ide.name]
+        });
+      }
+    }
+  }
+
+  // Convert the map to an array and sort by project name
+  return Array.from(projectMap.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // Helper function to get projects for an IDE
@@ -63,6 +114,7 @@ async function getProjectsForIDE(ideName: string): Promise<Project[]> {
       return {
         name: projectName,
         issues,
+        ides: [ideName],
       } satisfies Project;
     });
 
@@ -279,28 +331,52 @@ export function getIDEs(): IDE[] {
   return appState;
 }
 
+// Get all merged projects
+export function getMergedProjects(): Project[] {
+  return mergedProjects;
+}
+
 // Get a specific IDE by name
 export function getIDE(ideName: string): IDE | undefined {
   return appState.find(ide => ide.name === ideName);
 }
 
-// Get a specific project by IDE name and project name
-export function getProject(ideName: string, projectName: string): Project | undefined {
+// Get a specific project by name
+export function getProject(projectName: string): Project | undefined {
+  return mergedProjects.find(project => project.name === projectName);
+}
+
+// Get a specific project by IDE name and project name (legacy method)
+export function getProjectByIDE(ideName: string, projectName: string): Project | undefined {
   const ide = getIDE(ideName);
   if (!ide) return undefined;
   return ide.projects.find(project => project.name === projectName);
 }
 
-// Get a specific issue by IDE name, project name, and issue ID
-export function getIssue(ideName: string, projectName: string, issueId: string): Issue | undefined {
-  const project = getProject(ideName, projectName);
+// Get a specific issue by project name and issue ID
+export function getIssue(projectName: string, issueId: string): Issue | undefined {
+  const project = getProject(projectName);
   if (!project) return undefined;
   return project.issues.find(issue => issue.id.id === issueId);
 }
 
-// Get a specific task by IDE name, project name, issue ID, and task ID
-export function getTask(ideName: string, projectName: string, issueId: string, taskId: number): Task | undefined {
-  const issue = getIssue(ideName, projectName, issueId);
+// Get a specific issue by IDE name, project name, and issue ID (legacy method)
+export function getIssueByIDE(ideName: string, projectName: string, issueId: string): Issue | undefined {
+  const project = getProjectByIDE(ideName, projectName);
+  if (!project) return undefined;
+  return project.issues.find(issue => issue.id.id === issueId);
+}
+
+// Get a specific task by project name, issue ID, and task ID
+export function getTask(projectName: string, issueId: string, taskId: number): Task | undefined {
+  const issue = getIssue(projectName, issueId);
+  if (!issue) return undefined;
+  return issue.tasks.find(task => task.id.index === taskId);
+}
+
+// Get a specific task by IDE name, project name, issue ID, and task ID (legacy method)
+export function getTaskByIDE(ideName: string, projectName: string, issueId: string, taskId: number): Task | undefined {
+  const issue = getIssueByIDE(ideName, projectName, issueId);
   if (!issue) return undefined;
   return issue.tasks.find(task => task.id.index === taskId);
 }

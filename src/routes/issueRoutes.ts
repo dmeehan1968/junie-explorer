@@ -1,5 +1,5 @@
 import express from 'express';
-import { getProject } from '../utils/appState.js';
+import { getProject, getIDEIcon } from '../utils/appState.js';
 import { formatSeconds } from '../utils/timeUtils.js';
 import { calculateIssueSummary } from '../utils/metricsUtils.js';
 import { Issue } from '../matterhorn.js'
@@ -93,10 +93,10 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 }
 
 // Project issues page route
-router.get('/ide/:ideName/project/:projectName', (req, res) => {
+router.get('/project/:projectName/issues', (req, res) => {
   try {
-    const { ideName, projectName } = req.params;
-    const project = getProject(ideName, projectName);
+    const { projectName } = req.params;
+    const project = getProject(projectName);
 
     if (!project) {
       return res.status(404).send('Project not found');
@@ -124,6 +124,29 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
           : ''
         }
         <script src="/js/issueGraph.js"></script>
+        <script>
+          function reloadPage() {
+            const button = document.getElementById('reload-button');
+            if (button) {
+              button.disabled = true;
+              button.classList.add('loading');
+              setTimeout(() => {
+                window.location.href = '/refresh';
+              }, 100);
+            }
+          }
+        </script>
+        <style>
+          .ide-icons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+          }
+          .ide-icon {
+            width: 30px;
+            height: 30px;
+          }
+        </style>
       </head>
       <body>
         <div class="container">
@@ -133,11 +156,17 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
           </div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">JetBrains</a></li>
-              <li class="breadcrumb-item"><a href="/ide/${encodeURIComponent(ideName)}">${ideName}</a></li>
-              <li class="breadcrumb-item active">${project.name}</li>
+              <li class="breadcrumb-item"><a href="/">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${project.name}</a></li>
+              <li class="breadcrumb-item active">Issues</li>
             </ol>
           </nav>
+
+          <div class="ide-icons">
+            ${project.ides.map(ide => `
+              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+            `).join('')}
+          </div>
 
           ${project.issues.length > 0 
             ? `<div class="graph-container">
@@ -151,7 +180,7 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
               ? project.issues.map(issue => {
                   return `
                     <li class="issue-item">
-                      <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id.id)}" class="issue-link">
+                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id.id)}" class="issue-link">
                         <div class="issue-container">
                           <div class="issue-name">${issue.name}</div>
                           <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
@@ -176,6 +205,12 @@ router.get('/ide/:ideName/project/:projectName', (req, res) => {
     console.error('Error generating issues page:', error);
     res.status(500).send('An error occurred while generating the issues page');
   }
+});
+
+// Legacy route for backward compatibility
+router.get('/ide/:ideName/project/:projectName', (req, res) => {
+  const { projectName } = req.params;
+  res.redirect(`/project/${encodeURIComponent(projectName)}/issues`);
 });
 
 export default router;

@@ -18,11 +18,15 @@ export interface IDE {
  * Location: /Users/<username>/Libraries/Caches/JetBrains/<IDE>/projects/<project-name>
  *
  * <project-name> is read from the filesystem
+ * 
+ * Projects with the same name across different IDEs are merged
+ * The ides array contains the names of all IDEs that have this project
  */
 
 export interface Project {
   name: string;
   issues: Issue[];
+  ides: string[]; // Names of IDEs that have this project
 }
 
 /**

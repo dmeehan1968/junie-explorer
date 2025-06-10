@@ -1,13 +1,13 @@
 import express from 'express';
 import { jetBrainsPath } from '../utils/jetBrainsPath.js';
-import { getIDEs } from '../utils/appState.js';
+import { getMergedProjects, getIDEIcon } from '../utils/appState.js';
 
 const router = express.Router();
 
-// Homepage route
+// Homepage route (now shows projects instead of IDEs)
 router.get('/', (req, res) => {
   try {
-    const ideDirectories = getIDEs();
+    const projects = getMergedProjects();
 
     // Generate HTML
     const html = `
@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>JetBrains IDE Explorer</title>
+        <title>JetBrains Project Explorer</title>
         <link rel="stylesheet" href="/css/style.css">
         <script>
           function reloadPage() {
@@ -30,25 +30,41 @@ router.get('/', (req, res) => {
             }
           }
         </script>
+        <style>
+          .ide-icons {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+          }
+          .ide-icon {
+            width: 20px;
+            height: 20px;
+          }
+        </style>
       </head>
       <body>
         <div class="container">
           <div class="header-container">
-            <h1>JetBrains IDE Explorer</h1>
+            <h1>JetBrains Project Explorer</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
-          <p>Directories found in: ${jetBrainsPath}</p>
+          <p>Projects found in: ${jetBrainsPath}</p>
 
-          <ul class="ide-list">
-            ${ideDirectories.length > 0 
-              ? ideDirectories.map(ide => `
-                <li class="ide-item">
-                  <a href="/ide/${encodeURIComponent(ide.name)}" class="ide-link">
-                    <div class="ide-name">${ide.name}</div>
+          <ul class="project-list">
+            ${projects.length > 0 
+              ? projects.map(project => `
+                <li class="project-item">
+                  <a href="/project/${encodeURIComponent(project.name)}" class="project-link">
+                    <div class="project-name">${project.name}</div>
+                    <div class="ide-icons">
+                      ${project.ides.map(ide => `
+                        <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+                      `).join('')}
+                    </div>
                   </a>
                 </li>
               `).join('')
-              : '<li>No JetBrains IDE directories found</li>'
+              : '<li>No JetBrains projects found</li>'
             }
           </ul>
         </div>

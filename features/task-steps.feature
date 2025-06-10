@@ -22,7 +22,11 @@ Feature: Task Steps Page
 
   Scenario: Breadcrumb navigation on steps page
     Given I am on the steps page for a task
-    Then I should see breadcrumb navigation with links to Home, IDE Projects, Project Issues, and Tasks
+    Then I should see breadcrumb navigation with links to Projects, Project Details, Project Issues, and Tasks
+
+  Scenario: IDE icons display
+    Given I am on the steps page for a task
+    Then I should see icons for each IDE that was used with the project
 
   Scenario: Step table column structure
     Given I am on the steps page for a task
