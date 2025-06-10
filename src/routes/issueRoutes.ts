@@ -124,18 +124,7 @@ router.get('/project/:projectName/issues', (req, res) => {
           : ''
         }
         <script src="/js/issueGraph.js"></script>
-        <script>
-          function reloadPage() {
-            const button = document.getElementById('reload-button');
-            if (button) {
-              button.disabled = true;
-              button.classList.add('loading');
-              setTimeout(() => {
-                window.location.href = '/refresh';
-              }, 100);
-            }
-          }
-        </script>
+        <script src="/js/ideFilters.js"></script>
         <style>
           .ide-icons {
             display: flex;

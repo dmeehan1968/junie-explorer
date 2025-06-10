@@ -170,18 +170,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${issue.name} Tasks</title>
         <link rel="stylesheet" href="/css/style.css">
-        <script>
-          function reloadPage() {
-            const button = document.getElementById('reload-button');
-            if (button) {
-              button.disabled = true;
-              button.classList.add('loading');
-              setTimeout(() => {
-                window.location.href = '/refresh';
-              }, 100);
-            }
-          }
-        </script>
+        <script src="/js/ideFilters.js"></script>
         <style>
           .ide-icons {
             display: flex;
@@ -292,18 +281,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
           : ''
         }
         <script src="/js/taskStepGraph.js"></script>
-        <script>
-          function reloadPage() {
-            const button = document.getElementById('reload-button');
-            if (button) {
-              button.disabled = true;
-              button.classList.add('loading');
-              setTimeout(() => {
-                window.location.href = '/refresh';
-              }, 100);
-            }
-          }
-        </script>
+        <script src="/js/ideFilters.js"></script>
         <style>
           .ide-icons {
             display: flex;
