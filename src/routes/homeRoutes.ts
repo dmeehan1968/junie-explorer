@@ -34,11 +34,20 @@ router.get('/', (req, res) => {
           .ide-icons {
             display: flex;
             gap: 5px;
-            margin-top: 5px;
+            margin-left: auto;
           }
           .ide-icon {
             width: 20px;
             height: 20px;
+          }
+          .project-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          .project-item {
+            padding: 10px 15px;
+            margin-bottom: 5px;
           }
         </style>
       </head>

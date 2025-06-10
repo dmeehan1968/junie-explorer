@@ -45,11 +45,17 @@ router.get('/project/:projectName', (req, res) => {
           .ide-icons {
             display: flex;
             gap: 10px;
-            margin: 15px 0;
+            margin-left: auto;
           }
           .ide-icon {
             width: 30px;
             height: 30px;
+          }
+          .project-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
           }
         </style>
       </head>
@@ -66,10 +72,13 @@ router.get('/project/:projectName', (req, res) => {
             </ol>
           </nav>
 
-          <div class="ide-icons">
-            ${project.ides.map(ide => `
-              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
-            `).join('')}
+          <div class="project-header">
+            <h2>Project Details</h2>
+            <div class="ide-icons">
+              ${project.ides.map(ide => `
+                <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              `).join('')}
+            </div>
           </div>
 
           <h2>Issues</h2>

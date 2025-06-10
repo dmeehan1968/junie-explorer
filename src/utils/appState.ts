@@ -9,19 +9,24 @@ let mergedProjects: Project[] = [];
 
 /**
  * Get the icon URL for a JetBrains IDE
- * @param ideName The name of the IDE (e.g., WebStorm2025.1)
+ * @param ideName The name of the IDE (e.g., WebStorm)
  * @returns The URL to the IDE icon
  */
 export function getIDEIcon(ideName: string): string {
-  // Remove version number from IDE name (e.g., WebStorm2025.1 -> WebStorm)
-  const baseIdeName = ideName.replace(/\d+(\.\d+)*$/, '');
-
-  // If the base IDE name is empty, return a generic question mark icon
-  if (!baseIdeName) {
-    return 'https://resources.jetbrains.com/storage/products/company/brand/logos/unknown_icon.svg';
+  const ideNameMap: Record<string, string> = {
+    'AppCode': 'AppCode',
+    'CLion': 'CLion',
+    'DataGrip': 'DataGrip',
+    'GoLand': 'GoLand',
+    'IntelliJIdea': 'IntelliJ_IDEA',
+    'PhpStorm': 'PhpStorm',
+    'PyCharm': 'PyCharm',
+    'Rider': 'Rider',
+    'WebStorm': 'WebStorm',
   }
+  const mappedName = ideNameMap[ideName] ?? 'AI'
 
-  return `https://resources.jetbrains.com/storage/products/company/brand/logos/${baseIdeName}_icon.svg`;
+  return `https://resources.jetbrains.com/storage/products/company/brand/logos/${mappedName}_icon.svg`;
 }
 
 // Function to scan the file system and build the complete hierarchy
@@ -45,7 +50,7 @@ export async function scanFileSystem(): Promise<IDE[]> {
     const idePromises = ides.map(async (ideName) => {
       const projects = await getProjectsForIDE(ideName);
       return {
-        name: ideName,
+        name: ideName.replace(/\d+(\.\d+)*$/, ''),  // remove version number suffix
         projects,
       } satisfies IDE;
     });
@@ -74,8 +79,7 @@ function mergeProjects(ides: IDE[]): Project[] {
       if (existingProject) {
         // Merge issues from this project into the existing project
         existingProject.issues = [...existingProject.issues, ...project.issues];
-        // Add this IDE to the list of IDEs for this project
-        existingProject.ides.push(ide.name);
+        existingProject.ides = [...new Set(existingProject.ides.concat(ide.name))];
       } else {
         // Create a new project with this IDE
         projectMap.set(project.name, {
