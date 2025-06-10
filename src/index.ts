@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import homeRoutes from './routes/homeRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
+import issueRoutes from './routes/issueRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import notFoundRoutes from './routes/notFoundRoutes.js';
 import { initializeAppState, refreshAppState } from './utils/appState.js';
@@ -25,6 +26,7 @@ app.get('/refresh', async (req, res) => {
 // Register routes
 app.use('/', homeRoutes);
 app.use('/', projectRoutes);
+app.use('/', issueRoutes);
 app.use('/', taskRoutes);
 
 // Add not found page (must be after routes)

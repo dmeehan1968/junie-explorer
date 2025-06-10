@@ -1,22 +1,12 @@
 import express from 'express';
 import { getIssue, getTask, getIDEIcon, getProject } from '../utils/appState.js'
+import { escapeHtml } from "../utils/escapeHtml.js"
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
 import { calculateStepSummary } from '../utils/metricsUtils.js';
 import { Step, Metrics } from '../matterhorn.js';
 import { marked } from 'marked';
 
-// Helper function to escape HTML before markdown conversion
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 const router = express.Router();
-
 
 // Function to prepare data for the metrics over time graph
 function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
@@ -129,109 +119,6 @@ const metricsHeaders = `
   <th>Default</th>
   <th>Cached</th>
 `;
-
-// Function to generate HTML for step totals table
-const generateStepTotalsTable = (summaryData: Metrics): string => {
-  // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = summaryData.buildTime + summaryData.modelTime/1000 + summaryData.artifactTime + summaryData.modelCachedTime/1000;
-
-  return `
-  <table class="step-totals-table">
-    <tbody>
-      <tr>
-        <td>Input Tokens: ${summaryData.inputTokens}</td>
-        <td>Output Tokens: ${summaryData.outputTokens}</td>
-        <td>Cache Tokens: ${summaryData.cacheTokens}</td>
-        <td>Cost: ${summaryData.cost.toFixed(4)}</td>
-        <td>Total Time: ${formatSeconds(totalTime)}</td>
-      </tr>
-    </tbody>
-  </table>
-`;
-};
-
-// Issue tasks page route
-router.get('/project/:projectName/issue/:issueId', (req, res) => {
-  try {
-    const { projectName, issueId } = req.params;
-    const project = getProject(projectName);
-    const issue = getIssue(projectName, issueId);
-
-    if (!project || !issue) {
-      return res.status(404).send('Issue not found');
-    }
-
-    // Generate HTML
-    const html = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${issue.name} Tasks</title>
-        <link rel="stylesheet" href="/css/style.css">
-        <script src="/js/reloadPage.js"></script>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header-container">
-            <h1>Issue: ${issue.name}</h1>
-            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
-          </div>
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
-              <li class="breadcrumb-item active">${issue.name}</li>
-            </ol>
-          </nav>
-
-          <div class="ide-icons">
-            ${project.ides.map(ide => `
-              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
-            `).join('')}
-          </div>
-
-          <div class="issue-details">
-            <div class="issue-created">Created: ${new Date(issue.created).toLocaleString()}</div>
-            <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
-          </div>
-
-          <ul class="task-list">
-            ${issue.tasks.length > 0 
-              ? issue.tasks.map(task => {
-                  // Calculate step totals for this task
-                  const stepTotals = calculateStepSummary(task.steps);
-
-                  return `
-                    <li class="task-item">
-                      <div class="task-header">
-                        <div class="task-id">${task.id.index === 0 ? 'Initial Request' : `Follow up ${task.id.index}`}</div>
-                        <div class="task-date">Created: ${new Date(task.created).toLocaleString()}</div>
-                      </div>
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
-                        ${task.context?.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
-                      </a>
-                      <div class="task-details">
-                        ${generateStepTotalsTable(stepTotals)}
-                      </div>
-                    </li>
-                  `;
-                }).join('')
-              : '<li>No tasks found for this issue</li>'
-            }
-          </ul>
-        </div>
-      </body>
-      </html>
-    `;
-
-    res.send(html);
-  } catch (error) {
-    console.error('Error generating tasks page:', error);
-    res.status(500).send('An error occurred while generating the tasks page');
-  }
-});
 
 // Task steps page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
