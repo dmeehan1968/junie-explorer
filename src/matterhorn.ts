@@ -9,7 +9,6 @@
 
 export interface IDE {
   name: string;
-  projects: Project[];
 }
 
 /**

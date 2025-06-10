@@ -30,18 +30,14 @@ export function getIDEIcon(ideName: string): string {
 }
 
 // Function to scan the file system and build the complete hierarchy
-export function scanFileSystem(): IDE[] {
+export function scanFileSystem(): void {
   try {
     console.log(`JetBrains Path: ${jetBrainsPath}`);
     console.log('Scanning file system...');
 
-    // Log memory usage before scan
-    const memBefore = process.memoryUsage();
-    console.log(`Memory usage before scan: ${formatMemoryUsage(memBefore)}`);
-
     const exists = fs.pathExistsSync(jetBrainsPath);
     if (!exists) {
-      return [];
+      return;
     }
 
     // Reset the state
@@ -56,30 +52,23 @@ export function scanFileSystem(): IDE[] {
 
     // Process each IDE incrementally
     for (const ideName of ides) {
-      // Log memory usage during scan
       console.log(`Processing IDE: ${ideName}`);
-      const memDuring = process.memoryUsage();
-      console.log(`Memory usage during scan: ${formatMemoryUsage(memDuring)}`);
 
       const projects = getProjectsForIDE(ideName);
       const truncatedIdeName = ideName.replace(/\d+(\.\d+)*$/, '');  // remove version number suffix
 
-      // Merge projects from this IDE into mergedProjects
       mergeProjectsWithIdeName(projects, truncatedIdeName);
     }
 
-    // Sort merged projects by name
     mergedProjects.sort((a, b) => a.name.localeCompare(b.name));
 
-    // Log memory usage after scan
     const memAfter = process.memoryUsage();
     console.log(`Memory usage after scan: ${formatMemoryUsage(memAfter)}`);
 
-    // Derive IDE information from mergedProjects
-    return getIDEsFromProjects();
+    return;
   } catch (error) {
     console.error('Error scanning file system:', error);
-    return [];
+    return;
   }
 }
 
@@ -91,22 +80,16 @@ function formatMemoryUsage(memory: NodeJS.MemoryUsage): string {
 // Function to derive IDE information from mergedProjects
 function getIDEsFromProjects(): IDE[] {
   // Get all unique IDE names from all projects
-  const ideMap = new Map<string, Project[]>();
+  const ideMap = new Set<IDE>();
 
   for (const project of mergedProjects) {
     for (const ideName of project.ides) {
-      if (!ideMap.has(ideName)) {
-        ideMap.set(ideName, []);
-      }
-      ideMap.get(ideName)!.push(project);
+      ideMap.add({ name: ideName });
     }
   }
 
   // Convert the map to an array of IDE objects
-  return Array.from(ideMap.entries()).map(([name, projects]) => ({
-    name,
-    projects
-  }));
+  return Array.from(ideMap);
 }
 
 // Function to merge projects with their IDE name directly
@@ -246,7 +229,7 @@ function getTasksForIssue(ideName: string, projectName: string, issueId: string)
     const tasks = taskFiles.map((file) => {
       try {
         const filePath = path.join(issuePath, file.name);
-        const data = fs.readJsonSync(filePath);
+        const { previousTasksInfo, finalAgentState, sessionHistory, patch, ...data } = fs.readJsonSync(filePath);
 
         // Get steps for this task
         const steps = getStepsForTask(ideName, projectName, data.artifactPath || '');
@@ -303,7 +286,7 @@ function getStepsForTask(ideName: string, projectName: string, taskArtifactPath:
     const steps = stepFiles.map((file) => {
       try {
         const filePath = path.join(stepsPath, file.name);
-        const data = fs.readJsonSync(filePath);
+        const { content, dependencies, description, ...data } = fs.readJsonSync(filePath);
 
         // Get file stats to extract creation time
         const stats = fs.statSync(filePath);
@@ -322,6 +305,8 @@ function getStepsForTask(ideName: string, projectName: string, taskArtifactPath:
         // Use the full file content for the Step interface
         return {
           ...data,
+          content: {},
+          dependencies: [],
           metrics: {
             inputTokens: data.statistics?.inputTokens || 0,
             outputTokens: data.statistics?.outputTokens || 0,
@@ -358,15 +343,12 @@ function getStepsForTask(ideName: string, projectName: string, taskArtifactPath:
 // Initialize the app state
 export function initializeAppState(): void {
   scanFileSystem();
-  const ides = getIDEsFromProjects();
-  console.log(`App state initialized with ${ides.length} IDEs`);
 }
 
 // Refresh the app state
 export function refreshAppState(): void {
   scanFileSystem();
-  const ides = getIDEsFromProjects();
-  console.log(`App state refreshed with ${ides.length} IDEs`);
+  console.log(`App state refreshed with ${mergedProjects.length} projects`);
 }
 
 // Get all IDEs
