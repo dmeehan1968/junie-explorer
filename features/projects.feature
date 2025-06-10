@@ -19,19 +19,53 @@ Feature: Project Details Page
     When the user visits the project details page
     Then the user should see icons for each IDE that was used with the project
 
-  Scenario: Viewing project details page with issues
+  Scenario: Reload button display
     Given there are issues for a specific JetBrains project
     When the user visits the project details page
-    Then the user should see a table of all issues for that project
-    And the table should have columns for Issue Name, Created, State, Tasks, Input Tokens, Output Tokens, Cache Tokens, Cost, and Total Time
-    And the user should see a summary of project metrics
+    Then the user should see a reload button in the header
 
-  Scenario: Viewing project details page with no issues
-    Given there are no issues for a specific JetBrains project
-    When the user visits the project details page
-    Then the user should see a message indicating no issues were found
+  Scenario: Reload button functionality
+    Given the user is on a project details page
+    When the user clicks the reload button
+    Then the page should redirect to the refresh route
+
+  Scenario: Breadcrumb navigation display
+    Given the user is on a project details page
+    Then the user should see breadcrumb navigation showing the current location
 
   Scenario: Navigating back to homepage
     Given the user is on a project details page
     When the user clicks on the "Projects" link in the breadcrumb navigation
     Then the user should be taken back to the homepage
+
+  Scenario: Cost over time graph display
+    Given there are issues for a specific JetBrains project
+    When the user visits the project details page
+    Then the user should see a graph visualizing issue costs over time
+
+  Scenario: Cost over time graph not displayed for empty projects
+    Given there are no issues for a specific JetBrains project
+    When the user visits the project details page
+    Then no cost over time graph should be displayed
+
+  Scenario: Viewing issue list with details
+    Given there are issues for a specific JetBrains project
+    When the user visits the project details page
+    Then the user should see a list of all issues for that project
+    And each issue should display its name and state
+    And each issue should display metrics including created date, input tokens, output tokens, cache tokens, cost, and total time
+
+  Scenario: Issue state display
+    Given there are issues for a specific JetBrains project
+    When the user visits the project details page
+    Then each issue should display its current state with appropriate styling
+
+  Scenario: Issue link functionality
+    Given there are issues for a specific JetBrains project
+    When the user clicks on an issue in the list
+    Then the user should be taken to a page for that specific issue
+
+  Scenario: Viewing project details page with no issues
+    Given there are no issues for a specific JetBrains project
+    When the user visits the project details page
+    Then the user should see a message indicating no issues were found
