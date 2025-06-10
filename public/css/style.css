@@ -719,16 +719,52 @@ p {
   height: 20px;
 }
 
+/* Project Selection Styles */
+.project-selection-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.select-all-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.select-all-container label {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.project-checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.project-checkbox {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
 /* Project Link Styles */
 .project-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex: 1;
 }
 
 .project-item {
   padding: 10px 15px;
   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
 }
 
 /* IDE Filter Toolbar Styles */
