@@ -304,8 +304,10 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
           </nav>
 
           <div class="task-details">
-            <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
-            <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
+            <div class="task-meta">
+              <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
+              <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
+            </div>
             <div class="task-content-container${(!task.plan || task.plan.length === 0) ? ' no-plan' : ''}">
               ${task.context.description ? `
                 <div class="task-description">

@@ -374,10 +374,18 @@ p {
   color: #777;
 }
 
+.task-created {
+  font-size: 14px;
+  color: #555;
+  flex: 1;
+}
+
 .task-artifact {
   font-size: 14px;
   color: #555;
   word-break: break-all;
+  flex: 1;
+  text-align: right;
 }
 
 .task-content-container {
@@ -569,10 +577,19 @@ p {
 
 .task-details {
   background-color: #f9f9f9;
-  padding: 0;
+  padding: 10px;
   margin-top: 10px;
   margin-bottom: 20px;
   border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 /* Graph Container Styles */
