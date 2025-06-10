@@ -1,12 +1,12 @@
 import { jetBrainsPath } from './utils/jetBrainsPath.js';
 import { initializeAppState, getIDEs } from './utils/appState.js';
 
-async function testDirectoryAccess() {
+function testDirectoryAccess() {
   try {
     console.log(`Testing access to: ${jetBrainsPath}`);
 
     // Initialize the app state
-    await initializeAppState();
+    initializeAppState();
 
     // Get IDE directories from the app state
     const ideDirectories = getIDEs();
@@ -26,4 +26,4 @@ async function testDirectoryAccess() {
 }
 
 // Run the test
-await testDirectoryAccess();
+testDirectoryAccess();

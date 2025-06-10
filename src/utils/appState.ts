@@ -6,8 +6,6 @@ import { jetBrainsPath } from './jetBrainsPath.js';
 // The in-memory app state
 // mergedProjects is the primary state representation
 let mergedProjects: Project[] = [];
-// appState is derived from mergedProjects
-let appState: IDE[] = [];
 
 /**
  * Get the icon URL for a JetBrains IDE
@@ -36,6 +34,11 @@ export function scanFileSystem(): IDE[] {
   try {
     console.log(`JetBrains Path: ${jetBrainsPath}`);
     console.log('Scanning file system...');
+
+    // Log memory usage before scan
+    const memBefore = process.memoryUsage();
+    console.log(`Memory usage before scan: ${formatMemoryUsage(memBefore)}`);
+
     const exists = fs.pathExistsSync(jetBrainsPath);
     if (!exists) {
       return [];
@@ -43,7 +46,6 @@ export function scanFileSystem(): IDE[] {
 
     // Reset the state
     mergedProjects = [];
-    appState = [];
 
     const directories = fs.readdirSync(jetBrainsPath, { withFileTypes: true });
 
@@ -54,77 +56,80 @@ export function scanFileSystem(): IDE[] {
 
     // Process each IDE incrementally
     for (const ideName of ides) {
-      const projects = getProjectsForIDE(ideName);
-      const ide = {
-        name: ideName.replace(/\d+(\.\d+)*$/, ''),  // remove version number suffix
-        projects,
-      } satisfies IDE;
+      // Log memory usage during scan
+      console.log(`Processing IDE: ${ideName}`);
+      const memDuring = process.memoryUsage();
+      console.log(`Memory usage during scan: ${formatMemoryUsage(memDuring)}`);
 
-      // Add to appState
-      appState.push(ide);
+      const projects = getProjectsForIDE(ideName);
+      const truncatedIdeName = ideName.replace(/\d+(\.\d+)*$/, '');  // remove version number suffix
 
       // Merge projects from this IDE into mergedProjects
-      mergeProjectsIncremental(ide);
+      mergeProjectsWithIdeName(projects, truncatedIdeName);
     }
 
     // Sort merged projects by name
     mergedProjects.sort((a, b) => a.name.localeCompare(b.name));
 
-    return appState;
+    // Log memory usage after scan
+    const memAfter = process.memoryUsage();
+    console.log(`Memory usage after scan: ${formatMemoryUsage(memAfter)}`);
+
+    // Derive IDE information from mergedProjects
+    return getIDEsFromProjects();
   } catch (error) {
     console.error('Error scanning file system:', error);
     return [];
   }
 }
 
-// Function to merge projects with the same name across IDEs
-function mergeProjects(ides: IDE[]): Project[] {
-  const projectMap = new Map<string, Project>();
+// Helper function to format memory usage
+function formatMemoryUsage(memory: NodeJS.MemoryUsage): string {
+  return `rss: ${Math.round(memory.rss / 1024 / 1024)}MB, heapTotal: ${Math.round(memory.heapTotal / 1024 / 1024)}MB, heapUsed: ${Math.round(memory.heapUsed / 1024 / 1024)}MB`;
+}
 
-  // Iterate through all IDEs and their projects
-  for (const ide of ides) {
-    for (const project of ide.projects) {
-      const existingProject = projectMap.get(project.name);
+// Function to derive IDE information from mergedProjects
+function getIDEsFromProjects(): IDE[] {
+  // Get all unique IDE names from all projects
+  const ideMap = new Map<string, Project[]>();
 
-      if (existingProject) {
-        // Merge issues from this project into the existing project
-        existingProject.issues = [...existingProject.issues, ...project.issues];
-        existingProject.ides = [...new Set(existingProject.ides.concat(ide.name))];
-      } else {
-        // Create a new project with this IDE
-        projectMap.set(project.name, {
-          ...project,
-          ides: [ide.name]
-        });
+  for (const project of mergedProjects) {
+    for (const ideName of project.ides) {
+      if (!ideMap.has(ideName)) {
+        ideMap.set(ideName, []);
       }
+      ideMap.get(ideName)!.push(project);
     }
   }
 
-  // Convert the map to an array and sort by project name
-  return Array.from(projectMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  // Convert the map to an array of IDE objects
+  return Array.from(ideMap.entries()).map(([name, projects]) => ({
+    name,
+    projects
+  }));
 }
 
-// Function to incrementally merge projects from an IDE into the mergedProjects array
-function mergeProjectsIncremental(ide: IDE): void {
+// Function to merge projects with their IDE name directly
+function mergeProjectsWithIdeName(projects: Project[], ideName: string): void {
   // Create a map of existing projects for faster lookup
   const projectMap = new Map<string, Project>();
   for (const project of mergedProjects) {
     projectMap.set(project.name, project);
   }
 
-  // Process each project in the IDE
-  for (const project of ide.projects) {
+  // Process each project
+  for (const project of projects) {
     const existingProject = projectMap.get(project.name);
 
     if (existingProject) {
       // Merge issues from this project into the existing project
       existingProject.issues = [...existingProject.issues, ...project.issues];
-      existingProject.ides = [...new Set(existingProject.ides.concat(ide.name))];
+      existingProject.ides = [...new Set(existingProject.ides.concat(ideName))];
     } else {
       // Create a new project with this IDE and add it to mergedProjects
       const newProject = {
         ...project,
-        ides: [ide.name]
+        ides: [ideName]
       };
       mergedProjects.push(newProject);
       projectMap.set(project.name, newProject);
@@ -352,19 +357,21 @@ function getStepsForTask(ideName: string, projectName: string, taskArtifactPath:
 
 // Initialize the app state
 export function initializeAppState(): void {
-  appState = scanFileSystem();
-  console.log(`App state initialized with ${appState.length} IDEs`);
+  scanFileSystem();
+  const ides = getIDEsFromProjects();
+  console.log(`App state initialized with ${ides.length} IDEs`);
 }
 
 // Refresh the app state
 export function refreshAppState(): void {
-  appState = scanFileSystem();
-  console.log(`App state refreshed with ${appState.length} IDEs`);
+  scanFileSystem();
+  const ides = getIDEsFromProjects();
+  console.log(`App state refreshed with ${ides.length} IDEs`);
 }
 
 // Get all IDEs
 export function getIDEs(): IDE[] {
-  return appState;
+  return getIDEsFromProjects();
 }
 
 // Get all merged projects
