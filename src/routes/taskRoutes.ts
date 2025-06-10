@@ -215,7 +215,6 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId', (req, res) => {
                         <div class="task-date">Created: ${new Date(task.created).toLocaleString()}</div>
                       </div>
                       <a href="/ide/${encodeURIComponent(ideName)}/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
-                        <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
                         ${task.context?.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                       </a>
                       <div class="task-details">
@@ -306,7 +305,6 @@ router.get('/ide/:ideName/project/:projectName/issue/:issueId/task/:taskId', (re
           <div class="task-details">
             <div class="task-meta">
               <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
-              <div class="task-artifact">Artifact Path: ${task.artifactPath}</div>
             </div>
             <div class="task-content-container${(!task.plan || task.plan.length === 0) ? ' no-plan' : ''}">
               ${task.context.description ? `

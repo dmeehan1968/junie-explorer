@@ -21,7 +21,6 @@ Feature: Issue Tasks Page
     Then I should see the following information for each task:
       | Task ID      |
       | Created Date |
-      | Artifact Path|
       | Step Totals  |
 
   Scenario: Step totals display format
