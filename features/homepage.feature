@@ -32,6 +32,41 @@ Feature: Homepage
     When the user visits the homepage
     Then each project should display icons for the IDEs it was used with
 
+  Scenario: Reload button display
+    Given there are JetBrains projects in the cache
+    When the user visits the homepage
+    Then the user should see a reload button in the header
+
+  Scenario: Reload button functionality
+    Given there are JetBrains projects in the cache
+    When the user clicks the reload button
+    Then the page should redirect to the refresh route
+
+  Scenario: IDE filter toolbar display
+    Given there are JetBrains projects in the cache
+    When the user visits the homepage
+    Then the user should see a toolbar with IDE filters
+
+  Scenario: IDE filter functionality
+    Given there are JetBrains projects in the cache
+    When the user toggles an IDE filter
+    Then only projects associated with the selected IDEs should be displayed
+
+  Scenario: Project search display
+    Given there are JetBrains projects in the cache
+    When the user visits the homepage
+    Then the user should see a search input field for filtering projects by name
+
+  Scenario: Project search functionality
+    Given there are JetBrains projects in the cache
+    When the user enters text in the project search field
+    Then only projects with names containing the search text should be displayed
+
+  Scenario: No matching projects message
+    Given there are JetBrains projects in the cache
+    When the user applies filters that result in no matching projects
+    Then the user should see a message indicating no matching projects were found
+
   Scenario: Empty homepage title
     Given there are no JetBrains projects in the cache
     When the user visits the homepage
@@ -66,3 +101,8 @@ Feature: Homepage
     Given there are JetBrains projects in the cache
     When the user hovers over a project item
     Then the item should slightly move to indicate interactivity
+
+  Scenario: Filter persistence
+    Given the user has applied IDE filters
+    When the user refreshes the page
+    Then the previously selected IDE filters should be preserved
