@@ -162,7 +162,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
       <body>
         <div class="container">
           <div class="header-container">
-            <h1>Task ${task.id.index}</h1>
+            <h1>Junie Explorer: Task ${task.id.index}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
           <nav aria-label="breadcrumb">

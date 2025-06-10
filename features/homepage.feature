@@ -10,7 +10,7 @@ Feature: Homepage
   Scenario: Homepage title
     Given there are JetBrains projects in the cache
     When the user visits the homepage
-    Then the user should see a page titled "JetBrains Project Explorer"
+    Then the user should see a page titled "Junie Explorer"
 
   Scenario: Cache directory path display
     Given there are JetBrains projects in the cache
@@ -70,7 +70,7 @@ Feature: Homepage
   Scenario: Empty homepage title
     Given there are no JetBrains projects in the cache
     When the user visits the homepage
-    Then the user should see a page titled "JetBrains Project Explorer"
+    Then the user should see a page titled "Junie Explorer"
 
   Scenario: Empty homepage cache path display
     Given there are no JetBrains projects in the cache

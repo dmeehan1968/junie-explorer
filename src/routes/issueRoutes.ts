@@ -53,7 +53,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
       <body>
         <div class="container">
           <div class="header-container">
-            <h1>Issue: ${issue.name}</h1>
+            <h1>Junie Explorer: ${issue.name}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
           <nav aria-label="breadcrumb">

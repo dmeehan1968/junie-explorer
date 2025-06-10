@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>JetBrains Project Explorer</title>
+        <title>Junie Explorer</title>
         <link rel="stylesheet" href="/css/style.css">
         <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
@@ -33,7 +33,7 @@ router.get('/', (req, res) => {
       <body>
         <div class="container">
           <div class="header-container">
-            <h1>JetBrains Project Explorer</h1>
+            <h1>Junie Explorer</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
           <p>Projects found in: ${jetBrainsPath}</p>
