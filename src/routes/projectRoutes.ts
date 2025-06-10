@@ -1,7 +1,7 @@
 import express from 'express';
 import { getProject, getIDEIcon } from '../utils/appState.js';
 import { formatSeconds } from '../utils/timeUtils.js';
-import { calculateIssueSummary } from '../utils/metricsUtils.js';
+import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js';
 import { Issue } from '../matterhorn.js'
 
 const router = express.Router();
@@ -25,6 +25,42 @@ const generateIssueMetricsTable = (issue: Issue): string => {
       </tr>
     </tbody>
   </table>
+`;};
+
+// Function to generate HTML for project summary metrics table
+const generateProjectSummaryTable = (issues: Issue[]): string => {
+  if (issues.length === 0) {
+    return '';
+  }
+
+  const projectMetrics = calculateProjectMetrics(issues);
+
+  // Calculate total time as sum of build time, model time, artifact time and model cached time
+  const totalTime = projectMetrics.buildTime + projectMetrics.modelTime/1000 + projectMetrics.artifactTime + projectMetrics.modelCachedTime/1000;
+
+  // Calculate elapsed time (difference between oldest and most recent issue)
+  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
+  const oldestIssue = sortedIssues[0];
+  const newestIssue = sortedIssues[sortedIssues.length - 1];
+  const elapsedTimeMs = new Date(newestIssue.created).getTime() - new Date(oldestIssue.created).getTime();
+  const elapsedTimeSec = elapsedTimeMs / 1000;
+
+  return `
+  <div class="project-summary">
+    <h3>Project Summary</h3>
+    <table class="project-summary-table">
+      <tbody>
+        <tr>
+          <td>Input Tokens: ${projectMetrics.inputTokens}</td>
+          <td>Output Tokens: ${projectMetrics.outputTokens}</td>
+          <td>Cache Tokens: ${projectMetrics.cacheTokens}</td>
+          <td>Cost: ${projectMetrics.cost.toFixed(4)}</td>
+          <td>Total Time: ${formatSeconds(totalTime)}</td>
+          <td>Elapsed Time: ${formatSeconds(elapsedTimeSec)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 `;
 };
 
@@ -148,7 +184,8 @@ router.get('/project/:projectName', (req, res) => {
           ${project.issues.length > 0 
             ? `<div class="graph-container">
                 <canvas id="costOverTimeChart"></canvas>
-              </div>`
+              </div>
+              ${generateProjectSummaryTable(project.issues)}`
             : ''
           }
 
