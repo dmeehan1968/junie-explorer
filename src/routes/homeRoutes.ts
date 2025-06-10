@@ -79,6 +79,15 @@ router.get('/', (req, res) => {
             display: flex;
             align-items: center;
           }
+          .project-search {
+            margin-left: auto;
+          }
+          #project-search-input {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+          }
         </style>
       </head>
       <body>
@@ -96,6 +105,9 @@ router.get('/', (req, res) => {
                 <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" />
               </div>
             `).join('')}
+            <div class="project-search">
+              <input type="text" id="project-search-input" placeholder="Search projects..." oninput="filterByProjectName(this.value)">
+            </div>
           </div>
 
           <ul class="project-list">

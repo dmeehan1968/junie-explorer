@@ -1,3 +1,6 @@
+// Global variables for filters
+let currentSearchTerm = '';
+
 // Initialize IDE filters from session storage or default to all selected
 function initializeFilters() {
   const ideFilters = {};
@@ -31,7 +34,7 @@ function initializeFilters() {
   }
 
   // Apply filters
-  applyFilters(ideFilters);
+  applyFilters(ideFilters, currentSearchTerm);
 
   return ideFilters;
 }
@@ -55,26 +58,56 @@ function toggleIdeFilter(element) {
   sessionStorage.setItem('ideFilters', JSON.stringify(ideFilters));
 
   // Apply filters to the project list
-  applyFilters(ideFilters);
+  applyFilters(ideFilters, currentSearchTerm);
 
   // Update global state
   window.ideFilters = ideFilters;
 }
 
+// Filter by project name
+function filterByProjectName(searchTerm) {
+  currentSearchTerm = searchTerm.trim().toLowerCase();
+  applyFilters(window.ideFilters || {}, currentSearchTerm);
+}
+
 // Apply filters to the project list
-function applyFilters(ideFilters) {
+function applyFilters(ideFilters, searchTerm = '') {
   const projectItems = document.querySelectorAll('.project-item');
+  let visibleCount = 0;
 
   projectItems.forEach(item => {
     const projectIdes = JSON.parse(item.getAttribute('data-ides') || '[]');
-    const shouldShow = projectIdes.some(ide => ideFilters[ide]);
+    const projectName = item.querySelector('.project-name').textContent.toLowerCase();
+
+    // Check if project matches both IDE filter and search term
+    const matchesIdeFilter = projectIdes.some(ide => ideFilters[ide]);
+    const matchesSearchTerm = searchTerm === '' || projectName.includes(searchTerm.toLowerCase());
+    const shouldShow = matchesIdeFilter && matchesSearchTerm;
 
     if (shouldShow) {
       item.style.display = '';
+      visibleCount++;
     } else {
       item.style.display = 'none';
     }
   });
+
+  // Show or hide the "no matching projects" message
+  const projectList = document.querySelector('.project-list');
+  let noMatchMessage = document.getElementById('no-match-message');
+
+  if (visibleCount === 0) {
+    if (!noMatchMessage) {
+      noMatchMessage = document.createElement('li');
+      noMatchMessage.id = 'no-match-message';
+      noMatchMessage.textContent = 'No matching projects';
+      noMatchMessage.style.padding = '10px 15px';
+      projectList.appendChild(noMatchMessage);
+    }
+    noMatchMessage.style.display = '';
+  } else if (noMatchMessage) {
+    noMatchMessage.style.display = 'none';
+  }
 }
 
 
