@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-06-10
+
+### Features
+- Add project cost graph functionality (4334396)
+- Add lazy-loading for improved performance (906a05d)
+- Group data points by time unit for improved chart accuracy (5529e6f)
+- Add display option toggles for project metrics graph (ab5a635)
+- Add project selection and metrics graph functionality (e1c315a)
+- Add `Task` class with lazy-loading and testing utilities (31952b6)
+- Add `Step` class and update step processing logic (ef55899)
+
+### UI Improvements
+- Improve graph container visibility and animations (ba48602)
+- Add summary icon to task steps (cd0ced4)
+- Add styling for preformatted code blocks in markdown sections (d1ee4fb)
+- Update branding to "Junie Explorer" (3c13d77)
+
+### Code Improvements
+- Sort issues by creation date when merging projects (af10dd8)
+
 ## [1.1.2] - 2025-06-10
 
 ### Bug Fixes
