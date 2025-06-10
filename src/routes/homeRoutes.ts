@@ -28,6 +28,7 @@ router.get('/', (req, res) => {
         <title>JetBrains Project Explorer</title>
         <link rel="stylesheet" href="/css/style.css">
         <script src="/js/ideFilters.js"></script>
+        <script src="/js/reloadPage.js"></script>
         <style>
           .ide-icons {
             display: flex;

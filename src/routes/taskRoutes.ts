@@ -171,6 +171,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         <title>${issue.name} Tasks</title>
         <link rel="stylesheet" href="/css/style.css">
         <script src="/js/ideFilters.js"></script>
+        <script src="/js/reloadPage.js"></script>
         <style>
           .ide-icons {
             display: flex;
@@ -282,6 +283,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
         }
         <script src="/js/taskStepGraph.js"></script>
         <script src="/js/ideFilters.js"></script>
+        <script src="/js/reloadPage.js"></script>
         <style>
           .ide-icons {
             display: flex;

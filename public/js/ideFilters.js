@@ -77,17 +77,6 @@ function applyFilters(ideFilters) {
   });
 }
 
-// Reload page function
-function reloadPage() {
-  const button = document.getElementById('reload-button');
-  if (button) {
-    button.disabled = true;
-    button.classList.add('loading');
-    setTimeout(() => {
-      window.location.href = '/refresh';
-    }, 100);
-  }
-}
 
 // Initialize filters when the page loads
 window.onload = function() {
