@@ -92,42 +92,134 @@ export interface Task {
  * swe_next_step or chat_next is part of the file extension and can be prefixed or suffixed with other text
  */
 
-export interface Step {
+import fs from 'fs-extra';
+
+export class Step {
+  // Basic properties loaded initially
   id: string;
   title: string;
-  description: string;
   reasoning: {
     type: string;
     reason: string;
   };
   statistics: Statistics;
-  dependencies: Array<{
-    id: string;
-    cached: boolean;
-  }>;
-  content: {
-    llmResponse: {
-      type: string;
-      content: string;
-      kind: string;
-    };
-    actionRequest: {
-      type: string;
-      name: string;
-      arguments: string;
-      description: string;
-    };
-    actionResult: {
-      type: string;
-      content: string;
-      kind: string;
-    };
-  };
 
   // Derived fields
   metrics: Metrics;
   startTime: Date;
   endTime: Date;
+
+  // Path to the source JSON file
+  private readonly filePath: string;
+
+  // Memoized properties
+  private _content: StepContent | null = null;
+  private _dependencies: Array<StepDependency> | null = null;
+  private _description: string | null = null;
+
+  /**
+   * Constructor for Step class
+   * @param filePath Full path to the source JSON file
+   */
+  constructor(filePath: string) {
+    this.filePath = filePath;
+
+    // Read the JSON file excluding content, dependencies, and description which will be lazy loaded if needed
+    const { content, dependencies, description, ...data } = fs.readJsonSync(filePath);
+
+    // Assign basic properties
+    this.id = data.id;
+    this.title = data.title;
+    this.reasoning = data.reasoning;
+    this.statistics = data.statistics || {};
+
+    // Get file stats to extract creation time
+    const stats = fs.statSync(filePath);
+    const fileCreationTime = stats.birthtime;
+
+    // Calculate metrics
+    const artifactTime = this.statistics?.artifactTime || 0;
+    const modelTime = this.statistics?.modelTime || 0;
+    const modelCachedTime = this.statistics?.modelCachedTime || 0;
+
+    // Calculate startTime: fileCreationTime minus the sum of times
+    const totalDeductionMs = artifactTime + modelTime + modelCachedTime;
+    this.startTime = new Date(fileCreationTime.getTime() - totalDeductionMs);
+    this.endTime = fileCreationTime;
+
+    // Calculate metrics
+    this.metrics = {
+      inputTokens: this.statistics?.inputTokens || 0,
+      outputTokens: this.statistics?.outputTokens || 0,
+      cacheTokens: this.statistics?.cacheCreateInputTokens !== undefined ? this.statistics.cacheCreateInputTokens : 0,
+      cost: this.statistics?.cost || 0,
+      cachedCost: this.statistics?.cachedCost || 0,
+      buildTime: this.statistics?.totalArtifactBuildTimeSeconds || 0,
+      artifactTime: artifactTime,
+      modelTime: modelTime,
+      modelCachedTime: modelCachedTime,
+      requests: this.statistics?.requests || 0,
+      cachedRequests: this.statistics?.cachedRequests || 0,
+    };
+  }
+
+  private lazyLoad(): this {
+    if (this._content === null || this._description == null || this._dependencies === null) {
+      console.log('loading')
+      const data = fs.readJsonSync(this.filePath);
+      this._content = data.content || {};
+      this._description = data.description || '';
+      this._dependencies = data.dependencies || [];
+    }
+    return this;
+  }
+  /**
+   * Getter for content property
+   * Reads from source JSON and memoizes the result
+   */
+  get content(): any {
+    return this.lazyLoad()._content!;
+  }
+
+  /**
+   * Getter for dependencies property
+   * Reads from source JSON and memoizes the result
+   */
+  get dependencies(): Array<StepDependency> {
+    return this.lazyLoad()._dependencies!
+  }
+
+  /**
+   * Getter for description property
+   * Reads from source JSON and memoizes the result
+   */
+  get description(): string {
+    return this.lazyLoad()._description!
+  }
+}
+
+interface StepContent {
+  llmResponse: {
+    type: string;
+    content: string;
+    kind: string;
+  };
+  actionRequest: {
+    type: string;
+    name: string;
+    arguments: string;
+    description: string;
+  };
+  actionResult: {
+    type: string;
+    content: string;
+    kind: string;
+  };
+}
+
+interface StepDependency {
+  id: string;
+  cached: boolean;
 }
 
 export interface Statistics {

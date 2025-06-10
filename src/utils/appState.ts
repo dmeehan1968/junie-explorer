@@ -282,47 +282,11 @@ function getStepsForTask(ideName: string, projectName: string, taskArtifactPath:
     const stepFiles = files
       .filter(file => file.isFile() && file.name.match(/step_\d+\..*(swe_next|chat_next).*$/));
 
-    // Read and parse each step file
+    // Create Step instances for each file
     const steps = stepFiles.map((file) => {
       try {
         const filePath = path.join(stepsPath, file.name);
-        const { content, dependencies, description, ...data } = fs.readJsonSync(filePath);
-
-        // Get file stats to extract creation time
-        const stats = fs.statSync(filePath);
-        const fileCreationTime = stats.birthtime;
-
-        // Calculate metrics
-        const artifactTime = data.statistics?.artifactTime || 0;
-        const modelTime = data.statistics?.modelTime || 0;
-        const modelCachedTime = data.statistics?.modelCachedTime || 0;
-
-        // Calculate startTime: fileCreationTime minus the sum of times (not artifactTime, which appears to be whole seconds of these)
-        const totalDeductionMs = artifactTime + modelTime + modelCachedTime;
-        const startTime = new Date(fileCreationTime.getTime() - totalDeductionMs);
-        const endTime = fileCreationTime;
-
-        // Use the full file content for the Step interface
-        return {
-          ...data,
-          content: {},
-          dependencies: [],
-          metrics: {
-            inputTokens: data.statistics?.inputTokens || 0,
-            outputTokens: data.statistics?.outputTokens || 0,
-            cacheTokens: data.statistics?.cacheCreateInputTokens !== undefined ? data.statistics.cacheCreateInputTokens : 0,
-            cost: data.statistics?.cost || 0,
-            cachedCost: data.statistics?.cachedCost || 0,
-            buildTime: data.statistics?.totalArtifactBuildTimeSeconds || 0,
-            artifactTime: artifactTime,
-            modelTime: modelTime,
-            modelCachedTime: modelCachedTime,
-            requests: data.statistics?.requests || 0,
-            cachedRequests: data.statistics?.cachedRequests || 0,
-          },
-          startTime,
-          endTime,
-        };
+        return new Step(filePath);
       } catch (error) {
         console.error(`Error reading step file ${file.name}:`, error);
         return null;
