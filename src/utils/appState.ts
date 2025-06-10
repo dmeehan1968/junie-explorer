@@ -1,7 +1,7 @@
-import fs from 'fs-extra';
-import path from 'path';
-import { IDE, Issue, Project, Step, Task } from '../matterhorn.js';
-import { jetBrainsPath } from './jetBrainsPath.js';
+import fs from 'fs-extra'
+import path from 'path'
+import { IDE, Issue, Project, Step, Task } from '../matterhorn.js'
+import { jetBrainsPath } from './jetBrainsPath.js'
 
 // The in-memory app state
 // mergedProjects is the primary state representation
@@ -229,16 +229,12 @@ function getTasksForIssue(ideName: string, projectName: string, issueId: string)
     const tasks = taskFiles.map((file) => {
       try {
         const filePath = path.join(issuePath, file.name);
-        const { previousTasksInfo, finalAgentState, sessionHistory, patch, ...data } = fs.readJsonSync(filePath);
+
+        // Create a new Task instance with the file path
+        const task = new Task(filePath);
 
         // Get steps for this task
-        const steps = getStepsForTask(ideName, projectName, data.artifactPath || '');
-
-        // Create a task object with the full file content
-        const task: Task = {
-          ...data,
-          steps
-        };
+        task.steps = getStepsForTask(ideName, projectName, task.artifactPath);
 
         return task;
       } catch (error) {

@@ -88,7 +88,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                         <div class="task-date">Created: ${new Date(task.created).toLocaleString()}</div>
                       </div>
                       <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
-                        ${task.context?.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                        ${task.context.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                       </a>
                       <div class="task-details">
                         ${generateStepTotalsTable(stepTotals)}

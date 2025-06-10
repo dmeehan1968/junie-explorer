@@ -243,7 +243,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>${formatMilliseconds(step.metrics.modelCachedTime)}</td>
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
-                      <td>${step.description}</td>
                     </tr>
                   `).join('')}
                 </tbody>
