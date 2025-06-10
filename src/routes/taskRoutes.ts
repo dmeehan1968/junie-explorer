@@ -229,6 +229,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>
                         <div class="title-container">
                           ${index + 1}
+                          <span class="summary-icon" title="${escapeHtml(step.title)}">ⓘ</span>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
