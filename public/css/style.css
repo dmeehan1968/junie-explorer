@@ -722,7 +722,7 @@ p {
 /* Project Selection Styles */
 .project-selection-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-bottom: 10px;
   padding: 5px 10px;
   background-color: #f9f9f9;
@@ -738,6 +738,23 @@ p {
 .select-all-container label {
   font-weight: bold;
   cursor: pointer;
+}
+
+.display-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.display-options label {
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .project-checkbox-container {

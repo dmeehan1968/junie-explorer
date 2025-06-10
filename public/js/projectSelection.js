@@ -1,10 +1,19 @@
 // Global variables for project selection
 let selectedProjects = {};
 let projectsChart = null;
+let displayOption = 'both'; // Default display option (both, cost, tokens)
 
 // Initialize project selection from session storage
 function initializeProjectSelection() {
   const storedSelection = sessionStorage.getItem('selectedProjects');
+  const storedDisplayOption = sessionStorage.getItem('displayOption');
+
+  // Initialize display option from session storage or default to 'both'
+  if (storedDisplayOption) {
+    displayOption = storedDisplayOption;
+    // Update radio buttons based on stored display option
+    document.querySelector(`input[name="display-option"][value="${displayOption}"]`).checked = true;
+  }
 
   if (storedSelection) {
     selectedProjects = JSON.parse(storedSelection);
@@ -83,6 +92,19 @@ function updateSelectAllCheckbox() {
   }
 }
 
+// Handle display option change (Cost, Tokens, Both)
+function handleDisplayOptionChange(radio) {
+  displayOption = radio.value;
+
+  // Save to session storage
+  sessionStorage.setItem('displayOption', displayOption);
+
+  // Reload the graph with the new display option
+  if (projectsChart) {
+    loadProjectsGraph();
+  }
+}
+
 // Load and display the graph for selected projects
 async function loadProjectsGraph() {
   const graphContainer = document.getElementById('projects-graph-container');
@@ -140,15 +162,28 @@ function createProjectsChart(graphData) {
     options: { weekStartsOn: 0 }
   };
 
+  // Filter datasets based on the selected display option
+  let filteredDatasets = [];
+  if (graphData.datasets) {
+    if (displayOption === 'both') {
+      filteredDatasets = graphData.datasets;
+    } else if (displayOption === 'cost') {
+      filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y');
+    } else if (displayOption === 'tokens') {
+      filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y1');
+    }
+  }
+
   // Create chart configuration
   const config = {
     type: 'line',
     data: {
-      datasets: graphData.datasets || []
+      datasets: filteredDatasets
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      spanGaps: true, // Prevent connecting lines between points with gaps
       elements: {
         point: {
           radius: 4,
@@ -190,7 +225,8 @@ function createProjectsChart(graphData) {
             display: true,
             text: 'Cost ($)'
           },
-          beginAtZero: true
+          beginAtZero: true,
+          display: displayOption === 'both' || displayOption === 'cost'
         },
         y1: {
           position: 'right',
@@ -201,7 +237,8 @@ function createProjectsChart(graphData) {
           beginAtZero: true,
           grid: {
             drawOnChartArea: false
-          }
+          },
+          display: displayOption === 'both' || displayOption === 'tokens'
         }
       },
       plugins: {

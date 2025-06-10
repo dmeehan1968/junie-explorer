@@ -80,10 +80,8 @@ function prepareProjectsGraphData(projects: Project[]): {
   } else if (dateRange < DAY*2) {
     timeUnit = 'hour';
     stepSize = 3;
-  } else if (dateRange < WEEK) {
-    timeUnit = 'day';
   } else if (dateRange < MONTH) {
-    timeUnit = 'week';
+    timeUnit = 'day';
   } else if (dateRange < YEAR) {
     timeUnit = 'month';
   } else {
@@ -103,11 +101,14 @@ function prepareProjectsGraphData(projects: Project[]): {
     const data = Object.keys(issuesByDay)
       .sort() // Sort days in chronological order (YYYY-MM-DD format sorts correctly)
       .map(day => {
-        return {
+        const cost = issuesByDay[day][project.name]?.cost || 0;
+        // Only include data points with non-zero values
+        return cost > 0 ? {
           x: day,
-          y: issuesByDay[day][project.name]?.cost || 0
-        };
-      });
+          y: cost
+        } : null;
+      })
+      .filter(point => point !== null); // Remove null values
 
     return {
       label: `${project.name} (Cost)`,
@@ -134,11 +135,14 @@ function prepareProjectsGraphData(projects: Project[]): {
     const data = Object.keys(issuesByDay)
       .sort() // Sort days in chronological order (YYYY-MM-DD format sorts correctly)
       .map(day => {
-        return {
+        const tokens = issuesByDay[day][project.name]?.tokens || 0;
+        // Only include data points with non-zero values
+        return tokens > 0 ? {
           x: day,
-          y: issuesByDay[day][project.name]?.tokens || 0
-        };
-      });
+          y: tokens
+        } : null;
+      })
+      .filter(point => point !== null); // Remove null values
 
     return {
       label: `${project.name} (Tokens)`,
@@ -221,6 +225,22 @@ router.get('/', (req, res) => {
             <div class="select-all-container">
               <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()">
               <label for="select-all-projects">Select All</label>
+            </div>
+            <div class="display-options">
+              <div class="radio-group">
+                <div>
+                  <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)">
+                  <label for="display-both">Both</label>
+                </div>
+                <div>
+                  <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)">
+                  <label for="display-cost">Cost</label>
+                </div>
+                <div>
+                  <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)">
+                  <label for="display-tokens">Tokens</label>
+                </div>
+              </div>
             </div>
           </div>
 
