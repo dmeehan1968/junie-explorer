@@ -10,11 +10,9 @@ junie-explorer/
 │   └── guidelines.md        # Project guidelines and documentation
 ├── features/                # Gherkin feature files for requirements documentation
 │   ├── homepage.feature     # Homepage requirements specification
-│   ├── issue-cost-graph.feature # Issue cost graph requirements
 │   ├── projects.feature     # Projects page requirements
-│   ├── refresh-button.feature # Refresh button functionality requirements
-│   ├── task-steps.feature   # Task steps page requirements
-│   └── tasks.feature        # Tasks page requirements
+│   ├── issue.feature        # Issue page requirements
+│   └── task.feature         # Task page requirements
 ├── public/                  # Static assets
 │   ├── css/                 # CSS stylesheets
 │   │   └── style.css        # Main stylesheet
@@ -102,6 +100,9 @@ Requirements for this project are documented using Gherkin feature files located
 - Feature files use the Gherkin syntax to describe application behavior in a human-readable format
 - Each feature file contains scenarios that outline specific user interactions and expected outcomes
 - The `features/homepage.feature` file describes the expected behavior of the application's homepage
+- The `features/projects.feature` file describes the expected behavior of the project details page
+- The `features/issue.feature` file describes the expected behavior of the issue details page
+- The `features/task.feature` file describes the expected behavior of the task details page
 
 ### Using Feature Files
 - Feature files should be consulted when implementing new features or modifying existing ones

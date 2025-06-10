@@ -68,11 +68,9 @@ junie-explorer/
 │   └── guidelines.md        # Project guidelines and documentation
 ├── features/                # Gherkin feature files for requirements documentation
 │   ├── homepage.feature     # Homepage requirements specification
-│   ├── issue-cost-graph.feature # Issue cost graph requirements
 │   ├── projects.feature     # Projects page requirements
-│   ├── refresh-button.feature # Refresh button functionality requirements
-│   ├── task-steps.feature   # Task steps page requirements
-│   └── tasks.feature        # Tasks page requirements
+│   ├── issue.feature        # Issue page requirements
+│   └── task.feature         # Task page requirements
 ├── public/                  # Static assets
 │   ├── css/                 # CSS stylesheets
 │   │   └── style.css        # Main stylesheet
@@ -122,7 +120,22 @@ The application uses several interfaces defined in `matterhorn.ts`:
 5. **Production**: Use `npm start` to run the compiled application
 
 ## Requirements Documentation
-Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth for the expected behavior of the application.
+Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth and documentation for the expected behavior of the application.
+
+### Feature Files
+- Feature files use the Gherkin syntax to describe application behavior in a human-readable format
+- Each feature file contains scenarios that outline specific user interactions and expected outcomes
+- The `features/homepage.feature` file describes the expected behavior of the application's homepage
+- The `features/projects.feature` file describes the expected behavior of the project details page
+- The `features/issue.feature` file describes the expected behavior of the issue details page
+- The `features/task.feature` file describes the expected behavior of the task details page
+
+### Using Feature Files
+- Feature files should be consulted when implementing new features or modifying existing ones
+- They serve as acceptance criteria for the application's functionality
+- No step definitions or testing tools should be created at this time - the feature files are purely for documentation purposes
+- When implementing features, developers should ensure their code satisfies all scenarios described in the relevant feature files
+- When code changes are made, make sure that the relevant feature files are updated to reflect new functionality
 
 ## Contributing
 
