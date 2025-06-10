@@ -73,6 +73,12 @@ router.get('/', (req, res) => {
           .ide-filter-disabled img {
             filter: grayscale(100%) opacity(50%);
           }
+          .filter-label {
+            font-weight: bold;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+          }
         </style>
       </head>
       <body>
@@ -84,6 +90,7 @@ router.get('/', (req, res) => {
           <p>Projects found in: ${jetBrainsPath}</p>
 
           <div class="ide-filter-toolbar">
+            <div class="filter-label">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
               <div class="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
                 <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" />
