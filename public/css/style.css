@@ -636,11 +636,20 @@ p {
   margin-bottom: 0;
 }
 
-.step-totals-table th, .metrics-table th, .project-summary-table th {
+.step-totals-table th, .metrics-table th {
   background-color: #f2f2f2;
   color: #333;
   font-weight: bold;
   text-align: left;
+  padding: 8px;
+  border-bottom: 2px solid #ddd;
+}
+
+.project-summary-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
   padding: 8px;
   border-bottom: 2px solid #ddd;
 }

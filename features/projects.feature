@@ -48,6 +48,15 @@ Feature: Project Details Page
     When the user visits the project details page
     Then no cost over time graph should be displayed
 
+  Scenario: Project summary table display
+    Given there are issues for a specific JetBrains project
+    When the user visits the project details page
+    Then the user should see a project summary table below the graph
+    And the summary table should display aggregated metrics for all issues
+    And the metrics should include input tokens, output tokens, cache tokens, cost, total time, and elapsed time
+    And all numeric values should be formatted with thousands separators
+    And the elapsed time should be formatted to show days, hours, and minutes, omitting any parts which are zero
+
   Scenario: Viewing issue list with details
     Given there are issues for a specific JetBrains project
     When the user visits the project details page

@@ -1,6 +1,6 @@
 import express from 'express';
 import { getProject, getIDEIcon } from '../utils/appState.js';
-import { formatSeconds } from '../utils/timeUtils.js';
+import { formatSeconds, formatElapsedTime, formatNumber } from '../utils/timeUtils.js';
 import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js';
 import { Issue } from '../matterhorn.js'
 
@@ -14,14 +14,24 @@ const generateIssueMetricsTable = (issue: Issue): string => {
 
   return `
   <table class="step-totals-table">
+    <thead>
+      <tr>
+        <th>Created</th>
+        <th>Input Tokens</th>
+        <th>Output Tokens</th>
+        <th>Cache Tokens</th>
+        <th>Cost</th>
+        <th>Total Time</th>
+      </tr>
+    </thead>
     <tbody>
       <tr>
         <td>${new Date(issue.created).toLocaleString()}</td>
-        <td>Input Tokens: ${issueMetrics.inputTokens}</td>
-        <td>Output Tokens: ${issueMetrics.outputTokens}</td>
-        <td>Cache Tokens: ${issueMetrics.cacheTokens}</td>
-        <td>Cost: ${issueMetrics.cost.toFixed(4)}</td>
-        <td>Total Time: ${formatSeconds(totalTime)}</td>
+        <td>${formatNumber(issueMetrics.inputTokens)}</td>
+        <td>${formatNumber(issueMetrics.outputTokens)}</td>
+        <td>${formatNumber(issueMetrics.cacheTokens)}</td>
+        <td>${issueMetrics.cost.toFixed(4)}</td>
+        <td>${formatSeconds(totalTime)}</td>
       </tr>
     </tbody>
   </table>
@@ -49,14 +59,24 @@ const generateProjectSummaryTable = (issues: Issue[]): string => {
   <div class="project-summary">
     <h3>Project Summary</h3>
     <table class="project-summary-table">
+      <thead>
+        <tr>
+          <th>Input Tokens</th>
+          <th>Output Tokens</th>
+          <th>Cache Tokens</th>
+          <th>Cost</th>
+          <th>Total Time</th>
+          <th>Elapsed Time</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
-          <td>Input Tokens: ${projectMetrics.inputTokens}</td>
-          <td>Output Tokens: ${projectMetrics.outputTokens}</td>
-          <td>Cache Tokens: ${projectMetrics.cacheTokens}</td>
-          <td>Cost: ${projectMetrics.cost.toFixed(4)}</td>
-          <td>Total Time: ${formatSeconds(totalTime)}</td>
-          <td>Elapsed Time: ${formatSeconds(elapsedTimeSec)}</td>
+          <td>${formatNumber(projectMetrics.inputTokens)}</td>
+          <td>${formatNumber(projectMetrics.outputTokens)}</td>
+          <td>${formatNumber(projectMetrics.cacheTokens)}</td>
+          <td>${projectMetrics.cost.toFixed(4)}</td>
+          <td>${formatSeconds(totalTime)}</td>
+          <td>${formatElapsedTime(elapsedTimeSec)}</td>
         </tr>
       </tbody>
     </table>
