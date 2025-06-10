@@ -82,10 +82,63 @@ function prepareProjectsGraphData(projects: Project[]): {
     stepSize = 3;
   } else if (dateRange < MONTH) {
     // default of day
+  } else if (dateRange < MONTH*6) {
+    timeUnit = 'week'
   } else if (dateRange < YEAR) {
     timeUnit = 'month';
   } else {
     timeUnit = 'year';
+  }
+
+  // Helper function to convert a date string to the appropriate timeUnit format
+  function formatDateByTimeUnit(dateStr: string, timeUnit: string): string {
+    const date = new Date(dateStr);
+
+    switch(timeUnit) {
+      case 'hour':
+        return `${dateStr}T${date.getHours().toString().padStart(2, '0')}:00`;
+      case 'day':
+        return dateStr; // Already in YYYY-MM-DD format
+      case 'week':
+        // Get the first day of the week (Sunday)
+        const firstDayOfWeek = new Date(date);
+        firstDayOfWeek.setDate(date.getDate() - date.getDay());
+        return firstDayOfWeek.toISOString().split('T')[0];
+      case 'month':
+        return `${dateStr.substring(0, 7)}`; // YYYY-MM format
+      case 'year':
+        return `${dateStr.substring(0, 4)}`; // YYYY format
+      default:
+        return dateStr;
+    }
+  }
+
+  // Group data by timeUnit
+  function groupDataByTimeUnit(
+    issuesByDay: Record<string, Record<string, { cost: number; tokens: number }>>,
+    projectName: string,
+    timeUnit: string,
+    metricType: 'cost' | 'tokens'
+  ): Array<{ x: string; y: number }> {
+    const groupedData: Record<string, number> = {};
+
+    Object.keys(issuesByDay)
+      .sort() // Sort days in chronological order
+      .forEach(day => {
+        const value = issuesByDay[day][projectName]?.[metricType] || 0;
+        if (value > 0) {
+          const timeUnitKey = formatDateByTimeUnit(day, timeUnit);
+          groupedData[timeUnitKey] = (groupedData[timeUnitKey] || 0) + value;
+        }
+      });
+
+    // Convert to array format required for chart
+    return Object.keys(groupedData)
+      .sort()
+      .map(key => ({
+        x: key,
+        y: groupedData[key]
+      }));
   }
 
   // Create datasets for cost
@@ -98,17 +151,7 @@ function prepareProjectsGraphData(projects: Project[]): {
     tension: number;
     yAxisID: string;
   }> = projects.map(project => {
-    const data = Object.keys(issuesByDay)
-      .sort() // Sort days in chronological order (YYYY-MM-DD format sorts correctly)
-      .map(day => {
-        const cost = issuesByDay[day][project.name]?.cost || 0;
-        // Only include data points with non-zero values
-        return cost > 0 ? {
-          x: day,
-          y: cost
-        } : null;
-      })
-      .filter(point => point !== null); // Remove null values
+    const data = groupDataByTimeUnit(issuesByDay, project.name, timeUnit, 'cost');
 
     return {
       label: `${project.name} (Cost)`,
@@ -132,17 +175,7 @@ function prepareProjectsGraphData(projects: Project[]): {
     tension: number;
     yAxisID: string;
   }> = projects.map(project => {
-    const data = Object.keys(issuesByDay)
-      .sort() // Sort days in chronological order (YYYY-MM-DD format sorts correctly)
-      .map(day => {
-        const tokens = issuesByDay[day][project.name]?.tokens || 0;
-        // Only include data points with non-zero values
-        return tokens > 0 ? {
-          x: day,
-          y: tokens
-        } : null;
-      })
-      .filter(point => point !== null); // Remove null values
+    const data = groupDataByTimeUnit(issuesByDay, project.name, timeUnit, 'tokens');
 
     return {
       label: `${project.name} (Tokens)`,
