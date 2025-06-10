@@ -18,8 +18,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Add refresh endpoint
-app.get('/refresh', async (req, res) => {
-  await refreshAppState();
+app.get('/refresh', (req, res) => {
+  refreshAppState();
   res.redirect(req.headers.referer || '/');
 });
 
@@ -33,8 +33,7 @@ app.use('/', taskRoutes);
 app.use(notFoundRoutes);
 
 // Initialize app state and start the server
-initializeAppState().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
+initializeAppState();
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

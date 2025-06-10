@@ -4,8 +4,10 @@ import { IDE, Issue, Project, Step, Task } from '../matterhorn.js';
 import { jetBrainsPath } from './jetBrainsPath.js';
 
 // The in-memory app state
-let appState: IDE[] = [];
+// mergedProjects is the primary state representation
 let mergedProjects: Project[] = [];
+// appState is derived from mergedProjects
+let appState: IDE[] = [];
 
 /**
  * Get the icon URL for a JetBrains IDE
@@ -30,14 +32,18 @@ export function getIDEIcon(ideName: string): string {
 }
 
 // Function to scan the file system and build the complete hierarchy
-export async function scanFileSystem(): Promise<IDE[]> {
+export function scanFileSystem(): IDE[] {
   try {
     console.log(`JetBrains Path: ${jetBrainsPath}`);
     console.log('Scanning file system...');
-    const exists = await fs.pathExists(jetBrainsPath);
+    const exists = fs.pathExistsSync(jetBrainsPath);
     if (!exists) {
       return [];
     }
+
+    // Reset the state
+    mergedProjects = [];
+    appState = [];
 
     const directories = fs.readdirSync(jetBrainsPath, { withFileTypes: true });
 
@@ -46,21 +52,25 @@ export async function scanFileSystem(): Promise<IDE[]> {
       .filter(dirent => dirent.isDirectory())
       .map(dirent => dirent.name);
 
-    // Build the complete hierarchy
-    const idePromises = ides.map(async (ideName) => {
-      const projects = await getProjectsForIDE(ideName);
-      return {
+    // Process each IDE incrementally
+    for (const ideName of ides) {
+      const projects = getProjectsForIDE(ideName);
+      const ide = {
         name: ideName.replace(/\d+(\.\d+)*$/, ''),  // remove version number suffix
         projects,
       } satisfies IDE;
-    });
 
-    const ideArray = await Promise.all(idePromises);
+      // Add to appState
+      appState.push(ide);
 
-    // Merge projects with the same name across IDEs
-    mergedProjects = mergeProjects(ideArray);
+      // Merge projects from this IDE into mergedProjects
+      mergeProjectsIncremental(ide);
+    }
 
-    return ideArray;
+    // Sort merged projects by name
+    mergedProjects.sort((a, b) => a.name.localeCompare(b.name));
+
+    return appState;
   } catch (error) {
     console.error('Error scanning file system:', error);
     return [];
@@ -94,13 +104,41 @@ function mergeProjects(ides: IDE[]): Project[] {
   return Array.from(projectMap.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
+// Function to incrementally merge projects from an IDE into the mergedProjects array
+function mergeProjectsIncremental(ide: IDE): void {
+  // Create a map of existing projects for faster lookup
+  const projectMap = new Map<string, Project>();
+  for (const project of mergedProjects) {
+    projectMap.set(project.name, project);
+  }
+
+  // Process each project in the IDE
+  for (const project of ide.projects) {
+    const existingProject = projectMap.get(project.name);
+
+    if (existingProject) {
+      // Merge issues from this project into the existing project
+      existingProject.issues = [...existingProject.issues, ...project.issues];
+      existingProject.ides = [...new Set(existingProject.ides.concat(ide.name))];
+    } else {
+      // Create a new project with this IDE and add it to mergedProjects
+      const newProject = {
+        ...project,
+        ides: [ide.name]
+      };
+      mergedProjects.push(newProject);
+      projectMap.set(project.name, newProject);
+    }
+  }
+}
+
 // Helper function to get projects for an IDE
-async function getProjectsForIDE(ideName: string): Promise<Project[]> {
+function getProjectsForIDE(ideName: string): Project[] {
   try {
     const idePath = path.join(jetBrainsPath, ideName);
     const projectsPath = path.join(idePath, 'projects');
 
-    const exists = await fs.pathExists(projectsPath);
+    const exists = fs.pathExistsSync(projectsPath);
     if (!exists) {
       return [];
     }
@@ -113,8 +151,8 @@ async function getProjectsForIDE(ideName: string): Promise<Project[]> {
       .map(dirent => dirent.name);
 
     // Build projects with their issues
-    const projectPromises = projectNames.map(async (projectName) => {
-      const issues = await getIssuesForProject(ideName, projectName);
+    const projects = projectNames.map((projectName) => {
+      const issues = getIssuesForProject(ideName, projectName);
       return {
         name: projectName,
         issues,
@@ -122,7 +160,7 @@ async function getProjectsForIDE(ideName: string): Promise<Project[]> {
       } satisfies Project;
     });
 
-    return await Promise.all(projectPromises);
+    return projects;
   } catch (error) {
     console.error(`Error getting projects for IDE ${ideName}:`, error);
     return [];
@@ -130,13 +168,13 @@ async function getProjectsForIDE(ideName: string): Promise<Project[]> {
 }
 
 // Helper function to get issues for a project
-async function getIssuesForProject(ideName: string, projectName: string): Promise<Issue[]> {
+function getIssuesForProject(ideName: string, projectName: string): Issue[] {
   try {
     const idePath = path.join(jetBrainsPath, ideName);
     const projectPath = path.join(idePath, 'projects', projectName);
     const issuesPath = path.join(projectPath, 'matterhorn', '.matterhorn', 'issues');
 
-    const exists = await fs.pathExists(issuesPath);
+    const exists = fs.pathExistsSync(issuesPath);
     if (!exists) {
       return [];
     }
@@ -148,14 +186,14 @@ async function getIssuesForProject(ideName: string, projectName: string): Promis
       .filter(file => file.isFile() && file.name.startsWith('chain-') && file.name.endsWith('.json'));
 
     // Read and parse each issue file
-    const issuePromises = issueFiles.map(async (file) => {
+    const issues = issueFiles.map((file) => {
       try {
         const filePath = path.join(issuesPath, file.name);
-        const data = await fs.readJson(filePath);
+        const data = fs.readJsonSync(filePath);
 
         // Get tasks for this issue
         const issueId = data.id.id;
-        const tasks = await getTasksForIssue(ideName, projectName, issueId);
+        const tasks = getTasksForIssue(ideName, projectName, issueId);
 
         const issue: Issue = {
           ...data,
@@ -170,8 +208,6 @@ async function getIssuesForProject(ideName: string, projectName: string): Promis
       }
     });
 
-    const issues = await Promise.all(issuePromises);
-
     // Filter out any null values
     const validIssues: Issue[] = issues.filter((issue): issue is Issue => issue !== null);
 
@@ -184,13 +220,13 @@ async function getIssuesForProject(ideName: string, projectName: string): Promis
 }
 
 // Helper function to get tasks for an issue
-async function getTasksForIssue(ideName: string, projectName: string, issueId: string): Promise<Task[]> {
+function getTasksForIssue(ideName: string, projectName: string, issueId: string): Task[] {
   try {
     const idePath = path.join(jetBrainsPath, ideName);
     const projectPath = path.join(idePath, 'projects', projectName);
     const issuePath = path.join(projectPath, 'matterhorn', '.matterhorn', 'issues', `chain-${issueId}`);
 
-    const exists = await fs.pathExists(issuePath);
+    const exists = fs.pathExistsSync(issuePath);
     if (!exists) {
       return [];
     }
@@ -202,13 +238,13 @@ async function getTasksForIssue(ideName: string, projectName: string, issueId: s
       .filter(file => file.isFile() && file.name.startsWith('task-') && file.name.endsWith('.json'));
 
     // Read and parse each task file
-    const taskPromises = taskFiles.map(async (file) => {
+    const tasks = taskFiles.map((file) => {
       try {
         const filePath = path.join(issuePath, file.name);
-        const data = await fs.readJson(filePath);
+        const data = fs.readJsonSync(filePath);
 
         // Get steps for this task
-        const steps = await getStepsForTask(ideName, projectName, data.artifactPath || '');
+        const steps = getStepsForTask(ideName, projectName, data.artifactPath || '');
 
         // Create a task object with the full file content
         const task: Task = {
@@ -223,8 +259,6 @@ async function getTasksForIssue(ideName: string, projectName: string, issueId: s
       }
     });
 
-    const tasks = await Promise.all(taskPromises);
-
     // Filter out any null values
     const validTasks: Task[] = tasks.filter((task): task is Task => task !== null);
 
@@ -237,7 +271,7 @@ async function getTasksForIssue(ideName: string, projectName: string, issueId: s
 }
 
 // Helper function to get steps for a task
-async function getStepsForTask(ideName: string, projectName: string, taskArtifactPath: string): Promise<Step[]> {
+function getStepsForTask(ideName: string, projectName: string, taskArtifactPath: string): Step[] {
   try {
     if (!taskArtifactPath) {
       return [];
@@ -248,7 +282,7 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
     const matterhornPath = path.join(projectPath, 'matterhorn', '.matterhorn');
     const stepsPath = path.join(matterhornPath, taskArtifactPath);
 
-    const exists = await fs.pathExists(stepsPath);
+    const exists = fs.pathExistsSync(stepsPath);
     if (!exists) {
       return [];
     }
@@ -261,10 +295,10 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
       .filter(file => file.isFile() && file.name.match(/step_\d+\..*(swe_next|chat_next).*$/));
 
     // Read and parse each step file
-    const stepPromises = stepFiles.map(async (file) => {
+    const steps = stepFiles.map((file) => {
       try {
         const filePath = path.join(stepsPath, file.name);
-        const data = await fs.readJson(filePath);
+        const data = fs.readJsonSync(filePath);
 
         // Get file stats to extract creation time
         const stats = fs.statSync(filePath);
@@ -305,8 +339,6 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
       }
     });
 
-    const steps = await Promise.all(stepPromises);
-
     // Filter out any null values
     const validSteps = steps.filter((step): step is Step => step !== null);
 
@@ -319,14 +351,14 @@ async function getStepsForTask(ideName: string, projectName: string, taskArtifac
 }
 
 // Initialize the app state
-export async function initializeAppState(): Promise<void> {
-  appState = await scanFileSystem();
+export function initializeAppState(): void {
+  appState = scanFileSystem();
   console.log(`App state initialized with ${appState.length} IDEs`);
 }
 
 // Refresh the app state
-export async function refreshAppState(): Promise<void> {
-  appState = await scanFileSystem();
+export function refreshAppState(): void {
+  appState = scanFileSystem();
   console.log(`App state refreshed with ${appState.length} IDEs`);
 }
 
@@ -358,4 +390,3 @@ export function getTask(projectName: string, issueId: string, taskId: number): T
   if (!issue) return undefined;
   return issue.tasks.find(task => task.id.index === taskId);
 }
-
