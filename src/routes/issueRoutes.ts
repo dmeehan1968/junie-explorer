@@ -124,7 +124,6 @@ router.get('/project/:projectName/issues', (req, res) => {
           : ''
         }
         <script src="/js/issueGraph.js"></script>
-        <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
       <body>
@@ -136,8 +135,7 @@ router.get('/project/:projectName/issues', (req, res) => {
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${project.name}</a></li>
-              <li class="breadcrumb-item active">Issues</li>
+              <li class="breadcrumb-item">${project.name}</li>
             </ol>
           </nav>
 

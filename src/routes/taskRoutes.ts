@@ -170,7 +170,6 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${issue.name} Tasks</title>
         <link rel="stylesheet" href="/css/style.css">
-        <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
       <body>
@@ -182,8 +181,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">Issues</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">${projectName}</a></li>
               <li class="breadcrumb-item active">${issue.name}</li>
             </ol>
           </nav>
@@ -240,6 +238,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
     const { projectName, issueId, taskId } = req.params;
     const project = getProject(projectName);
+    const issue = getIssue(projectName, issueId);
     const task = getTask(projectName, issueId, parseInt(taskId, 10));
 
     if (!project || !task) {
@@ -271,7 +270,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
           : ''
         }
         <script src="/js/taskStepGraph.js"></script>
-        <script src="/js/ideFilters.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
       <body>
@@ -283,9 +281,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">Issues</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">Tasks</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issues">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">${issue?.name}</a></li>
               <li class="breadcrumb-item active">Task ${task.id.index}</li>
             </ol>
           </nav>

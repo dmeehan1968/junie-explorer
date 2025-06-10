@@ -16,17 +16,6 @@ window._locale = {
   options: { weekStartsOn: 0 }
 };
 
-function reloadPage() {
-  const button = document.getElementById('reload-button');
-  if (button) {
-    button.disabled = true;
-    button.classList.add('loading');
-    setTimeout(() => {
-      window.location.href = '/refresh';
-    }, 100);
-  }
-}
-
 // Initialize the cost over time graph when the page loads
 window.onload = function() {
   // Add a small delay to ensure all scripts are loaded
