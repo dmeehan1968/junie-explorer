@@ -70,3 +70,19 @@ Feature: Issue Details Page
     Given there are no tasks for a specific issue
     When the user visits the issue details page
     Then the user should see a message indicating no tasks were found
+
+  Scenario: JSON viewer button display
+    Given there are tasks for a specific issue
+    When the user visits the issue details page
+    Then each task should display a JSON button
+
+  Scenario: JSON viewer button functionality
+    Given the user is on an issue details page
+    When the user clicks on the JSON button for a task
+    Then a JSON viewer should be displayed showing the raw task data
+    And the JSON data should be initially displayed in a collapsed view
+
+  Scenario: Toggling JSON viewer visibility
+    Given the user has opened the JSON viewer for a task
+    When the user clicks on the JSON button again
+    Then the JSON viewer should be hidden
