@@ -157,6 +157,23 @@ export class Task {
   get patch(): string {
     return this.lazyLoad()._patch!;
   }
+
+  toJSON() {
+    return {
+      filePath: this.filePath,
+      id: this.id,
+      created: this.created,
+      artifactPath: this.artifactPath,
+      context: this.context,
+      isDeclined: this.isDeclined,
+      plan: this.plan,
+      steps: this.steps,
+      previousTasksInfo: this.previousTasksInfo,
+      finalAgentState: this.finalAgentState,
+      sessionHistory: this.sessionHistory,
+      patch: this.patch,
+    }
+  }
 }
 
 /**
@@ -277,6 +294,22 @@ export class Step {
    */
   get description(): string {
     return this.lazyLoad()._description!
+  }
+
+  toJSON() {
+    return {
+      filePath: this.filePath,
+      id: this.id,
+      title: this.title,
+      reasoning: this.reasoning,
+      statistics: this.statistics,
+      metrics: this.metrics,
+      startTime: this.startTime,
+      endTime: this.endTime,
+      content: this.content,
+      dependencies: this.dependencies,
+      description: this.description,
+    }
   }
 }
 

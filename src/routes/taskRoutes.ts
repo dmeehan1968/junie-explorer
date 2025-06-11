@@ -305,15 +305,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
     const step = task.steps[stepIdx];
 
     // Return only the data needed for the JSON viewer
-    res.json({
-      id: step.id,
-      title: step.title,
-      reasoning: step.reasoning,
-      statistics: step.statistics,
-      content: step.content,
-      dependencies: step.dependencies,
-      description: step.description
-    });
+    res.json(step);
   } catch (error) {
     console.error('Error fetching step data:', error);
     res.status(500).json({ error: 'An error occurred while fetching step data' });
