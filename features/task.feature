@@ -78,6 +78,18 @@ Feature: Task Details Page
     And the table should have columns for step number, tokens, costs, time, and requests
     And the table should have a footer row with totals for each metric
 
+  Scenario: Raw data view for steps
+    Given there are steps for a specific task
+    When the user visits the task details page
+    Then each step should have a "JSON" button in the first row
+    When the user clicks on a "JSON" button
+    Then a second row should appear below the step row
+    And the second row should contain the raw JSON data for that step
+    And the JSON data should be interactive with collapsible nodes
+    And the JSON data should have syntax highlighting
+    And the JSON data should be constrained to the width of the table with scroll bars for overflow
+    And the JSON data should have a limited height to prevent it from becoming too tall
+
   Scenario: Viewing task details page with no steps
     Given there are no steps for a specific task
     When the user visits the task details page

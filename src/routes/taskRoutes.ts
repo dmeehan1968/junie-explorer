@@ -149,6 +149,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
         ${task.steps.length > 0 
           ? `<script>
               // Define the chart data as a global variable
@@ -157,6 +160,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
           : ''
         }
         <script src="/js/taskStepGraph.js"></script>
+        <script src="/js/taskStepRawData.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
       <body>
@@ -229,7 +233,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>
                         <div class="title-container">
                           ${index + 1}
-                          <span class="summary-icon" title="${escapeHtml(step.title)}">ⓘ</span>
+                          <button class="toggle-raw-data" data-step="${index}">JSON</button>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
@@ -243,6 +247,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>${formatMilliseconds(step.metrics.modelCachedTime)}</td>
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
+                    </tr>
+                    <tr id="raw-data-${index}" class="raw-data-row" style="display: none;">
+                      <td colspan="12" class="raw-data-container">
+                        <div id="json-renderer-${index}" class="json-renderer"></div>
+                      </td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -275,6 +284,39 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   } catch (error) {
     console.error('Error generating steps page:', error);
     res.status(500).send('An error occurred while generating the steps page');
+  }
+});
+
+// API endpoint to get step data for a specific task
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex', (req, res) => {
+  try {
+    const { projectName, issueId, taskId, stepIndex } = req.params;
+    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const stepIdx = parseInt(stepIndex, 10);
+    if (isNaN(stepIdx) || stepIdx < 0 || stepIdx >= task.steps.length) {
+      return res.status(404).json({ error: 'Step not found' });
+    }
+
+    const step = task.steps[stepIdx];
+
+    // Return only the data needed for the JSON viewer
+    res.json({
+      id: step.id,
+      title: step.title,
+      reasoning: step.reasoning,
+      statistics: step.statistics,
+      content: step.content,
+      dependencies: step.dependencies,
+      description: step.description
+    });
+  } catch (error) {
+    console.error('Error fetching step data:', error);
+    res.status(500).json({ error: 'An error occurred while fetching step data' });
   }
 });
 
