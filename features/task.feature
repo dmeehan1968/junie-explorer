@@ -88,6 +88,7 @@ Feature: Task Details Page
     And the JSON data should be interactive with collapsible nodes
     And the JSON data should have syntax highlighting
     And the JSON data should be constrained to the width of the table with scroll bars for overflow
+    And the JSON data should have a limited height to prevent it from becoming too tall
 
   Scenario: Viewing task details page with no steps
     Given there are no steps for a specific task

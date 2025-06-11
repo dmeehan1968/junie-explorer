@@ -14,12 +14,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize JSON viewer if not already done
         if (!container.getAttribute('data-initialized')) {
           const jsonRenderer = document.getElementById(`json-renderer-${stepIndex}`);
+
+          // Initialize the JSON viewer with default options
           $(jsonRenderer).jsonViewer(window.stepData[stepIndex], {
             collapsed: true,  // Start with collapsed view
             rootCollapsable: false,  // Don't allow collapsing the root object
             withQuotes: true,  // Show quotes around keys
-            withLinks: false   // Don't convert URLs to links
+            withLinks: false,  // Don't convert URLs to links
+            // Note: The height is controlled via CSS (max-height: 200px)
+            // The library doesn't have a built-in height option
           });
+
+          // Add a custom height control if needed
+          // This allows expanding/collapsing nodes to control what's visible
+          // rather than relying solely on scrollbars
+
           container.setAttribute('data-initialized', 'true');
         }
       } else {
