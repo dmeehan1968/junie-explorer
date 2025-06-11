@@ -131,8 +131,24 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) =
       return res.status(404).json({ error: 'Task not found' });
     }
 
-    // Return the task data
-    res.json(task);
+    // Create a new object with only the public fields
+    // This ensures getters are called and private fields are omitted
+    const taskData = {
+      id: task.id,
+      created: task.created,
+      artifactPath: task.artifactPath,
+      context: task.context,
+      isDeclined: task.isDeclined,
+      plan: task.plan,
+      steps: task.steps,
+      previousTasksInfo: task.previousTasksInfo,
+      finalAgentState: task.finalAgentState,
+      sessionHistory: task.sessionHistory,
+      patch: task.patch
+    };
+
+    // Return the task data with only public fields
+    res.json(taskData);
   } catch (error) {
     console.error('Error fetching task data:', error);
     res.status(500).json({ error: 'An error occurred while fetching task data' });
