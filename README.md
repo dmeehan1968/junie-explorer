@@ -112,6 +112,39 @@ The application uses several interfaces defined in `matterhorn.ts`:
 - `Step`: Represents a step within a task
 - `Metrics`: Contains processed metrics data for display
 
+## JetBrains Cache File Structure
+The application reads files from the JetBrains cache directory, which is located at:
+- Windows: `%APPDATA%\..\Local\JetBrains`
+- macOS: `/Users/<username>/Library/Caches/JetBrains`
+- Linux: `~/.cache/JetBrains`
+
+The files are organized in the following hierarchical structure:
+
+```
+JetBrains/
+├── <IDE Name>/ (e.g., WebStorm, IntelliJIdea)
+│   └── projects/
+│       └── <Project Name>/
+│           └── matterhorn/
+│               └── .matterhorn/
+│                   ├── issues/
+│                   │   ├── chain-<issueId>.json (issue metadata)
+│                   │   └── chain-<issueId>/
+│                   │       └── task-<index>.json (task metadata)
+│                   └── <taskArtifactPath>/
+│                       └── step_<number>.<type> (step data files)
+```
+
+When loading the application state, the system:
+1. Scans for all IDE directories in the JetBrains cache
+2. For each IDE, scans for project directories
+3. For each project, reads issue metadata files
+4. For each issue, reads task metadata files
+5. For each task, reads step data files
+6. Merges projects that appear in multiple IDEs
+
+This hierarchical structure allows the application to display a comprehensive view of all JetBrains projects, issues, tasks, and steps across different IDE installations.
+
 ## Development Workflow
 1. **Setup**: Clone the repository and run `npm install`
 2. **Development**: Use `npm run dev` to start the development server
