@@ -1,4 +1,5 @@
 import express from 'express';
+import { escapeHtml } from "../utils/escapeHtml.js"
 import { jetBrainsPath } from '../utils/jetBrainsPath.js';
 import { getMergedProjects, getIDEIcon } from '../utils/appState.js';
 import { calculateIssueSummary } from '../utils/metricsUtils.js';

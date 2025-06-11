@@ -1,5 +1,6 @@
 import express from 'express';
 import { getProject, getIDEIcon } from '../utils/appState.js';
+import { escapeHtml } from "../utils/escapeHtml.js"
 import { formatSeconds, formatElapsedTime, formatNumber } from '../utils/timeUtils.js';
 import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js';
 import { Issue } from '../matterhorn.js'
@@ -131,7 +132,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
     const color = `hsl(${hue}, 70%, 60%)`;
 
     return {
-      label: issue.name,
+      label: escapeHtml(issue.name),
       data: [{ x: issue.created, y: issueMetrics.cost }],
       borderColor: color,
       backgroundColor: color,
@@ -216,7 +217,7 @@ router.get('/project/:projectName', (req, res) => {
                     <li class="issue-item">
                       <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id.id)}" class="issue-link">
                         <div class="issue-container">
-                          <div class="issue-name">${issue.name}</div>
+                          <div class="issue-name">${escapeHtml(issue.name)}</div>
                           <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
                         </div>
                       </a>
