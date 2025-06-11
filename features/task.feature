@@ -81,11 +81,13 @@ Feature: Task Details Page
   Scenario: Raw data view for steps
     Given there are steps for a specific task
     When the user visits the task details page
-    Then each step should have a "Raw Data" button
-    When the user clicks on a "Raw Data" button
-    Then the raw JSON data for that step should be displayed
+    Then each step should have a "JSON" button in the first row
+    When the user clicks on a "JSON" button
+    Then a second row should appear below the step row
+    And the second row should contain the raw JSON data for that step
     And the JSON data should be interactive with collapsible nodes
     And the JSON data should have syntax highlighting
+    And the JSON data should be constrained to the width of the table with scroll bars for overflow
 
   Scenario: Viewing task details page with no steps
     Given there are no steps for a specific task

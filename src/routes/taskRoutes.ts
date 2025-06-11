@@ -243,11 +243,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>
                         <div class="title-container">
                           ${index + 1}
-                          <span class="summary-icon" title="${escapeHtml(step.title)}">ⓘ</span>
-                          <button class="toggle-raw-data" data-step="${index}">Raw Data</button>
-                        </div>
-                        <div id="raw-data-${index}" class="raw-data-container" style="display: none;">
-                          <div id="json-renderer-${index}" class="json-renderer"></div>
+                          <button class="toggle-raw-data" data-step="${index}">JSON</button>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
@@ -261,6 +257,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>${formatMilliseconds(step.metrics.modelCachedTime)}</td>
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
+                    </tr>
+                    <tr id="raw-data-${index}" class="raw-data-row" style="display: none;">
+                      <td colspan="12" class="raw-data-container">
+                        <div id="json-renderer-${index}" class="json-renderer"></div>
+                      </td>
                     </tr>
                   `).join('')}
                 </tbody>

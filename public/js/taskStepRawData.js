@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
     button.addEventListener('click', function() {
       const stepIndex = this.getAttribute('data-step');
       const container = document.getElementById(`raw-data-${stepIndex}`);
-      
+
       // Toggle visibility
       if (container.style.display === 'none') {
-        container.style.display = 'block';
-        
+        container.style.display = 'table-row';
+
         // Initialize JSON viewer if not already done
         if (!container.getAttribute('data-initialized')) {
           const jsonRenderer = document.getElementById(`json-renderer-${stepIndex}`);

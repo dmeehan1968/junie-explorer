@@ -860,7 +860,6 @@ p {
 
 /* Raw data container styles */
 .raw-data-container {
-  margin-top: 10px;
   padding: 10px;
   background-color: #f8f9fa;
   border-radius: 4px;
@@ -869,10 +868,19 @@ p {
   overflow: auto;
 }
 
+.raw-data-row {
+  background-color: #f8f9fa;
+}
+
+.raw-data-row td {
+  padding: 0;
+}
+
 .json-renderer {
   font-family: monospace;
   font-size: 13px;
   line-height: 1.4;
+  width: 100%;
 }
 
 .toggle-raw-data {

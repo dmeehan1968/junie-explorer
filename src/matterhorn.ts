@@ -243,7 +243,6 @@ export class Step {
 
   private lazyLoad(): this {
     if (this._content === null || this._description == null || this._dependencies === null) {
-      console.log('loading')
       const data = fs.readJsonSync(this.filePath);
       this._content = data.content || {};
       this._description = data.description || '';
