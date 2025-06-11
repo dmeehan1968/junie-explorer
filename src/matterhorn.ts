@@ -245,7 +245,12 @@ export class Step {
     if (this._content === null || this._description == null || this._dependencies === null) {
       const data = fs.readJsonSync(this.filePath);
       this._content = data.content || {};
-      this._description = data.description || '';
+      try {
+        this._description = JSON.parse(data.description || '') as string;
+      } catch (error) {
+        console.error('Error parsing step description:', error);
+        this._description = data.description || '';
+      }
       this._dependencies = data.dependencies || [];
     }
     return this;
