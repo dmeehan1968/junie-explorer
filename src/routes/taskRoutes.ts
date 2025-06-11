@@ -149,14 +149,28 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
         ${task.steps.length > 0 
           ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
+              // Define the step data for raw data view
+              window.stepData = ${JSON.stringify(task.steps.map(step => ({
+                id: step.id,
+                title: step.title,
+                reasoning: step.reasoning,
+                statistics: step.statistics,
+                content: step.content,
+                dependencies: step.dependencies,
+                description: step.description
+              })))};
             </script>`
           : ''
         }
         <script src="/js/taskStepGraph.js"></script>
+        <script src="/js/taskStepRawData.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
       <body>
@@ -230,6 +244,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                         <div class="title-container">
                           ${index + 1}
                           <span class="summary-icon" title="${escapeHtml(step.title)}">ⓘ</span>
+                          <button class="toggle-raw-data" data-step="${index}">Raw Data</button>
+                        </div>
+                        <div id="raw-data-${index}" class="raw-data-container" style="display: none;">
+                          <div id="json-renderer-${index}" class="json-renderer"></div>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
