@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-06-11
+
+### Features
+- Add raw data viewer for tasks with dynamic API fetching (6b534c9)
+- Add raw data viewer for task steps (9fcdcad)
+- Fetch step data dynamically via API in `taskStepRawData.js` (dba0cc9)
+- Update raw data viewer to enhance UX (af5a5ac)
+
+### Bug Fixes
+- Handle errors when parsing step descriptions in `matterhorn.ts` (efa4f99)
+- Escape HTML in issue names across routes and templates (67327ef)
+
+### Code Improvements
+- Restrict task endpoint to return only public fields (187c19a)
+- Limit JSON viewer height, improve styles, and update feature scenario (5824d38)
+
+### Documentation
+- Document JetBrains cache file structure in README (9a52fe0)
+
 ## [1.2.0] - 2025-06-10
 
 ### Features
