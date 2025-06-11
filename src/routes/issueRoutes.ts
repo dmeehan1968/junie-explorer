@@ -1,7 +1,7 @@
 import express from 'express'
 import { marked } from 'marked'
 import { Metrics } from '../matterhorn.js'
-import { getIDEIcon, getIssue, getProject } from '../utils/appState.js'
+import { getIDEIcon, getIssue, getProject, getTask } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
@@ -48,7 +48,11 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${escapeHtml(issue.name)} Tasks</title>
         <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
         <script src="/js/reloadPage.js"></script>
+        <script src="/js/taskRawData.js"></script>
       </head>
       <body>
         <div class="container">
@@ -85,7 +89,13 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                     <li class="task-item">
                       <div class="task-header">
                         <div class="task-id">${task.id.index === 0 ? 'Initial Request' : `Follow up ${task.id.index}`}</div>
-                        <div class="task-date">Created: ${new Date(task.created).toLocaleString()}</div>
+                        <div class="task-date">
+                          Created: ${new Date(task.created).toLocaleString()}
+                          <button class="toggle-raw-data" data-task="${task.id.index}">JSON</button>
+                        </div>
+                      </div>
+                      <div id="raw-data-${task.id.index}" class="raw-data-container" style="display: none;">
+                        <div id="json-renderer-${task.id.index}" class="json-renderer"></div>
                       </div>
                       <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
                         ${task.context.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
@@ -108,6 +118,24 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
   } catch (error) {
     console.error('Error generating tasks page:', error);
     res.status(500).send('An error occurred while generating the tasks page');
+  }
+});
+
+// API endpoint to get task data for a specific issue
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
+  try {
+    const { projectName, issueId, taskId } = req.params;
+    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Return the task data
+    res.json(task);
+  } catch (error) {
+    console.error('Error fetching task data:', error);
+    res.status(500).json({ error: 'An error occurred while fetching task data' });
   }
 });
 
