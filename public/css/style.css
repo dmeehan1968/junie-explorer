@@ -727,13 +727,19 @@ p {
 /* For project-link context, use smaller icons with different positioning */
 .project-link .ide-icons {
   gap: 5px;
-  margin-left: auto;
   margin: 0;
 }
 
 .project-link .ide-icon {
   width: 20px;
   height: 20px;
+}
+
+.issue-count {
+  margin-left: auto;
+  margin-right: 10px;
+  font-size: 14px;
+  color: #666;
 }
 
 /* Project Selection Styles */

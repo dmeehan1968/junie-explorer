@@ -290,6 +290,7 @@ router.get('/', (req, res) => {
                   </div>
                   <a href="/project/${encodeURIComponent(project.name)}" class="project-link">
                     <div class="project-name">${project.name}</div>
+                    <div class="issue-count">${project.issues.length} issues</div>
                     <div class="ide-icons">
                       ${project.ides.map(ide => `
                         <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
