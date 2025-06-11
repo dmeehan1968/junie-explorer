@@ -156,16 +156,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
           ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
-              // Define the step data for raw data view
-              window.stepData = ${JSON.stringify(task.steps.map(step => ({
-                id: step.id,
-                title: step.title,
-                reasoning: step.reasoning,
-                statistics: step.statistics,
-                content: step.content,
-                dependencies: step.dependencies,
-                description: step.description
-              })))};
             </script>`
           : ''
         }
@@ -294,6 +284,39 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   } catch (error) {
     console.error('Error generating steps page:', error);
     res.status(500).send('An error occurred while generating the steps page');
+  }
+});
+
+// API endpoint to get step data for a specific task
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex', (req, res) => {
+  try {
+    const { projectName, issueId, taskId, stepIndex } = req.params;
+    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const stepIdx = parseInt(stepIndex, 10);
+    if (isNaN(stepIdx) || stepIdx < 0 || stepIdx >= task.steps.length) {
+      return res.status(404).json({ error: 'Step not found' });
+    }
+
+    const step = task.steps[stepIdx];
+
+    // Return only the data needed for the JSON viewer
+    res.json({
+      id: step.id,
+      title: step.title,
+      reasoning: step.reasoning,
+      statistics: step.statistics,
+      content: step.content,
+      dependencies: step.dependencies,
+      description: step.description
+    });
+  } catch (error) {
+    console.error('Error fetching step data:', error);
+    res.status(500).json({ error: 'An error occurred while fetching step data' });
   }
 });
 
