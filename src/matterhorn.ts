@@ -167,7 +167,6 @@ export class Task {
       context: this.context,
       isDeclined: this.isDeclined,
       plan: this.plan,
-      steps: this.steps,
       previousTasksInfo: this.previousTasksInfo,
       finalAgentState: this.finalAgentState,
       sessionHistory: this.sessionHistory,
