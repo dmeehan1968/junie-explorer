@@ -13,7 +13,7 @@ export class Project {
   }
 
   private _issues: Map<string, Issue> = new Map()
-  get issues() {
+  private get issues() {
     if (this._issues.size) {
       return this._issues
     }
@@ -32,7 +32,7 @@ export class Project {
     return this.issues.get(id)
   }
 
-  private get metrics() {
+  get metrics() {
     if (this._metrics) {
       return this._metrics
     }

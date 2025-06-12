@@ -112,6 +112,23 @@ const Description = z.string().transform(v => {
   return v
 })
 export type Description = z.infer<typeof Description>
+
+export const JunieStatistics = z.object({
+  totalArtifactBuildTimeSeconds: z.number().default(() => 0),
+  artifactTime: z.number(),
+  modelTime: z.number(),
+  modelCachedTime: z.number(),
+  requests: z.number(),
+  cachedRequests: z.number(),
+  inputTokens: z.number(),
+  outputTokens: z.number(),
+  cacheInputTokens: z.number(),
+  cacheCreateInputTokens: z.number(),
+  cost: z.number(),
+  cachedCost: z.number(),
+})
+export type JunieStatistics = z.infer<typeof JunieStatistics>
+
 export const JunieStepSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -119,24 +136,12 @@ export const JunieStepSchema = z.object({
     type: z.enum(['com.intellij.ml.llm.matterhorn.ArtifactReasoning.Success']),
     reason: z.string(),
   }),
-  statistics: z.object({
-    totalArtifactBuildTimeSeconds: z.number().default(() => 0),
-    artifactTime: z.number(),
-    modelTime: z.number(),
-    modelCachedTime: z.number(),
-    requests: z.number(),
-    cachedRequests: z.number(),
-    inputTokens: z.number(),
-    outputTokens: z.number(),
-    cacheInputTokens: z.number(),
-    cacheCreateInputTokens: z.number(),
-    cost: z.number(),
-    cachedCost: z.number(),
-  }),
+  statistics: JunieStatistics,
   content: StepContent,
   dependencies: Dependencies.array().default(() => ([])),
   description: Description,
 })
+export type JunieStep = z.infer<typeof JunieStepSchema>
 
 export interface SummaryMetrics {
   inputTokens: number;

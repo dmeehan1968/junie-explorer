@@ -1,26 +1,13 @@
 import fs from "fs-extra"
 import { inspect } from "util"
-import { Dependencies, Description, JunieStepSchema, StepContent } from "./schema.js"
+import { Dependencies, Description, JunieStatistics, JunieStepSchema, StepContent } from "./schema.js"
 
 export class Step {
   id: number
   startTime: Date
   endTime: Date
   title: string
-  statistics: {
-    totalArtifactBuildTimeSeconds: number;
-    artifactTime: number;
-    modelTime: number;
-    modelCachedTime: number;
-    requests: number;
-    cachedRequests: number;
-    inputTokens: number;
-    outputTokens: number;
-    cacheInputTokens: number;
-    cacheCreateInputTokens: number;
-    cost: number;
-    cachedCost: number;
-  }
+  statistics: JunieStatistics
   metrics: {
     inputTokens: number;
     outputTokens: number;
