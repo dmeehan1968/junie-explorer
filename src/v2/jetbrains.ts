@@ -267,7 +267,9 @@ class Step {
 }
 
 interface SummaryMetrics {
-  tokens: number;
+  inputTokens: number;
+  outputTokens: number;
+  cacheTokens: number;
   cost: number;
   time: number;
 }
@@ -297,9 +299,11 @@ class Task {
       .map(path => new Step(path))
       .map(step => this.steps.set(step.id, step))
 
-    this.metrics = { tokens: 0, cost: 0, time: 0 }
+    this.metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
     for (const step of this.steps.values()) {
-      this.metrics.tokens += step.metrics.inputTokens + step.metrics.outputTokens + step.metrics.cacheTokens
+      this.metrics.inputTokens += step.metrics.inputTokens
+      this.metrics.outputTokens += step.metrics.outputTokens
+      this.metrics.cacheTokens += step.metrics.cacheTokens
       this.metrics.cost += step.metrics.cost + step.metrics.cachedCost
       this.metrics.time += step.metrics.buildTime + step.metrics.modelTime + step.metrics.modelCachedTime
     }
@@ -331,7 +335,7 @@ class Issue {
   readonly state: string
   readonly error?: any
   readonly tasks: Map<string, Task> = new Map()
-  readonly metrics: SummaryMetrics = { tokens: 0, cost: 0, time: 0 }
+  readonly metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
   constructor(public readonly logPath: string) {
     const issue = JunieChainSchema.safeParse(fs.readJsonSync(logPath))
@@ -350,7 +354,9 @@ class Issue {
       .forEach(task => this.tasks.set(task.id, task))
 
     for (const task of this.tasks.values()) {
-      this.metrics.tokens += task.metrics.tokens
+      this.metrics.inputTokens += task.metrics.inputTokens
+      this.metrics.outputTokens += task.metrics.outputTokens
+      this.metrics.cacheTokens += task.metrics.cacheTokens
       this.metrics.cost += task.metrics.cost
       this.metrics.time += task.metrics.time
     }
@@ -403,10 +409,12 @@ class Project {
       return this._metrics
     }
 
-    this._metrics = { tokens: 0, cost: 0, time: 0 }
+    this._metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
     for (const issue of this.issues.values()) {
-      this._metrics.tokens += issue.metrics.tokens
+      this._metrics.inputTokens += issue.metrics.inputTokens
+      this._metrics.outputTokens += issue.metrics.outputTokens
+      this._metrics.cacheTokens += issue.metrics.cacheTokens
       this._metrics.cost += issue.metrics.cost
       this._metrics.time += issue.metrics.time
     }
@@ -448,10 +456,12 @@ class Jetbrains {
     if (this._metrics) {
       return this._metrics
     }
-    this._metrics = { tokens: 0, cost: 0, time: 0 }
+    this._metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
     for (const project of this.projects.values()) {
-      this._metrics.tokens += project.metrics.tokens
+      this._metrics.inputTokens += project.metrics.inputTokens
+      this._metrics.outputTokens += project.metrics.outputTokens
+      this._metrics.cacheTokens += project.metrics.cacheTokens
       this._metrics.cost += project.metrics.cost
       this._metrics.time += project.metrics.time
     }
