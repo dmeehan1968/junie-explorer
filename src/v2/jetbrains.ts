@@ -101,5 +101,6 @@ export class JetBrains {
   }
 }
 
+export const jetBrains = new JetBrains()
 
 
