@@ -28,7 +28,11 @@ export class Project {
     return this._issues
   }
 
-  get metrics() {
+  getIssueById(id: string) {
+    return this.issues.get(id)
+  }
+
+  private get metrics() {
     if (this._metrics) {
       return this._metrics
     }

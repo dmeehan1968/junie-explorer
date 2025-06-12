@@ -10,7 +10,7 @@ export class Task {
   readonly context: JunieTaskContext
   readonly isDeclined: boolean
   readonly plan: JuniePlan[]
-  readonly steps: Map<string, Step> = new Map()
+  private readonly steps: Map<number, Step> = new Map()
   readonly metrics: SummaryMetrics
 
   constructor(public readonly logPath: string) {
@@ -37,6 +37,10 @@ export class Task {
       this.metrics.cost += step.metrics.cost + step.metrics.cachedCost
       this.metrics.time += step.metrics.buildTime + step.metrics.modelTime + step.metrics.modelCachedTime
     }
+  }
+
+  getStepById(id: number) {
+    return this.steps.get(id)
   }
 
   toJSON() {

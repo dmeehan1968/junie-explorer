@@ -10,7 +10,7 @@ export class Issue {
   readonly created: Date
   readonly state: string
   readonly error?: any
-  readonly tasks: Map<string, Task> = new Map()
+  private readonly tasks: Map<string, Task> = new Map()
   readonly metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
   constructor(public readonly logPath: string) {
@@ -36,6 +36,10 @@ export class Issue {
       this.metrics.cost += task.metrics.cost
       this.metrics.time += task.metrics.time
     }
+  }
+
+  getTaskById(id: string) {
+    return this.tasks.get(`${this.id} ${id}`)
   }
 
   toJSON() {

@@ -3,7 +3,7 @@ import { inspect } from "util"
 import { Dependencies, Description, JunieStepSchema, StepContent } from "./schema.js"
 
 export class Step {
-  id: string
+  id: number
   startTime: Date
   endTime: Date
   title: string
@@ -41,7 +41,11 @@ export class Step {
   constructor(public readonly logPath: string) {
     const step = this.load()
 
-    this.id = step.id
+    const id = step.id.match(/step_(\d+)/)?.[1]
+    if (id === undefined) {
+      throw new Error(`Could not extract step id from ${logPath}`)
+    }
+    this.id = parseInt(id)
     this.endTime = fs.statSync(logPath).birthtime
     this.startTime = new Date(this.endTime.getTime() - (step.statistics.artifactTime + step.statistics.modelTime + step.statistics.modelCachedTime))
 
