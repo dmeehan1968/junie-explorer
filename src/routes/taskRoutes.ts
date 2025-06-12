@@ -1,80 +1,85 @@
-import express from 'express';
-import { getIssue, getTask, getIDEIcon, getProject } from '../utils/appState.js'
+import express from 'express'
+import { marked } from 'marked'
+import { Step } from '../matterhorn.js'
+import { getIDEIcon, getIssue, getProject, getTask } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
-import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js';
-import { calculateStepSummary } from '../utils/metricsUtils.js';
-import { Step, Metrics } from '../matterhorn.js';
-import { marked } from 'marked';
+import { calculateStepSummary } from '../utils/metricsUtils.js'
+import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
 
-const router = express.Router();
+const router = express.Router()
 
 // Function to prepare data for the metrics over time graph
-function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
+function prepareStepGraphData(steps: Step[]): {
+  labels: string[],
+  datasets: any[],
+  timeUnit: string,
+  stepSize: number
+} {
   // Use the actual timestamps from the step data
-  const stepTimes = steps.map(step => step.startTime);
+  const stepTimes = steps.map(step => step.startTime)
 
   // Find min and max dates
-  const minDate = stepTimes.length > 0 ? new Date(Math.min(...stepTimes.map(date => date.getTime()))) : new Date();
-  const maxDate = stepTimes.length > 0 ? new Date(Math.max(...stepTimes.map(date => date.getTime()))) : new Date();
+  const minDate = stepTimes.length > 0 ? new Date(Math.min(...stepTimes.map(date => date.getTime()))) : new Date()
+  const maxDate = stepTimes.length > 0 ? new Date(Math.max(...stepTimes.map(date => date.getTime()))) : new Date()
 
   // Calculate the date range in milliseconds
-  const dateRange = maxDate.getTime() - minDate.getTime();
+  const dateRange = maxDate.getTime() - minDate.getTime()
 
   // Determine the appropriate time unit based on the date range
-  let timeUnit = 'minute'; // default for task steps (usually short timeframe)
-  let stepSize = 1;
+  let timeUnit = 'minute' // default for task steps (usually short timeframe)
+  let stepSize = 1
 
   // Constants for time calculations
-  const MINUTE = 60 * 1000;
-  const HOUR = 60 * MINUTE;
-  const DAY = 24 * HOUR;
-  const WEEK = 7 * DAY;
-  const MONTH = 30 * DAY;
-  const YEAR = 365 * DAY;
+  const MINUTE = 60 * 1000
+  const HOUR = 60 * MINUTE
+  const DAY = 24 * HOUR
+  const WEEK = 7 * DAY
+  const MONTH = 30 * DAY
+  const YEAR = 365 * DAY
 
   // Minimum number of labels we want to display
-  const MIN_LABELS = 5;
+  const MIN_LABELS = 5
 
   if (dateRange < MINUTE * 5) {
-    timeUnit = 'second';
+    timeUnit = 'second'
     // Calculate step size to ensure at least MIN_LABELS labels
-    stepSize = Math.max(1, Math.floor(dateRange / (1000 * MIN_LABELS)));
+    stepSize = Math.max(1, Math.floor(dateRange / (1000 * MIN_LABELS)))
   } else if (dateRange < HOUR) {
-    timeUnit = 'minute';
+    timeUnit = 'minute'
     // Calculate step size to ensure at least MIN_LABELS labels
-    stepSize = Math.max(1, Math.floor(dateRange / (MINUTE * MIN_LABELS)));
+    stepSize = Math.max(1, Math.floor(dateRange / (MINUTE * MIN_LABELS)))
   } else if (dateRange < DAY) {
-    timeUnit = 'hour';
+    timeUnit = 'hour'
     // Calculate step size to ensure at least MIN_LABELS labels
-    stepSize = Math.max(1, Math.floor(dateRange / (HOUR * MIN_LABELS)));
+    stepSize = Math.max(1, Math.floor(dateRange / (HOUR * MIN_LABELS)))
   } else if (dateRange < WEEK) {
-    timeUnit = 'day';
+    timeUnit = 'day'
     // Calculate step size to ensure at least MIN_LABELS labels
-    stepSize = Math.max(1, Math.floor(dateRange / (DAY * MIN_LABELS)));
+    stepSize = Math.max(1, Math.floor(dateRange / (DAY * MIN_LABELS)))
   } else if (dateRange < MONTH) {
-    timeUnit = 'week';
+    timeUnit = 'week'
     // Calculate step size to ensure at least MIN_LABELS labels
-    stepSize = Math.max(1, Math.floor(dateRange / (WEEK * MIN_LABELS)));
+    stepSize = Math.max(1, Math.floor(dateRange / (WEEK * MIN_LABELS)))
   } else if (dateRange < YEAR) {
-    timeUnit = 'month';
+    timeUnit = 'month'
     // Calculate step size to ensure at least MIN_LABELS labels
-    stepSize = Math.max(1, Math.floor(dateRange / (MONTH * MIN_LABELS)));
+    stepSize = Math.max(1, Math.floor(dateRange / (MONTH * MIN_LABELS)))
   } else {
-    timeUnit = 'year';
+    timeUnit = 'year'
     // Calculate step size to ensure at least MIN_LABELS labels
-    stepSize = Math.max(1, Math.floor(dateRange / (YEAR * MIN_LABELS)));
+    stepSize = Math.max(1, Math.floor(dateRange / (YEAR * MIN_LABELS)))
   }
 
   // Create datasets for cost and aggregate tokens
   const costData = steps.map(step => ({
     x: step.startTime.toISOString(),
-    y: step.metrics.cost
-  }));
+    y: step.metrics.cost,
+  }))
 
   const tokenData = steps.map(step => ({
     x: step.startTime.toISOString(),
-    y: step.metrics.inputTokens + step.metrics.outputTokens + step.metrics.cacheTokens
-  }));
+    y: step.metrics.inputTokens + step.metrics.outputTokens + step.metrics.cacheTokens,
+  }))
 
   const datasets = [
     {
@@ -84,7 +89,7 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
       backgroundColor: 'rgba(54, 162, 235, 0.5)',
       fill: false,
       tension: 0.1,
-      yAxisID: 'y'
+      yAxisID: 'y',
     },
     {
       label: 'Tokens (Input + Output + Cache)',
@@ -93,16 +98,16 @@ function prepareStepGraphData(steps: Step[]): { labels: string[], datasets: any[
       backgroundColor: 'rgba(255, 99, 132, 0.5)',
       fill: false,
       tension: 0.1,
-      yAxisID: 'y1'
-    }
-  ];
+      yAxisID: 'y1',
+    },
+  ]
 
   return {
     labels: steps.map(step => step.startTime.toISOString()),
     datasets,
     timeUnit,
     stepSize,
-  };
+  }
 }
 
 // Generate HTML for metrics table headers (used only for steps table, not for totals)
@@ -118,25 +123,25 @@ const metricsHeaders = `
   <th>Model Cached</th>
   <th>Default</th>
   <th>Cached</th>
-`;
+`
 
 // Task steps page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
-    const { projectName, issueId, taskId } = req.params;
-    const project = getProject(projectName);
-    const issue = getIssue(projectName, issueId);
-    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+    const { projectName, issueId, taskId } = req.params
+    const project = getProject(projectName)
+    const issue = getIssue(projectName, issueId)
+    const task = getTask(projectName, issueId, parseInt(taskId, 10))
 
     if (!project || !task) {
-      return res.status(404).send('Task not found');
+      return res.status(404).send('Task not found')
     }
 
     // Calculate summary values for the footer
-    const summaryData = calculateStepSummary(task.steps);
+    const summaryData = calculateStepSummary(task.steps)
 
     // Prepare graph data
-    const graphData = prepareStepGraphData(task.steps);
+    const graphData = prepareStepGraphData(task.steps)
 
     // Generate HTML
     const html = `
@@ -152,13 +157,13 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
-        ${task.steps.length > 0 
-          ? `<script>
+        ${task.steps.length > 0
+      ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
             </script>`
-          : ''
-        }
+      : ''
+    }
         <script src="/js/taskStepGraph.js"></script>
         <script src="/js/taskStepRawData.js"></script>
         <script src="/js/reloadPage.js"></script>
@@ -205,15 +210,15 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
             </div>
           </div>
 
-          ${task.steps.length > 0 
-            ? `<div class="graph-container">
+          ${task.steps.length > 0
+      ? `<div class="graph-container">
                 <canvas id="stepMetricsChart"></canvas>
               </div>`
-            : ''
-          }
+      : ''
+    }
 
-          ${task.steps.length > 0 
-            ? `
+          ${task.steps.length > 0
+      ? `
               <table class="steps-table">
                 <thead>
                   <tr>
@@ -273,43 +278,43 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                 </tfoot>
               </table>
             `
-            : '<p>No steps found for this task</p>'
-          }
+      : '<p>No steps found for this task</p>'
+    }
         </div>
       </body>
       </html>
-    `;
+    `
 
-    res.send(html);
+    res.send(html)
   } catch (error) {
-    console.error('Error generating steps page:', error);
-    res.status(500).send('An error occurred while generating the steps page');
+    console.error('Error generating steps page:', error)
+    res.status(500).send('An error occurred while generating the steps page')
   }
-});
+})
 
 // API endpoint to get step data for a specific task
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex', (req, res) => {
   try {
-    const { projectName, issueId, taskId, stepIndex } = req.params;
-    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+    const { projectName, issueId, taskId, stepIndex } = req.params
+    const task = getTask(projectName, issueId, parseInt(taskId, 10))
 
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: 'Task not found' })
     }
 
-    const stepIdx = parseInt(stepIndex, 10);
+    const stepIdx = parseInt(stepIndex, 10)
     if (isNaN(stepIdx) || stepIdx < 0 || stepIdx >= task.steps.length) {
-      return res.status(404).json({ error: 'Step not found' });
+      return res.status(404).json({ error: 'Step not found' })
     }
 
-    const step = task.steps[stepIdx];
+    const step = task.steps[stepIdx]
 
     // Return only the data needed for the JSON viewer
-    res.json(step);
+    res.json(step)
   } catch (error) {
-    console.error('Error fetching step data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching step data' });
+    console.error('Error fetching step data:', error)
+    res.status(500).json({ error: 'An error occurred while fetching step data' })
   }
-});
+})
 
-export default router;
+export default router

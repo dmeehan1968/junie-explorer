@@ -6,12 +6,12 @@ import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
 
-const router = express.Router();
+const router = express.Router()
 
 // Function to generate HTML for step totals table
 const generateStepTotalsTable = (summaryData: Metrics): string => {
   // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = summaryData.buildTime + summaryData.modelTime/1000 + summaryData.artifactTime + summaryData.modelCachedTime/1000;
+  const totalTime = summaryData.buildTime + summaryData.modelTime / 1000 + summaryData.artifactTime + summaryData.modelCachedTime / 1000
 
   return `
   <table class="step-totals-table">
@@ -25,18 +25,18 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
       </tr>
     </tbody>
   </table>
-`;
-};
+`
+}
 
 // Issue tasks page route
 router.get('/project/:projectName/issue/:issueId', (req, res) => {
   try {
-    const { projectName, issueId } = req.params;
-    const project = getProject(projectName);
-    const issue = getIssue(projectName, issueId);
+    const { projectName, issueId } = req.params
+    const project = getProject(projectName)
+    const issue = getIssue(projectName, issueId)
 
     if (!project || !issue) {
-      return res.status(404).send('Issue not found');
+      return res.status(404).send('Issue not found')
     }
 
     // Generate HTML
@@ -80,12 +80,12 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           </div>
 
           <ul class="task-list">
-            ${issue.tasks.length > 0 
-              ? issue.tasks.map(task => {
-                  // Calculate step totals for this task
-                  const stepTotals = calculateStepSummary(task.steps);
+            ${issue.tasks.length > 0
+      ? issue.tasks.map(task => {
+        // Calculate step totals for this task
+        const stepTotals = calculateStepSummary(task.steps)
 
-                  return `
+        return `
                     <li class="task-item">
                       <div class="task-header">
                         <div class="task-id">${task.id.index === 0 ? 'Initial Request' : `Follow up ${task.id.index}`}</div>
@@ -104,39 +104,39 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                         ${generateStepTotalsTable(stepTotals)}
                       </div>
                     </li>
-                  `;
-                }).join('')
-              : '<li>No tasks found for this issue</li>'
-            }
+                  `
+      }).join('')
+      : '<li>No tasks found for this issue</li>'
+    }
           </ul>
         </div>
       </body>
       </html>
-    `;
+    `
 
-    res.send(html);
+    res.send(html)
   } catch (error) {
-    console.error('Error generating tasks page:', error);
-    res.status(500).send('An error occurred while generating the tasks page');
+    console.error('Error generating tasks page:', error)
+    res.status(500).send('An error occurred while generating the tasks page')
   }
-});
+})
 
 // API endpoint to get task data for a specific issue
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
-    const { projectName, issueId, taskId } = req.params;
-    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+    const { projectName, issueId, taskId } = req.params
+    const task = getTask(projectName, issueId, parseInt(taskId, 10))
 
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: 'Task not found' })
     }
 
     // Return the task data with only public fields
-    res.json(task);
+    res.json(task)
   } catch (error) {
-    console.error('Error fetching task data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching task data' });
+    console.error('Error fetching task data:', error)
+    res.status(500).json({ error: 'An error occurred while fetching task data' })
   }
-});
+})
 
-export default router;
+export default router

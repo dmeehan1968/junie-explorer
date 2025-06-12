@@ -1,17 +1,17 @@
-import express from 'express';
-import { getProject, getIDEIcon } from '../utils/appState.js';
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { formatSeconds, formatElapsedTime, formatNumber } from '../utils/timeUtils.js';
-import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js';
+import express from 'express'
 import { Issue } from '../matterhorn.js'
+import { getIDEIcon, getProject } from '../utils/appState.js'
+import { escapeHtml } from "../utils/escapeHtml.js"
+import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js'
+import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
 
-const router = express.Router();
+const router = express.Router()
 
 // Function to generate HTML for issue metrics table
 const generateIssueMetricsTable = (issue: Issue): string => {
-  const issueMetrics = calculateIssueSummary(issue.tasks);
+  const issueMetrics = calculateIssueSummary(issue.tasks)
   // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = issueMetrics.buildTime + issueMetrics.modelTime/1000 + issueMetrics.artifactTime + issueMetrics.modelCachedTime/1000;
+  const totalTime = issueMetrics.buildTime + issueMetrics.modelTime / 1000 + issueMetrics.artifactTime + issueMetrics.modelCachedTime / 1000
 
   return `
   <table class="step-totals-table">
@@ -36,25 +36,26 @@ const generateIssueMetricsTable = (issue: Issue): string => {
       </tr>
     </tbody>
   </table>
-`;};
+`
+}
 
 // Function to generate HTML for project summary metrics table
 const generateProjectSummaryTable = (issues: Issue[]): string => {
   if (issues.length === 0) {
-    return '';
+    return ''
   }
 
-  const projectMetrics = calculateProjectMetrics(issues);
+  const projectMetrics = calculateProjectMetrics(issues)
 
   // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = projectMetrics.buildTime + projectMetrics.modelTime/1000 + projectMetrics.artifactTime + projectMetrics.modelCachedTime/1000;
+  const totalTime = projectMetrics.buildTime + projectMetrics.modelTime / 1000 + projectMetrics.artifactTime + projectMetrics.modelCachedTime / 1000
 
   // Calculate elapsed time (difference between oldest and most recent issue)
-  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
-  const oldestIssue = sortedIssues[0];
-  const newestIssue = sortedIssues[sortedIssues.length - 1];
-  const elapsedTimeMs = new Date(newestIssue.created).getTime() - new Date(oldestIssue.created).getTime();
-  const elapsedTimeSec = elapsedTimeMs / 1000;
+  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
+  const oldestIssue = sortedIssues[0]
+  const newestIssue = sortedIssues[sortedIssues.length - 1]
+  const elapsedTimeMs = new Date(newestIssue.created).getTime() - new Date(oldestIssue.created).getTime()
+  const elapsedTimeSec = elapsedTimeMs / 1000
 
   return `
   <div class="project-summary">
@@ -82,54 +83,54 @@ const generateProjectSummaryTable = (issues: Issue[]): string => {
       </tbody>
     </table>
   </div>
-`;
-};
+`
+}
 
 // Function to prepare data for the cost over time graph
 function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
   // Sort issues by creation date
-  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
+  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
 
   // Find min and max dates
-  const minDate = sortedIssues.length > 0 ? new Date(sortedIssues[0].created) : new Date();
-  const maxDate = sortedIssues.length > 0 ? new Date(sortedIssues[sortedIssues.length - 1].created) : new Date();
+  const minDate = sortedIssues.length > 0 ? new Date(sortedIssues[0].created) : new Date()
+  const maxDate = sortedIssues.length > 0 ? new Date(sortedIssues[sortedIssues.length - 1].created) : new Date()
 
   // Calculate the date range in milliseconds
-  const dateRange = maxDate.getTime() - minDate.getTime();
+  const dateRange = maxDate.getTime() - minDate.getTime()
 
   // Determine the appropriate time unit based on the date range
-  let timeUnit = 'day'; // default
-  let stepSize = 1;
+  let timeUnit = 'day' // default
+  let stepSize = 1
 
   // Constants for time calculations
-  const HOUR = 60 * 60 * 1000;
-  const DAY = 24 * HOUR;
-  const WEEK = 7 * DAY;
-  const MONTH = 30 * DAY;
-  const YEAR = 365 * DAY;
+  const HOUR = 60 * 60 * 1000
+  const DAY = 24 * HOUR
+  const WEEK = 7 * DAY
+  const MONTH = 30 * DAY
+  const YEAR = 365 * DAY
 
   if (dateRange < DAY) {
-    timeUnit = 'hour';
-  } else if (dateRange < DAY*2) {
-    timeUnit = 'hour';
-    stepSize = 3;
+    timeUnit = 'hour'
+  } else if (dateRange < DAY * 2) {
+    timeUnit = 'hour'
+    stepSize = 3
   } else if (dateRange < WEEK) {
-    timeUnit = 'day';
+    timeUnit = 'day'
   } else if (dateRange < MONTH) {
-    timeUnit = 'week';
+    timeUnit = 'week'
   } else if (dateRange < YEAR) {
-    timeUnit = 'month';
+    timeUnit = 'month'
   } else {
-    timeUnit = 'year';
+    timeUnit = 'year'
   }
 
   // Create datasets for each issue
   const datasets = sortedIssues.map((issue, index) => {
-    const issueMetrics = calculateIssueSummary(issue.tasks);
+    const issueMetrics = calculateIssueSummary(issue.tasks)
 
     // Generate a color based on index
-    const hue = (index * 137) % 360; // Use golden ratio to spread colors
-    const color = `hsl(${hue}, 70%, 60%)`;
+    const hue = (index * 137) % 360 // Use golden ratio to spread colors
+    const color = `hsl(${hue}, 70%, 60%)`
 
     return {
       label: escapeHtml(issue.name),
@@ -137,30 +138,30 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
       borderColor: color,
       backgroundColor: color,
       fill: false,
-      tension: 0.1
-    };
-  });
+      tension: 0.1,
+    }
+  })
 
   return {
     labels: [minDate.toISOString(), maxDate.toISOString()],
     datasets,
     timeUnit,
     stepSize,
-  };
+  }
 }
 
 // Project issues page route
 router.get('/project/:projectName', (req, res) => {
   try {
-    const { projectName } = req.params;
-    const project = getProject(projectName);
+    const { projectName } = req.params
+    const project = getProject(projectName)
 
     if (!project) {
-      return res.status(404).send('Project not found');
+      return res.status(404).send('Project not found')
     }
 
     // Prepare graph data
-    const graphData = prepareGraphData(project.issues);
+    const graphData = prepareGraphData(project.issues)
 
     // Generate HTML
     const html = `
@@ -173,13 +174,13 @@ router.get('/project/:projectName', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-        ${project.issues.length > 0 
-          ? `<script>
+        ${project.issues.length > 0
+      ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
             </script>`
-          : ''
-        }
+      : ''
+    }
         <script src="/js/issueGraph.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
@@ -202,18 +203,18 @@ router.get('/project/:projectName', (req, res) => {
             `).join('')}
           </div>
 
-          ${project.issues.length > 0 
-            ? `<div class="graph-container">
+          ${project.issues.length > 0
+      ? `<div class="graph-container">
                 <canvas id="costOverTimeChart"></canvas>
               </div>
               ${generateProjectSummaryTable(project.issues)}`
-            : ''
-          }
+      : ''
+    }
 
           <ul class="issue-list">
-            ${project.issues.length > 0 
-              ? project.issues.map(issue => {
-                  return `
+            ${project.issues.length > 0
+      ? project.issues.map(issue => {
+        return `
                     <li class="issue-item">
                       <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id.id)}" class="issue-link">
                         <div class="issue-container">
@@ -225,21 +226,21 @@ router.get('/project/:projectName', (req, res) => {
                         ${generateIssueMetricsTable(issue)}
                       </div>
                     </li>
-                  `;
-                }).join('')
-              : '<li>No issues found for this project</li>'
-            }
+                  `
+      }).join('')
+      : '<li>No issues found for this project</li>'
+    }
           </ul>
         </div>
       </body>
       </html>
-    `;
+    `
 
-    res.send(html);
+    res.send(html)
   } catch (error) {
-    console.error('Error generating issues page:', error);
-    res.status(500).send('An error occurred while generating the issues page');
+    console.error('Error generating issues page:', error)
+    res.status(500).send('An error occurred while generating the issues page')
   }
-});
+})
 
-export default router;
+export default router
