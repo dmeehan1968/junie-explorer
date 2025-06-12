@@ -10,7 +10,7 @@ export class Task {
   readonly context: JunieTaskContext
   readonly isDeclined: boolean
   readonly plan: JuniePlan[]
-  private readonly steps: Map<number, Step> = new Map()
+  readonly steps: Map<number, Step> = new Map()
   readonly metrics: SummaryMetrics
 
   constructor(public readonly logPath: string) {

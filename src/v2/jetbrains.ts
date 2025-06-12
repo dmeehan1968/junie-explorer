@@ -37,7 +37,7 @@ export class JetBrains {
     return this.projects.get(name)
   }
 
-  private get projects() {
+  get projects() {
     if (this._projects.size) {
       return this._projects
     }

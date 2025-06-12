@@ -10,7 +10,7 @@ export class Issue {
   readonly created: Date
   readonly state: string
   readonly error?: any
-  private readonly tasks: Map<string, Task> = new Map()
+  readonly tasks: Map<string, Task> = new Map()
   readonly metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
   constructor(public readonly logPath: string) {
