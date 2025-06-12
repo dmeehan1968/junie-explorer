@@ -200,7 +200,9 @@ function prepareProjectsGraphData(projects: Project[]): {
 
 // Homepage route (now shows projects instead of IDEs)
 router.get('/', (req, res) => {
+
   try {
+
     const projects: Project[] = getMergedProjects();
 
     // Get all unique IDE names from all projects

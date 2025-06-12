@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import homeRoutes from './routes/homeRoutes.js';
@@ -22,6 +22,7 @@ app.get('/refresh', (req, res) => {
   refreshAppState();
   res.redirect(req.headers.referer || '/');
 });
+
 
 // Register routes
 app.use('/', homeRoutes);
