@@ -1,4 +1,6 @@
-import { Metrics, Step, Task, Issue } from '../matterhorn.js';
+import { Issue } from "../v2/Issue.js"
+import { Metrics, Step } from "../v2/Step.js"
+import { Task } from "../v2/Task.js"
 
 /**
  * Helper function to calculate summary data for all steps in all tasks of an issue
@@ -8,7 +10,7 @@ import { Metrics, Step, Task, Issue } from '../matterhorn.js';
 export function calculateIssueSummary(tasks: Task[]): Metrics {
   return tasks.reduce((acc: Metrics, task: Task) => {
     // Calculate metrics for each task's steps
-    const taskMetrics = task.steps.reduce((stepAcc: Metrics, step: Step) => {
+    const taskMetrics = [...task.steps.values()].reduce((stepAcc: Metrics, step: Step) => {
       stepAcc.inputTokens += step.metrics.inputTokens;
       stepAcc.outputTokens += step.metrics.outputTokens;
       stepAcc.cacheTokens += step.metrics.cacheTokens;
@@ -72,7 +74,7 @@ export function calculateIssueSummary(tasks: Task[]): Metrics {
  */
 export function calculateProjectMetrics(issues: Issue[]): Metrics {
   return issues.reduce((acc: Metrics, issue: Issue) => {
-    const issueMetrics = calculateIssueSummary(issue.tasks);
+    const issueMetrics = calculateIssueSummary([...issue.tasks.values()]);
 
     acc.inputTokens += issueMetrics.inputTokens;
     acc.outputTokens += issueMetrics.outputTokens;

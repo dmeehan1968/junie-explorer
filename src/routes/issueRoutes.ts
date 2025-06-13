@@ -1,7 +1,8 @@
 import express from 'express'
 import { marked } from 'marked'
 import { Metrics } from '../matterhorn.js'
-import { getIDEIcon, getIssue, getProject, getTask } from '../utils/appState.js'
+import { jetBrains } from '../v2/jetbrains.js'
+import { getIDEIcon } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
@@ -32,8 +33,8 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
 router.get('/project/:projectName/issue/:issueId', (req, res) => {
   try {
     const { projectName, issueId } = req.params
-    const project = getProject(projectName)
-    const issue = getIssue(projectName, issueId)
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
 
     if (!project || !issue) {
       return res.status(404).send('Issue not found')
@@ -69,7 +70,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           </nav>
 
           <div class="ide-icons">
-            ${project.ides.map(ide => `
+            ${project.ideNames.map(ide => `
               <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
@@ -80,24 +81,24 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           </div>
 
           <ul class="task-list">
-            ${issue.tasks.length > 0
-      ? issue.tasks.map(task => {
+            ${issue.tasks.size > 0
+      ? [...issue.tasks.values()].map((task, index) => {
         // Calculate step totals for this task
-        const stepTotals = calculateStepSummary(task.steps)
+        const stepTotals = calculateStepSummary([...task.steps.values()])
 
         return `
                     <li class="task-item">
                       <div class="task-header">
-                        <div class="task-id">${task.id.index === 0 ? 'Initial Request' : `Follow up ${task.id.index}`}</div>
+                        <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
                         <div class="task-date">
                           Created: ${new Date(task.created).toLocaleString()}
-                          <button class="toggle-raw-data" data-task="${task.id.index}">JSON</button>
+                          <button class="toggle-raw-data" data-task="${index}">JSON</button>
                         </div>
                       </div>
-                      <div id="raw-data-${task.id.index}" class="raw-data-container" style="display: none;">
-                        <div id="json-renderer-${task.id.index}" class="json-renderer"></div>
+                      <div id="raw-data-${index}" class="raw-data-container" style="display: none;">
+                        <div id="json-renderer-${index}" class="json-renderer"></div>
                       </div>
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
+                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-link">
                         ${task.context.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                       </a>
                       <div class="task-details">
@@ -125,7 +126,9 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
     const { projectName, issueId, taskId } = req.params
-    const task = getTask(projectName, issueId, parseInt(taskId, 10))
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
 
     if (!task) {
       return res.status(404).json({ error: 'Task not found' })

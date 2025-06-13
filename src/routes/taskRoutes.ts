@@ -1,10 +1,11 @@
 import express from 'express'
 import { marked } from 'marked'
-import { Step } from '../matterhorn.js'
 import { getIDEIcon, getIssue, getProject, getTask } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
+import { jetBrains } from "../v2/jetbrains.js"
+import { Step } from "../v2/Step.js"
 
 const router = express.Router()
 
@@ -129,19 +130,19 @@ const metricsHeaders = `
 router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
     const { projectName, issueId, taskId } = req.params
-    const project = getProject(projectName)
-    const issue = getIssue(projectName, issueId)
-    const task = getTask(projectName, issueId, parseInt(taskId, 10))
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
 
-    if (!project || !task) {
+    if (!project || !issue || !task) {
       return res.status(404).send('Task not found')
     }
 
     // Calculate summary values for the footer
-    const summaryData = calculateStepSummary(task.steps)
+    const summaryData = calculateStepSummary([...task.steps.values()])
 
     // Prepare graph data
-    const graphData = prepareStepGraphData(task.steps)
+    const graphData = prepareStepGraphData([...task.steps.values()])
 
     // Generate HTML
     const html = `
@@ -150,14 +151,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Task ${task.id.index} Steps</title>
+        <title>Task ${task.id} Steps</title>
         <link rel="stylesheet" href="/css/style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
-        ${task.steps.length > 0
+        ${task.steps.size > 0
       ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
@@ -171,7 +172,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
       <body>
         <div class="container">
           <div class="header-container">
-            <h1>Junie Explorer: Task ${task.id.index}</h1>
+            <h1>Junie Explorer: Task ${task.id}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
           <nav aria-label="breadcrumb">
@@ -179,12 +180,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
               <li class="breadcrumb-item"><a href="/">Projects</a></li>
               <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
               <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">${issue?.name}</a></li>
-              <li class="breadcrumb-item active">Task ${task.id.index}</li>
+              <li class="breadcrumb-item active">Task ${task.id}</li>
             </ol>
           </nav>
 
           <div class="ide-icons">
-            ${project.ides.map(ide => `
+            ${project.ideNames.map(ide => `
               <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
@@ -210,14 +211,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
             </div>
           </div>
 
-          ${task.steps.length > 0
+          ${task.steps.size > 0
       ? `<div class="graph-container">
                 <canvas id="stepMetricsChart"></canvas>
               </div>`
       : ''
     }
 
-          ${task.steps.length > 0
+          ${task.steps.size > 0
       ? `
               <table class="steps-table">
                 <thead>
@@ -233,7 +234,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                   </tr>
                 </thead>
                 <tbody>
-                  ${task.steps.map((step, index) => `
+                  ${[...task.steps.values()].map((step, index) => `
                     <tr>
                       <td>
                         <div class="title-container">

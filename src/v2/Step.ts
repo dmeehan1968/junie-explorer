@@ -2,6 +2,20 @@ import fs from "fs-extra"
 import { inspect } from "util"
 import { Dependencies, Description, JunieStatistics, JunieStepSchema, StepContent } from "./schema.js"
 
+export interface Metrics {
+  inputTokens: number;
+  outputTokens: number;
+  cacheTokens: number;
+  cost: number;
+  cachedCost: number;
+  buildTime: number;
+  artifactTime: number;
+  modelTime: number;
+  modelCachedTime: number;
+  requests: number;
+  cachedRequests: number;
+}
+
 export class Step {
   id: number
   startTime: Date
@@ -12,18 +26,7 @@ export class Step {
     reason: string;
   }
   statistics: JunieStatistics
-  metrics: {
-    inputTokens: number;
-    outputTokens: number;
-    cacheTokens: number;
-    cost: number;
-    cachedCost: number;
-    buildTime: number;
-    modelTime: number;
-    modelCachedTime: number;
-    requests: number;
-    cachedRequests: number;
-  }
+  metrics: Metrics
 
   private _content: StepContent | undefined
   private _dependencies: Dependencies[] | undefined
@@ -50,6 +53,7 @@ export class Step {
       cost: this.statistics.cost,
       cachedCost: this.statistics.cachedCost,
       buildTime: this.statistics.artifactTime,
+      artifactTime: this.statistics.totalArtifactBuildTimeSeconds,
       modelTime: this.statistics.modelTime,
       modelCachedTime: this.statistics.modelCachedTime,
       requests: this.statistics.requests,

@@ -1,6 +1,7 @@
 import express from 'express'
-import { Issue } from '../matterhorn.js'
-import { getIDEIcon, getProject } from '../utils/appState.js'
+import { Issue } from "../v2/Issue.js"
+import { jetBrains } from '../v2/jetbrains.js'
+import { getIDEIcon } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js'
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
@@ -9,7 +10,7 @@ const router = express.Router()
 
 // Function to generate HTML for issue metrics table
 const generateIssueMetricsTable = (issue: Issue): string => {
-  const issueMetrics = calculateIssueSummary(issue.tasks)
+  const issueMetrics = calculateIssueSummary([...issue.tasks.values()])
   // Calculate total time as sum of build time, model time, artifact time and model cached time
   const totalTime = issueMetrics.buildTime + issueMetrics.modelTime / 1000 + issueMetrics.artifactTime + issueMetrics.modelCachedTime / 1000
 
@@ -126,7 +127,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
   // Create datasets for each issue
   const datasets = sortedIssues.map((issue, index) => {
-    const issueMetrics = calculateIssueSummary(issue.tasks)
+    const issueMetrics = calculateIssueSummary([...issue.tasks.values()])
 
     // Generate a color based on index
     const hue = (index * 137) % 360 // Use golden ratio to spread colors
@@ -154,14 +155,14 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 router.get('/project/:projectName', (req, res) => {
   try {
     const { projectName } = req.params
-    const project = getProject(projectName)
+    const project = jetBrains.getProjectByName(projectName)
 
     if (!project) {
       return res.status(404).send('Project not found')
     }
 
     // Prepare graph data
-    const graphData = prepareGraphData(project.issues)
+    const graphData = prepareGraphData([...project.issues.values()])
 
     // Generate HTML
     const html = `
@@ -174,7 +175,7 @@ router.get('/project/:projectName', (req, res) => {
         <link rel="stylesheet" href="/css/style.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-        ${project.issues.length > 0
+        ${project.issues.size > 0
       ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
@@ -198,25 +199,25 @@ router.get('/project/:projectName', (req, res) => {
           </nav>
 
           <div class="ide-icons">
-            ${project.ides.map(ide => `
+            ${project.ideNames.map(ide => `
               <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
 
-          ${project.issues.length > 0
+          ${project.issues.size > 0
       ? `<div class="graph-container">
                 <canvas id="costOverTimeChart"></canvas>
               </div>
-              ${generateProjectSummaryTable(project.issues)}`
+              ${generateProjectSummaryTable([...project.issues.values()])}`
       : ''
     }
 
           <ul class="issue-list">
-            ${project.issues.length > 0
-      ? project.issues.map(issue => {
+            ${project.issues.size > 0
+      ? [...project.issues.values()].map(issue => {
         return `
                     <li class="issue-item">
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id.id)}" class="issue-link">
+                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
                         <div class="issue-container">
                           <div class="issue-name">${escapeHtml(issue.name)}</div>
                           <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>

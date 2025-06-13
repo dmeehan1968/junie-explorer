@@ -1,6 +1,7 @@
 import express from 'express'
-import { Project } from '../matterhorn.js'
-import { getIDEIcon, getMergedProjects } from '../utils/appState.js'
+import { Project } from '../v2/Project.js'
+import { jetBrains } from '../v2/jetbrains.js'
+import { getIDEIcon } from '../utils/appState.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { calculateIssueSummary } from '../utils/metricsUtils.js'
 
@@ -56,7 +57,7 @@ function prepareProjectsGraphData(projects: Project[]): {
         }
       }
 
-      const metrics = calculateIssueSummary(issue.tasks)
+      const metrics = calculateIssueSummary([...issue.tasks.values()])
       issuesByDay[day][project.name].cost += metrics.cost
       issuesByDay[day][project.name].tokens += metrics.inputTokens + metrics.outputTokens
     })
@@ -202,12 +203,12 @@ router.get('/', (req, res) => {
 
   try {
 
-    const projects: Project[] = getMergedProjects()
+    const projects: Project[] = Array.from(jetBrains.projects.values())
 
     // Get all unique IDE names from all projects
     const allIdes = new Set<string>()
     projects.forEach(project => {
-      project.ides.forEach(ide => allIdes.add(ide))
+      project.ideNames.forEach(ide => allIdes.add(ide))
     })
 
     // Sort IDE names alphabetically
@@ -226,7 +227,7 @@ router.get('/', (req, res) => {
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
         <script>
           // Define the projects data as a global variable
-          window.projectsData = ${JSON.stringify(projects.map(p => ({ name: p.name, ides: p.ides })))};
+          window.projectsData = ${JSON.stringify(projects.map(p => ({ name: p.name, ides: p.ideNames })))};
         </script>
         <script src="/js/ideFilters.js"></script>
         <script src="/js/projectSelection.js"></script>
@@ -282,7 +283,7 @@ router.get('/', (req, res) => {
           <ul class="project-list">
             ${projects.length > 0
       ? projects.map(project => `
-                <li class="project-item" data-ides='${JSON.stringify(project.ides)}'>
+                <li class="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
                   <div class="project-checkbox-container">
                     <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
                            class="project-checkbox" 
@@ -291,9 +292,9 @@ router.get('/', (req, res) => {
                   </div>
                   <a href="/project/${encodeURIComponent(project.name)}" class="project-link">
                     <div class="project-name">${project.name}</div>
-                    <div class="issue-count">${project.issues.length} issues</div>
+                    <div class="issue-count">${project.issues.size} issues</div>
                     <div class="ide-icons">
-                      ${project.ides.map(ide => `
+                      ${project.ideNames.map(ide => `
                         <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
                       `).join('')}
                     </div>
@@ -320,7 +321,7 @@ router.get('/api/projects', (req, res) => {
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
-    const allProjects: Project[] = getMergedProjects()
+    const allProjects: Project[] = Array.from(jetBrains.projects.values())
 
     // Filter projects by name if names are provided
     const projects: Project[] = projectNames.length > 0
@@ -339,7 +340,7 @@ router.get('/api/projects/graph', (req, res) => {
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
-    const allProjects: Project[] = getMergedProjects()
+    const allProjects: Project[] = Array.from(jetBrains.projects.values())
 
     // Filter projects by name if names are provided
     const projects: Project[] = projectNames.length > 0
