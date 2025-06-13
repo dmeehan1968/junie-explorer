@@ -24,6 +24,7 @@ export class Task {
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
+  private _events: any[] = []
 
   constructor(public readonly logPath: string) {
     const task = this.load()
@@ -89,6 +90,35 @@ export class Task {
     return this.lazyload()._patch!
   }
 
+  get events() {
+    if (this._events.length > 0) {
+      return this._events
+    }
+
+    const root = path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
+    console.log(root)
+    
+    if (fs.existsSync(root)) {
+      const content = fs.readFileSync(root, 'utf-8')
+      this._events = content
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => {
+          try {
+            return JSON.parse(line)
+          } catch (error) {
+            return {
+              type: 'error',
+              message: String(error),
+              line,
+            }
+          }
+        })
+    }
+
+    return this._events
+  }
+
   toJSON() {
     return {
       logPath: this.logPath,
@@ -97,7 +127,8 @@ export class Task {
       context: this.context,
       isDeclined: this.isDeclined,
       plan: this.plan,
-      steps: [...this.steps],
+      events: [...this.events?.values() ?? []],
+      steps: [...this.steps?.values() ?? []],
       metrics: this.metrics,
       previousTasksInfo: this.previousTasksInfo,
       finalAgentState: this.finalAgentState,
