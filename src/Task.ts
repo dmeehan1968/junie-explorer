@@ -25,6 +25,7 @@ export class Task {
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
   private _events: any[] = []
+  private _trajectory: any[] = []
 
   constructor(public readonly logPath: string) {
     const task = this.load()
@@ -97,7 +98,7 @@ export class Task {
 
     const root = path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
     console.log(root)
-    
+
     if (fs.existsSync(root)) {
       const content = fs.readFileSync(root, 'utf-8')
       this._events = content
@@ -119,6 +120,35 @@ export class Task {
     return this._events
   }
 
+  get trajectory() {
+    if (this._trajectory.length > 0) {
+      return this._trajectory
+    }
+
+    const root = path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
+    console.log(root)
+
+    if (fs.existsSync(root)) {
+      const content = fs.readFileSync(root, 'utf-8')
+      this._trajectory = content
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => {
+          try {
+            return JSON.parse(line)
+          } catch (error) {
+            return {
+              type: 'error',
+              message: String(error),
+              line,
+            }
+          }
+        })
+    }
+
+    return this._trajectory
+  }
+
   toJSON() {
     return {
       logPath: this.logPath,
@@ -127,7 +157,8 @@ export class Task {
       context: this.context,
       isDeclined: this.isDeclined,
       plan: this.plan,
-      events: [...this.events?.values() ?? []],
+      events: [...this.events ?? []],
+      trajectory: [...this.trajectory ?? []],
       steps: [...this.steps?.values() ?? []],
       metrics: this.metrics,
       previousTasksInfo: this.previousTasksInfo,
