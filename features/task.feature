@@ -90,6 +90,20 @@ Feature: Task Details Page
     And the JSON data should be constrained to the width of the table with scroll bars for overflow
     And the JSON data should have a limited height to prevent it from becoming too tall
 
+  Scenario: Representations view for steps
+    Given there are steps for a specific task
+    When the user visits the task details page
+    Then each step should have a "REP" button in the first row
+    When the user clicks on a "REP" button
+    Then a third row should appear below the step row
+    And the third row should contain the representations data for that step
+    And the representations data should be displayed as formatted HTML
+    And the representations data should be constrained to the width of the table with horizontal scroll bars for overflow
+    And the representations data should have a limited height to prevent it from becoming too tall
+    When the user clicks the "REP" button again
+    Then the representations row should be hidden
+    And subsequent clicks should show and hide the representations without making additional requests
+
   Scenario: Viewing task details page with no steps
     Given there are no steps for a specific task
     When the user visits the task details page

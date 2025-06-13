@@ -168,7 +168,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
     }
         <script src="/js/taskStepGraph.js"></script>
         <script src="/js/taskStepRawData.js"></script>
-        <script src="/js/taskStepMdData.js"></script>
+        <script src="/js/taskStepRepData.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
       <body>
@@ -242,7 +242,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                         <div class="title-container">
                           ${step.id}
                           <button class="toggle-raw-data" data-step="${step.id}">JSON</button>
-                          <button class="toggle-md-data" data-step="${step.id}">MD</button>
+                          <button class="toggle-rep-data" data-step="${step.id}">REP</button>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
@@ -262,9 +262,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                         <div id="json-renderer-${step.id}" class="json-renderer"></div>
                       </td>
                     </tr>
-                    <tr id="md-data-${step.id}" class="md-data-row" style="display: none;">
-                      <td colspan="12" class="md-data-container">
-                        <div id="md-renderer-${step.id}" class="md-renderer"></div>
+                    <tr id="rep-data-${step.id}" class="rep-data-row" style="display: none;">
+                      <td colspan="12" class="rep-data-container">
+                        <div id="rep-renderer-${step.id}" class="rep-renderer"></div>
                       </td>
                     </tr>
                   `).join('')}
