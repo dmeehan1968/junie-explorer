@@ -1,7 +1,6 @@
 import express from 'express'
 import { Project } from '../v2/Project.js'
 import { jetBrains } from '../v2/jetbrains.js'
-import { getIDEIcon } from '../utils/appState.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { calculateIssueSummary } from '../utils/metricsUtils.js'
 
@@ -245,7 +244,7 @@ router.get('/', (req, res) => {
             <div class="filter-label">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
               <div class="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
-                <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" />
+                <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" />
               </div>
             `).join('')}
             <div class="project-search">
@@ -295,7 +294,7 @@ router.get('/', (req, res) => {
                     <div class="issue-count">${project.issues.size} issues</div>
                     <div class="ide-icons">
                       ${project.ideNames.map(ide => `
-                        <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+                        <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
                       `).join('')}
                     </div>
                   </a>

@@ -36,7 +36,6 @@ app.use('/', taskRoutes)
 app.use(notFoundRoutes)
 
 // Initialize app state and start the server
-// initializeAppState()
 jetBrains.preload()
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)

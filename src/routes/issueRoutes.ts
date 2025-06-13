@@ -2,7 +2,6 @@ import express from 'express'
 import { marked } from 'marked'
 import { Metrics } from '../matterhorn.js'
 import { jetBrains } from '../v2/jetbrains.js'
-import { getIDEIcon } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
@@ -71,7 +70,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
 
           <div class="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
 

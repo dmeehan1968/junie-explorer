@@ -1,6 +1,6 @@
 import express from 'express'
 import { marked } from 'marked'
-import { getIDEIcon, getIssue, getProject, getTask } from '../utils/appState.js'
+import { getTask } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
@@ -186,7 +186,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
 
           <div class="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
 
@@ -234,12 +234,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                   </tr>
                 </thead>
                 <tbody>
-                  ${[...task.steps.values()].map((step, index) => `
+                  ${[...task.steps.values()].map((step) => `
                     <tr>
                       <td>
                         <div class="title-container">
-                          ${index + 1}
-                          <button class="toggle-raw-data" data-step="${index}">JSON</button>
+                          ${step.id}
+                          <button class="toggle-raw-data" data-step="${step.id}">JSON</button>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
@@ -254,9 +254,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
                     </tr>
-                    <tr id="raw-data-${index}" class="raw-data-row" style="display: none;">
+                    <tr id="raw-data-${step.id}" class="raw-data-row" style="display: none;">
                       <td colspan="12" class="raw-data-container">
-                        <div id="json-renderer-${index}" class="json-renderer"></div>
+                        <div id="json-renderer-${step.id}" class="json-renderer"></div>
                       </td>
                     </tr>
                   `).join('')}
@@ -297,18 +297,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex', (req, res) => {
   try {
     const { projectName, issueId, taskId, stepIndex } = req.params
-    const task = getTask(projectName, issueId, parseInt(taskId, 10))
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
+    const step = task?.getStepById(parseInt(stepIndex, 10))
 
-    if (!task) {
+    if (!project || !issue || !task || !step) {
       return res.status(404).json({ error: 'Task not found' })
     }
-
-    const stepIdx = parseInt(stepIndex, 10)
-    if (isNaN(stepIdx) || stepIdx < 0 || stepIdx >= task.steps.length) {
-      return res.status(404).json({ error: 'Step not found' })
-    }
-
-    const step = task.steps[stepIdx]
 
     // Return only the data needed for the JSON viewer
     res.json(step)

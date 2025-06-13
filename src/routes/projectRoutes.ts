@@ -1,7 +1,6 @@
 import express from 'express'
 import { Issue } from "../v2/Issue.js"
 import { jetBrains } from '../v2/jetbrains.js'
-import { getIDEIcon } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js'
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
@@ -200,7 +199,7 @@ router.get('/project/:projectName', (req, res) => {
 
           <div class="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
 

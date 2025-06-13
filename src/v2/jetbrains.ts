@@ -21,6 +21,7 @@ export class JetBrains {
   reload() {
     this._projects.clear()
     this._metrics = undefined
+    this.preload()
   }
 
   private _projects: Map<string, Project> = new Map()
@@ -88,6 +89,23 @@ export class JetBrains {
       }
     }
     return [...names]
+  }
+
+  getIDEIcon(ideName: string): string {
+    const ideNameMap: Record<string, string> = {
+      'AppCode': 'AppCode',
+      'CLion': 'CLion',
+      'DataGrip': 'DataGrip',
+      'GoLand': 'GoLand',
+      'IntelliJIdea': 'IntelliJ_IDEA',
+      'PhpStorm': 'PhpStorm',
+      'PyCharm': 'PyCharm',
+      'Rider': 'Rider',
+      'WebStorm': 'WebStorm',
+    }
+    const mappedName = ideNameMap[ideName] ?? 'AI'
+
+    return `https://resources.jetbrains.com/storage/products/company/brand/logos/${mappedName}_icon.svg`;
   }
 
   get logPath() {
