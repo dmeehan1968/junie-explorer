@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
               $(jsonRenderer).jsonViewer(data, {
                 collapsed: true,  // Start with collapsed view
                 rootCollapsable: false,  // Don't allow collapsing the root object
-                withQuotes: true,  // Show quotes around keys
+                withQuotes: false,  // Show quotes around keys
                 withLinks: false,  // Don't convert URLs to links
                 // Note: The height is controlled via CSS (max-height: 200px)
                 // The library doesn't have a built-in height option

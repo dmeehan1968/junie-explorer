@@ -14,6 +14,15 @@ export class JetBrains {
 
   }
 
+  preload() {
+    this.metrics  // forces a full load
+  }
+
+  reload() {
+    this._projects.clear()
+    this._metrics = undefined
+  }
+
   private _projects: Map<string, Project> = new Map()
 
   get metrics() {

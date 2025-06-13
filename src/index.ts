@@ -7,6 +7,7 @@ import notFoundRoutes from './routes/notFoundRoutes.js'
 import projectRoutes from './routes/projectRoutes.js'
 import taskRoutes from './routes/taskRoutes.js'
 import { initializeAppState, refreshAppState } from './utils/appState.js'
+import { jetBrains } from "./v2/jetbrains.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -19,7 +20,8 @@ app.use(express.static(path.join(__dirname, '../public')))
 
 // Add refresh endpoint
 app.get('/refresh', (req, res) => {
-  refreshAppState()
+  // refreshAppState()
+  jetBrains.reload()
   res.redirect(req.headers.referer || '/')
 })
 
@@ -34,7 +36,8 @@ app.use('/', taskRoutes)
 app.use(notFoundRoutes)
 
 // Initialize app state and start the server
-initializeAppState()
+// initializeAppState()
+jetBrains.preload()
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
 })

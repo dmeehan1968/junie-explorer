@@ -9,12 +9,15 @@ export const JunieChainSchema = z.object({
   state: z.enum(['Done', 'Stopped', 'Finished', 'Running', 'Declined', 'Failed']),
   error: z.any().optional(),
 })
-const JuniePlanSchema = z.object({
+export type JunieChain = z.infer<typeof JunieChainSchema>
+
+export const JuniePlanSchema = z.object({
   description: z.string(),
   status: z.enum(['DONE', 'IN_PROGRESS', 'PENDING', 'ERROR']),
 })
 export type JuniePlan = z.infer<typeof JuniePlanSchema>
-const SessionHistory = z.object({
+
+export const SessionHistory = z.object({
   viewedFiles: z.string().array(),
   viewedImports: z.string().array(),
   createdFiles: z.string().array(),
@@ -23,12 +26,16 @@ const SessionHistory = z.object({
     second: z.number(),
   }).array()),
 })
-const TasksInfo = z.object({
+export type SessionHistory = z.infer<typeof SessionHistory>
+
+export const TasksInfo = z.object({
   agentState: z.any().nullish(),  // this should be AgentState but I can't figure out how to create the recursive schema
   patch: z.string().nullish(),
   sessionHistory: SessionHistory.nullish(),
 })
-const AgentIssue = z.object({
+export type TasksInfo = z.infer<typeof TasksInfo>
+
+export const AgentIssue = z.object({
   description: z.string(),
   editorContext: z.object({
     recentFiles: z.string().array(),
@@ -36,7 +43,9 @@ const AgentIssue = z.object({
   }),
   previousTasksInfo: TasksInfo.nullish(),
 })
-const AgentObservation = z.object({
+export type AgentIssue = z.infer<typeof AgentIssue>
+
+export const AgentObservation = z.object({
   element: z.object({
     type: z.string(),
     content: z.string(),
@@ -44,7 +53,9 @@ const AgentObservation = z.object({
   }).nullish(),
   action: z.string().nullish(), // as well as the 'special commands', this can include any CLI command
 })
-const AgentState = z.object({
+export type AgentObservation = z.infer<typeof AgentObservation>
+
+export const AgentState = z.object({
   issue: AgentIssue,
   observations: AgentObservation.nullish().array(),
   ideInitialState: z.object({
@@ -52,11 +63,21 @@ const AgentState = z.object({
     kind: z.enum(['User']),
   }).nullish(),
 })
-const JunieTaskContext = z.object({
+export type AgentState = z.infer<typeof AgentState>
+
+export const JunieTaskContext = z.object({
   type: z.enum(['CHAT']).nullish(),
   description: z.string(),
 })
 export type JunieTaskContext = z.infer<typeof JunieTaskContext>
+
+export const PreviousTaskInfo = z.object({
+  agentState: AgentState,
+  patch: z.string().nullish(),
+  sessionHistory: SessionHistory.nullish(),
+})
+export type PreviousTaskInfo = z.infer<typeof PreviousTaskInfo>
+
 export const JunieTaskSchema = z.object({
   id: z.object({
     index: z.number(),
@@ -66,11 +87,7 @@ export const JunieTaskSchema = z.object({
   context: JunieTaskContext,
   isDeclined: z.boolean(),
   plan: JuniePlanSchema.array().default(() => ([])),
-  previousTasksInfo: z.object({
-    agentState: AgentState,
-    patch: z.string().nullish(),
-    sessionHistory: SessionHistory.nullish(),
-  }).nullish(),
+  previousTasksInfo: PreviousTaskInfo.nullish(),
   finalAgentState: AgentState.nullish(),
   sessionHistory: SessionHistory.nullish(),
   patch: z.string().nullish(),
@@ -79,6 +96,8 @@ export const JunieTaskSchema = z.object({
   id: artifactPath,
   ...task,
 }))
+export type JunieTask = z.infer<typeof JunieTaskSchema>
+
 const StepContent = z.object({
   llmResponse: z.object({
     type: z.enum(['com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage']),
@@ -98,11 +117,13 @@ const StepContent = z.object({
   }).optional(),
 })
 export type StepContent = z.infer<typeof StepContent>
+
 const Dependencies = z.object({
   id: z.string(),
   cached: z.boolean(),
 })
 export type Dependencies = z.infer<typeof Dependencies>
+
 const Description = z.string().transform(v => {
   try {
     return JSON.parse(v)
