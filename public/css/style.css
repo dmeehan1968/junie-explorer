@@ -941,8 +941,115 @@ p {
   max-height: 400px;
   overflow-x: auto;
   overflow-y: auto;
-  white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
   word-wrap: break-word;
+  padding: 15px;
+}
+
+/* Descendant styles for proper HTML formatting within representations viewer */
+.rep-renderer h1,
+.rep-renderer h2,
+.rep-renderer h3,
+.rep-renderer h4,
+.rep-renderer h5,
+.rep-renderer h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+
+.rep-renderer h1 {
+  font-size: 1.8em;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3em;
+}
+
+.rep-renderer h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.3em;
+}
+
+.rep-renderer h3 {
+  font-size: 1.3em;
+}
+
+.rep-renderer h4 {
+  font-size: 1.1em;
+}
+
+.rep-renderer h5,
+.rep-renderer h6 {
+  font-size: 1em;
+}
+
+.rep-renderer p {
+  margin-bottom: 1em;
+  white-space: break-spaces;
+}
+
+.rep-renderer ul,
+.rep-renderer ol {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+.rep-renderer ul {
+  list-style-type: disc;
+}
+
+.rep-renderer ol {
+  list-style-type: decimal;
+}
+
+.rep-renderer li {
+  margin-bottom: 0.5em;
+  white-space: normal;
+}
+
+.rep-renderer ul ul,
+.rep-renderer ol ol,
+.rep-renderer ul ol,
+.rep-renderer ol ul {
+  margin: 0.5em 0;
+}
+
+.rep-renderer ul ul {
+  list-style-type: circle;
+}
+
+.rep-renderer ul ul ul {
+  list-style-type: square;
+}
+
+.rep-renderer blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid #ddd;
+  background-color: #f9f9f9;
+}
+
+.rep-renderer code {
+  background-color: #f1f1f1;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.rep-renderer pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1em;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+
+.rep-renderer pre code {
+  background-color: transparent;
+  padding: 0;
 }
 
 .toggle-rep-data {
