@@ -25,13 +25,13 @@ export class Project {
       const root = path.join(logPath, 'issues', 'chain-*.json')
       fs.globSync(root)
         .map(path => new Issue(path))
+        .sort((a, b) => a.name.localeCompare(b.name))
         .forEach(issue => this._issues.set(issue.id, issue))
     }
 
-    const sortedIssues = new Map([...this._issues.entries()].sort((a, b) =>
+    this._issues = new Map([...this._issues.entries()].sort((a, b) =>
       b[1].created.getTime() - a[1].created.getTime(),
     ))
-    this._issues = sortedIssues
 
     return this._issues
   }

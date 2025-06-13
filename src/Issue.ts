@@ -27,6 +27,7 @@ export class Issue {
     const root = path.join(this.logPath, '..', path.parse(this.logPath).name, 'task-*.json')
     fs.globSync(root)
       .map(path => new Task(path))
+      .sort((a, b) => a.created.getTime() - b.created.getTime())
       .forEach(task => this.tasks.set(task.id, task))
 
     for (const task of this.tasks.values()) {

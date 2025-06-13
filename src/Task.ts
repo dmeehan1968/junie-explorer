@@ -36,6 +36,7 @@ export class Task {
     const root = path.join(this.logPath, '../../..', this.id, 'step_+([0-9]).*{swe,chat}_next*')
     fs.globSync(root)
       .map(path => new Step(path))
+      .sort((a, b) => a.id - b.id)
       .map(step => this.steps.set(step.id, step))
 
     this.metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
