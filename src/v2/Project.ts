@@ -7,9 +7,11 @@ import { SummaryMetrics } from "./schema.js"
 export class Project {
   private _logPaths: string[] = []
   private _metrics: SummaryMetrics | undefined
+  private _ideNames: Set<string> = new Set()
 
-  constructor(public readonly name: string, logPath: string) {
+  constructor(public readonly name: string, logPath: string, ideName: string) {
     this._logPaths.push(logPath)
+    this._ideNames.add(ideName)
   }
 
   private _issues: Map<string, Issue> = new Map()
@@ -50,8 +52,13 @@ export class Project {
     return this._metrics!
   }
 
-  addLogPath(logPath: string) {
+  get ideNames() {
+    return [...this._ideNames]
+  }
+
+  addLogPath(logPath: string, ideName: string) {
     this._logPaths.push(logPath)
+    this._ideNames.add(ideName)
     this._issues.clear()
     this._metrics = undefined
   }

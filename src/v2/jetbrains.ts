@@ -53,11 +53,12 @@ export class JetBrains {
         .filter(entry => fs.existsSync(entry.logPath) && fs.statSync(entry.logPath).isDirectory())
         .forEach(entry => {
           const existing = this._projects.get(entry.name)
+          const ideName = ideDir.name.replace(/\d+(\.\d+)?/, '')
           if (!existing) {
-            this._projects.set(entry.name, new Project(entry.name, entry.logPath))
+            this._projects.set(entry.name, new Project(entry.name, entry.logPath, ideName))
             return
           }
-          existing.addLogPath(entry.logPath)
+          existing.addLogPath(entry.logPath, ideName)
         })
 
     }
@@ -68,6 +69,16 @@ export class JetBrains {
 
   get projectsPath() {
     return path.join(this.logPath, 'projects')
+  }
+
+  get ideNames() {
+    const names = new Set<string>()
+    for (const project of this.projects.values()) {
+      for (const ideName of project.ideNames) {
+        names.add(ideName)
+      }
+    }
+    return [...names]
   }
 
   get logPath() {
@@ -102,5 +113,3 @@ export class JetBrains {
 }
 
 export const jetBrains = new JetBrains()
-
-
