@@ -19,13 +19,14 @@ junie-explorer/
 │   └── js/                  # JavaScript files
 │       ├── ideFilters.js    # Client-side script for IDE filtering
 │       ├── issueGraph.js    # Client-side script for issue graph visualization
+│       ├── projectSelection.js # Client-side script for project selection
 │       ├── reloadPage.js    # Client-side script for page reloading
-│       └── taskStepGraph.js # Client-side script for task step graph visualization
+│       ├── taskRawData.js   # Client-side script for task raw data handling
+│       ├── taskStepGraph.js # Client-side script for task step graph visualization
+│       └── taskStepRawData.js # Client-side script for task step raw data handling
 ├── src/                     # Source code
 │   ├── chart.d.ts           # Type definitions for chart library
 │   ├── index.ts             # Main application entry point
-│   ├── matterhorn.ts        # Interface definitions for data model
-│   ├── test.ts              # Test utilities
 │   ├── types.ts             # Type definitions
 │   ├── routes/              # Route handlers
 │   │   ├── homeRoutes.ts    # Homepage route handler
@@ -33,12 +34,18 @@ junie-explorer/
 │   │   ├── notFoundRoutes.ts # Not found page route handler
 │   │   ├── projectRoutes.ts # Project page route handler
 │   │   └── taskRoutes.ts    # Task page route handler
-│   └── utils/               # Utility functions
-│       ├── appState.ts      # Application state management
-│       ├── escapeHtml.ts    # HTML escaping utilities
-│       ├── jetBrainsPath.ts # JetBrains path utilities
-│       ├── metricsUtils.ts  # Metrics calculation utilities
-│       └── timeUtils.ts     # Time and date utilities
+│   ├── utils/               # Utility functions
+│   │   ├── escapeHtml.ts    # HTML escaping utilities
+│   │   ├── jetBrainsPath.ts # JetBrains path utilities
+│   │   ├── metricsUtils.ts  # Metrics calculation utilities
+│   │   └── timeUtils.ts     # Time and date utilities
+│   ├── Issue.ts         # Issue class implementation
+│   ├── Project.ts       # Project class implementation
+│   ├── Step.ts          # Step class implementation
+│   ├── Task.ts          # Task class implementation
+│   ├── jetbrains.ts     # Main JetBrains class implementation
+│   ├── schema.ts        # Zod schemas for data validation
+│   └── test-jetbrains.ts # Test file for JetBrains classes
 ├── dist/                    # Compiled JavaScript (generated)
 ├── package.json             # Project dependencies and scripts
 ├── tsconfig.json            # TypeScript configuration
@@ -59,14 +66,18 @@ junie-explorer/
 3. **Static File Serving**: Serves CSS and other static assets.
 
 ## Data Model
-The application uses several interfaces defined in `matterhorn.ts`:
-- `IDE`: Represents a JetBrains IDE installation
-- `Project`: Represents a user project within an IDE
-- `Issue`: Represents an issue within a project
-- `Task`: Represents a task within an issue
-- `Step`: Represents a step within a task
-- `JunieMetrics`: Contains raw metrics data
-- `Metrics`: Contains processed metrics data for display
+The new class-based data model with enhanced functionality:
+- `JetBrains`: Main class that manages IDE installations and projects
+- `Project`: Enhanced project class with multiple IDE support
+- `Issue`: Issue class with comprehensive metadata handling
+- `Task`: Task class with agent state and session history
+- `Step`: Step class with detailed content and statistics
+- `Schema definitions` (schema.ts): Comprehensive Zod schemas including:
+  - `JunieChain`: Chain metadata with state management
+  - `JunieTask`: Task definitions with context and planning
+  - `JunieStep`: Step definitions with reasoning and statistics
+  - `AgentState`: Agent state management for AI interactions
+  - `SummaryMetrics`: Aggregated metrics across projects and tasks
 
 ## Development Workflow
 1. **Setup**: Clone the repository and run `npm install`

@@ -1,17 +1,17 @@
 import express from 'express'
 import { marked } from 'marked'
-import { Metrics } from '../matterhorn.js'
-import { getIDEIcon, getIssue, getProject, getTask } from '../utils/appState.js'
+import { jetBrains } from '../jetbrains.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
+import { Metrics } from "../Step.js"
 
-const router = express.Router();
+const router = express.Router()
 
 // Function to generate HTML for step totals table
 const generateStepTotalsTable = (summaryData: Metrics): string => {
   // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = summaryData.buildTime + summaryData.modelTime/1000 + summaryData.artifactTime + summaryData.modelCachedTime/1000;
+  const totalTime = summaryData.buildTime + summaryData.modelTime / 1000 + summaryData.artifactTime + summaryData.modelCachedTime / 1000
 
   return `
   <table class="step-totals-table">
@@ -25,18 +25,18 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
       </tr>
     </tbody>
   </table>
-`;
-};
+`
+}
 
 // Issue tasks page route
 router.get('/project/:projectName/issue/:issueId', (req, res) => {
   try {
-    const { projectName, issueId } = req.params;
-    const project = getProject(projectName);
-    const issue = getIssue(projectName, issueId);
+    const { projectName, issueId } = req.params
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
 
     if (!project || !issue) {
-      return res.status(404).send('Issue not found');
+      return res.status(404).send('Issue not found')
     }
 
     // Generate HTML
@@ -69,8 +69,8 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           </nav>
 
           <div class="ide-icons">
-            ${project.ides.map(ide => `
-              <img src="${getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+            ${project.ideNames.map(ide => `
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
 
@@ -80,63 +80,65 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           </div>
 
           <ul class="task-list">
-            ${issue.tasks.length > 0 
-              ? issue.tasks.map(task => {
-                  // Calculate step totals for this task
-                  const stepTotals = calculateStepSummary(task.steps);
+            ${issue.tasks.size > 0
+      ? [...issue.tasks.values()].map((task, index) => {
+        // Calculate step totals for this task
+        const stepTotals = calculateStepSummary([...task.steps.values()])
 
-                  return `
+        return `
                     <li class="task-item">
                       <div class="task-header">
-                        <div class="task-id">${task.id.index === 0 ? 'Initial Request' : `Follow up ${task.id.index}`}</div>
+                        <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
                         <div class="task-date">
                           Created: ${new Date(task.created).toLocaleString()}
-                          <button class="toggle-raw-data" data-task="${task.id.index}">JSON</button>
+                          <button class="toggle-raw-data" data-task="${index}">JSON</button>
                         </div>
                       </div>
-                      <div id="raw-data-${task.id.index}" class="raw-data-container" style="display: none;">
-                        <div id="json-renderer-${task.id.index}" class="json-renderer"></div>
+                      <div id="raw-data-${index}" class="raw-data-container" style="display: none;">
+                        <div id="json-renderer-${index}" class="json-renderer"></div>
                       </div>
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${task.id.index}" class="task-link">
+                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-link">
                         ${task.context.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                       </a>
                       <div class="task-details">
                         ${generateStepTotalsTable(stepTotals)}
                       </div>
                     </li>
-                  `;
-                }).join('')
-              : '<li>No tasks found for this issue</li>'
-            }
+                  `
+      }).join('')
+      : '<li>No tasks found for this issue</li>'
+    }
           </ul>
         </div>
       </body>
       </html>
-    `;
+    `
 
-    res.send(html);
+    res.send(html)
   } catch (error) {
-    console.error('Error generating tasks page:', error);
-    res.status(500).send('An error occurred while generating the tasks page');
+    console.error('Error generating tasks page:', error)
+    res.status(500).send('An error occurred while generating the tasks page')
   }
-});
+})
 
 // API endpoint to get task data for a specific issue
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
   try {
-    const { projectName, issueId, taskId } = req.params;
-    const task = getTask(projectName, issueId, parseInt(taskId, 10));
+    const { projectName, issueId, taskId } = req.params
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
 
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: 'Task not found' })
     }
 
     // Return the task data with only public fields
-    res.json(task);
+    res.json(task)
   } catch (error) {
-    console.error('Error fetching task data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching task data' });
+    console.error('Error fetching task data:', error)
+    res.status(500).json({ error: 'An error occurred while fetching task data' })
   }
-});
+})
 
-export default router;
+export default router
