@@ -1,6 +1,7 @@
 import express from 'express'
 import fs from "fs-extra"
 import { marked } from 'marked'
+import { isPromise } from "node:util/types"
 import path from "path"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
@@ -348,7 +349,13 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
 
     try {
       const content = fs.readFileSync(files[0], 'utf-8')
-      const htmlContent = marked(escapeHtml(content))
+      /**
+       * content is markdown, but also includes XML like tags such as `<THOUGHT>` which need to
+       * be escaped or `marked` will strip them out.  We can't just escape the entire thing, as
+       * there are often code blocks which might contain <> characters.  These will be preserved
+       * by marked as they are in code blocks.
+       */
+      const htmlContent = marked(escapeHtmlExceptCodeBlocks(content))
       res.setHeader('Content-Type', 'text/html')
       res.send(htmlContent)
     } catch (error) {
@@ -360,5 +367,46 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
     res.status(500).send('An error occurred while fetching step representations')
   }
 })
+
+/**
+ * Escapes HTML special characters in a given string, except for content wrapped in
+ * code blocks (```...```) or inline code spans (`...`). This ensures that code blocks
+ * and inline codes are preserved as-is, while other content is made safe for use in HTML.
+ *
+ * @param {string} markdown - The input string which may contain raw HTML and markdown with code blocks.
+ * @return {string} A string where HTML special characters are escaped, except within code blocks and inline code spans.
+ */
+function escapeHtmlExceptCodeBlocks(markdown: string): string {
+  // Regex to find code blocks and codespans
+  // (```...``` for block, `...` for inline)
+  // This is a simplified regex and might not catch all edge cases or nested blocks perfectly
+  const codeBlockRegex = /(```[\s\S]*?```)|(`[^`]*?`)/g
+
+  let lastIndex = 0
+  let result = ''
+  let match
+
+  while ((match = codeBlockRegex.exec(markdown)) !== null) {
+    const codeBlockContent = match[0]
+    const codeBlockStart = match.index
+    const codeBlockEnd = match.index + codeBlockContent.length
+
+    // Process text *before* the current code block
+    const textBeforeCode = markdown.substring(lastIndex, codeBlockStart)
+    result += textBeforeCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+    // Add the code block as-is (marked will handle it, and we don't want to escape)
+    result += codeBlockContent
+    lastIndex = codeBlockEnd
+  }
+
+  // Process any remaining text after the last code block
+  result += markdown
+    .substring(lastIndex)
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+  return result
+}
 
 export default router
