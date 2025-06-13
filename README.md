@@ -83,7 +83,6 @@ junie-explorer/
 │   ├── chart.d.ts           # Type definitions for chart library
 │   ├── index.ts             # Main application entry point
 │   ├── matterhorn.ts        # Interface definitions for data model
-│   ├── test.ts              # Test utilities
 │   ├── types.ts             # Type definitions
 │   ├── routes/              # Route handlers
 │   │   ├── homeRoutes.ts    # Homepage route handler
@@ -92,7 +91,6 @@ junie-explorer/
 │   │   ├── projectRoutes.ts # Project page route handler
 │   │   └── taskRoutes.ts    # Task page route handler
 │   └── utils/               # Utility functions
-│       ├── appState.ts      # Application state management
 │       ├── escapeHtml.ts    # HTML escaping utilities
 │       ├── jetBrainsPath.ts # JetBrains path utilities
 │       ├── metricsUtils.ts  # Metrics calculation utilities

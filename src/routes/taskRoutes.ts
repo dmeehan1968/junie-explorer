@@ -1,6 +1,5 @@
 import express from 'express'
 import { marked } from 'marked'
-import { getTask } from '../utils/appState.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
