@@ -58,6 +58,12 @@ export class JetBrains {
 
     for (const ideDir of ideDirs) {
       const root = path.join(this.logPath, ideDir.name, 'projects')
+
+      if (!fs.existsSync(root)) {
+        console.log('Skipping', ideDir.name, 'because it does not have a projects directory')
+        continue
+      }
+
       fs.readdirSync(root, { withFileTypes: true })
         .filter(entry => entry.isDirectory())
         .map(entry => ({ name: entry.name, logPath: path.join(root, entry.name, 'matterhorn', '.matterhorn') }))
