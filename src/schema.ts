@@ -151,7 +151,7 @@ export const JunieStatistics = z.object({
 export type JunieStatistics = z.infer<typeof JunieStatistics>
 
 export const JunieException = z.object({
-  type: z.enum(['com.intellij.ml.llm.matterhorn.FailureReason.UnexpectedException']),
+  type: z.string(),
   message: z.string().nullish()
 }).passthrough()
 export type JunieException = z.infer<typeof JunieException>
