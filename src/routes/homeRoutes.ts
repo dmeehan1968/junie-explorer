@@ -1,6 +1,6 @@
 import express from 'express'
-import { Project } from '../v2/Project.js'
-import { jetBrains } from '../v2/jetbrains.js'
+import { Project } from '../Project.js'
+import { jetBrains } from '../jetbrains.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { calculateIssueSummary } from '../utils/metricsUtils.js'
 

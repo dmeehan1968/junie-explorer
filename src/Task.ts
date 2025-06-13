@@ -6,7 +6,7 @@ import {
   JuniePlan,
   JunieTaskContext,
   JunieTaskSchema,
-  PreviousTaskInfo,
+  PreviousTasksInfo,
   SessionHistory,
   SummaryMetrics,
 } from "./schema.js"
@@ -20,7 +20,7 @@ export class Task {
   readonly plan: JuniePlan[]
   readonly steps: Map<number, Step> = new Map()
   readonly metrics: SummaryMetrics
-  private _previousTasksInfo?: PreviousTaskInfo | null
+  private _previousTasksInfo?: PreviousTasksInfo | null
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null

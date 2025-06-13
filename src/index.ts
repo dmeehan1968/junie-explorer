@@ -6,7 +6,7 @@ import issueRoutes from './routes/issueRoutes.js'
 import notFoundRoutes from './routes/notFoundRoutes.js'
 import projectRoutes from './routes/projectRoutes.js'
 import taskRoutes from './routes/taskRoutes.js'
-import { jetBrains } from "./v2/jetbrains.js"
+import { jetBrains } from "./jetbrains.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

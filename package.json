@@ -10,7 +10,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/index.ts",
-    "test": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/v2/test-jetbrains.ts"
+    "test": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/test-jetbrains.ts"
   },
   "dependencies": {
     "express": "^4.18.2",

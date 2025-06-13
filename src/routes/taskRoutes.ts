@@ -3,8 +3,8 @@ import { marked } from 'marked'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
-import { jetBrains } from "../v2/jetbrains.js"
-import { Step } from "../v2/Step.js"
+import { jetBrains } from "../jetbrains.js"
+import { Step } from "../Step.js"
 
 const router = express.Router()
 

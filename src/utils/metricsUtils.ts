@@ -1,6 +1,6 @@
-import { Issue } from "../v2/Issue.js"
-import { Metrics, Step } from "../v2/Step.js"
-import { Task } from "../v2/Task.js"
+import { Issue } from "../Issue.js"
+import { Metrics, Step } from "../Step.js"
+import { Task } from "../Task.js"
 
 /**
  * Helper function to calculate summary data for all steps in all tasks of an issue

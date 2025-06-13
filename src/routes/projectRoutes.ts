@@ -1,6 +1,6 @@
 import express from 'express'
-import { Issue } from "../v2/Issue.js"
-import { jetBrains } from '../v2/jetbrains.js'
+import { Issue } from "../Issue.js"
+import { jetBrains } from '../jetbrains.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js'
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'

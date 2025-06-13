@@ -1,10 +1,10 @@
 import express from 'express'
 import { marked } from 'marked'
-import { Metrics } from '../matterhorn.js'
-import { jetBrains } from '../v2/jetbrains.js'
+import { jetBrains } from '../jetbrains.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
+import { Metrics } from "../Step.js"
 
 const router = express.Router()
 
