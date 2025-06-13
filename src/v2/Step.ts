@@ -7,6 +7,10 @@ export class Step {
   startTime: Date
   endTime: Date
   title: string
+  reasoning: {
+    type: string;
+    reason: string;
+  }
   statistics: JunieStatistics
   metrics: {
     inputTokens: number;
@@ -37,6 +41,7 @@ export class Step {
     this.startTime = new Date(this.endTime.getTime() - (step.statistics.artifactTime + step.statistics.modelTime + step.statistics.modelCachedTime))
 
     this.title = step.title
+    this.reasoning = step.reasoning
     this.statistics = step.statistics
     this.metrics = {
       inputTokens: this.statistics.inputTokens,
@@ -91,6 +96,7 @@ export class Step {
       startTime: this.startTime,
       endTime: this.endTime,
       title: this.title,
+      reasoning: this.reasoning,
       statistics: this.statistics,
       metrics: this.metrics,
       content: this.content,

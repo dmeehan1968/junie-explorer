@@ -15,7 +15,7 @@ export class Project {
   }
 
   private _issues: Map<string, Issue> = new Map()
-  private get issues() {
+  get issues() {
     if (this._issues.size) {
       return this._issues
     }

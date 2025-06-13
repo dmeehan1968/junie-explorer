@@ -33,7 +33,7 @@ export class JetBrains {
     return this._metrics!
   }
 
-  projectByName(name: string) {
+  getProjectByName(name: string) {
     return this.projects.get(name)
   }
 
