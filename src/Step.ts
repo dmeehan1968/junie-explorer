@@ -23,14 +23,14 @@ export class Step {
   title: string
   reasoning: {
     type: string;
-    reason: string;
+    reason: any;
   }
   statistics: JunieStatistics
   metrics: Metrics
 
-  private _content: StepContent | undefined
-  private _dependencies: Dependencies[] | undefined
-  private _description: Description | undefined
+  private _content?: StepContent | null
+  private _dependencies?: Dependencies[] | null
+  private _description?: Description | null
 
   constructor(public readonly logPath: string) {
     const step = this.load()
@@ -90,7 +90,7 @@ export class Step {
   }
 
   get description(): Description {
-    return this.lazyload()._description!
+    return this.lazyload()._description
   }
 
   toJSON() {

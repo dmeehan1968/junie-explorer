@@ -150,17 +150,26 @@ export const JunieStatistics = z.object({
 })
 export type JunieStatistics = z.infer<typeof JunieStatistics>
 
+export const JunieException = z.object({
+  type: z.enum(['com.intellij.ml.llm.matterhorn.FailureReason.UnexpectedException']),
+  message: z.string().nullish()
+}).passthrough()
+export type JunieException = z.infer<typeof JunieException>
+
 export const JunieStepSchema = z.object({
   id: z.string(),
   title: z.string(),
   reasoning: z.object({
-    type: z.enum(['com.intellij.ml.llm.matterhorn.ArtifactReasoning.Success']),
-    reason: z.string(),
+    type: z.enum([
+      'com.intellij.ml.llm.matterhorn.ArtifactReasoning.Success',
+      'com.intellij.ml.llm.matterhorn.ArtifactReasoning.Failure',
+    ]),
+    reason: z.string().or(JunieException),
   }),
   statistics: JunieStatistics,
-  content: StepContent,
+  content: StepContent.nullish(),
   dependencies: Dependencies.array().default(() => ([])),
-  description: Description,
+  description: Description.nullish(),
 })
 export type JunieStep = z.infer<typeof JunieStepSchema>
 
