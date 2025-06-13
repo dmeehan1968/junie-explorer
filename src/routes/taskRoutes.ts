@@ -348,7 +348,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
 
     try {
       const content = fs.readFileSync(files[0], 'utf-8')
-      const htmlContent = marked(content)
+      const htmlContent = marked(escapeHtml(content))
       res.setHeader('Content-Type', 'text/html')
       res.send(htmlContent)
     } catch (error) {
