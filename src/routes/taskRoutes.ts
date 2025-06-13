@@ -250,7 +250,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>${step.metrics.buildTime.toFixed(2)}s</td>
                       <td>${step.metrics.artifactTime.toFixed(2)}s</td>
                       <td>${formatMilliseconds(step.metrics.modelTime)}</td>
-                      <td>${formatMilliseconds(step.metrics.modelCachedTime)}</td>
+                      <td>${step.metrics.modelCachedTime.toFixed(2)}s</td>
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
                     </tr>
@@ -272,7 +272,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                     <td><strong>${formatSeconds(summaryData.buildTime)}</strong></td>
                     <td><strong>${formatSeconds(summaryData.artifactTime)}</strong></td>
                     <td><strong>${formatMilliseconds(summaryData.modelTime)}</strong></td>
-                    <td><strong>${formatMilliseconds(summaryData.modelCachedTime)}</strong></td>
+                    <td><strong>${summaryData.modelCachedTime.toFixed(2)}s</strong></td>
                     <td><strong>${summaryData.requests}</strong></td>
                     <td><strong>${summaryData.cachedRequests}</strong></td>
                   </tr>
