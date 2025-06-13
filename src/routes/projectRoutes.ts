@@ -114,9 +114,9 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
   } else if (dateRange < DAY * 2) {
     timeUnit = 'hour'
     stepSize = 3
-  } else if (dateRange < WEEK) {
+  } else if (dateRange < WEEK * 4) {
     timeUnit = 'day'
-  } else if (dateRange < MONTH) {
+  } else if (dateRange < MONTH * 6) {
     timeUnit = 'week'
   } else if (dateRange < YEAR) {
     timeUnit = 'month'
