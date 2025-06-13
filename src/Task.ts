@@ -97,7 +97,6 @@ export class Task {
     }
 
     const root = path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
-    console.log(root)
 
     if (fs.existsSync(root)) {
       const content = fs.readFileSync(root, 'utf-8')
@@ -126,7 +125,6 @@ export class Task {
     }
 
     const root = path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
-    console.log(root)
 
     if (fs.existsSync(root)) {
       const content = fs.readFileSync(root, 'utf-8')

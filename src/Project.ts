@@ -21,7 +21,7 @@ export class Project {
     }
 
     for (const logPath of this._logPaths) {
-      console.log('Reading logs from', logPath)
+      console.log('From:', logPath)
       const root = path.join(logPath, 'issues', 'chain-*.json')
       fs.globSync(root)
         .map(path => new Issue(path))

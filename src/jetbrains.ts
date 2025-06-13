@@ -15,7 +15,7 @@ export class JetBrains {
   }
 
   preload() {
-    console.log('Loading logs...')
+    console.log('Reading logs...')
     this.metrics  // forces a full load
   }
 
