@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-06-13
+
+### Features
+- Add trajectory retrieval and parsing to `Task.ts` (6d1a285)
+- Replace Markdown viewer with Representations viewer for task steps (9bb63ff)
+- Add Markdown data representation for task steps (a36c9e7)
+- Add event retrieval and parsing to `Task.ts` (8ff5c72)
+- Add scenarios to validate JSON viewer functionality in issue feature (c715d72)
+
+### UI Improvements
+- Add styles for representations viewer HTML formatting (34eff1b)
+- Add Markdown container styles and escape HTML in Markdown rendering (a36c9e7)
+- Add issue count to project links and adjust CSS styles (a971b92)
+
+### Code Improvements
+- Update log messages and remove redundant debug logs (7793fbb)
+- Escape HTML in Markdown content except for code blocks (ee3d115)
+- Sort tasks and steps by creation date and ID (9092de8)
+- Sort issues by creation date in `Project.ts` (657d543)
+- Update `JunieException` schema to allow flexible exception types (610d030)
+- Enhance `JunieStepSchema` and refactor nullable properties (e59ec54)
+- Add check for missing projects directory in `jetbrains.ts` (fc85b02)
+- Remove deprecated `matterhorn.ts` file (455c389)
+- Migrate `v2` files to root and enhance schema consistency (91a523f)
+- Remove `appState.ts` and related references (158dcb9)
+- Remove test files for `Task` and `Step` classes (ad91fac)
+- Adjust time unit thresholds in `projectRoutes.ts` (93386eb)
+- Refactor metrics time formatting in taskRoutes (88282a7)
+- Remove `getIDEIcon` utility and refactor icon retrieval via `jetBrains` (1d74816)
+- Update app to leverage JetBrains API and refactor task schemas (18f9629)
+- Update routes for to use JetBrains state (6463fc8)
+- Add reasoning field and adjust method visibility in core classes (01e2050)
+- Add IDE names tracking for projects in `jetbrains.ts` (cd12e60)
+- Add JetBrains instance initialization in `jetbrains.ts` (fa33556)
+- Adjust encapsulation for `tasks`, `steps`, and `projects` (d73ed42)
+- Refactor routes and improve formatting across router files (1221ea3)
+- Fix formatting and add spacing adjustments in `index.ts` and `homeRoutes.ts` (6c8922b)
+- Refactor statistics handling and schema validation in Step class (7326fc8)
+- Refactor ID and access methods across core classes (f1dbc11)
+- Add and refactor classes for enhanced metrics tracking and schema validation (686414e)
+- Refactor metrics handling with detailed token breakdown (f92fb46)
+- Add detailed metrics tracking and schema enhancements for Junie tasks and steps (0b3365e)
+- Enable source maps and improve dev/test scripts (d3b33c4)
+- Add Jetbrains schema and enhance project structure (eb9791e)
+- Remove unused `steps` field from `matterhorn.ts` (a971b92)
+- Simplify and streamline JSON responses for tasks and steps (dbb97f4)
+
 ## [1.3.0] - 2025-06-11
 
 ### Features
