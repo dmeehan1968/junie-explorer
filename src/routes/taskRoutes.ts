@@ -1,5 +1,7 @@
 import express from 'express'
+import fs from "fs-extra"
 import { marked } from 'marked'
+import path from "path"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
@@ -166,6 +168,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
     }
         <script src="/js/taskStepGraph.js"></script>
         <script src="/js/taskStepRawData.js"></script>
+        <script src="/js/taskStepMdData.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
       <body>
@@ -239,6 +242,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                         <div class="title-container">
                           ${step.id}
                           <button class="toggle-raw-data" data-step="${step.id}">JSON</button>
+                          <button class="toggle-md-data" data-step="${step.id}">MD</button>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
@@ -256,6 +260,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                     <tr id="raw-data-${step.id}" class="raw-data-row" style="display: none;">
                       <td colspan="12" class="raw-data-container">
                         <div id="json-renderer-${step.id}" class="json-renderer"></div>
+                      </td>
+                    </tr>
+                    <tr id="md-data-${step.id}" class="md-data-row" style="display: none;">
+                      <td colspan="12" class="md-data-container">
+                        <div id="md-renderer-${step.id}" class="md-renderer"></div>
                       </td>
                     </tr>
                   `).join('')}
@@ -310,6 +319,45 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
   } catch (error) {
     console.error('Error fetching step data:', error)
     res.status(500).json({ error: 'An error occurred while fetching step data' })
+  }
+})
+
+// API endpoint to get representations for a specific step
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex/representations', (req, res) => {
+  try {
+    const { projectName, issueId, taskId, stepIndex } = req.params
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
+    const step = task?.getStepById(parseInt(stepIndex, 10))
+
+    if (!project || !issue || !task || !step) {
+      return res.status(404).send('Step not found')
+    }
+
+    const root = path.join(step.logPath, '../../representations', task.id, `step_${step.id.toString().padStart(2, '0')}.*{swe,chat}_next*`)
+    const files = fs.globSync(root)
+
+    if (files.length === 0) {
+      return res.status(404).send('No representation files found')
+    }
+
+    if (files.length > 1) {
+      return res.status(400).send('More than one representation file found')
+    }
+
+    try {
+      const content = fs.readFileSync(files[0], 'utf-8')
+      const htmlContent = marked(content)
+      res.setHeader('Content-Type', 'text/html')
+      res.send(htmlContent)
+    } catch (error) {
+      console.error('Error reading representation file:', error)
+      res.status(500).send('Error reading representation file')
+    }
+  } catch (error) {
+    console.error('Error fetching step representations:', error)
+    res.status(500).send('An error occurred while fetching step representations')
   }
 })
 
