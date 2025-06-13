@@ -28,6 +28,11 @@ export class Project {
         .forEach(issue => this._issues.set(issue.id, issue))
     }
 
+    const sortedIssues = new Map([...this._issues.entries()].sort((a, b) =>
+      b[1].created.getTime() - a[1].created.getTime(),
+    ))
+    this._issues = sortedIssues
+
     return this._issues
   }
 
