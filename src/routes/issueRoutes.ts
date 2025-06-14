@@ -99,10 +99,10 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                       </div>
                       <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-link">
                         ${task.context.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                        <div class="task-details">
+                          ${generateStepTotalsTable(stepTotals)}
+                        </div>
                       </a>
-                      <div class="task-details">
-                        ${generateStepTotalsTable(stepTotals)}
-                      </div>
                     </li>
                   `
       }).join('')

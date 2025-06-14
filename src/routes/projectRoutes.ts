@@ -221,10 +221,10 @@ router.get('/project/:projectName', (req, res) => {
                           <div class="issue-name">${escapeHtml(issue.name)}</div>
                           <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
                         </div>
+                        <div class="issue-metrics">
+                          ${generateIssueMetricsTable(issue)}
+                        </div>
                       </a>
-                      <div class="issue-metrics">
-                        ${generateIssueMetricsTable(issue)}
-                      </div>
                     </li>
                   `
       }).join('')
