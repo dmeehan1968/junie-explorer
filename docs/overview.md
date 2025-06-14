@@ -1,6 +1,6 @@
 # Junie Explorer - User Guide
 
-Junie Explorer is a web application that provides an intuitive interface to browse and explore JetBrains IDE projects, issues, tasks, and development workflows. It automatically scans your JetBrains cache directory to discover all your IDE installations and their associated projects.
+Junie Explorer is a web application that provides an intuitive interface to browse and explore JetBrains IDE projects, issues, tasks, and development workflows. It automatically scans your JetBrains logs directory to discover all your IDE installations and their associated projects.
 
 ## Getting Started
 
@@ -19,7 +19,7 @@ The homepage displays:
 - **IDE Filter**: Filter projects by specific JetBrains IDEs (WebStorm, IntelliJ IDEA, etc.)
 - **Project List**: All discovered projects with their associated IDEs
 - **Project Metrics**: Quick overview of issues and tasks for each project
-- **Refresh Button**: Update the data by rescanning your JetBrains cache directory
+- **Refresh Button**: Update the data by rescanning your JetBrains logs directory
 
 Click on a project name to drill into the details.
 
@@ -98,13 +98,12 @@ the conversation for that step.
 ## Navigation Tips
 
 1. **Breadcrumb Navigation**: Use the breadcrumb trail at the top of each page to navigate back to previous levels
-2. **Refresh Data**: Use the refresh button on any page to update data from your JetBrains cache
+2. **Refresh Data**: Use the refresh button on any page to update data from your JetBrains logs
 3. **Filter Options**: Use IDE filters on the homepage to focus on specific development environments
-4. **View Switching**: Toggle between list and graph views where available for different perspectives on your data
 
 ## Understanding Your Data
 
-Junie Explorer reads data from your JetBrains cache directory, which contains:
+Junie Explorer reads data from your JetBrains log directory, which contains:
 - **Projects**: Your development projects across different IDEs
 - **Issues**: Problems, features, or tasks you're working on
 - **Tasks**: Specific work items within issues
@@ -115,9 +114,9 @@ This hierarchical structure allows you to understand your development workflow a
 ## Troubleshooting
 
 If you don't see expected data:
-1. Ensure your JetBrains IDEs have been used recently to generate cache data
-2. Use the refresh button to rescan your cache directory
-3. Check that the application has proper permissions to read your JetBrains cache directory
-4. Verify that your JetBrains cache directory contains the expected project structure
+1. Ensure your JetBrains IDEs have been used with Junie recently to generate log data
+2. Use the refresh button to rescan your log directory
+3. Check that the application has proper permissions to read your JetBrains log directory
+4. Verify that your JetBrains log directory contains the expected project structure
 
 For technical issues, refer to the [README.md](../README.md) file for installation and configuration details.
