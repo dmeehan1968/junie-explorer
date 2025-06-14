@@ -11,6 +11,8 @@ Junie Explorer is a full-stack web application built with Node.js and TypeScript
 - Includes a refresh button to update the data
 - Responsive web interface
 
+See the [Documentation](docs/overview.md) for details
+
 ## Tech Stack
 - **Backend**: Node.js with Express.js
 - **Language**: TypeScript
