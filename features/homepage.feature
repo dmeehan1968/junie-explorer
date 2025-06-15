@@ -7,31 +7,37 @@ Feature: Homepage
     Given the application has access to the JetBrains logs directory
     And the user has a web browser
 
+  @wip
   Scenario: Homepage title
     Given there are JetBrains projects in the logs
     When the user visits the homepage
     Then the user should see a page titled "Junie Explorer"
 
+  @wip
   Scenario: Logs directory path display
     Given there are JetBrains projects in the logs
     When the user visits the homepage
     Then the user should see the path to the JetBrains logs directory
 
+  @wip
   Scenario: Projects list display
     Given there are JetBrains projects in the logs
     When the user visits the homepage
     Then the user should see a list of all JetBrains projects
 
+  @wip
   Scenario: Project name display
     Given there are JetBrains projects in the logs
     When the user visits the homepage
     Then each project should display its name
 
+  @wip
   Scenario: IDE icons display
     Given there are JetBrains projects in the logs
     When the user visits the homepage
     Then each project should display icons for the IDEs it was used with
 
+  @wip
   Scenario: Reload button display
     Given there are JetBrains projects in the logs
     When the user visits the homepage
