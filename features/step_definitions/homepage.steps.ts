@@ -197,3 +197,51 @@ Then('the user should see a message indicating no matching projects were found',
   const isVisible = await this.homePage.isNoMatchingProjectsMessageVisible();
   expect(isVisible).toBe(true);
 });
+
+// @wip scenario: Filter persistence
+Given('the user has applied IDE filters', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  // First visit the homepage to ensure we're on the right page
+  await this.homePage.visitHomepage();
+
+  // Get the initial state of all filters (all should be enabled by default)
+  const initialFilters = await this.homePage.getSelectedIdeFilters();
+
+  if (initialFilters.length === 0) {
+    throw new Error('No IDE filters found on the page');
+  }
+
+  // Toggle the first filter to disable it, creating a specific filter state
+  const firstIdeName = initialFilters[0];
+  await this.homePage.toggleIdeFilter(firstIdeName);
+
+  // Get the current filter state after toggling
+  const currentFilters = await this.homePage.getSelectedIdeFilters();
+
+  // Store the current filter state for later verification
+  this.appliedFilters = currentFilters;
+});
+
+When('the user refreshes the page', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  await this.homePage.refreshPage();
+});
+
+Then('the previously selected IDE filters should be preserved', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  if (!this.appliedFilters || this.appliedFilters.length === 0) {
+    throw new Error('No applied filters found in test context');
+  }
+
+  const areFiltersPreserved = await this.homePage.areIdeFiltersSelected(this.appliedFilters);
+  expect(areFiltersPreserved).toBe(true);
+});

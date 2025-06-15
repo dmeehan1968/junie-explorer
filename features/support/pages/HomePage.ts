@@ -125,4 +125,51 @@ export class HomePage extends BasePage {
     // We'll search for a term that's unlikely to match any project
     await this.searchProjects('zzz_no_match_xyz_123');
   }
+
+  async getSelectedIdeFilters(): Promise<string[]> {
+    // Get all enabled IDE filters (those without the 'ide-filter-disabled' class)
+    const enabledFilters = await this.page.locator('.ide-filter:not(.ide-filter-disabled)').all();
+    const filterNames: string[] = [];
+
+    for (const filter of enabledFilters) {
+      const ideName = await filter.getAttribute('data-ide');
+      if (ideName) {
+        filterNames.push(ideName);
+      }
+    }
+
+    return filterNames;
+  }
+
+  async applyIdeFilters(ideNames: string[]): Promise<void> {
+    // Apply multiple IDE filters
+    for (const ideName of ideNames) {
+      await this.toggleIdeFilter(ideName);
+    }
+  }
+
+  async refreshPage(): Promise<void> {
+    await this.page.reload();
+    await this.waitForNavigation();
+  }
+
+  async areIdeFiltersSelected(expectedFilters: string[]): Promise<boolean> {
+    const selectedFilters = await this.getSelectedIdeFilters();
+
+    // Check if all expected filters are selected
+    for (const expectedFilter of expectedFilters) {
+      if (!selectedFilters.includes(expectedFilter)) {
+        return false;
+      }
+    }
+
+    // Check if no unexpected filters are selected
+    for (const selectedFilter of selectedFilters) {
+      if (!expectedFilters.includes(selectedFilter)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

@@ -7,6 +7,7 @@ export interface ICustomWorld extends World {
   context?: BrowserContext;
   page?: Page;
   homePage?: HomePage;
+  appliedFilters?: string[];
   init(): Promise<void>;
   cleanup(): Promise<void>;
 }
@@ -16,6 +17,7 @@ export class CustomWorld extends World implements ICustomWorld {
   context?: BrowserContext;
   page?: Page;
   homePage?: HomePage;
+  appliedFilters?: string[];
 
   constructor(options: IWorldOptions) {
     super(options);
