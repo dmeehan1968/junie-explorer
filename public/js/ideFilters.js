@@ -100,6 +100,7 @@ function applyFilters(ideFilters, searchTerm = '') {
     if (!noMatchMessage) {
       noMatchMessage = document.createElement('li');
       noMatchMessage.id = 'no-match-message';
+      noMatchMessage.setAttribute('data-testid', 'no-matching-projects');
       noMatchMessage.textContent = 'No matching projects';
       noMatchMessage.style.padding = '10px 15px';
       projectList.appendChild(noMatchMessage);
