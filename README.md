@@ -104,8 +104,7 @@ junie-explorer/
 │   ├── Step.ts          # Step class implementation
 │   ├── Task.ts          # Task class implementation
 │   ├── jetbrains.ts     # Main JetBrains class implementation
-│   ├── schema.ts        # Zod schemas for data validation
-│   └── test-jetbrains.ts # Test file for JetBrains classes
+│   └── schema.ts        # Zod schemas for data validation
 ├── dist/                    # Compiled JavaScript (generated)
 ├── package.json             # Project dependencies and scripts
 ├── tsconfig.json            # TypeScript configuration
