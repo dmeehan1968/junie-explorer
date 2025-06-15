@@ -1,5 +1,5 @@
-import { BasePage } from './BasePage.js';
-import { Page } from '@playwright/test';
+import { Page } from '@playwright/test'
+import { BasePage } from './BasePage.js'
 
 export class HomePage extends BasePage {
   private readonly selectors = {
@@ -47,8 +47,7 @@ export class HomePage extends BasePage {
   }
 
   async getProjectsCount(): Promise<number> {
-    const projects = await this.page.locator(this.selectors.projectItem).count();
-    return projects;
+    return await this.page.locator(this.selectors.projectItem).count();
   }
 
   async areProjectNamesVisible(): Promise<boolean> {
@@ -65,6 +64,12 @@ export class HomePage extends BasePage {
 
   async isReloadButtonVisible(): Promise<boolean> {
     return await this.isVisible(this.selectors.reloadButton);
+  }
+
+  async isReloadButtonLoading(): Promise<boolean> {
+    const reloadButton = this.page.locator(this.selectors.reloadButton);
+    const cls = await reloadButton.getAttribute('class')
+    return cls?.includes('loading') ?? false
   }
 
   async clickReloadButton(): Promise<void> {
@@ -94,5 +99,30 @@ export class HomePage extends BasePage {
   async hoverOverProject(index: number = 0): Promise<void> {
     const projectItems = this.page.locator(this.selectors.projectItem);
     await projectItems.nth(index).hover();
+  }
+
+  async getCurrentUrl(): Promise<string> {
+    return this.page.url();
+  }
+
+  async toggleIdeFilter(ideName: string): Promise<void> {
+    const ideFilter = this.page.locator(`[data-ide="${ideName}"]`);
+    await ideFilter.click();
+  }
+
+  async getVisibleProjectsCount(): Promise<number> {
+    const visibleProjects = await this.page.locator(this.selectors.projectItem + ':visible').count();
+    return visibleProjects;
+  }
+
+  async getFirstIdeFilterName(): Promise<string> {
+    const firstIdeFilter = this.page.locator('.ide-filter').first();
+    return await firstIdeFilter.getAttribute('data-ide') || '';
+  }
+
+  async applyFiltersWithNoResults(): Promise<void> {
+    // This method applies filters that should result in no matching projects
+    // We'll search for a term that's unlikely to match any project
+    await this.searchProjects('zzz_no_match_xyz_123');
   }
 }

@@ -10,5 +10,5 @@ export default {
   ],
   formatOptions: {
     snippetInterface: 'async-await'
-  }
+  },
 };
