@@ -6,7 +6,6 @@ export default {
   loader: ['ts-node/esm'],
   format: [
     'progress-bar',
-    'summary',
     'html:reports/cucumber-report.html',
   ],
   formatOptions: {
