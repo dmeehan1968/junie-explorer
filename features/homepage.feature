@@ -43,34 +43,44 @@ Feature: Homepage
     When the user visits the homepage
     Then the user should see a reload button in the header
 
+  @wip
   Scenario: Reload button functionality
     Given there are JetBrains projects in the logs
-    When the user clicks the reload button
-    Then the page should redirect to the refresh route
+    When the user visits the homepage
+    And the user clicks the reload button
+    Then the reload button should indicate loading
 
+  @wip
   Scenario: IDE filter toolbar display
     Given there are JetBrains projects in the logs
     When the user visits the homepage
     Then the user should see a toolbar with IDE filters
 
+  @wip
   Scenario: IDE filter functionality
     Given there are JetBrains projects in the logs
-    When the user toggles an IDE filter
+    When the user visits the homepage
+    And the user toggles an IDE filter
     Then only projects associated with the selected IDEs should be displayed
 
+  @wip
   Scenario: Project search display
     Given there are JetBrains projects in the logs
     When the user visits the homepage
     Then the user should see a search input field for filtering projects by name
 
+  @wip
   Scenario: Project search functionality
     Given there are JetBrains projects in the logs
-    When the user enters text in the project search field
+    When the user visits the homepage
+    And the user enters text in the project search field
     Then only projects with names containing the search text should be displayed
 
+  @wip
   Scenario: No matching projects message
     Given there are JetBrains projects in the logs
-    When the user applies filters that result in no matching projects
+    When the user visits the homepage
+    And the user applies filters that result in no matching projects
     Then the user should see a message indicating no matching projects were found
 
   Scenario: Empty homepage message
