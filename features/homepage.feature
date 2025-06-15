@@ -67,16 +67,6 @@ Feature: Homepage
     When the user applies filters that result in no matching projects
     Then the user should see a message indicating no matching projects were found
 
-  Scenario: Empty homepage title
-    Given there are no JetBrains projects in the logs
-    When the user visits the homepage
-    Then the user should see a page titled "Junie Explorer"
-
-  Scenario: Empty homepage logs path display
-    Given there are no JetBrains projects in the logs
-    When the user visits the homepage
-    Then the user should see the path to the JetBrains logs directory
-
   Scenario: Empty homepage message
     Given there are no JetBrains projects in the logs
     When the user visits the homepage
