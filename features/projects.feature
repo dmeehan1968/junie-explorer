@@ -4,11 +4,11 @@ Feature: Project Details Page
   So that I can explore the issues and metrics for that project
 
   Background:
-    Given the application has access to the JetBrains cache directory
+    Given the application has access to the JetBrains logs directory
     And the user has a web browser
 
   Scenario: Navigating from homepage to project details page
-    Given there are JetBrains projects in the cache
+    Given there are JetBrains projects in the logs
     When the user clicks on a project link on the homepage
     Then the user should be taken to a page for that specific project
     And the user should see a page titled with the project name

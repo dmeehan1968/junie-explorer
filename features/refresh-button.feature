@@ -4,7 +4,7 @@ Feature: Reload Button
   So that I can refresh the data displayed on the page
 
   Background:
-    Given the application has access to the JetBrains cache directory
+    Given the application has access to the JetBrains logs directory
     And the user has a web browser
 
   Scenario: Reload button visibility

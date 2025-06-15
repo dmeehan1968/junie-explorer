@@ -4,7 +4,7 @@ Feature: Task Details Page
   So that I can explore the steps and metrics for that task
 
   Background:
-    Given the application has access to the JetBrains cache directory
+    Given the application has access to the JetBrains logs directory
     And the user has a web browser
 
   Scenario: Navigating from issue page to task details page

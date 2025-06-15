@@ -4,7 +4,7 @@ Feature: Issue Details Page
   So that I can explore the tasks and metrics for that issue
 
   Background:
-    Given the application has access to the JetBrains cache directory
+    Given the application has access to the JetBrains logs directory
     And the user has a web browser
 
   Scenario: Navigating from project page to issue details page
