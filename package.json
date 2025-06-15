@@ -10,9 +10,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/index.ts",
-    "test": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/test-jetbrains.ts",
-    "test:cucumber": "cucumber-js",
-    "test:e2e": "playwright test",
+    "test": "NODE_OPTIONS=\"--no-warnings\" cucumber-js",
     "playwright:install": "playwright install"
   },
   "dependencies": {

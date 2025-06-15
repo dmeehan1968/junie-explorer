@@ -236,11 +236,11 @@ router.get('/', (req, res) => {
         <div class="container">
           <div class="header-container">
             <h1>Junie Explorer</h1>
-            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+            <button id="reload-button" class="reload-button" data-testid="reload-button" onclick="reloadPage()">Reload</button>
           </div>
-          <p>Projects found in: ${jetBrainsPath}</p>
+          <p data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
 
-          <div class="ide-filter-toolbar">
+          <div class="ide-filter-toolbar" data-testid="ide-filter-toolbar">
             <div class="filter-label">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
               <div class="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
@@ -248,7 +248,7 @@ router.get('/', (req, res) => {
               </div>
             `).join('')}
             <div class="project-search">
-              <input type="text" id="project-search-input" placeholder="Search projects..." oninput="filterByProjectName(this.value)">
+              <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)">
             </div>
           </div>
 
@@ -279,10 +279,10 @@ router.get('/', (req, res) => {
             </div>
           </div>
 
-          <ul class="project-list">
+          <ul class="project-list" data-testid="projects-list">
             ${projects.length > 0
       ? projects.map(project => `
-                <li class="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
+                <li class="project-item" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
                   <div class="project-checkbox-container">
                     <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
                            class="project-checkbox" 
@@ -290,9 +290,9 @@ router.get('/', (req, res) => {
                            onchange="handleProjectSelection(this)">
                   </div>
                   <a href="/project/${encodeURIComponent(project.name)}" class="project-link">
-                    <div class="project-name">${project.name}</div>
+                    <div class="project-name" data-testid="project-name">${project.name}</div>
                     <div class="issue-count">${project.issues.size} issues</div>
-                    <div class="ide-icons">
+                    <div class="ide-icons" data-testid="ide-icons">
                       ${project.ideNames.map(ide => `
                         <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
                       `).join('')}
@@ -300,7 +300,7 @@ router.get('/', (req, res) => {
                   </a>
                 </li>
               `).join('')
-      : '<li>No JetBrains projects found</li>'
+      : '<li data-testid="empty-projects-message">No JetBrains projects found</li>'
     }
           </ul>
         </div>
