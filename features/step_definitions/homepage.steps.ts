@@ -40,3 +40,56 @@ Then('the user should see a page titled {string}', async function (this: ICustom
   const actualTitle = await this.homePage.getPageTitle();
   expect(actualTitle).toBe(expectedTitle);
 });
+
+// Second scenario: Logs directory path display
+Then('the user should see the path to the JetBrains logs directory', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  const isVisible = await this.homePage.isLogsDirectoryPathVisible();
+  expect(isVisible).toBe(true);
+});
+
+// Third scenario: Projects list display
+Then('the user should see a list of all JetBrains projects', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  const isVisible = await this.homePage.isProjectsListVisible();
+  expect(isVisible).toBe(true);
+
+  const projectsCount = await this.homePage.getProjectsCount();
+  expect(projectsCount).toBeGreaterThan(0);
+});
+
+// Fourth scenario: Project name display
+Then('each project should display its name', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  const areNamesVisible = await this.homePage.areProjectNamesVisible();
+  expect(areNamesVisible).toBe(true);
+});
+
+// Fifth scenario: IDE icons display
+Then('each project should display icons for the IDEs it was used with', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  const areIconsVisible = await this.homePage.areIdeIconsVisible();
+  expect(areIconsVisible).toBe(true);
+});
+
+// Sixth scenario: Reload button display
+Then('the user should see a reload button in the header', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  const isVisible = await this.homePage.isReloadButtonVisible();
+  expect(isVisible).toBe(true);
+});
