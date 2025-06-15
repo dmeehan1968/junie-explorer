@@ -1,6 +1,6 @@
 import express from 'express'
-import { marked } from 'marked'
-import { jetBrains } from '../jetbrains.js'
+import { marked } from "marked"
+import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
@@ -30,6 +30,7 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
 
 // Issue tasks page route
 router.get('/project/:projectName/issue/:issueId', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId } = req.params
     const project = jetBrains.getProjectByName(projectName)
@@ -123,6 +124,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
 
 // API endpoint to get task data for a specific issue
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
     const project = jetBrains.getProjectByName(projectName)

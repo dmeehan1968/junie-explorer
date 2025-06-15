@@ -13,3 +13,4 @@ yarn-error.log*
 /.junie-context/
 /reports/
 /test-results/
+/fixtures/

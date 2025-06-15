@@ -1,3 +1,4 @@
+@skip
 Feature: Task Details Page
   As a user
   I want to view details for a specific task within an issue

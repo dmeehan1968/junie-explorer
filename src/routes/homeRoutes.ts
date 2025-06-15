@@ -1,6 +1,6 @@
 import express from 'express'
+import { JetBrains } from "../jetbrains.js"
 import { Project } from '../Project.js'
-import { jetBrains } from '../jetbrains.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { calculateIssueSummary } from '../utils/metricsUtils.js'
 
@@ -199,7 +199,7 @@ function prepareProjectsGraphData(projects: Project[]): {
 
 // Homepage route (now shows projects instead of IDEs)
 router.get('/', (req, res) => {
-
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
 
     const projects: Project[] = Array.from(jetBrains.projects.values())
@@ -317,6 +317,7 @@ router.get('/', (req, res) => {
 
 // API endpoint to get projects by name
 router.get('/api/projects', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
@@ -336,6 +337,8 @@ router.get('/api/projects', (req, res) => {
 
 // API endpoint to get graph data for selected projects
 router.get('/api/projects/graph', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []

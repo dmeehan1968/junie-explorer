@@ -1,17 +1,22 @@
 import fs from "fs-extra"
 import os from "os"
 import path from "path"
+import { fileURLToPath } from "url"
 import { inspect } from 'util'
 import { Project } from "./Project.js"
 import { SummaryMetrics } from "./schema.js"
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export class JetBrains {
 
   private _metrics: SummaryMetrics | undefined
+  private _customLogPath?: string
 
-  constructor() {
-
+  constructor(customLogPath?: string) {
+    this._customLogPath = customLogPath ? path.join(__dirname, '..', customLogPath) : undefined
+    console.log('Log Path', this._customLogPath)
   }
 
   preload() {
@@ -118,6 +123,10 @@ export class JetBrains {
   }
 
   get logPath() {
+    if (this._customLogPath) {
+      return this._customLogPath
+    }
+
     switch (os.platform()) {
       case 'win32': // Windows
         return path.join(process.env.APPDATA || '', '..', 'Local', 'JetBrains')
@@ -148,4 +157,3 @@ export class JetBrains {
   }
 }
 
-export const jetBrains = new JetBrains()

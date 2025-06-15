@@ -1,6 +1,8 @@
 import { Browser, BrowserContext, Page, chromium } from '@playwright/test';
 import { setWorldConstructor, World, IWorldOptions } from '@cucumber/cucumber';
 import { HomePage } from './pages/HomePage.js';
+import { JetBrains } from '../../src/jetbrains.js';
+import { Server } from 'http';
 
 export interface ICustomWorld extends World {
   browser?: Browser;
@@ -8,6 +10,9 @@ export interface ICustomWorld extends World {
   page?: Page;
   homePage?: HomePage;
   appliedFilters?: string[];
+  server?: Server;
+  jetBrainsInstance?: JetBrains;
+  serverPort?: number;
   init(): Promise<void>;
   cleanup(): Promise<void>;
 }
@@ -18,6 +23,9 @@ export class CustomWorld extends World implements ICustomWorld {
   page?: Page;
   homePage?: HomePage;
   appliedFilters?: string[];
+  server?: Server;
+  jetBrainsInstance?: JetBrains;
+  serverPort?: number;
 
   constructor(options: IWorldOptions) {
     super(options);
@@ -27,7 +35,8 @@ export class CustomWorld extends World implements ICustomWorld {
     this.browser = await chromium.launch({ headless: true });
     this.context = await this.browser.newContext();
     this.page = await this.context.newPage();
-    this.homePage = new HomePage(this.page);
+    const baseUrl = `http://localhost:${this.serverPort}`;
+    this.homePage = new HomePage(this.page, baseUrl);
   }
 
   async cleanup(): Promise<void> {
