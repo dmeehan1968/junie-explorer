@@ -1,6 +1,6 @@
 import express from 'express'
 import { Issue } from "../Issue.js"
-import { jetBrains } from '../jetbrains.js'
+import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js'
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
@@ -152,6 +152,8 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
 // Project issues page route
 router.get('/project/:projectName', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+
   try {
     const { projectName } = req.params
     const project = jetBrains.getProjectByName(projectName)

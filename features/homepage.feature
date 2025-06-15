@@ -1,4 +1,3 @@
-@home
 Feature: Homepage
   As a user
   I want to view JetBrains projects on the homepage

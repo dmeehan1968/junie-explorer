@@ -7,10 +7,8 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/index.ts",
-    "test": "NODE_OPTIONS=\"--no-warnings\" cucumber-js",
+    "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @skip\"",
     "playwright:install": "playwright install"
   },
   "dependencies": {

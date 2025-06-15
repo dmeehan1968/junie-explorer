@@ -82,8 +82,7 @@ The new class-based data model with enhanced functionality:
 1. **Setup**: Clone the repository and run `npm install`
 2. **Development**: Use `npm run dev` to start the development server
 3. **Testing**: Use `npm test` to run the test script
-4. **Building**: Use `npm run build` to compile TypeScript to JavaScript
-5. **Production**: Use `npm start` to run the compiled application
+4. **Building**: There is no build step, typescript can be run directly via loader ts-node/esm. tsconfig.json includes noEmit=true
 
 ## Code Conventions
 - Use TypeScript interfaces for type definitions

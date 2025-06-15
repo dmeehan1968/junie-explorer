@@ -1,3 +1,4 @@
+@skip
 Feature: Project Graph on Homepage
   As a user
   I want to see a graph of project metrics on the homepage

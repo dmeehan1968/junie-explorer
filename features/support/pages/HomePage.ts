@@ -16,12 +16,15 @@ export class HomePage extends BasePage {
     emptyProjectsMessage: '[data-testid="empty-projects-message"]'
   };
 
-  constructor(page: Page) {
+  private baseUrl: string;
+
+  constructor(page: Page, baseUrl: string = 'http://localhost:3000') {
     super(page);
+    this.baseUrl = baseUrl;
   }
 
   async visitHomepage(): Promise<void> {
-    await this.navigateTo('http://localhost:3000');
+    await this.navigateTo(this.baseUrl);
     await this.waitForNavigation();
   }
 

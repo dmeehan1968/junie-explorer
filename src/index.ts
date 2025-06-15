@@ -6,36 +6,61 @@ import issueRoutes from './routes/issueRoutes.js'
 import notFoundRoutes from './routes/notFoundRoutes.js'
 import projectRoutes from './routes/projectRoutes.js'
 import taskRoutes from './routes/taskRoutes.js'
-import { jetBrains } from "./jetbrains.js"
+import { JetBrains } from "./jetbrains.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const app = express()
-const PORT = process.env.PORT || 3000
+export interface ServerOptions {
+  jetBrainsInstance?: JetBrains
+  port?: number
+  preload?: boolean
+}
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../public')))
+export function createServer(options: ServerOptions = {}) {
+  const {
+    jetBrainsInstance = new JetBrains(),
+    port = process.env.PORT || 3000,
+    preload = true
+  } = options
 
-// Add refresh endpoint
-app.get('/refresh', (req, res) => {
-  // refreshAppState()
-  jetBrains.reload()
-  res.redirect(req.headers.referer || '/')
-})
+  const app = express()
 
+  // Serve static files
+  app.use(express.static(path.join(__dirname, '../public')))
+  app.use((req, res, next) => {
+    req.app.locals.jetBrains = jetBrainsInstance
+    next()
+  })
+  // Add refresh endpoint
+  app.get('/refresh', (req, res) => {
+    jetBrainsInstance.reload()
+    res.redirect(req.headers.referer || '/')
+  })
 
-// Register routes
-app.use('/', homeRoutes)
-app.use('/', projectRoutes)
-app.use('/', issueRoutes)
-app.use('/', taskRoutes)
+  // Register routes
+  app.use('/', homeRoutes)
+  app.use('/', projectRoutes)
+  app.use('/', issueRoutes)
+  app.use('/', taskRoutes)
 
-// Add not found page (must be after routes)
-app.use(notFoundRoutes)
+  // Add not found page (must be after routes)
+  app.use(notFoundRoutes)
 
-// Initialize app state and start the server
-jetBrains.preload()
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
-})
+  // Initialize app state if requested
+  if (preload) {
+    jetBrainsInstance.preload()
+  }
+
+  return { app, jetBrainsInstance, port }
+}
+
+// Start the server when this file is run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const { app, port } = createServer({
+    jetBrainsInstance: new JetBrains(),
+  })
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`)
+  })
+}
