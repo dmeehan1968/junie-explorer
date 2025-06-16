@@ -175,4 +175,59 @@ export class HomePage extends BasePage {
 
     return true;
   }
+
+  // Mobile device testing methods
+  async setMobileViewport(): Promise<void> {
+    await this.page.setViewportSize({ width: 375, height: 667 }); // iPhone SE size
+  }
+
+  async isLayoutResponsive(): Promise<boolean> {
+    // Check if the layout adjusts properly for mobile
+    // This could check for specific CSS classes, element visibility, or layout changes
+    const projectsList = this.page.locator(this.selectors.projectsList);
+    const computedStyle = await projectsList.evaluate((el) => {
+      return window.getComputedStyle(el).display;
+    });
+
+    // On mobile, the layout should still be visible and properly formatted
+    return computedStyle !== 'none' && await this.isVisible(this.selectors.projectsList);
+  }
+
+  async areProjectsAccessibleOnMobile(): Promise<boolean> {
+    // Check if all projects are still accessible on mobile
+    const projectsCount = await this.getProjectsCount();
+    const visibleProjectsCount = await this.getVisibleProjectsCount();
+
+    // All projects should be accessible (visible) on mobile
+    return projectsCount > 0 && visibleProjectsCount === projectsCount;
+  }
+
+  // Hover effect testing methods
+  async getProjectBackgroundColor(index: number = 0): Promise<string> {
+    const projectItems = this.page.locator(this.selectors.projectItem);
+    return await projectItems.nth(index).evaluate((el) => {
+      return window.getComputedStyle(el).backgroundColor;
+    });
+  }
+
+  async getProjectTransform(index: number = 0): Promise<string> {
+    const projectItems = this.page.locator(this.selectors.projectItem);
+    return await projectItems.nth(index).evaluate((el) => {
+      return window.getComputedStyle(el).transform;
+    });
+  }
+
+  async hasProjectColorChanged(index: number = 0, originalColor: string): Promise<boolean> {
+    const currentColor = await this.getProjectBackgroundColor(index);
+    return currentColor !== originalColor;
+  }
+
+  async hasProjectMoved(index: number = 0, originalTransform: string): Promise<boolean> {
+    const currentTransform = await this.getProjectTransform(index);
+    return currentTransform !== originalTransform;
+  }
+
+  async waitForProjectsToLoad(): Promise<void> {
+    await this.waitForSelector(this.selectors.projectItem);
+  }
 }
