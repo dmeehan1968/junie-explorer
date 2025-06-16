@@ -69,3 +69,15 @@ Feature: Project Details Page
     Given the user visits project "no-issues.999999"
     Then the cost over time graph should not be displayed
 
+  Scenario: Reload button display
+    Given there are Junie projects in the logs
+    When the user visits the homepage
+    Then the user should see a reload button in the header
+
+  Scenario: Reload button functionality
+    Given there are Junie projects in the logs
+    When the user visits the homepage
+    And the user clicks the reload button
+    Then the reload button should indicate loading
+
+

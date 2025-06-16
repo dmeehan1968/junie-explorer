@@ -1,15 +1,20 @@
-import { Browser, BrowserContext, Page, chromium } from '@playwright/test';
-import { setWorldConstructor, World, IWorldOptions } from '@cucumber/cucumber';
-import { HomePage } from './pages/HomePage.js';
-import { ProjectPage } from './pages/ProjectPage.js';
-import { JetBrains } from '../../src/jetbrains.js';
-import { Server } from 'http';
+import { IWorldOptions, setWorldConstructor, World } from '@cucumber/cucumber'
+import { chromium } from '@playwright/test'
+import { Server } from 'http'
+import { JetBrains } from '../../src/jetbrains.js'
+import { Breadcrumb } from "./Breadcrumb.js"
+import { HomePage } from './pages/HomePage.js'
+import { ProjectPage } from './pages/ProjectPage.js'
+import { ReloadButton } from "./ReloadButton.js"
+
 
 export interface ICustomWorld extends World {
   server?: Server;
   serverPort?: number;
   homePage: HomePage;
   projectPage: ProjectPage;
+  reloadButton: ReloadButton;
+  breadcrumb: Breadcrumb;
   jetBrainsInstance?: JetBrains;
   setup(): Promise<void>;
   teardown(): Promise<void>;
@@ -20,6 +25,8 @@ export class CustomWorld extends World implements ICustomWorld {
   serverPort?: number;
   _homePage?: HomePage;
   _projectPage?: ProjectPage;
+  _reloadButton?: ReloadButton;
+  _breadcrumb?: Breadcrumb;
   jetBrainsInstance?: JetBrains;
   teardownActions: (() => Promise<void>)[] = []
 
@@ -45,12 +52,28 @@ export class CustomWorld extends World implements ICustomWorld {
     return this._projectPage;
   }
 
+  get reloadButton() {
+    if (!this._reloadButton) {
+      throw new Error('ReloadButton not initialized');
+    }
+    return this._reloadButton;
+  }
+
+  get breadcrumb() {
+    if (!this._breadcrumb) {
+      throw new Error('Breadcrumb not initialized');
+    }
+    return this._breadcrumb;
+  }
+
   async setup(): Promise<void> {
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
     this._homePage = new HomePage(page, this.baseUrl);
     this._projectPage = new ProjectPage(page, this.baseUrl);
+    this._reloadButton = new ReloadButton(page);
+    this._breadcrumb = new Breadcrumb(page);
 
     this.teardownActions.push(async () => page.close());
     this.teardownActions.push(async () => context.close());

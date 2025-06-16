@@ -195,7 +195,7 @@ router.get('/project/:projectName', (req, res) => {
           <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
-              <li class="breadcrumb-item">${project.name}</li>
+              <li class="breadcrumb-item active">${project.name}</li>
             </ol>
           </nav>
 

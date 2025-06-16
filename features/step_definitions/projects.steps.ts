@@ -22,15 +22,6 @@ When('the user visits the project details page', async function (this: ICustomWo
   await this.projectPage.visit('narrowboats.30291293');
 });
 
-When('the user clicks on the {string} link in the breadcrumb navigation', async function (this: ICustomWorld, linkText: string) {
-  if (linkText === 'Projects') {
-    await this.projectPage.clickProjectsLinkInBreadcrumb();
-  } else {
-    // Handle other breadcrumb links as needed
-    await this.projectPage.click(`[data-testid="breadcrumb-${linkText.toLowerCase()}"]`);
-  }
-});
-
 When('the user clicks on an issue in the list', async function (this: ICustomWorld) {
   await this.projectPage.clickOnFirstIssue();
 });
@@ -53,18 +44,6 @@ Then('the user should see a list of issues available for that project', async fu
 
 Then('the user should see icons for each IDE that was used with the project', async function (this: ICustomWorld) {
   await expect(this.projectPage.areIdeIconsVisible()).resolves.toEqual(true);
-});
-
-Then('the user should see breadcrumb navigation showing the current location', async function (this: ICustomWorld) {
-  await expect(this.projectPage.isBreadcrumbNavigationVisible()).resolves.toEqual(true);
-});
-
-Then('the user should be taken back to the homepage', async function (this: ICustomWorld) {
-  await expect(this.projectPage.getCurrentUrl()).resolves.toMatch(/\/$|\/index/);
-});
-
-Then('the page should redirect to the refresh route', async function (this: ICustomWorld) {
-  await expect(this.projectPage.getCurrentUrl()).resolves.toContain('/refresh');
 });
 
 Then('the user should see a graph visualizing issue costs over time', async function (this: ICustomWorld) {

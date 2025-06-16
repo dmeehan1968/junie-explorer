@@ -61,10 +61,10 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
             <h1>Junie Explorer: ${escapeHtml(issue.name)}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
-          <nav aria-label="breadcrumb">
+          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
               <li class="breadcrumb-item active">${escapeHtml(issue.name)}</li>
             </ol>
           </nav>

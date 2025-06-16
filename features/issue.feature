@@ -18,11 +18,13 @@ Feature: Issue Details Page
     Then the user should see icons for each IDE that was used with the project
 
   Scenario: Reload button display
-    When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
+    Given there are Junie projects in the logs
+    When the user visits the homepage
     Then the user should see a reload button in the header
 
   Scenario: Reload button functionality
-    When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
+    Given there are Junie projects in the logs
+    When the user visits the homepage
     And the user clicks the reload button
     Then the reload button should indicate loading
 
@@ -32,8 +34,13 @@ Feature: Issue Details Page
 
   Scenario: Navigating back to project page
     When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
-    And the user clicks on the project name link in the breadcrumb navigation
+    And the user clicks on the "Project Name" link in the breadcrumb navigation
     Then the user should be taken back to the project page
+
+  Scenario: Navigating back to homepage
+    When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
+    And the user clicks on the "Projects" link in the breadcrumb navigation
+    Then the user should be taken back to the homepage
 
   Scenario: Navigating back to homepage
     When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"

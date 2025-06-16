@@ -7,8 +7,6 @@ export class ProjectPage extends BasePage {
     issuesList: '[data-testid="issues-list"]',
     ideIcons: '[data-testid="ide-icons"]',
     reloadButton: '[data-testid="reload-button"]',
-    breadcrumbNavigation: '[data-testid="breadcrumb-navigation"]',
-    breadcrumbProjects: '[data-testid="breadcrumb-projects"]',
     costOverTimeGraph: '[data-testid="cost-over-time-graph"]',
     projectSummaryTable: '[data-testid="project-summary-table"]',
     summaryInputTokens: '[data-testid="summary-input-tokens"]',
@@ -64,14 +62,6 @@ export class ProjectPage extends BasePage {
 
   async clickReloadButton(): Promise<void> {
     await this.click(this.selectors.reloadButton);
-  }
-
-  async isBreadcrumbNavigationVisible(): Promise<boolean> {
-    return await this.isVisible(this.selectors.breadcrumbNavigation);
-  }
-
-  async clickProjectsLinkInBreadcrumb(): Promise<void> {
-    await this.click(this.selectors.breadcrumbProjects);
   }
 
   async isCostOverTimeGraphVisible(): Promise<boolean> {

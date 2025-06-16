@@ -42,18 +42,6 @@ Then('each project should display icons for the IDEs it was used with', async fu
   await expect(this.homePage.areIdeIconsVisible()).resolves.toEqual(true);
 });
 
-Then('the user should see a reload button in the header', async function (this: ICustomWorld) {
-  await expect(this.homePage.isReloadButtonVisible()).resolves.toEqual(true);
-});
-
-When('the user clicks the reload button', async function (this: ICustomWorld) {
-  await this.homePage.clickReloadButton();
-});
-
-Then('the reload button should indicate loading', async function (this: ICustomWorld) {
-  await this.homePage.isReloadButtonLoading()
-});
-
 Then('the user should see a toolbar with IDE filters', async function (this: ICustomWorld) {
   await expect(this.homePage.isIdeFilterToolbarVisible()).resolves.toEqual(true);
 });
