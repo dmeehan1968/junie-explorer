@@ -6,56 +6,62 @@ import { JetBrains } from '../../src/jetbrains.js';
 import { Server } from 'http';
 
 export interface ICustomWorld extends World {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
-  homePage?: HomePage;
-  projectPage?: ProjectPage;
+  homePage: HomePage;
+  projectPage: ProjectPage;
   appliedFilters?: string[];
-  originalBackgroundColor?: string;
-  originalTransform?: string;
   server?: Server;
   jetBrainsInstance?: JetBrains;
   serverPort?: number;
-  init(): Promise<void>;
-  cleanup(): Promise<void>;
+  setup(): Promise<void>;
+  teardown(): Promise<void>;
 }
 
 export class CustomWorld extends World implements ICustomWorld {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
-  homePage?: HomePage;
-  projectPage?: ProjectPage;
+  _homePage?: HomePage;
+  _projectPage?: ProjectPage;
   appliedFilters?: string[];
-  originalBackgroundColor?: string;
-  originalTransform?: string;
   server?: Server;
   jetBrainsInstance?: JetBrains;
   serverPort?: number;
+  teardownActions: (() => Promise<void>)[] = []
 
   constructor(options: IWorldOptions) {
     super(options);
   }
 
-  async init(): Promise<void> {
-    this.browser = await chromium.launch({ headless: true });
-    this.context = await this.browser.newContext();
-    this.page = await this.context.newPage();
-    const baseUrl = `http://localhost:${this.serverPort}`;
-    this.homePage = new HomePage(this.page, baseUrl);
-    this.projectPage = new ProjectPage(this.page, baseUrl);
+  get baseUrl() {
+    return `http://localhost:${this.serverPort}`;
   }
 
-  async cleanup(): Promise<void> {
-    if (this.page) {
-      await this.page.close();
+  get homePage() {
+    if (!this._homePage) {
+      throw new Error('HomePage not initialized');
     }
-    if (this.context) {
-      await this.context.close();
+    return this._homePage;
+  }
+
+  get projectPage() {
+    if (!this._projectPage) {
+      throw new Error('ProjectPage not initialized');
     }
-    if (this.browser) {
-      await this.browser.close();
+    return this._projectPage;
+  }
+
+  async setup(): Promise<void> {
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    this._homePage = new HomePage(page, this.baseUrl);
+    this._projectPage = new ProjectPage(page, this.baseUrl);
+
+    this.teardownActions.push(async () => page.close());
+    this.teardownActions.push(async () => context.close());
+    this.teardownActions.push(async () => browser.close());
+  }
+
+  async teardown(): Promise<void> {
+    for (const teardown of this.teardownActions) {
+      await teardown();
     }
   }
 }
