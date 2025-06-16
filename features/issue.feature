@@ -1,4 +1,3 @@
-@pending
 Feature: Issue Details Page
   As a user
   I want to view details for a specific issue within a JetBrains project

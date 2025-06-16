@@ -4,6 +4,7 @@ import { Server } from 'http'
 import { JetBrains } from '../../src/jetbrains.js'
 import { Breadcrumb } from "./Breadcrumb.js"
 import { HomePage } from './pages/HomePage.js'
+import { IssuePage } from "./pages/IssuePage.js"
 import { ProjectPage } from './pages/ProjectPage.js'
 import { ReloadButton } from "./ReloadButton.js"
 
@@ -13,6 +14,7 @@ export interface ICustomWorld extends World {
   serverPort?: number;
   homePage: HomePage;
   projectPage: ProjectPage;
+  issuePage: IssuePage;
   reloadButton: ReloadButton;
   breadcrumb: Breadcrumb;
   jetBrainsInstance?: JetBrains;
@@ -25,6 +27,7 @@ export class CustomWorld extends World implements ICustomWorld {
   serverPort?: number;
   _homePage?: HomePage;
   _projectPage?: ProjectPage;
+  _issuePage?: IssuePage;
   _reloadButton?: ReloadButton;
   _breadcrumb?: Breadcrumb;
   jetBrainsInstance?: JetBrains;
@@ -52,6 +55,13 @@ export class CustomWorld extends World implements ICustomWorld {
     return this._projectPage;
   }
 
+  get issuePage() {
+    if (!this._issuePage) {
+      throw new Error('IssuePage not initialized');
+    }
+    return this._issuePage;
+  }
+
   get reloadButton() {
     if (!this._reloadButton) {
       throw new Error('ReloadButton not initialized');
@@ -70,8 +80,11 @@ export class CustomWorld extends World implements ICustomWorld {
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
+
     this._homePage = new HomePage(page, this.baseUrl);
     this._projectPage = new ProjectPage(page, this.baseUrl);
+    this._issuePage = new IssuePage(page, this.baseUrl);
+
     this._reloadButton = new ReloadButton(page);
     this._breadcrumb = new Breadcrumb(page);
 
