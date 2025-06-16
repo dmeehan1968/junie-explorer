@@ -76,25 +76,25 @@ Feature: Homepage
     When the user visits the homepage
     Then the user should see a message indicating no projects were found
 
-  @skip
+  @wip
   Scenario: Responsive layout on mobile devices
     Given there are JetBrains projects in the logs
     When the user visits the homepage on a mobile device
     Then the page should adjust its layout to fit the smaller screen
 
-  @skip
+  @wip
   Scenario: Projects accessibility on mobile
     Given there are JetBrains projects in the logs
     When the user visits the homepage on a mobile device
     Then all projects should still be visible and accessible
 
-  @skip
+  @wip
   Scenario: Project hover color effect
     Given there are JetBrains projects in the logs
     When the user hovers over a project item
     Then the item should change its background color
 
-  @skip
+  @wip
   Scenario: Project hover movement effect
     Given there are JetBrains projects in the logs
     When the user hovers over a project item

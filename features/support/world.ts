@@ -10,6 +10,8 @@ export interface ICustomWorld extends World {
   page?: Page;
   homePage?: HomePage;
   appliedFilters?: string[];
+  originalBackgroundColor?: string;
+  originalTransform?: string;
   server?: Server;
   jetBrainsInstance?: JetBrains;
   serverPort?: number;
@@ -23,6 +25,8 @@ export class CustomWorld extends World implements ICustomWorld {
   page?: Page;
   homePage?: HomePage;
   appliedFilters?: string[];
+  originalBackgroundColor?: string;
+  originalTransform?: string;
   server?: Server;
   jetBrainsInstance?: JetBrains;
   serverPort?: number;

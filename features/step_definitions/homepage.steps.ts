@@ -250,3 +250,80 @@ Then('the previously selected IDE filters should be preserved', async function (
   const areFiltersPreserved = await this.homePage.areIdeFiltersSelected(this.appliedFilters);
   expect(areFiltersPreserved).toBe(true);
 });
+
+// @wip scenarios: Mobile responsive layout
+When('the user visits the homepage on a mobile device', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  // Set mobile viewport
+  await this.homePage.setMobileViewport();
+
+  // Visit the homepage
+  await this.homePage.visitHomepage();
+});
+
+Then('the page should adjust its layout to fit the smaller screen', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  const isResponsive = await this.homePage.isLayoutResponsive();
+  expect(isResponsive).toBe(true);
+});
+
+Then('all projects should still be visible and accessible', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  const areAccessible = await this.homePage.areProjectsAccessibleOnMobile();
+  expect(areAccessible).toBe(true);
+});
+
+// @wip scenarios: Project hover effects
+When('the user hovers over a project item', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  // First visit the homepage to ensure we're on the right page
+  await this.homePage.visitHomepage();
+
+  // Wait for projects to be visible
+  await this.homePage.waitForProjectsToLoad();
+
+  // Store original state before hovering
+  this.originalBackgroundColor = await this.homePage.getProjectBackgroundColor(0);
+  this.originalTransform = await this.homePage.getProjectTransform(0);
+
+  // Hover over the first project
+  await this.homePage.hoverOverProject(0);
+});
+
+Then('the item should change its background color', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  if (!this.originalBackgroundColor) {
+    throw new Error('Original background color not stored');
+  }
+
+  const hasColorChanged = await this.homePage.hasProjectColorChanged(0, this.originalBackgroundColor);
+  expect(hasColorChanged).toBe(true);
+});
+
+Then('the item should slightly move to indicate interactivity', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+
+  if (!this.originalTransform) {
+    throw new Error('Original transform not stored');
+  }
+
+  const hasMoved = await this.homePage.hasProjectMoved(0, this.originalTransform);
+  expect(hasMoved).toBe(true);
+});
