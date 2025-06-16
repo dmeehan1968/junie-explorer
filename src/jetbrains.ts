@@ -16,7 +16,6 @@ export class JetBrains {
 
   constructor(customLogPath?: string) {
     this._customLogPath = customLogPath ? path.join(__dirname, '..', customLogPath) : undefined
-    console.log('Log Path', this._customLogPath)
   }
 
   preload() {

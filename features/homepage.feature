@@ -71,7 +71,6 @@ Feature: Homepage
     And the user applies filters that result in no matching projects
     Then the user should see a message indicating no matching projects were found
 
-  @skip
   Scenario: Empty homepage message
     Given there are no JetBrains projects in the logs
     When the user visits the homepage
