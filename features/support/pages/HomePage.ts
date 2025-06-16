@@ -218,12 +218,36 @@ export class HomePage extends BasePage {
   }
 
   async hasProjectColorChanged(index: number = 0, originalColor: string): Promise<boolean> {
-    const currentColor = await this.getProjectBackgroundColor(index);
+    // Get the current color while maintaining hover state
+    const projectItems = this.page.locator(this.selectors.projectItem);
+
+    // First, ensure we're hovering over the element
+    await projectItems.nth(index).hover();
+
+    // Wait a bit for the transition to complete
+    await this.page.waitForTimeout(100);
+
+    const currentColor = await projectItems.nth(index).evaluate((el) => {
+      return window.getComputedStyle(el).backgroundColor;
+    });
+
     return currentColor !== originalColor;
   }
 
   async hasProjectMoved(index: number = 0, originalTransform: string): Promise<boolean> {
-    const currentTransform = await this.getProjectTransform(index);
+    // Get the current transform while maintaining hover state
+    const projectItems = this.page.locator(this.selectors.projectItem);
+
+    // First, ensure we're hovering over the element
+    await projectItems.nth(index).hover();
+
+    // Wait a bit for the transition to complete
+    await this.page.waitForTimeout(100);
+
+    const currentTransform = await projectItems.nth(index).evaluate((el) => {
+      return window.getComputedStyle(el).transform;
+    });
+
     return currentTransform !== originalTransform;
   }
 
