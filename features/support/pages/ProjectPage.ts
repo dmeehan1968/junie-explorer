@@ -33,8 +33,8 @@ export class ProjectPage extends BasePage {
     super(page, baseUrl);
   }
 
-  async visitProjectDetailsPage(projectName: string): Promise<void> {
-    await this.navigateTo(`${this.baseUrl}/project/${encodeURIComponent(projectName)}`);
+  async visit(projectName: string): Promise<void> {
+    await super.visit(`project/${encodeURIComponent(projectName)}`);
   }
 
   async getPageTitle(): Promise<string> {
