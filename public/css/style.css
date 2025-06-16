@@ -60,42 +60,6 @@ p {
   color: #27ae60;
 }
 
-/* Project Table Styles */
-.project-table, .issue-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.project-table th, .issue-table th {
-  background-color: #f2f2f2;
-  color: #333;
-  font-weight: bold;
-  text-align: left;
-  padding: 12px 15px;
-  border-bottom: 2px solid #ddd;
-}
-
-.project-table td, .issue-table td {
-  padding: 10px 15px;
-  border-bottom: 1px solid #ddd;
-}
-
-.project-table tbody tr:hover, .issue-table tbody tr:hover {
-  background-color: #f5f5f5;
-}
-
-.project-table a, .issue-table a {
-  color: #27ae60;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.project-table a:hover, .issue-table a:hover {
-  text-decoration: underline;
-}
-
 /* Navigation */
 .breadcrumb {
   display: flex;
