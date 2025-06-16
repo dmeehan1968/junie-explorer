@@ -1,4 +1,4 @@
-@skip
+@pending
 Feature: Project Details Page
   As a user
   I want to view details for a specific JetBrains project

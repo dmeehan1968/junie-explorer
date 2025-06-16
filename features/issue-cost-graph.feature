@@ -1,4 +1,4 @@
-@skip
+@pending
 Feature: Graph of issue cost over time
   As a user
   I want to see a line graph showing the total cost of each issue over time

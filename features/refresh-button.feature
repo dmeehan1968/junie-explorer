@@ -1,4 +1,4 @@
-@skip
+@pending
 Feature: Reload Button
   As a user
   I want to reload the page with a button
