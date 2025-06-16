@@ -8,21 +8,17 @@ import { Server } from 'http';
 export interface ICustomWorld extends World {
   homePage: HomePage;
   projectPage: ProjectPage;
-  appliedFilters?: string[];
-  server?: Server;
   jetBrainsInstance?: JetBrains;
-  serverPort?: number;
   setup(): Promise<void>;
   teardown(): Promise<void>;
 }
 
 export class CustomWorld extends World implements ICustomWorld {
+  private server?: Server;
+  private serverPort?: number;
   _homePage?: HomePage;
   _projectPage?: ProjectPage;
-  appliedFilters?: string[];
-  server?: Server;
   jetBrainsInstance?: JetBrains;
-  serverPort?: number;
   teardownActions: (() => Promise<void>)[] = []
 
   constructor(options: IWorldOptions) {

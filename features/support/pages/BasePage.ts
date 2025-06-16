@@ -1,6 +1,8 @@
-import { Page } from '@playwright/test';
+import { Page } from '@playwright/test'
 
 export abstract class BasePage {
+
+  private reloadButtonSelector = '[data-testid="reload-button"]' as const
 
   constructor(protected readonly page: Page, protected readonly baseUrl: string) {
   }
@@ -39,5 +41,19 @@ export abstract class BasePage {
 
   async waitForNavigation(): Promise<void> {
     await this.page.waitForLoadState('networkidle');
+  }
+
+  async isReloadButtonVisible(): Promise<boolean> {
+    return await this.isVisible(this.reloadButtonSelector)
+  }
+
+  async isReloadButtonLoading(): Promise<boolean> {
+    const reloadButton = this.page.locator(this.reloadButtonSelector)
+    const cls = await reloadButton.getAttribute('class')
+    return cls?.includes('loading') ?? false
+  }
+
+  async clickReloadButton(): Promise<void> {
+    await this.click(this.reloadButtonSelector)
   }
 }

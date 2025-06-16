@@ -109,7 +109,7 @@ Given('the user has applied IDE filters', async function (this: ICustomWorld) {
   await this.homePage.toggleIdeFilter(initialFilters[0]);
 
   // Store the current filter state for later verification
-  this.appliedFilters = await this.homePage.getSelectedIdeFilters();
+  await this.homePage.memoizeIdeFilters();
 });
 
 When('the user refreshes the page', async function (this: ICustomWorld) {
@@ -117,11 +117,7 @@ When('the user refreshes the page', async function (this: ICustomWorld) {
 });
 
 Then('the previously selected IDE filters should be preserved', async function (this: ICustomWorld) {
-  if (!this.appliedFilters || this.appliedFilters.length === 0) {
-    throw new Error('No applied filters found in test context');
-  }
-
-  await expect(this.homePage.areIdeFiltersSelected(this.appliedFilters)).resolves.toEqual(true);
+  await expect(this.homePage.areIdeFiltersSelected()).resolves.toEqual(true);
 });
 
 When('the user visits the homepage on a mobile device', async function (this: ICustomWorld) {

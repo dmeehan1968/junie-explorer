@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename)
 export class JetBrains {
 
   private _metrics: SummaryMetrics | undefined
-  private _customLogPath?: string
+  private readonly _customLogPath?: string
 
   constructor(customLogPath?: string) {
     this._customLogPath = customLogPath ? path.join(__dirname, '..', customLogPath) : undefined
