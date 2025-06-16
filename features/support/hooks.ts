@@ -20,7 +20,7 @@ BeforeAll(async function () {
   const { app } = createServer({
     jetBrainsInstance: globalJetBrainsInstance,
     port: globalServerPort,
-    preload: true
+    preload: true,
   });
 
   // Start the server
@@ -51,9 +51,9 @@ Before(async function (this: ICustomWorld) {
   this.serverPort = globalServerPort;
 
   // Initialize browser and page
-  await this.init();
+  await this.setup();
 });
 
 After(async function (this: ICustomWorld) {
-  await this.cleanup();
+  await this.teardown();
 });

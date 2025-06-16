@@ -1,7 +1,9 @@
-import { Page } from '@playwright/test'
 import { BasePage } from './BasePage.js'
 
 export class HomePage extends BasePage {
+  private projectBackgroundColor?: string;
+  private projectTransform?: string;
+
   private readonly selectors = {
     pageTitle: 'h1',
     logsDirectoryPath: '[data-testid="logs-directory-path"]',
@@ -14,16 +16,9 @@ export class HomePage extends BasePage {
     projectSearchInput: '[data-testid="project-search"]',
     noMatchingProjectsMessage: '[data-testid="no-matching-projects"]',
     emptyProjectsMessage: '[data-testid="empty-projects-message"]'
-  };
+  } as const;
 
-  private baseUrl: string;
-
-  constructor(page: Page, baseUrl: string = 'http://localhost:3000') {
-    super(page);
-    this.baseUrl = baseUrl;
-  }
-
-  async visitHomepage(): Promise<void> {
+  async visit(): Promise<void> {
     await this.navigateTo(this.baseUrl);
     await this.waitForNavigation();
   }
@@ -49,7 +44,7 @@ export class HomePage extends BasePage {
     return await this.isVisible(this.selectors.projectsList);
   }
 
-  async getProjectsCount(): Promise<number> {
+  async projectCount(): Promise<number> {
     return await this.page.locator(this.selectors.projectItem).count();
   }
 
@@ -113,9 +108,8 @@ export class HomePage extends BasePage {
     await ideFilter.click();
   }
 
-  async getVisibleProjectsCount(): Promise<number> {
-    const visibleProjects = await this.page.locator(this.selectors.projectItem + ':visible').count();
-    return visibleProjects;
+  async visibleProjectCount(): Promise<number> {
+    return await this.page.locator(this.selectors.projectItem + ':visible').count();
   }
 
   async getFirstIdeFilterName(): Promise<string> {
@@ -195,29 +189,33 @@ export class HomePage extends BasePage {
 
   async areProjectsAccessibleOnMobile(): Promise<boolean> {
     // Check if all projects are still accessible on mobile
-    const projectsCount = await this.getProjectsCount();
-    const visibleProjectsCount = await this.getVisibleProjectsCount();
+    const projectsCount = await this.projectCount();
+    const visibleProjectsCount = await this.visibleProjectCount();
 
     // All projects should be accessible (visible) on mobile
     return projectsCount > 0 && visibleProjectsCount === projectsCount;
   }
 
   // Hover effect testing methods
-  async getProjectBackgroundColor(index: number = 0): Promise<string> {
+  async memoizeProjectBackgroundColor(index: number = 0): Promise<void> {
     const projectItems = this.page.locator(this.selectors.projectItem);
-    return await projectItems.nth(index).evaluate((el) => {
+    this.projectBackgroundColor = await projectItems.nth(index).evaluate((el) => {
       return window.getComputedStyle(el).backgroundColor;
-    });
+    })
   }
 
-  async getProjectTransform(index: number = 0): Promise<string> {
+  async memoizeProjectTransform(index: number = 0): Promise<void> {
     const projectItems = this.page.locator(this.selectors.projectItem);
-    return await projectItems.nth(index).evaluate((el) => {
+    this.projectTransform = await projectItems.nth(index).evaluate((el) => {
       return window.getComputedStyle(el).transform;
     });
   }
 
-  async hasProjectColorChanged(index: number = 0, originalColor: string): Promise<boolean> {
+  async hasProjectBackgroundColorChanged(index: number): Promise<boolean> {
+    if (!this.projectBackgroundColor) {
+      throw new Error('Project background color not memoized');
+    }
+
     // Get the current color while maintaining hover state
     const projectItems = this.page.locator(this.selectors.projectItem);
 
@@ -231,10 +229,10 @@ export class HomePage extends BasePage {
       return window.getComputedStyle(el).backgroundColor;
     });
 
-    return currentColor !== originalColor;
+    return currentColor !== this.projectBackgroundColor;
   }
 
-  async hasProjectMoved(index: number = 0, originalTransform: string): Promise<boolean> {
+  async hasProjectMoved(index: number = 0): Promise<boolean> {
     // Get the current transform while maintaining hover state
     const projectItems = this.page.locator(this.selectors.projectItem);
 
@@ -248,7 +246,7 @@ export class HomePage extends BasePage {
       return window.getComputedStyle(el).transform;
     });
 
-    return currentTransform !== originalTransform;
+    return currentTransform !== this.projectTransform;
   }
 
   async waitForProjectsToLoad(): Promise<void> {

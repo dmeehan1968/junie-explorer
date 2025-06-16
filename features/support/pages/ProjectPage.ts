@@ -29,11 +29,8 @@ export class ProjectPage extends BasePage {
     noIssuesMessage: '[data-testid="no-issues-message"]'
   };
 
-  private baseUrl: string;
-
   constructor(page: Page, baseUrl: string) {
-    super(page);
-    this.baseUrl = baseUrl;
+    super(page, baseUrl);
   }
 
   async visitProjectDetailsPage(projectName: string): Promise<void> {

@@ -3,138 +3,62 @@ import { expect } from '@playwright/test'
 import { JetBrains } from "../../src/jetbrains.js"
 import { ICustomWorld } from '../support/world.js'
 
-// Background steps
-Given('the application has access to the JetBrains logs directory', async function (this: ICustomWorld) {
-  expect(this.jetBrainsInstance).toBeDefined();
-});
-
-Given('the user has a web browser', async function (this: ICustomWorld) {
-  // This step is satisfied by our browser initialization in the hooks
-  expect(this.page).toBeDefined();
-  expect(this.browser).toBeDefined();
-});
-
-// Common steps used across scenarios
-Given('there are JetBrains projects in the logs', async function (this: ICustomWorld) {
+Given('there are Junie projects in the logs', async function (this: ICustomWorld) {
   // use conditional assignment, test logs should be created in the hooks
   this.jetBrainsInstance ??= new JetBrains('./fixtures/test-logs')
 });
 
-Given('there are no JetBrains projects in the logs', async function (this: ICustomWorld) {
+Given('there are no Junie projects in the logs', async function (this: ICustomWorld) {
   // override the existing logs
   this.jetBrainsInstance = new JetBrains('./fixtures/no-logs')
 })
 
 When('the user visits the homepage', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-  await this.homePage.visitHomepage();
+  await this.homePage.visit();
 });
 
-// First scenario: Homepage title
 Then('the user should see a page titled {string}', async function (this: ICustomWorld, expectedTitle: string) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const actualTitle = await this.homePage.getPageTitle();
-  expect(actualTitle).toBe(expectedTitle);
+  await expect(this.homePage.getPageTitle()).resolves.toEqual(expectedTitle);
 });
 
-// Second scenario: Logs directory path display
 Then('the user should see the path to the JetBrains logs directory', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const isVisible = await this.homePage.isLogsDirectoryPathVisible();
-  expect(isVisible).toBe(true);
+  await expect(this.homePage.isLogsDirectoryPathVisible()).resolves.toEqual(true);
 });
 
 Given('the user should see a message indicating no projects were found', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
   await this.homePage.isEmptyProjectsMessageVisible()
 })
 
-// Third scenario: Projects list display
-Then('the user should see a list of all JetBrains projects', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const isVisible = await this.homePage.isProjectsListVisible();
-  expect(isVisible).toBe(true);
-
-  const projectsCount = await this.homePage.getProjectsCount();
-  expect(projectsCount).toBeGreaterThan(0);
+Then('the user should see a list of projects', async function (this: ICustomWorld) {
+  await expect(this.homePage.isProjectsListVisible()).resolves.toEqual(true);
+  await expect(this.homePage.projectCount()).resolves.toBeGreaterThan(0);
 });
 
-// Fourth scenario: Project name display
 Then('each project should display its name', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const areNamesVisible = await this.homePage.areProjectNamesVisible();
-  expect(areNamesVisible).toBe(true);
+  await expect(this.homePage.areProjectNamesVisible()).resolves.toEqual(true);
 });
 
-// Fifth scenario: IDE icons display
 Then('each project should display icons for the IDEs it was used with', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const areIconsVisible = await this.homePage.areIdeIconsVisible();
-  expect(areIconsVisible).toBe(true);
+  await expect(this.homePage.areIdeIconsVisible()).resolves.toEqual(true);
 });
 
-// Sixth scenario: Reload button display
 Then('the user should see a reload button in the header', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const isVisible = await this.homePage.isReloadButtonVisible();
-  expect(isVisible).toBe(true);
+  await expect(this.homePage.isReloadButtonVisible()).resolves.toEqual(true);
 });
 
-// Seventh scenario: Reload button functionality
 When('the user clicks the reload button', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
   await this.homePage.clickReloadButton();
 });
 
 Then('the reload button should indicate loading', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
   await this.homePage.isReloadButtonLoading()
 });
 
-// Eighth scenario: IDE filter toolbar display
 Then('the user should see a toolbar with IDE filters', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const isVisible = await this.homePage.isIdeFilterToolbarVisible();
-  expect(isVisible).toBe(true);
+  await expect(this.homePage.isIdeFilterToolbarVisible()).resolves.toEqual(true);
 });
 
-// Ninth scenario: IDE filter functionality
 When('the user toggles an IDE filter', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  // Get the first available IDE filter and toggle it
   const firstIdeName = await this.homePage.getFirstIdeFilterName();
   if (firstIdeName) {
     await this.homePage.toggleIdeFilter(firstIdeName);
@@ -142,78 +66,37 @@ When('the user toggles an IDE filter', async function (this: ICustomWorld) {
 });
 
 Then('only projects associated with the selected IDEs should be displayed', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
+  const visibleCount = await this.homePage.visibleProjectCount();
+  const totalCount = await this.homePage.projectCount();
 
-  // This step verifies that filtering is working by checking that the visible project count
-  // is different from the total project count (assuming some projects are filtered out)
-  const visibleCount = await this.homePage.getVisibleProjectsCount();
-  const totalCount = await this.homePage.getProjectsCount();
-
-  // The visible count should be less than or equal to the total count
   expect(visibleCount).toBeLessThanOrEqual(totalCount);
 });
 
-// Tenth scenario: Project search display
 Then('the user should see a search input field for filtering projects by name', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const isVisible = await this.homePage.isProjectSearchInputVisible();
-  expect(isVisible).toBe(true);
+  await expect(this.homePage.isProjectSearchInputVisible()).resolves.toEqual(true);
 });
 
-// Eleventh scenario: Project search functionality
 When('the user enters text in the project search field', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  // Search for a common term that might match some projects
-  await this.homePage.searchProjects('test');
+  await this.homePage.searchProjects('narrowboats');
 });
 
 Then('only projects with names containing the search text should be displayed', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
+  const visibleCount = await this.homePage.visibleProjectCount();
+  const totalCount = await this.homePage.projectCount();
 
-  // This step verifies that search filtering is working
-  const visibleCount = await this.homePage.getVisibleProjectsCount();
-  const totalCount = await this.homePage.getProjectsCount();
-
-  // The visible count should be less than or equal to the total count
   expect(visibleCount).toBeLessThanOrEqual(totalCount);
 });
 
-// Twelfth scenario: No matching projects message
 When('the user applies filters that result in no matching projects', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
   await this.homePage.applyFiltersWithNoResults();
 });
 
 Then('the user should see a message indicating no matching projects were found', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const isVisible = await this.homePage.isNoMatchingProjectsMessageVisible();
-  expect(isVisible).toBe(true);
+  await expect(this.homePage.isNoMatchingProjectsMessageVisible()).resolves.toEqual(true);
 });
 
-// @wip scenario: Filter persistence
 Given('the user has applied IDE filters', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  // First visit the homepage to ensure we're on the right page
-  await this.homePage.visitHomepage();
+  await this.homePage.visit();
 
   // Get the initial state of all filters (all should be enabled by default)
   const initialFilters = await this.homePage.getSelectedIdeFilters();
@@ -223,107 +106,50 @@ Given('the user has applied IDE filters', async function (this: ICustomWorld) {
   }
 
   // Toggle the first filter to disable it, creating a specific filter state
-  const firstIdeName = initialFilters[0];
-  await this.homePage.toggleIdeFilter(firstIdeName);
+  await this.homePage.toggleIdeFilter(initialFilters[0]);
 
   // Store the current filter state for later verification
   this.appliedFilters = await this.homePage.getSelectedIdeFilters();
 });
 
 When('the user refreshes the page', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
   await this.homePage.refreshPage();
 });
 
 Then('the previously selected IDE filters should be preserved', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
   if (!this.appliedFilters || this.appliedFilters.length === 0) {
     throw new Error('No applied filters found in test context');
   }
 
-  const areFiltersPreserved = await this.homePage.areIdeFiltersSelected(this.appliedFilters);
-  expect(areFiltersPreserved).toBe(true);
+  await expect(this.homePage.areIdeFiltersSelected(this.appliedFilters)).resolves.toEqual(true);
 });
 
-// @wip scenarios: Mobile responsive layout
 When('the user visits the homepage on a mobile device', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  // Set mobile viewport
   await this.homePage.setMobileViewport();
-
-  // Visit the homepage
-  await this.homePage.visitHomepage();
+  await this.homePage.visit();
 });
 
 Then('the page should adjust its layout to fit the smaller screen', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const isResponsive = await this.homePage.isLayoutResponsive();
-  expect(isResponsive).toBe(true);
+  await expect(this.homePage.isLayoutResponsive()).resolves.toEqual(true);
 });
 
 Then('all projects should still be visible and accessible', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  const areAccessible = await this.homePage.areProjectsAccessibleOnMobile();
-  expect(areAccessible).toBe(true);
+  await expect(this.homePage.areProjectsAccessibleOnMobile()).resolves.toEqual(true);
 });
 
-// @wip scenarios: Project hover effects
 When('the user hovers over a project item', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  // First visit the homepage to ensure we're on the right page
-  await this.homePage.visitHomepage();
-
-  // Wait for projects to be visible
   await this.homePage.waitForProjectsToLoad();
 
-  // Store original state before hovering
-  this.originalBackgroundColor = await this.homePage.getProjectBackgroundColor(0);
-  this.originalTransform = await this.homePage.getProjectTransform(0);
+  await this.homePage.memoizeProjectBackgroundColor(0);
+  await this.homePage.memoizeProjectTransform(0);
 
-  // Hover over the first project
   await this.homePage.hoverOverProject(0);
 });
 
 Then('the item should change its background color', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  if (!this.originalBackgroundColor) {
-    throw new Error('Original background color not stored');
-  }
-
-  const hasColorChanged = await this.homePage.hasProjectColorChanged(0, this.originalBackgroundColor);
-  expect(hasColorChanged).toBe(true);
+  await expect(this.homePage.hasProjectBackgroundColorChanged(0)).resolves.toEqual(true);
 });
 
 Then('the item should slightly move to indicate interactivity', async function (this: ICustomWorld) {
-  if (!this.homePage) {
-    throw new Error('HomePage not initialized');
-  }
-
-  if (!this.originalTransform) {
-    throw new Error('Original transform not stored');
-  }
-
-  const hasMoved = await this.homePage.hasProjectMoved(0, this.originalTransform);
-  expect(hasMoved).toBe(true);
+  await expect(this.homePage.hasProjectMoved(0)).resolves.toEqual(true);
 });
