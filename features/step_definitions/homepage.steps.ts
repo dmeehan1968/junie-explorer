@@ -110,7 +110,7 @@ When('the user clicks the reload button', async function (this: ICustomWorld) {
   await this.homePage.clickReloadButton();
 });
 
-Then('the reload button should indicate loading', { timeout: 20000 }, async function (this: ICustomWorld) {
+Then('the reload button should indicate loading', async function (this: ICustomWorld) {
   if (!this.homePage) {
     throw new Error('HomePage not initialized');
   }
