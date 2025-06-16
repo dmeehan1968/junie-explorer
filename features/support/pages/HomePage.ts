@@ -13,6 +13,7 @@ export class HomePage extends BasePage {
     projectName: '[data-testid="project-name"]',
     ideIcons: '[data-testid="ide-icons"]',
     ideFilterToolbar: '[data-testid="ide-filter-toolbar"]',
+    ideFilter: '[data-testid="ide-filter"]',
     projectSearchInput: '[data-testid="project-search"]',
     noMatchingProjectsMessage: '[data-testid="no-matching-projects"]',
     emptyProjectsMessage: '[data-testid="empty-projects-message"]'
@@ -90,7 +91,7 @@ export class HomePage extends BasePage {
   }
 
   async toggleIdeFilter(ideName: string): Promise<void> {
-    const ideFilter = this.page.locator(`[data-ide="${ideName}"]`);
+    const ideFilter = this.page.locator(`${this.selectors.ideFilter}[data-ide="${ideName}"]`);
     await ideFilter.click();
   }
 
@@ -99,7 +100,7 @@ export class HomePage extends BasePage {
   }
 
   async getFirstIdeFilterName(): Promise<string> {
-    const firstIdeFilter = this.page.locator('.ide-filter').first();
+    const firstIdeFilter = this.page.locator(this.selectors.ideFilter).first();
     return await firstIdeFilter.getAttribute('data-ide') || '';
   }
 
@@ -111,7 +112,7 @@ export class HomePage extends BasePage {
 
   async getSelectedIdeFilters(): Promise<string[]> {
     // Get all enabled IDE filters (those without the 'ide-filter-disabled' class)
-    const enabledFilters = await this.page.locator('.ide-filter:not(.ide-filter-disabled)').all();
+    const enabledFilters = await this.page.locator(`${this.selectors.ideFilter}:not(.ide-filter-disabled)`).all();
     const filterNames: string[] = [];
 
     for (const filter of enabledFilters) {
