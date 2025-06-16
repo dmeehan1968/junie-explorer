@@ -34,36 +34,6 @@ p {
   color: #666;
 }
 
-/* IDE List Styles */
-.ide-list {
-  list-style: none;
-}
-
-.ide-item {
-  padding: 15px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  border-left: 4px solid #3498db;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.ide-item:hover {
-  background-color: #eef7ff;
-  transform: translateX(5px);
-}
-
-.ide-name {
-  font-weight: bold;
-  font-size: 18px;
-  color: #2980b9;
-}
-
-.ide-link {
-  text-decoration: none;
-  display: block;
-  color: inherit;
-}
 
 /* Project List Styles */
 .project-list {
@@ -164,20 +134,6 @@ p {
   color: #6c757d;
 }
 
-/* Keep back-link for backward compatibility */
-.back-link {
-  display: inline-block;
-  margin-bottom: 20px;
-  color: #3498db;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s ease;
-}
-
-.back-link:hover {
-  color: #2980b9;
-  text-decoration: underline;
-}
 
 /* Header container for title and reload button */
 .header-container {
@@ -246,23 +202,6 @@ p {
   100% { transform: rotate(360deg); }
 }
 
-/* Keep refresh-button for backward compatibility */
-.refresh-button {
-  display: inline-block;
-  padding: 8px 16px;
-  background-color: #3498db;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-  margin-bottom: 20px;
-}
-
-.refresh-button:hover {
-  background-color: #2980b9;
-  text-decoration: none;
-}
 
 /* Issue List Styles */
 .issue-list {
@@ -471,38 +410,9 @@ p {
   font-size: 16px;
 }
 
-.plan-list {
-  list-style: none;
-  padding-left: 5px;
-}
-
 .plan-content {
   padding-left: 5px;
   font-size: 14px;
-}
-
-.plan-item {
-  padding: 5px 0;
-  margin-bottom: 5px;
-  font-size: 14px;
-  display: flex;
-  align-items: flex-start;
-}
-
-.plan-item:last-child {
-  margin-bottom: 0;
-}
-
-.plan-done {
-  color: #27ae60;
-}
-
-.plan-in_progress {
-  color: #3498db;
-}
-
-.plan-pending {
-  color: #95a5a6;
 }
 
 .issue-details {
@@ -1071,7 +981,7 @@ p {
     padding: 15px;
   }
 
-  .ide-item, .project-item, .issue-item {
+  .project-item, .issue-item {
     padding: 10px;
   }
 
