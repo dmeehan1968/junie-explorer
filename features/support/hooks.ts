@@ -3,8 +3,6 @@ import { ICustomWorld } from './world.js';
 import { createServer } from '../../src/index.js';
 import { JetBrains } from '../../src/jetbrains.js';
 import { Server } from 'http';
-import path from 'path';
-import os from 'os';
 
 // Global server instance for all tests
 let globalServer: Server;
