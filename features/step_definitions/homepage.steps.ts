@@ -1,13 +1,11 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
+import { JetBrains } from "../../src/jetbrains.js"
 import { ICustomWorld } from '../support/world.js';
 
 // Background steps
 Given('the application has access to the JetBrains logs directory', async function (this: ICustomWorld) {
-  // This step assumes the application is running and has access to the logs directory
-  // In a real test environment, we might want to verify this by checking if the server is running
-  // For now, we'll just mark this as a precondition that should be met
-  expect(this.homePage).toBeDefined();
+  expect(this.jetBrainsInstance).toBeDefined();
 });
 
 Given('the user has a web browser', async function (this: ICustomWorld) {
@@ -18,11 +16,14 @@ Given('the user has a web browser', async function (this: ICustomWorld) {
 
 // Common steps used across scenarios
 Given('there are JetBrains projects in the logs', async function (this: ICustomWorld) {
-  // This step assumes that the application has projects to display
-  // In a real test environment, we might want to set up test data
-  // For now, we'll assume the application has access to real or mock data
-  expect(this.homePage).toBeDefined();
+  // use conditional assignment, test logs should be created in the hooks
+  this.jetBrainsInstance ??= new JetBrains('./fixtures/test-logs')
 });
+
+Given('there are no JetBrains projects in the logs', async function (this: ICustomWorld) {
+  // override the existing logs
+  this.jetBrainsInstance = new JetBrains('./fixtures/no-logs')
+})
 
 When('the user visits the homepage', async function (this: ICustomWorld) {
   if (!this.homePage) {
@@ -50,6 +51,13 @@ Then('the user should see the path to the JetBrains logs directory', async funct
   const isVisible = await this.homePage.isLogsDirectoryPathVisible();
   expect(isVisible).toBe(true);
 });
+
+Given('the user should see a message indicating no projects were found', async function (this: ICustomWorld) {
+  if (!this.homePage) {
+    throw new Error('HomePage not initialized');
+  }
+  await this.homePage.isEmptyProjectsMessageVisible()
+})
 
 // Third scenario: Projects list display
 Then('the user should see a list of all JetBrains projects', async function (this: ICustomWorld) {
