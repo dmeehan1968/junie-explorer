@@ -84,6 +84,8 @@ export class JetBrains {
 
     }
 
+    this._projects = new Map([...this._projects.entries()].sort((a, b) => a[0].localeCompare(b[0])))
+
     return this._projects
 
   }
