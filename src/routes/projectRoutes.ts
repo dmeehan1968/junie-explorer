@@ -27,12 +27,12 @@ const generateIssueMetricsTable = (issue: Issue): string => {
     </thead>
     <tbody>
       <tr>
-        <td>${new Date(issue.created).toLocaleString()}</td>
-        <td>${formatNumber(issueMetrics.inputTokens)}</td>
-        <td>${formatNumber(issueMetrics.outputTokens)}</td>
-        <td>${formatNumber(issueMetrics.cacheTokens)}</td>
-        <td>${issueMetrics.cost.toFixed(4)}</td>
-        <td>${formatSeconds(totalTime)}</td>
+        <td data-testid="issue-created-date">${new Date(issue.created).toLocaleString()}</td>
+        <td data-testid="issue-input-tokens">${formatNumber(issueMetrics.inputTokens)}</td>
+        <td data-testid="issue-output-tokens">${formatNumber(issueMetrics.outputTokens)}</td>
+        <td data-testid="issue-cache-tokens">${formatNumber(issueMetrics.cacheTokens)}</td>
+        <td data-testid="issue-cost">${issueMetrics.cost.toFixed(4)}</td>
+        <td data-testid="issue-total-time">${formatSeconds(totalTime)}</td>
       </tr>
     </tbody>
   </table>
@@ -60,7 +60,7 @@ const generateProjectSummaryTable = (issues: Issue[]): string => {
   return `
   <div class="project-summary">
     <h3>Project Summary</h3>
-    <table class="project-summary-table">
+    <table class="project-summary-table" data-testid="project-summary-table">
       <thead>
         <tr>
           <th>Input Tokens</th>
@@ -73,12 +73,12 @@ const generateProjectSummaryTable = (issues: Issue[]): string => {
       </thead>
       <tbody>
         <tr>
-          <td>${formatNumber(projectMetrics.inputTokens)}</td>
-          <td>${formatNumber(projectMetrics.outputTokens)}</td>
-          <td>${formatNumber(projectMetrics.cacheTokens)}</td>
-          <td>${projectMetrics.cost.toFixed(4)}</td>
-          <td>${formatSeconds(totalTime)}</td>
-          <td>${formatElapsedTime(elapsedTimeSec)}</td>
+          <td data-testid="summary-input-tokens">${formatNumber(projectMetrics.inputTokens)}</td>
+          <td data-testid="summary-output-tokens">${formatNumber(projectMetrics.outputTokens)}</td>
+          <td data-testid="summary-cache-tokens">${formatNumber(projectMetrics.cacheTokens)}</td>
+          <td data-testid="summary-cost">${projectMetrics.cost.toFixed(4)}</td>
+          <td data-testid="summary-total-time">${formatSeconds(totalTime)}</td>
+          <td data-testid="summary-elapsed-time">${formatElapsedTime(elapsedTimeSec)}</td>
         </tr>
       </tbody>
     </table>
@@ -190,38 +190,38 @@ router.get('/project/:projectName', (req, res) => {
         <div class="container">
           <div class="header-container">
             <h1>Junie Explorer: ${project.name}</h1>
-            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+            <button id="reload-button" class="reload-button" data-testid="reload-button" onclick="reloadPage()">Reload</button>
           </div>
-          <nav aria-label="breadcrumb">
+          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
               <li class="breadcrumb-item">${project.name}</li>
             </ol>
           </nav>
 
-          <div class="ide-icons">
+          <div class="ide-icons" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
               <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
 
           ${project.issues.size > 0
-      ? `<div class="graph-container">
+      ? `<div class="graph-container" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>
               ${generateProjectSummaryTable([...project.issues.values()])}`
       : ''
     }
 
-          <ul class="issue-list">
+          <ul class="issue-list" data-testid="issues-list">
             ${project.issues.size > 0
       ? [...project.issues.values()].map(issue => {
         return `
                     <li class="issue-item">
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link">
+                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link" data-testid="issue-link">
                         <div class="issue-container">
-                          <div class="issue-name">${escapeHtml(issue.name)}</div>
-                          <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
+                          <div class="issue-name" data-testid="issue-name">${escapeHtml(issue.name)}</div>
+                          <div class="issue-state state-${issue.state.toLowerCase()}" data-testid="issue-state">${issue.state}</div>
                         </div>
                         <div class="issue-metrics">
                           ${generateIssueMetricsTable(issue)}
@@ -230,7 +230,7 @@ router.get('/project/:projectName', (req, res) => {
                     </li>
                   `
       }).join('')
-      : '<li>No issues found for this project</li>'
+      : '<li data-testid="no-issues-message">No issues found for this project</li>'
     }
           </ul>
         </div>

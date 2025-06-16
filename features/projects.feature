@@ -10,6 +10,7 @@ Feature: Project Details Page
 
   Scenario: Navigating from homepage to project details page
     Given there are JetBrains projects in the logs
+    And the user visits the homepage
     When the user clicks on a project link on the homepage
     Then the user should be taken to a page for that specific project
     And the user should see a page titled with the project name

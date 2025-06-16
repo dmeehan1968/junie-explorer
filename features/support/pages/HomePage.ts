@@ -254,4 +254,8 @@ export class HomePage extends BasePage {
   async waitForProjectsToLoad(): Promise<void> {
     await this.waitForSelector(this.selectors.projectItem);
   }
+
+  async clickFirstProjectLink(): Promise<void> {
+    await this.click(`${this.selectors.projectItem}:first-child`);
+  }
 }
