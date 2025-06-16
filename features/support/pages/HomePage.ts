@@ -3,6 +3,7 @@ import { BasePage } from './BasePage.js'
 export class HomePage extends BasePage {
   private projectBackgroundColor?: string;
   private projectTransform?: string;
+  private ideFilters?: string[];
 
   private readonly selectors = {
     pageTitle: 'h1',
@@ -11,7 +12,6 @@ export class HomePage extends BasePage {
     projectItem: '[data-testid="project-item"]',
     projectName: '[data-testid="project-name"]',
     ideIcons: '[data-testid="ide-icons"]',
-    reloadButton: '[data-testid="reload-button"]',
     ideFilterToolbar: '[data-testid="ide-filter-toolbar"]',
     projectSearchInput: '[data-testid="project-search"]',
     noMatchingProjectsMessage: '[data-testid="no-matching-projects"]',
@@ -58,20 +58,6 @@ export class HomePage extends BasePage {
     const ideIcons = await this.page.locator(this.selectors.ideIcons);
     const count = await ideIcons.count();
     return count > 0;
-  }
-
-  async isReloadButtonVisible(): Promise<boolean> {
-    return await this.isVisible(this.selectors.reloadButton);
-  }
-
-  async isReloadButtonLoading(): Promise<boolean> {
-    const reloadButton = this.page.locator(this.selectors.reloadButton);
-    const cls = await reloadButton.getAttribute('class')
-    return cls?.includes('loading') ?? false
-  }
-
-  async clickReloadButton(): Promise<void> {
-    await this.click(this.selectors.reloadButton);
   }
 
   async isIdeFilterToolbarVisible(): Promise<boolean> {
@@ -138,6 +124,10 @@ export class HomePage extends BasePage {
     return filterNames;
   }
 
+  async memoizeIdeFilters(): Promise<void> {
+    this.ideFilters = await this.getSelectedIdeFilters();
+  }
+
   async applyIdeFilters(ideNames: string[]): Promise<void> {
     // Apply multiple IDE filters
     for (const ideName of ideNames) {
@@ -150,11 +140,15 @@ export class HomePage extends BasePage {
     await this.waitForNavigation();
   }
 
-  async areIdeFiltersSelected(expectedFilters: string[]): Promise<boolean> {
+  async areIdeFiltersSelected(): Promise<boolean> {
+    if (!this.ideFilters) {
+      throw new Error('Ide filters not memoized');
+    }
+
     const selectedFilters = await this.getSelectedIdeFilters();
 
     // Check if all expected filters are selected
-    for (const expectedFilter of expectedFilters) {
+    for (const expectedFilter of this.ideFilters) {
       if (!selectedFilters.includes(expectedFilter)) {
         return false;
       }
@@ -162,7 +156,7 @@ export class HomePage extends BasePage {
 
     // Check if no unexpected filters are selected
     for (const selectedFilter of selectedFilters) {
-      if (!expectedFilters.includes(selectedFilter)) {
+      if (!this.ideFilters.includes(selectedFilter)) {
         return false;
       }
     }
