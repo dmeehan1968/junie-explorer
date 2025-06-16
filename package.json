@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/index.ts",
-    "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @skip\"",
+    "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @pending\"",
     "playwright:install": "playwright install"
   },
   "dependencies": {
