@@ -1,7 +1,7 @@
-import { Given, When, Then } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
+import { Given, Then, When } from '@cucumber/cucumber'
+import { expect } from '@playwright/test'
 import { JetBrains } from "../../src/jetbrains.js"
-import { ICustomWorld } from '../support/world.js';
+import { ICustomWorld } from '../support/world.js'
 
 // Background steps
 Given('the application has access to the JetBrains logs directory', async function (this: ICustomWorld) {
@@ -226,11 +226,8 @@ Given('the user has applied IDE filters', async function (this: ICustomWorld) {
   const firstIdeName = initialFilters[0];
   await this.homePage.toggleIdeFilter(firstIdeName);
 
-  // Get the current filter state after toggling
-  const currentFilters = await this.homePage.getSelectedIdeFilters();
-
   // Store the current filter state for later verification
-  this.appliedFilters = currentFilters;
+  this.appliedFilters = await this.homePage.getSelectedIdeFilters();
 });
 
 When('the user refreshes the page', async function (this: ICustomWorld) {
