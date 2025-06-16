@@ -949,11 +949,6 @@ p {
     padding: 10px;
   }
 
-  .issue-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .task-content-container {
     flex-direction: column;
   }
