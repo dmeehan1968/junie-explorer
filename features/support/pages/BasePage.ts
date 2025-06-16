@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test'
+import path from "path"
 
 export abstract class BasePage {
 
@@ -11,8 +12,8 @@ export abstract class BasePage {
     await this.page.goto(url);
   }
 
-  async visit(): Promise<void> {
-    await this.navigateTo(this.baseUrl);
+  async visit(relativePath: string = ''): Promise<void> {
+    await this.navigateTo(path.join(this.baseUrl, relativePath));
   }
 
   async getTitle(): Promise<string> {

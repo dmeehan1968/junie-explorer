@@ -6,6 +6,8 @@ import { JetBrains } from '../../src/jetbrains.js';
 import { Server } from 'http';
 
 export interface ICustomWorld extends World {
+  server?: Server;
+  serverPort?: number;
   homePage: HomePage;
   projectPage: ProjectPage;
   jetBrainsInstance?: JetBrains;
@@ -14,8 +16,8 @@ export interface ICustomWorld extends World {
 }
 
 export class CustomWorld extends World implements ICustomWorld {
-  private server?: Server;
-  private serverPort?: number;
+  server?: Server;
+  serverPort?: number;
   _homePage?: HomePage;
   _projectPage?: ProjectPage;
   jetBrainsInstance?: JetBrains;
