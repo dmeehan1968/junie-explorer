@@ -36,7 +36,7 @@ export const TasksInfo = z.object({
 export type TasksInfo = z.infer<typeof TasksInfo>
 
 export const AgentIssue = z.object({
-  description: z.string(),
+  description: z.string().nullish(),
   editorContext: z.object({
     recentFiles: z.string().array(),
     openFiles: z.string().array(),
