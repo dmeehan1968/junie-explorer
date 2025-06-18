@@ -1,17 +1,19 @@
-import { Before, After, BeforeAll, AfterAll } from '@cucumber/cucumber';
-import { ICustomWorld } from './world.js';
-import { createServer } from '../../src/index.js';
-import { JetBrains } from '../../src/jetbrains.js';
-import { Server } from 'http';
+import { After, AfterAll, Before, BeforeAll } from '@cucumber/cucumber'
+import { Server } from 'http'
+import { createServer } from '../../src/index.js'
+import { JetBrains } from '../../src/jetbrains.js'
+import { MuteLogger } from "./MuteLogger.js"
+import { ICustomWorld } from './world.js'
 
 // Global server instance for all tests
 let globalServer: Server;
 let globalJetBrainsInstance: JetBrains;
 let globalServerPort: number;
 
+
 BeforeAll(async function () {
   // Create a custom JetBrains instance with the test log path
-  globalJetBrainsInstance = new JetBrains(process.env.JETBRAINS_LOG_PATH);
+  globalJetBrainsInstance = new JetBrains({ logPath: process.env.JETBRAINS_LOG_PATH, logger: MuteLogger });
 
   // Use a different port than the default to avoid conflicts
   globalServerPort = 3001;

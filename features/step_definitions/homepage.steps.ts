@@ -1,16 +1,17 @@
 import { Given, Then, When } from '@cucumber/cucumber'
 import { expect } from '@playwright/test'
 import { JetBrains } from "../../src/jetbrains.js"
+import { MuteLogger } from "../support/MuteLogger.js"
 import { ICustomWorld } from '../support/world.js'
 
 Given('there are Junie projects in the logs', async function (this: ICustomWorld) {
   // use conditional assignment, test logs should be created in the hooks
-  this.jetBrainsInstance ??= new JetBrains('./fixtures/test-logs')
+  this.jetBrainsInstance ??= new JetBrains({ logPath: './fixtures/test-logs', logger: MuteLogger })
 });
 
 Given('there are no Junie projects in the logs', async function (this: ICustomWorld) {
   // override the existing logs
-  this.jetBrainsInstance = new JetBrains('./fixtures/no-logs')
+  this.jetBrainsInstance = new JetBrains({ logPath: './fixtures/no-logs', logger: MuteLogger })
 })
 
 When('the user visits the homepage', async function (this: ICustomWorld) {

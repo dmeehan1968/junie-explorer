@@ -2,16 +2,19 @@ import fs from "fs-extra"
 import path from "path"
 import { inspect } from "util"
 import { Issue } from "./Issue.js"
+import { Logger } from "./jetbrains.js"
 import { SummaryMetrics } from "./schema.js"
 
 export class Project {
   private _logPaths: string[] = []
   private _metrics: SummaryMetrics | undefined
   private _ideNames: Set<string> = new Set()
+  private readonly logger: Logger
 
-  constructor(public readonly name: string, logPath: string, ideName: string) {
+  constructor(public readonly name: string, logPath: string, ideName: string, logger?: Logger ) {
     this._logPaths.push(logPath)
     this._ideNames.add(ideName)
+    this.logger = logger ?? console
   }
 
   private _issues: Map<string, Issue> = new Map()
@@ -21,7 +24,7 @@ export class Project {
     }
 
     for (const logPath of this._logPaths) {
-      console.log('From:', logPath)
+      this.logger.log('From:', logPath)
       const root = path.join(logPath, 'issues', 'chain-*.json')
       fs.globSync(root)
         .map(path => new Issue(path))
