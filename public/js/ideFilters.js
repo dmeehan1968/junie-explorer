@@ -82,7 +82,7 @@ function applyFilters(ideFilters, searchTerm = '') {
 
     // Check if project matches both IDE filter and search term
     const matchesIdeFilter = projectIdes.some(ide => ideFilters[ide]);
-    const matchesSearchTerm = searchTerm === '' || projectName.includes(searchTerm.toLowerCase());
+    const matchesSearchTerm = searchTerm === '' || projectName.includes(searchTerm);
     const shouldShow = matchesIdeFilter && matchesSearchTerm;
 
     if (shouldShow) {
