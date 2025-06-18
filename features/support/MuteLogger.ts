@@ -1,0 +1,4 @@
+export const MuteLogger = {
+  log: () => {
+  },
+}

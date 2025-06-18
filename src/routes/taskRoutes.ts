@@ -1,12 +1,11 @@
 import express from 'express'
 import fs from "fs-extra"
 import { marked } from 'marked'
-import { isPromise } from "node:util/types"
 import path from "path"
+import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
-import { jetBrains } from "../jetbrains.js"
 import { Step } from "../Step.js"
 
 const router = express.Router()
@@ -130,6 +129,7 @@ const metricsHeaders = `
 
 // Task steps page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
     const project = jetBrains.getProjectByName(projectName)
@@ -178,11 +178,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
             <h1>Junie Explorer: Task ${task.id}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
-          <nav aria-label="breadcrumb">
+          <nav aria-label="breadcrumb" data-testi="breadcrumb-navigation">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}">${issue?.name}</a></li>
+              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-task-name">${issue?.name}</a></li>
               <li class="breadcrumb-item active">Task ${task.id}</li>
             </ol>
           </nav>
@@ -304,6 +304,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
 
 // API endpoint to get step data for a specific task
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId, stepIndex } = req.params
     const project = jetBrains.getProjectByName(projectName)
@@ -325,6 +326,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
 
 // API endpoint to get representations for a specific step
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex/representations', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId, stepIndex } = req.params
     const project = jetBrains.getProjectByName(projectName)

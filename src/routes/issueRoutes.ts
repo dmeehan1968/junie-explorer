@@ -1,6 +1,6 @@
 import express from 'express'
-import { marked } from 'marked'
-import { jetBrains } from '../jetbrains.js'
+import { marked } from "marked"
+import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
@@ -14,7 +14,7 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
   const totalTime = summaryData.buildTime + summaryData.modelTime / 1000 + summaryData.artifactTime + summaryData.modelCachedTime / 1000
 
   return `
-  <table class="step-totals-table">
+  <table class="step-totals-table" data-testid="task-metrics">
     <tbody>
       <tr>
         <td>Input Tokens: ${summaryData.inputTokens}</td>
@@ -30,6 +30,7 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
 
 // Issue tasks page route
 router.get('/project/:projectName/issue/:issueId', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId } = req.params
     const project = jetBrains.getProjectByName(projectName)
@@ -60,26 +61,26 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
             <h1>Junie Explorer: ${escapeHtml(issue.name)}</h1>
             <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
           </div>
-          <nav aria-label="breadcrumb">
+          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
               <li class="breadcrumb-item active">${escapeHtml(issue.name)}</li>
             </ol>
           </nav>
 
-          <div class="ide-icons">
+          <div class="ide-icons" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
               <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
             `).join('')}
           </div>
 
           <div class="issue-details">
-            <div class="issue-created">Created: ${new Date(issue.created).toLocaleString()}</div>
-            <div class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</div>
+            <div class="issue-created" data-testid="issue-date">Created: ${new Date(issue.created).toLocaleString()}</div>
+            <div class="issue-state state-${issue.state.toLowerCase()}" data-testid="issue-state">${issue.state}</div>
           </div>
 
-          <ul class="task-list">
+          <ul class="task-list" data-testid="tasks-list">
             ${issue.tasks.size > 0
       ? [...issue.tasks.values()].map((task, index) => {
         // Calculate step totals for this task
@@ -87,26 +88,26 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
 
         return `
                     <li class="task-item">
-                      <div class="task-header">
-                        <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
-                        <div class="task-date">
-                          Created: ${new Date(task.created).toLocaleString()}
-                          <button class="toggle-raw-data" data-task="${index}">JSON</button>
+                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-link" data-testid="task-link">
+                        <div class="task-header">
+                          <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
+                          <div class="task-date">
+                            Created: ${new Date(task.created).toLocaleString()}
+                            <button class="toggle-raw-data" data-task="${index}" data-testid="json-button">JSON</button>
+                          </div>
                         </div>
-                      </div>
-                      <div id="raw-data-${index}" class="raw-data-container" style="display: none;">
-                        <div id="json-renderer-${index}" class="json-renderer"></div>
-                      </div>
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-link">
-                        ${task.context.description ? `<div class="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
-                        <div class="task-details">
+                        <div id="raw-data-${index}" class="raw-data-container" data-testid="json-viewer" style="display: none;">
+                          <div id="json-renderer-${index}" class="json-renderer"></div>
+                        </div>
+                        ${task.context.description ? `<div class="task-description" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                        <div class="task-details" data-testid="task-details">
                           ${generateStepTotalsTable(stepTotals)}
                         </div>
                       </a>
                     </li>
                   `
       }).join('')
-      : '<li>No tasks found for this issue</li>'
+      : '<li data-testid="no-tasks-message">No tasks found for this issue</li>'
     }
           </ul>
         </div>
@@ -123,6 +124,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
 
 // API endpoint to get task data for a specific issue
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
     const project = jetBrains.getProjectByName(projectName)

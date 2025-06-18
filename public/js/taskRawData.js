@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Add click handlers to the toggle buttons
   const toggleButtons = document.querySelectorAll('.toggle-raw-data');
   toggleButtons.forEach(button => {
-    button.addEventListener('click', function() {
+    button.addEventListener('click', function(event) {
+      event.preventDefault();
       const taskId = this.getAttribute('data-task');
       const container = document.getElementById(`raw-data-${taskId}`);
 

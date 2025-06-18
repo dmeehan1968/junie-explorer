@@ -76,6 +76,7 @@ function applyFilters(ideFilters, searchTerm = '') {
   let visibleCount = 0;
 
   projectItems.forEach(item => {
+    console.log(item.getAttribute('data-ides'))
     const projectIdes = JSON.parse(item.getAttribute('data-ides') || '[]');
     const projectName = item.querySelector('.project-name').textContent.toLowerCase();
 
@@ -100,6 +101,7 @@ function applyFilters(ideFilters, searchTerm = '') {
     if (!noMatchMessage) {
       noMatchMessage = document.createElement('li');
       noMatchMessage.id = 'no-match-message';
+      noMatchMessage.setAttribute('data-testid', 'no-matching-projects');
       noMatchMessage.textContent = 'No matching projects';
       noMatchMessage.style.padding = '10px 15px';
       projectList.appendChild(noMatchMessage);

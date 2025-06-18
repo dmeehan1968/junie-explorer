@@ -11,3 +11,6 @@ yarn-error.log*
 
 .vscode/*
 /.junie-context/
+/reports/
+/test-results/
+/fixtures/

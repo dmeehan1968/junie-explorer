@@ -1,21 +1,44 @@
 import fs from "fs-extra"
 import os from "os"
 import path from "path"
+import { fileURLToPath } from "url"
 import { inspect } from 'util'
 import { Project } from "./Project.js"
 import { SummaryMetrics } from "./schema.js"
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+interface JetBrainsOptions {
+  logPath?: string
+  logger?: { log: (...message: any[]) => void }
+}
+
+export interface Logger {
+  log: (...message: any[]) => void
+}
 
 export class JetBrains {
 
+  private readonly _logPath: string | undefined
+  private readonly logger: { log: (...message: any[]) => void }
+
   private _metrics: SummaryMetrics | undefined
 
-  constructor() {
+  constructor(options?: JetBrainsOptions) {
+    if (!options) {
+      options = {}
+    }
+    if (options && !options.logger) {
+      options.logger = console
+    }
 
+    this._logPath = options.logPath
+    this.logger = options.logger ?? console
   }
 
   preload() {
-    console.log('Reading logs...')
+    this.logger.log('Reading logs...')
     this.metrics  // forces a full load
   }
 
@@ -60,7 +83,7 @@ export class JetBrains {
       const root = path.join(this.logPath, ideDir.name, 'projects')
 
       if (!fs.existsSync(root)) {
-        console.log('Skipping', ideDir.name, 'because it does not have a projects directory')
+        this.logger.log('Skipping', ideDir.name, 'because it does not have a projects directory')
         continue
       }
 
@@ -72,7 +95,7 @@ export class JetBrains {
           const existing = this._projects.get(entry.name)
           const ideName = ideDir.name.replace(/\d+(\.\d+)?/, '')
           if (!existing) {
-            this._projects.set(entry.name, new Project(entry.name, entry.logPath, ideName))
+            this._projects.set(entry.name, new Project(entry.name, entry.logPath, ideName, this.logger))
             return
           }
           existing.addLogPath(entry.logPath, ideName)
@@ -118,6 +141,11 @@ export class JetBrains {
   }
 
   get logPath() {
+    if (this._logPath) {
+      return path.join(__dirname, '..', this._logPath)
+
+    }
+
     switch (os.platform()) {
       case 'win32': // Windows
         return path.join(process.env.APPDATA || '', '..', 'Local', 'JetBrains')
@@ -148,4 +176,3 @@ export class JetBrains {
   }
 }
 
-export const jetBrains = new JetBrains()

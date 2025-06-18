@@ -7,10 +7,9 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "noEmit": false,
-    "outDir": "dist",
-    "types": ["node"],
+    "noEmit": true,
+    "types": ["node", "@playwright/test"],
     "sourceMap": true,
   },
-  "include": ["src"]
+  "include": ["src", "features"]
 }
