@@ -24,10 +24,6 @@ export class IssuePage extends BasePage {
     return await this.isVisible(this.selectors.tasksList);
   }
 
-  async areIdeIconsVisible(): Promise<boolean> {
-    return await this.isVisible(this.selectors.ideIcons);
-  }
-
   async isIssueDateVisible(): Promise<boolean> {
     return await this.isVisible(this.selectors.issueDate);
   }

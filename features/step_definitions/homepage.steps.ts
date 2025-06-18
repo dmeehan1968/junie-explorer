@@ -40,7 +40,7 @@ Then('each project should display its name', async function (this: ICustomWorld)
 });
 
 Then('each project should display icons for the IDEs it was used with', async function (this: ICustomWorld) {
-  await expect(this.homePage.areIdeIconsVisible()).resolves.toEqual(true);
+  await expect(this.ideIcons.areVisible()).resolves.toEqual(true);
 });
 
 Then('the user should see a toolbar with IDE filters', async function (this: ICustomWorld) {
@@ -138,3 +138,4 @@ Then('the item should change its background color', async function (this: ICusto
 Then('the item should slightly move to indicate interactivity', async function (this: ICustomWorld) {
   await expect(this.homePage.hasProjectMoved(0)).resolves.toEqual(true);
 });
+

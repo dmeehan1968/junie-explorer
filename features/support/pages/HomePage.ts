@@ -41,12 +41,6 @@ export class HomePage extends BasePage {
     return count > 0;
   }
 
-  async areIdeIconsVisible(): Promise<boolean> {
-    const ideIcons = await this.page.locator(this.selectors.ideIcons);
-    const count = await ideIcons.count();
-    return count > 0;
-  }
-
   async isIdeFilterToolbarVisible(): Promise<boolean> {
     return await this.isVisible(this.selectors.ideFilterToolbar);
   }
@@ -222,7 +216,7 @@ export class HomePage extends BasePage {
     await this.waitForSelector(this.selectors.projectItem);
   }
 
-  async clickFirstProjectLink(): Promise<void> {
-    await this.click(`${this.selectors.projectItem}:first-child`);
+  async clickProjectName(name: string): Promise<void> {
+    await this.click(`[data-testid="project-link-${name}"]`);
   }
 }

@@ -2,8 +2,14 @@ import { Given, Then, When } from "@cucumber/cucumber"
 import { expect } from "@playwright/test"
 import { ICustomWorld } from "../support/world.js"
 
-When('the user visits project {string} issue {string}', async function (this: ICustomWorld, projectName: string, issueId: string) {
-  await this.issuePage.visit(`project/${projectName}/issue/${issueId}`);
+When('the user visits an issue', async function (this: ICustomWorld) {
+  if (!this.currentProject) {
+    throw new Error('No project selected for the current step');
+  }
+  if (!this.currentIssue) {
+    throw new Error('No issue selected for the current step');
+  }
+  await this.issuePage.visit(`project/${this.currentProject}/issue/${this.currentIssue}`);
 });
 
 Then('the user should see a page titled with the issue name', async function (this: ICustomWorld) {
@@ -87,6 +93,7 @@ Then('the JSON viewer should be hidden', async function (this: ICustomWorld) {
   await expect(this.issuePage.isJsonViewerVisible()).resolves.toEqual(false);
 });
 
-Then('the user should see icons for each IDE that was used with the project', async function () {
-  await expect(this.issuePage.areIdeIconsVisible()).resolves.toEqual(true)
+Then('the user should see {int} or more IDE icons', async function (this: ICustomWorld, count: number) {
+  await expect(this.ideIcons.visibleCount()).resolves.toBeGreaterThanOrEqual(count)
 });
+

@@ -117,8 +117,15 @@ export class ProjectPage extends BasePage {
     return true;
   }
 
-  async clickOnFirstIssue(): Promise<void> {
-    await this.click(`${this.selectors.issueLink}:first-child`);
+  async clickOnFirstIssue(): Promise<string> {
+    const selector = `${this.selectors.issueLink}:first-child`
+    const href = await this.page.getAttribute(selector, 'href');
+    const issueId = href?.split('/').pop();
+    if (!issueId) {
+      throw new Error('Issue ID not found in URL');
+    }
+    await this.click(selector);
+    return issueId
   }
 
   async isNoIssuesMessageVisible(): Promise<boolean> {

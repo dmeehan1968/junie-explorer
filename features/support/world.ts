@@ -15,6 +15,9 @@ export class IdeIcons {
   async areVisible(): Promise<boolean> {
     return this.page.isVisible('[data-testid="ide-icons"]')
   }
+  async visibleCount(): Promise<number> {
+    return this.page.$$eval('[data-testid="ide-icons"] img', icons => icons.length)
+  }
 }
 
 export interface ICustomWorld extends World {
@@ -27,6 +30,8 @@ export interface ICustomWorld extends World {
   breadcrumb: Breadcrumb;
   ideIcons: IdeIcons;
   jetBrainsInstance?: JetBrains;
+  currentProject?: string;
+  currentIssue?: string;
   setup(): Promise<void>;
   teardown(): Promise<void>;
 }
@@ -42,6 +47,8 @@ export class CustomWorld extends World implements ICustomWorld {
   _ideIcons?: IdeIcons;
   jetBrainsInstance?: JetBrains;
   teardownActions: (() => Promise<void>)[] = []
+  currentProject?: string;
+  currentIssue?: string;
 
   constructor(options: IWorldOptions) {
     super(options);

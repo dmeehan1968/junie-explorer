@@ -289,7 +289,7 @@ router.get('/', (req, res) => {
                            data-project-name="${project.name}" 
                            onchange="handleProjectSelection(this)">
                   </div>
-                  <a href="/project/${encodeURIComponent(project.name)}" class="project-link">
+                  <a href="/project/${encodeURIComponent(project.name)}" class="project-link" data-testid="project-link-${project.name}">
                     <div class="project-name" data-testid="project-name">${project.name}</div>
                     <div class="issue-count">${project.issues.size} issues</div>
                     <div class="ide-icons" data-testid="ide-icons">
