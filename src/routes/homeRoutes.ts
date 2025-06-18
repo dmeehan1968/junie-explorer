@@ -243,7 +243,7 @@ router.get('/', (req, res) => {
           <div class="ide-filter-toolbar" data-testid="ide-filter-toolbar">
             <div class="filter-label">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
-              <div class="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
+              <div class="ide-filter" data-testid="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
                 <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" />
               </div>
             `).join('')}

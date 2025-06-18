@@ -10,10 +10,15 @@ export class Breadcrumb {
   }
 
   click(link: string): Promise<void> {
-    return this.page.click(`[data-testid="breadcrumb-${link.split(' ').map(part => part.trim().toLowerCase()).join('-')}"]`)
+    const name = link.split(' ').map(part => part.trim().toLowerCase()).join('-')
+    return this.page.click(`[data-testid="breadcrumb-${name}"]`)
   }
 
   url(): string {
     return this.page.url()
+  }
+
+  isActive(link: string): Promise<boolean> {
+    return this.page.isVisible(`breadcrumb-item active`)
   }
 }

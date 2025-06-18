@@ -11,7 +11,7 @@ export abstract class BasePage {
   }
 
   async visit(relativePath: string = ''): Promise<void> {
-    await this.navigateTo(path.join(this.baseUrl, relativePath));
+    await this.navigateTo(new URL(relativePath, this.baseUrl).toString());
   }
 
   async getTitle(): Promise<string> {
@@ -36,10 +36,6 @@ export abstract class BasePage {
 
   async type(selector: string, text: string): Promise<void> {
     await this.page.fill(selector, text);
-  }
-
-  async waitForNavigation(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
   }
 
 }

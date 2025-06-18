@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Add click handlers to the toggle REP buttons
   const toggleButtons = document.querySelectorAll('.toggle-rep-data');
   toggleButtons.forEach(button => {
-    button.addEventListener('click', function() {
+    button.addEventListener('click', function(event) {
+      event.preventDefault();
       const stepIndex = this.getAttribute('data-step');
       const container = document.getElementById(`rep-data-${stepIndex}`);
 

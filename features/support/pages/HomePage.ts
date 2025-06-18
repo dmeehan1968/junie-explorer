@@ -19,26 +19,12 @@ export class HomePage extends BasePage {
     emptyProjectsMessage: '[data-testid="empty-projects-message"]'
   } as const;
 
-  async visit(): Promise<void> {
-    await this.navigateTo(this.baseUrl);
-    await this.waitForNavigation();
-  }
-
   async getPageTitle(): Promise<string> {
     return await this.getTitle();
   }
 
-  async getPageHeading(): Promise<string> {
-    await this.waitForSelector(this.selectors.pageTitle);
-    return await this.getText(this.selectors.pageTitle);
-  }
-
   async isLogsDirectoryPathVisible(): Promise<boolean> {
     return await this.isVisible(this.selectors.logsDirectoryPath);
-  }
-
-  async getLogsDirectoryPath(): Promise<string> {
-    return await this.getText(this.selectors.logsDirectoryPath);
   }
 
   async isProjectsListVisible(): Promise<boolean> {
@@ -86,10 +72,6 @@ export class HomePage extends BasePage {
     await projectItems.nth(index).hover();
   }
 
-  async getCurrentUrl(): Promise<string> {
-    return this.page.url();
-  }
-
   async toggleIdeFilter(ideName: string): Promise<void> {
     const ideFilter = this.page.locator(`${this.selectors.ideFilter}[data-ide="${ideName}"]`);
     await ideFilter.click();
@@ -129,16 +111,8 @@ export class HomePage extends BasePage {
     this.ideFilters = await this.getSelectedIdeFilters();
   }
 
-  async applyIdeFilters(ideNames: string[]): Promise<void> {
-    // Apply multiple IDE filters
-    for (const ideName of ideNames) {
-      await this.toggleIdeFilter(ideName);
-    }
-  }
-
   async refreshPage(): Promise<void> {
     await this.page.reload();
-    await this.waitForNavigation();
   }
 
   async areIdeFiltersSelected(): Promise<boolean> {

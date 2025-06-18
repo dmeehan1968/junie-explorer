@@ -3,11 +3,7 @@ import { expect } from "@playwright/test"
 import { ICustomWorld } from "../support/world.js"
 
 When('the user visits project {string} issue {string}', async function (this: ICustomWorld, projectName: string, issueId: string) {
-  await this.issuePage.visit(`projects/${projectName}/issue/${issueId}`);
-});
-
-Given('the user visits issue {string}', async function (this: ICustomWorld, issueId: string) {
-  await this.issuePage.visit(`issue/${issueId}`);
+  await this.issuePage.visit(`project/${projectName}/issue/${issueId}`);
 });
 
 Then('the user should see a page titled with the issue name', async function (this: ICustomWorld) {
@@ -71,7 +67,7 @@ When('the user clicks on the JSON button for a task', async function (this: ICus
 });
 
 Then('a JSON viewer should be displayed showing the raw task data', async function (this: ICustomWorld) {
-  await expect(this.issuePage.isJsonViewerVisible()).resolves.toEqual(true);
+  await expect(this.issuePage.isJsonViewerCollapsed()).resolves.toEqual(false);
 });
 
 Then('the JSON data should be initially displayed in a collapsed view', async function (this: ICustomWorld) {
@@ -89,4 +85,8 @@ When('the user clicks on the JSON button again', async function (this: ICustomWo
 
 Then('the JSON viewer should be hidden', async function (this: ICustomWorld) {
   await expect(this.issuePage.isJsonViewerVisible()).resolves.toEqual(false);
+});
+
+Then('the user should see icons for each IDE that was used with the project', async function () {
+  await expect(this.issuePage.areIdeIconsVisible()).resolves.toEqual(true)
 });

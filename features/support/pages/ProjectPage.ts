@@ -5,7 +5,6 @@ export class ProjectPage extends BasePage {
   private readonly selectors = {
     pageTitle: 'h1',
     issuesList: '[data-testid="issues-list"]',
-    ideIcons: '[data-testid="ide-icons"]',
     reloadButton: '[data-testid="reload-button"]',
     costOverTimeGraph: '[data-testid="cost-over-time-graph"]',
     projectSummaryTable: '[data-testid="project-summary-table"]',
@@ -39,29 +38,8 @@ export class ProjectPage extends BasePage {
     return await this.getTitle();
   }
 
-  async getPageHeading(): Promise<string> {
-    return await this.getText(this.selectors.pageTitle);
-  }
-
-  async isProjectNameInTitle(projectName: string): Promise<boolean> {
-    const title = await this.getPageTitle();
-    return title.includes(projectName);
-  }
-
   async isIssuesListVisible(): Promise<boolean> {
     return await this.isVisible(this.selectors.issuesList);
-  }
-
-  async areIdeIconsVisible(): Promise<boolean> {
-    return await this.isVisible(this.selectors.ideIcons);
-  }
-
-  async isReloadButtonVisible(): Promise<boolean> {
-    return await this.isVisible(this.selectors.reloadButton);
-  }
-
-  async clickReloadButton(): Promise<void> {
-    await this.click(this.selectors.reloadButton);
   }
 
   async isCostOverTimeGraphVisible(): Promise<boolean> {
@@ -149,9 +127,5 @@ export class ProjectPage extends BasePage {
 
   async getCurrentUrl(): Promise<string> {
     return this.page.url();
-  }
-
-  async waitForPageLoad(): Promise<void> {
-    await this.waitForNavigation();
   }
 }

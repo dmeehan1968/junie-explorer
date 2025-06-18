@@ -42,10 +42,6 @@ Then('the user should see a list of issues available for that project', async fu
   await expect(this.projectPage.isIssuesListVisible()).resolves.toEqual(true);
 });
 
-Then('the user should see icons for each IDE that was used with the project', async function (this: ICustomWorld) {
-  await expect(this.projectPage.areIdeIconsVisible()).resolves.toEqual(true);
-});
-
 Then('the user should see a graph visualizing issue costs over time', async function (this: ICustomWorld) {
   await expect(this.projectPage.isCostOverTimeGraphVisible()).resolves.toEqual(true);
 });

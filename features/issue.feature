@@ -41,11 +41,6 @@ Feature: Issue Details Page
     And the user clicks on the "Projects" link in the breadcrumb navigation
     Then the user should be taken back to the homepage
 
-  Scenario: Navigating back to homepage
-    When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
-    And the user clicks on the "Projects" link in the breadcrumb navigation
-    Then the user should be taken back to the homepage
-
   Scenario: Issue details display
     When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
     Then the user should see the issue creation date
@@ -67,18 +62,18 @@ Feature: Issue Details Page
     Then the user should be taken to a page for that specific task
 
   Scenario: Issue without tasks reports no tasks
-    Given the user visits issue "no-tasks.999999"
+    Given the user visits project "no-tasks.999999" issue "4f066129-2524-4032-8356-5f52fa6e531d"
     Then the user should see a message indicating no tasks were found
 
   Scenario: JSON viewer button display
     When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
     Then each task should display a JSON button
+    And the JSON data should be initially displayed in a collapsed view
 
   Scenario: JSON viewer button functionality
     When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
     And the user clicks on the JSON button for a task
     Then a JSON viewer should be displayed showing the raw task data
-    And the JSON data should be initially displayed in a collapsed view
 
   Scenario: Toggling JSON viewer visibility
     When the user visits project "narrowboats.30291293" issue "4f066129-2524-4032-8356-5f52fa6e531d"
