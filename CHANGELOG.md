@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-06-18
+
+### Testing Infrastructure
+- Merge pull request #17 from dmeehan1968/feature/tests (5699263)
+- Remove unused feature files for issue cost graph, project graph, and reload button (f2f6d80)
+- Refactor project and issue step definitions for improved clarity and functionality (d856f36)
+- Introduce `MuteLogger` and refactor logging for better flexibility (2224ba2)
+- Add testability and prevent default handling across components (7e802e4)
+- Add selectors and methods for task management in `IssuePage` (fc9cfb2)
+- Add `IssuePage` class and update step definitions (157c6e8)
+- Refactor breadcrumb and reload button features (a639bf9)
+- Update and refactor issue details feature for improved clarity and modularity (11fa2df)
+- Update and refactor project details feature and related step definitions (bdea108)
+- Refactor `BasePage` and `HomePage` for reload button handling and IDE filter memoization (cb3efcc)
+- Update and refactor homepage feature (6095014)
+- Add project page support and step definitions (5d5c440)
+- Update scenario tags in feature files (b449abd)
+- Replace `@skip` tags with `@pending` and update test command (3d71332)
+- Remove `@wip` tags and enhance hover effect validation (dc834d8)
+- Enhance homepage feature with mobile responsiveness and hover effects (449eb82)
+- Refactor `homepage.steps.ts` to streamline IDE filter handling (4a5232c)
+- Remove redundant timeout from reload button step definition (dfc128d)
+- Add support for no logs jetbrains instance (68d9a36)
+- Remove unused imports in `hooks.ts` (175b650)
+- Refactor server setup and enhance test environment (4ce60fb)
+- Remove unused `.last-run.json`, update `homepage.feature`, and enhance Playwright methods (8c9d3fe)
+- Update `homepage.feature` and improve Playwright methods (0ac9416)
+- Remove `summary` formatter from Cucumber configuration (12bd1f4)
+- Remove unused Cucumber report file (28d7aaa)
+- Add `data-testid` attributes for testability and clean up unused test script (76ede63)
+- Update HTML structure in Cucumber report script (54ee4ca)
+- Add Playwright base page and Cucumber configuration (4532e10)
+- Add project graph scenarios to feature file (550d16d)
+- Remove redundant homepage scenarios (8116a57)
+
+### Features
+- Make `description` field optional in `AgentIssue` schema (57f3b7d)
+
+### UI Improvements
+- Remove unused `.issue-header` styles from `style.css` (987fb19)
+- Remove project table styles from `style.css` (57f2937)
+- Remove unused styles from `style.css` (7cac187)
+- Fix misplaced HTML structure in issue and project routes (6fb5af2)
+
+### Code Improvements
+- Sort projects alphabetically in `jetbrains.ts` (1493803)
+
+### Documentation
+- Remove unused `test-jetbrains.ts` reference in documentation (25ec3d7)
+- Update feature files to reference JetBrains logs directory (ee6a2cf)
+- Update documentation to reference JetBrains logs directory (3bd5ac6)
+- Update task steps representation image (519f6b3)
+- Add detailed user guide and images for Junie Explorer (3bd5ac6)
+
 ## [1.4.0] - 2025-06-13
 
 ### Features
