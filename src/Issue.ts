@@ -10,8 +10,8 @@ export class Issue {
   readonly created: Date
   readonly state: string
   readonly error?: any
-  readonly tasks: Map<string, Task> = new Map()
-  readonly metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+  private readonly _tasks: Map<string, Task> = new Map()
+  private _metrics?: SummaryMetrics
 
   constructor(public readonly logPath: string) {
     const issue = JunieChainSchema.safeParse(fs.readJsonSync(logPath))
@@ -24,23 +24,42 @@ export class Issue {
     this.state = issue.data.state
     this.error = issue.data.error
 
+  }
+
+  get tasks() {
+    if (this._tasks.size) {
+      return this._tasks
+    }
+
     const root = path.join(this.logPath, '..', path.parse(this.logPath).name, 'task-*.json')
     fs.globSync(root)
       .map(path => new Task(path))
       .sort((a, b) => a.created.getTime() - b.created.getTime())
-      .forEach(task => this.tasks.set(task.id, task))
+      .forEach(task => this._tasks.set(task.id, task))
+
+    return this._tasks
+  }
+
+  get metrics() {
+    if (this._metrics) {
+      return this._metrics
+    }
+
+    this._metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
     for (const task of this.tasks.values()) {
-      this.metrics.inputTokens += task.metrics.inputTokens
-      this.metrics.outputTokens += task.metrics.outputTokens
-      this.metrics.cacheTokens += task.metrics.cacheTokens
-      this.metrics.cost += task.metrics.cost
-      this.metrics.time += task.metrics.time
+      this._metrics.inputTokens += task.metrics.inputTokens
+      this._metrics.outputTokens += task.metrics.outputTokens
+      this._metrics.cacheTokens += task.metrics.cacheTokens
+      this._metrics.cost += task.metrics.cost
+      this._metrics.time += task.metrics.time
     }
+
+    return this._metrics
   }
 
   getTaskById(id: string) {
-    return this.tasks.get(`${this.id} ${id}`)
+    return this._tasks.get(`${this.id} ${id}`)
   }
 
   toJSON() {
@@ -51,7 +70,7 @@ export class Issue {
       created: this.created,
       state: this.state,
       error: this.error,
-      tasks: [...this.tasks],
+      tasks: [...this._tasks],
       metrics: this.metrics,
     }
   }
