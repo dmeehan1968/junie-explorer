@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-06-19
+
+### Code Improvements
+- Replace `calculateIssueSummary` and `calculateProjectMetrics` with pre-computed `metrics` (c889c1d)
+- Simplify step metrics calculation and improve type consistency (6405e0c)
+- Switch storage from sessionStorage to localStorage for filter and project selection data (2703158)
+- Refactor `Issue` class with lazy loading and encapsulation for tasks and metrics (3d3d19c)
+
+### Bug Fixes
+- Fix case-sensitivity issue in project name search (closes #13) (2828025)
+
 ## [1.5.0] - 2025-06-18
 
 ### Testing Infrastructure
