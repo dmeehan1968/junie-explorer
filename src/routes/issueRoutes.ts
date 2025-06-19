@@ -2,17 +2,13 @@ import express from 'express'
 import { marked } from "marked"
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
-import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatSeconds } from '../utils/timeUtils.js'
-import { Metrics } from "../Step.js"
+import { SummaryMetrics } from "../schema.js"
 
 const router = express.Router()
 
 // Function to generate HTML for step totals table
-const generateStepTotalsTable = (summaryData: Metrics): string => {
-  // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = summaryData.buildTime + summaryData.modelTime / 1000 + summaryData.artifactTime + summaryData.modelCachedTime / 1000
-
+const generateStepTotalsTable = (summaryData: SummaryMetrics): string => {
   return `
   <table class="step-totals-table" data-testid="task-metrics">
     <tbody>
@@ -21,7 +17,7 @@ const generateStepTotalsTable = (summaryData: Metrics): string => {
         <td>Output Tokens: ${summaryData.outputTokens}</td>
         <td>Cache Tokens: ${summaryData.cacheTokens}</td>
         <td>Cost: ${summaryData.cost.toFixed(4)}</td>
-        <td>Total Time: ${formatSeconds(totalTime)}</td>
+        <td>Total Time: ${formatSeconds(summaryData.time / 1000)}</td>
       </tr>
     </tbody>
   </table>
@@ -83,8 +79,8 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           <ul class="task-list" data-testid="tasks-list">
             ${issue.tasks.size > 0
       ? [...issue.tasks.values()].map((task, index) => {
-        // Calculate step totals for this task
-        const stepTotals = calculateStepSummary([...task.steps.values()])
+        // Use aggregated metrics from task
+        const stepTotals = task.metrics
 
         return `
                     <li class="task-item">

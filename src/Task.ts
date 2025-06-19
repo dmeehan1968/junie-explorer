@@ -47,7 +47,7 @@ export class Task {
       this.metrics.outputTokens += step.metrics.outputTokens
       this.metrics.cacheTokens += step.metrics.cacheTokens
       this.metrics.cost += step.metrics.cost + step.metrics.cachedCost
-      this.metrics.time += step.metrics.buildTime + step.metrics.modelTime + step.metrics.modelCachedTime
+      this.metrics.time += step.metrics.modelTime
     }
   }
 

@@ -41,7 +41,7 @@ export class Step {
     }
     this.id = parseInt(id)
     this.endTime = fs.statSync(logPath).birthtime
-    this.startTime = new Date(this.endTime.getTime() - (step.statistics.artifactTime + step.statistics.modelTime + step.statistics.modelCachedTime))
+    this.startTime = new Date(this.endTime.getTime() - step.statistics.modelTime)
 
     this.title = step.title
     this.reasoning = step.reasoning
