@@ -3,13 +3,13 @@ let selectedProjects = {};
 let projectsChart = null;
 let displayOption = 'both'; // Default display option (both, cost, tokens)
 
-// Initialize project selection from session storage
+// Initialize project selection from local storage
 function initializeProjectSelection() {
-  const storedSelection = sessionStorage.getItem('selectedProjects');
-  const storedDisplayOption = sessionStorage.getItem('displayOption');
+  const storedSelection = localStorage.getItem('junie-explorer-selectedProjects');
+  const storedDisplayOption = localStorage.getItem('junie-explorer-displayOption');
   const graphContainer = document.getElementById('projects-graph-container');
 
-  // Initialize display option from session storage or default to 'both'
+  // Initialize display option from local storage or default to 'both'
   if (storedDisplayOption) {
     displayOption = storedDisplayOption;
     // Update radio buttons based on stored display option
@@ -56,8 +56,8 @@ function handleProjectSelection(checkbox) {
   const projectName = checkbox.getAttribute('data-project-name');
   selectedProjects[projectName] = checkbox.checked;
 
-  // Save to session storage
-  sessionStorage.setItem('selectedProjects', JSON.stringify(selectedProjects));
+  // Save to local storage
+  localStorage.setItem('junie-explorer-selectedProjects', JSON.stringify(selectedProjects));
 
   // Update "Select All" checkbox
   updateSelectAllCheckbox();
@@ -78,8 +78,8 @@ function toggleSelectAllProjects() {
     selectedProjects[projectName] = isChecked;
   });
 
-  // Save to session storage
-  sessionStorage.setItem('selectedProjects', JSON.stringify(selectedProjects));
+  // Save to local storage
+  localStorage.setItem('junie-explorer-selectedProjects', JSON.stringify(selectedProjects));
 
   // Load and display the graph if projects are selected
   loadProjectsGraph();
@@ -106,8 +106,8 @@ function updateSelectAllCheckbox() {
 function handleDisplayOptionChange(radio) {
   displayOption = radio.value;
 
-  // Save to session storage
-  sessionStorage.setItem('displayOption', displayOption);
+  // Save to local storage
+  localStorage.setItem('junie-explorer-displayOption', displayOption);
 
   // Reload the graph with the new display option
   if (projectsChart) {

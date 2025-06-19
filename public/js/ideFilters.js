@@ -1,10 +1,10 @@
 // Global variables for filters
 let currentSearchTerm = '';
 
-// Initialize IDE filters from session storage or default to all selected
+// Initialize IDE filters from local storage or default to all selected
 function initializeFilters() {
   const ideFilters = {};
-  const storedFilters = sessionStorage.getItem('ideFilters');
+  const storedFilters = localStorage.getItem('junie-explorer-ideFilters');
 
   // Get all IDE elements
   const ideElements = document.querySelectorAll('.ide-filter');
@@ -54,8 +54,8 @@ function toggleIdeFilter(element) {
     element.classList.add('ide-filter-disabled');
   }
 
-  // Save to session storage
-  sessionStorage.setItem('ideFilters', JSON.stringify(ideFilters));
+  // Save to local storage
+  localStorage.setItem('junie-explorer-ideFilters', JSON.stringify(ideFilters));
 
   // Apply filters to the project list
   applyFilters(ideFilters, currentSearchTerm);
@@ -76,7 +76,6 @@ function applyFilters(ideFilters, searchTerm = '') {
   let visibleCount = 0;
 
   projectItems.forEach(item => {
-    console.log(item.getAttribute('data-ides'))
     const projectIdes = JSON.parse(item.getAttribute('data-ides') || '[]');
     const projectName = item.querySelector('.project-name').textContent.toLowerCase();
 
