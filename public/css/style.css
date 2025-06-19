@@ -335,6 +335,8 @@ p {
   line-height: 1.5;
   border-radius: 2px;
   flex: 1;
+  overflow-x: auto;
+  word-wrap: break-word;
 }
 
 /* Ensure list markers appear inside their containers in markdown content */
@@ -359,12 +361,35 @@ p {
   margin-bottom: 15px;
 }
 
+/* Style for inline code elements in markdown content */
+.task-description code,
+.task-plan code {
+  background-color: #f1f1f1;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+/* Ensure code inside pre blocks doesn't have conflicting styles */
+.task-description pre code,
+.task-plan pre code {
+  background-color: transparent;
+  padding: 0;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
 /* Task Plan Styles */
 .task-plan {
   padding: 10px;
   background-color: #e8f4fb;
   border-radius: 2px;
   flex: 1;
+  overflow-x: auto;
+  word-wrap: break-word;
 }
 
 .task-plan h3 {
