@@ -2,7 +2,6 @@ import express from 'express'
 import { JetBrains } from "../jetbrains.js"
 import { Project } from '../Project.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
-import { calculateIssueSummary } from '../utils/metricsUtils.js'
 
 const router = express.Router()
 
@@ -56,9 +55,8 @@ function prepareProjectsGraphData(projects: Project[]): {
         }
       }
 
-      const metrics = calculateIssueSummary([...issue.tasks.values()])
-      issuesByDay[day][project.name].cost += metrics.cost
-      issuesByDay[day][project.name].tokens += metrics.inputTokens + metrics.outputTokens
+      issuesByDay[day][project.name].cost += issue.metrics.cost
+      issuesByDay[day][project.name].tokens += issue.metrics.inputTokens + issue.metrics.outputTokens
     })
   })
 

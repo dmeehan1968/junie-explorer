@@ -1,18 +1,14 @@
 import express from 'express'
 import { Issue } from "../Issue.js"
 import { JetBrains } from "../jetbrains.js"
+import { Project } from "../Project.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
-import { calculateIssueSummary, calculateProjectMetrics } from '../utils/metricsUtils.js'
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
 
 const router = express.Router()
 
 // Function to generate HTML for issue metrics table
 const generateIssueMetricsTable = (issue: Issue): string => {
-  const issueMetrics = calculateIssueSummary([...issue.tasks.values()])
-  // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = issueMetrics.buildTime + issueMetrics.modelTime / 1000 + issueMetrics.artifactTime + issueMetrics.modelCachedTime / 1000
-
   return `
   <table class="step-totals-table">
     <thead>
@@ -28,11 +24,11 @@ const generateIssueMetricsTable = (issue: Issue): string => {
     <tbody>
       <tr>
         <td data-testid="issue-created-date">${new Date(issue.created).toLocaleString()}</td>
-        <td data-testid="issue-input-tokens">${formatNumber(issueMetrics.inputTokens)}</td>
-        <td data-testid="issue-output-tokens">${formatNumber(issueMetrics.outputTokens)}</td>
-        <td data-testid="issue-cache-tokens">${formatNumber(issueMetrics.cacheTokens)}</td>
-        <td data-testid="issue-cost">${issueMetrics.cost.toFixed(4)}</td>
-        <td data-testid="issue-total-time">${formatSeconds(totalTime)}</td>
+        <td data-testid="issue-input-tokens">${formatNumber(issue.metrics.inputTokens)}</td>
+        <td data-testid="issue-output-tokens">${formatNumber(issue.metrics.outputTokens)}</td>
+        <td data-testid="issue-cache-tokens">${formatNumber(issue.metrics.cacheTokens)}</td>
+        <td data-testid="issue-cost">${issue.metrics.cost.toFixed(4)}</td>
+        <td data-testid="issue-total-time">${formatSeconds(issue.metrics.time / 1000)}</td>
       </tr>
     </tbody>
   </table>
@@ -40,18 +36,12 @@ const generateIssueMetricsTable = (issue: Issue): string => {
 }
 
 // Function to generate HTML for project summary metrics table
-const generateProjectSummaryTable = (issues: Issue[]): string => {
-  if (issues.length === 0) {
+const generateProjectSummaryTable = (project: Project): string => {
+  if (project.issues.size === 0) {
     return ''
   }
 
-  const projectMetrics = calculateProjectMetrics(issues)
-
-  // Calculate total time as sum of build time, model time, artifact time and model cached time
-  const totalTime = projectMetrics.buildTime + projectMetrics.modelTime / 1000 + projectMetrics.artifactTime + projectMetrics.modelCachedTime / 1000
-
-  // Calculate elapsed time (difference between oldest and most recent issue)
-  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
+  const sortedIssues = [...project.issues.values()].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
   const oldestIssue = sortedIssues[0]
   const newestIssue = sortedIssues[sortedIssues.length - 1]
   const elapsedTimeMs = new Date(newestIssue.created).getTime() - new Date(oldestIssue.created).getTime()
@@ -73,11 +63,11 @@ const generateProjectSummaryTable = (issues: Issue[]): string => {
       </thead>
       <tbody>
         <tr>
-          <td data-testid="summary-input-tokens">${formatNumber(projectMetrics.inputTokens)}</td>
-          <td data-testid="summary-output-tokens">${formatNumber(projectMetrics.outputTokens)}</td>
-          <td data-testid="summary-cache-tokens">${formatNumber(projectMetrics.cacheTokens)}</td>
-          <td data-testid="summary-cost">${projectMetrics.cost.toFixed(4)}</td>
-          <td data-testid="summary-total-time">${formatSeconds(totalTime)}</td>
+          <td data-testid="summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
+          <td data-testid="summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
+          <td data-testid="summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
+          <td data-testid="summary-cost">${project.metrics.cost.toFixed(4)}</td>
+          <td data-testid="summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
           <td data-testid="summary-elapsed-time">${formatElapsedTime(elapsedTimeSec)}</td>
         </tr>
       </tbody>
@@ -126,7 +116,6 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
   // Create datasets for each issue
   const datasets = sortedIssues.map((issue, index) => {
-    const issueMetrics = calculateIssueSummary([...issue.tasks.values()])
 
     // Generate a color based on index
     const hue = (index * 137) % 360 // Use golden ratio to spread colors
@@ -134,7 +123,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
     return {
       label: escapeHtml(issue.name),
-      data: [{ x: issue.created, y: issueMetrics.cost }],
+      data: [{ x: issue.created, y: issue.metrics.cost }],
       borderColor: color,
       backgroundColor: color,
       fill: false,
@@ -209,7 +198,7 @@ router.get('/project/:projectName', (req, res) => {
       ? `<div class="graph-container" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>
-              ${generateProjectSummaryTable([...project.issues.values()])}`
+              ${generateProjectSummaryTable(project)}`
       : ''
     }
 
