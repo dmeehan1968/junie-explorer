@@ -92,14 +92,14 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                             <button class="toggle-raw-data" data-task="${index}" data-testid="json-button">JSON</button>
                           </div>
                         </div>
-                        <div id="raw-data-${index}" class="raw-data-container" data-testid="json-viewer" style="display: none;">
-                          <div id="json-renderer-${index}" class="json-renderer"></div>
-                        </div>
                         ${task.context.description ? `<div class="task-description" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                         <div class="task-details" data-testid="task-details">
                           ${generateStepTotalsTable(stepTotals)}
                         </div>
                       </a>
+                      <div id="raw-data-${index}" class="raw-data-container" data-testid="json-viewer" style="display: none;">
+                        <div id="json-renderer-${index}" class="json-renderer"></div>
+                      </div>
                     </li>
                   `
       }).join('')
