@@ -34,6 +34,12 @@ See the [Documentation](docs/overview.md) for details
 npm install
 ```
 
+### Node Version Error
+
+`npm install` will check for the correct version of node and fail if not present. The best way to install and 
+manage multiple node version is to use node version manager, aka nvm ([installation](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating))
+and this project is setup to automatically switch to the correct version as needed.
+
 ## Usage
 
 ### Development Mode
