@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
               // Display the HTML content directly
-              console.log(data)
               repRenderer.innerHTML = data;
               container.setAttribute('data-initialized', 'true');
             })
