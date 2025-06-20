@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2025-06-20
+
+### Documentation
+- Update release guidelines to include package-lock.json handling (188e9bf)
+
+### Code Improvements
+- Refactor step representation handling with dedicated utilities (b558fb6)
+- Enhance step representation output to be more readable (5a254e4)
+- Enhance server startup logic and update README for port configuration (c9446fc)
+
 ## [1.6.1] - 2025-06-20
 
 ### Code Improvements
