@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2025-06-20
+
+### Code Improvements
+- Update package-lock.json to bump project version to 1.6.0 and update Node.js requirement (d765b68)
+- Update README with Node Version Error handling instructions (550e4dc)
+- Add Node.js and npm engine configuration files (e91f931)
+- Update Node.js version requirement and fix README numbering (5fd0068)
+
+### Bug Fixes
+- Move task JSON viewer out of the link to prevent erroneous navigation when interacting with viewer (0ef71d9)
+
+### UI Improvements
+- Improve Markdown code block styling and add overflow handling (f59f64d)
+
 ## [1.6.0] - 2025-06-19
 
 ### Code Improvements
