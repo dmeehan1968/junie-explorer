@@ -27,9 +27,9 @@ See the [Documentation](docs/overview.md) for details
 - npm (v6 or higher)
 
 ## Installation
-1. Install Node JS (>=v20) ([Download](https://nodejs.org/en/download))
-1. Clone the repository
-2. Install dependencies:
+1. Install Node JS (>=v22) ([Download](https://nodejs.org/en/download))
+2. Clone the repository
+3. Install dependencies:
 ```bash
 npm install
 ```
