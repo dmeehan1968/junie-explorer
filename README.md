@@ -42,6 +42,27 @@ and this project is setup to automatically switch to the correct version as need
 
 ## Usage
 
+### Port Conflicts
+
+Junie Explorer uses port 3000 by default.  If this conflicts with other apps on your system, you can set the desired
+port via an environment variable, which can be added to the command line, e.g.:
+
+```bash
+PORT=4000 npm run dev
+```
+
+If you set the PORT to 0, a free port will be allocated.  This may be different on each invocation and is
+shown on the server console once the server is running. e.g.
+
+```text
+Reading logs...
+From: <pathname>
+From: <pathname>
+From: <pathname>
+...
+Server is running on http://localhost:60123
+```
+
 ### Development Mode
 To run the application in development mode:
 ```bash
