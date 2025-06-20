@@ -7,6 +7,7 @@ import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
 import { Step } from "../Step.js"
+import { RepresentationService } from '../services/representationService.js'
 
 const router = express.Router()
 
@@ -325,135 +326,39 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
 })
 
 // API endpoint to get representations for a specific step
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex/representations', (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex/representations', async (req, res) => {
   try {
-    const { projectName, issueId, taskId, stepIndex } = req.params
-    const project = jetBrains.getProjectByName(projectName)
-    const issue = project?.getIssueById(issueId)
-    const task = issue?.getTaskById(taskId)
-    const step = task?.getStepById(parseInt(stepIndex, 10))
+    const jetBrains = req.app.locals.jetBrains as JetBrains;
+    const { projectName, issueId, taskId, stepIndex } = req.params;
 
-    if (!project || !issue || !task || !step) {
-      return res.status(404).send('Step not found')
-    }
+    const htmlContent = await RepresentationService.getStepRepresentation(
+      jetBrains,
+      projectName,
+      issueId,
+      taskId,
+      stepIndex
+    );
 
-    const root = path.join(step.logPath, '../../representations', task.id, `step_${step.id.toString().padStart(2, '0')}.*{swe,chat}_next*`)
-    const files = fs.globSync(root)
-
-    if (files.length === 0) {
-      return res.status(404).send('No representation files found')
-    }
-
-    if (files.length > 1) {
-      return res.status(400).send('More than one representation file found')
-    }
-
-    try {
-      const content = fs.readFileSync(files[0], 'utf-8')
-      /**
-       * the content has an XML like structure, and within each element tends to be markdown
-       * except in the case of the 'command' tag, where it is markdown with malformed JSON.
-       *
-       * Here we split out what we can so that we can give it a more elegant formatting.
-       */
-
-      type ThoughtContent = Record<string, string | undefined>
-
-      const extractTagContent = (content: string, tag: string): string | undefined => {
-        const regex = new RegExp(`<${tag}>(.*?)</${tag}>`, 's')
-        const match = content.match(regex)
-        return match ? match[1].trim() : undefined
-      }
-
-      const splitPattern = /(?<thought>[\s\S]*?)^-{8,}$\n(?<result>[\s\S]*)/m
-      const contentParts = content.match(splitPattern)
-
-      const thoughtContent = contentParts?.groups?.thought || content
-      const resultContent = contentParts?.groups?.result || ''
-
-      const parsedContent: ThoughtContent = {
-        ['Previous Step']: extractTagContent(thoughtContent, 'PREVIOUS_STEP'),
-        Plan: extractTagContent(thoughtContent, 'PLAN'),
-        Command: extractTagContent(thoughtContent, 'COMMAND'),
-      }
-
-      const htmlContent = `
-        <div class="thought-section">
-          ${Object.keys(parsedContent).some(key => parsedContent[key as keyof ThoughtContent])
-        ? Object.entries(parsedContent)
-          .filter(([_, value]) => value)
-          .map(([key, value]) => `
-                  <div class="parsed-section">
-                    <h3>${key.replace(/([A-Z])/g, ' $1').trim()}</h3>
-                    ${key === 'Command'
-            ? `<pre><code>${escapeHtmlExceptCodeBlocks(value!)}</code></pre>`
-            : marked(escapeHtmlExceptCodeBlocks(value!))}
-                  </div>
-                `).join('')
-        : marked(escapeHtmlExceptCodeBlocks(thoughtContent))
-      }
-        </div>
-        ${resultContent ? `
-          <div class="result-section">
-            <h3>Result</h3>
-            ${marked(escapeHtmlExceptCodeBlocks(resultContent))}
-          </div>
-        ` : ''}
-      `
-
-      res.setHeader('Content-Type', 'text/html')
-      res.send(htmlContent)
-    } catch (error) {
-      console.error('Error reading representation file:', error)
-      res.status(500).send('Error reading representation file')
-    }
+    res.setHeader('Content-Type', 'text/html');
+    res.send(htmlContent);
   } catch (error) {
-    console.error('Error fetching step representations:', error)
-    res.status(500).send('An error occurred while fetching step representations')
+    console.error('Error fetching step representations:', error);
+
+    if (error instanceof Error) {
+      if (error.message === 'Step not found') {
+        return res.status(404).send('Step not found');
+      }
+      if (error.message === 'No representation files found') {
+        return res.status(404).send('No representation files found');
+      }
+      if (error.message === 'More than one representation file found') {
+        return res.status(400).send('More than one representation file found');
+      }
+    }
+
+    res.status(500).send('An error occurred while fetching step representations');
   }
 })
 
-/**
- * Escapes HTML special characters in a given string, except for content wrapped in
- * code blocks (```...```) or inline code spans (`...`). This ensures that code blocks
- * and inline codes are preserved as-is, while other content is made safe for use in HTML.
- * Special handling is provided for Command content which gets wrapped in code tags.
- *
- * @param {string} markdown - The input string which may contain raw HTML and markdown with code blocks.
- * @return {string} A string where HTML special characters are escaped, except within code blocks and inline code spans.
- */
-function escapeHtmlExceptCodeBlocks(markdown: string): string {
-  // Regex to find code blocks and codespans
-  // (```...``` for block, `...` for inline)
-  // This is a simplified regex and might not catch all edge cases or nested blocks perfectly
-  const codeBlockRegex = /(```[\s\S]*?```)|(`[^`]*?`)/g
-
-  let lastIndex = 0
-  let result = ''
-  let match
-
-  while ((match = codeBlockRegex.exec(markdown)) !== null) {
-    const codeBlockContent = match[0]
-    const codeBlockStart = match.index
-    const codeBlockEnd = match.index + codeBlockContent.length
-
-    // Process text *before* the current code block
-    const textBeforeCode = markdown.substring(lastIndex, codeBlockStart)
-    result += textBeforeCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-
-    // Add the code block as-is (marked will handle it, and we don't want to escape)
-    result += codeBlockContent
-    lastIndex = codeBlockEnd
-  }
-
-  // Process any remaining text after the last code block
-  result += markdown
-    .substring(lastIndex)
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-
-  return result
-}
 
 export default router
