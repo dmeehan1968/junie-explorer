@@ -220,6 +220,7 @@ router.get('/', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Junie Explorer</title>
         <link rel="stylesheet" href="/css/style.css">
+        <link rel="icon" href="/icons/favicon.svg" sizes="any" type="image/svg+xml">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
         <script>

@@ -12,6 +12,7 @@ router.use((req, res, next) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Page Not Found</title>
       <link rel="stylesheet" href="/css/style.css">
+      <link rel="icon" href="/icons/favicon.svg" sizes="any" type="image/svg+xml">
     </head>
     <body>
       <div class="container">

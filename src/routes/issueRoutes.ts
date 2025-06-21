@@ -45,6 +45,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${escapeHtml(issue.name)} Tasks</title>
         <link rel="stylesheet" href="/css/style.css">
+        <link rel="icon" href="/icons/favicon.svg" sizes="any" type="image/svg+xml">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
