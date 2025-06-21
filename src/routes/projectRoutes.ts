@@ -164,6 +164,7 @@ router.get('/project/:projectName', (req, res) => {
         <title>${project.name} Issues</title>
         <link rel="stylesheet" href="/css/style.css">
         <link rel="icon" href="/icons/favicon.svg" sizes="any" type="image/svg+xml">
+        <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
         ${project.issues.size > 0

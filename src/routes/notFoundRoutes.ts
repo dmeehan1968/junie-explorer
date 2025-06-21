@@ -13,6 +13,7 @@ router.use((req, res, next) => {
       <title>Page Not Found</title>
       <link rel="stylesheet" href="/css/style.css">
       <link rel="icon" href="/icons/favicon.svg" sizes="any" type="image/svg+xml">
+      <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
     </head>
     <body>
       <div class="container">
