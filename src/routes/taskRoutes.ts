@@ -260,12 +260,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
                     </tr>
-                    <tr id="raw-data-${step.id}" class="raw-data-row" style="display: none;">
+                    <tr id="raw-data-${step.id}" class="raw-data-row">
                       <td colspan="12" class="raw-data-container">
                         <div id="json-renderer-${step.id}" class="json-renderer"></div>
                       </td>
                     </tr>
-                    <tr id="rep-data-${step.id}" class="rep-data-row" style="display: none;">
+                    <tr id="rep-data-${step.id}" class="rep-data-row">
                       <td colspan="12" class="rep-data-container">
                         <div id="rep-renderer-${step.id}" class="rep-renderer"></div>
                       </td>
@@ -388,50 +388,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
         <link rel="stylesheet" href="/css/style.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
         <script src="/js/reloadPage.js"></script>
-        <style>
-          .events-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
-          .events-table th,
-          .events-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            vertical-align: top;
-          }
-          .events-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-          }
-          .events-table .timestamp-col {
-            width: 200px;
-            white-space: nowrap;
-          }
-          .events-table .event-type-col {
-            width: 150px;
-          }
-          .events-table .json-col {
-            max-width: 600px;
-          }
-          .json-content {
-            max-height: 200px;
-            overflow: auto;
-            background-color: #f8f8f8;
-            padding: 8px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            word-break: break-all;
-          }
-          .no-events {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-          }
-        </style>
       </head>
       <body>
         <div class="container">
@@ -479,10 +435,45 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                 <tbody>
                   ${events.map((eventRecord, index) => {
                     const isError = 'message' in eventRecord && 'json' in eventRecord
+                    
+                    // Calculate timestamp display
+                    let timestampDisplay = '-'
+                    if (!isError) {
+                      if (index === 0) {
+                        // First record: show time only
+                        timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
+                      } else {
+                        // Subsequent records: show elapsed milliseconds since previous record
+                        const prevRecord = events[index - 1]
+                        const prevIsError = 'message' in prevRecord && 'json' in prevRecord
+                        if (!prevIsError) {
+                          const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
+                          timestampDisplay = `+${elapsed}ms`
+                        } else {
+                          // If previous record was an error, find the last valid timestamp
+                          let lastValidIndex = index - 1
+                          while (lastValidIndex >= 0) {
+                            const checkRecord = events[lastValidIndex]
+                            const checkIsError = 'message' in checkRecord && 'json' in checkRecord
+                            if (!checkIsError) {
+                              const elapsed = eventRecord.timestamp.getTime() - checkRecord.timestamp.getTime()
+                              timestampDisplay = `+${elapsed}ms`
+                              break
+                            }
+                            lastValidIndex--
+                          }
+                          if (lastValidIndex < 0) {
+                            // No valid previous timestamp found, show time only
+                            timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
+                          }
+                        }
+                      }
+                    }
+                    
                     if (isError) {
                       return `
                         <tr data-testid="event-row-${index}">
-                          <td class="timestamp-col">-</td>
+                          <td class="timestamp-col">${timestampDisplay}</td>
                           <td class="event-type-col">error</td>
                           <td class="json-col">
                             <div class="json-content">${escapeHtml(eventRecord.json)}</div>
@@ -492,7 +483,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                     } else {
                       return `
                         <tr data-testid="event-row-${index}">
-                          <td class="timestamp-col">${new Date(eventRecord.timestamp).toLocaleString()}</td>
+                          <td class="timestamp-col">${timestampDisplay}</td>
                           <td class="event-type-col">${escapeHtml(eventRecord.event.type || 'unknown')}</td>
                           <td class="json-col">
                             <div class="json-content">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>

@@ -777,6 +777,7 @@ p {
 .raw-data-row {
   background-color: #f8f9fa;
   width: 100%;
+  display: none;
 }
 
 .raw-data-row td {
@@ -877,6 +878,7 @@ p {
 .rep-data-row {
   background-color: #f8f9fa;
   width: 100%;
+  display: none;
 }
 
 .rep-data-row td {
@@ -1016,6 +1018,57 @@ p {
 
 .toggle-rep-data:hover {
   background-color: #e0e0e0;
+}
+
+/* Task Events Table Styles */
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.events-table th,
+.events-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.events-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.events-table .timestamp-col {
+  width: 200px;
+  white-space: nowrap;
+}
+
+.events-table .event-type-col {
+  width: 150px;
+}
+
+.events-table .json-col {
+  max-width: 600px;
+}
+
+.json-content {
+  max-height: 200px;
+  overflow: auto;
+  background-color: #f8f8f8;
+  padding: 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.no-events {
+  text-align: center;
+  padding: 40px;
+  color: #666;
 }
 
 @media (max-width: 768px) {
