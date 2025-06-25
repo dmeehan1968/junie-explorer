@@ -84,7 +84,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         const stepTotals = task.metrics
 
         return `
-                    <li class="task-item">
+                    <li class="task-item" data-testid="task-item">
                       <div class="task-header">
                         <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
                         <div class="task-date">
