@@ -827,6 +827,45 @@ p {
   text-decoration: none;
 }
 
+/* Task buttons container */
+.task-buttons {
+  display: flex;
+  gap: 0;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Task action buttons */
+.task-action-button {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  border: none;
+  border-right: 1px solid #ccc;
+  cursor: pointer;
+  text-decoration: none;
+  color: #333;
+  text-align: center;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
+}
+
+.task-action-button:last-child {
+  border-right: none;
+}
+
+.task-action-button:hover {
+  background-color: #e9ecef;
+  text-decoration: none;
+}
+
+.task-action-button:active {
+  background-color: #dee2e6;
+}
+
 /* REP data container styles */
 .rep-data-container {
   padding: 10px;

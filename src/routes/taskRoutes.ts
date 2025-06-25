@@ -444,8 +444,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
               <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
               <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
               <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-issue-name">${issue?.name}</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}" data-testid="breadcrumb-task-name">Task ${task.id}</a></li>
-              <li class="breadcrumb-item active">Events</li>
+              <li class="breadcrumb-item active">Task ${task.id} Events</li>
             </ol>
           </nav>
 
