@@ -91,6 +91,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                           <div class="task-date">
                             Created: ${new Date(task.created).toLocaleString()}
                             <button class="toggle-raw-data" data-task="${index}" data-testid="json-button">JSON</button>
+                            <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="events-button" data-testid="events-button">Events</a>
                           </div>
                         </div>
                         ${task.context.description ? `<div class="task-description" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}

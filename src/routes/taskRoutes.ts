@@ -361,5 +361,163 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
   }
 })
 
+// Task events page route
+router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
+
+    if (!project || !issue || !task) {
+      return res.status(404).send('Task not found')
+    }
+
+    // Get events for the task
+    const events = task.events
+
+    // Generate HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Task ${task.id} Events</title>
+        <link rel="stylesheet" href="/css/style.css">
+        <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
+        <script src="/js/reloadPage.js"></script>
+        <style>
+          .events-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+          }
+          .events-table th,
+          .events-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+          }
+          .events-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+          }
+          .events-table .timestamp-col {
+            width: 200px;
+            white-space: nowrap;
+          }
+          .events-table .event-type-col {
+            width: 150px;
+          }
+          .events-table .json-col {
+            max-width: 600px;
+          }
+          .json-content {
+            max-height: 200px;
+            overflow: auto;
+            background-color: #f8f8f8;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+          }
+          .no-events {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header-container">
+            <h1>Junie Explorer: Task ${task.id} Events</h1>
+            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+          </div>
+          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-issue-name">${issue?.name}</a></li>
+              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}" data-testid="breadcrumb-task-name">Task ${task.id}</a></li>
+              <li class="breadcrumb-item active">Events</li>
+            </ol>
+          </nav>
+
+          <div class="ide-icons">
+            ${project.ideNames.map(ide => `
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+            `).join('')}
+          </div>
+
+          <div class="task-details">
+            <div class="task-meta">
+              <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
+            </div>
+            ${task.context.description ? `
+              <div class="task-description">
+                <h3>Task Description</h3>
+                ${marked(escapeHtml(task.context.description))}
+              </div>
+            ` : ''}
+          </div>
+
+          ${events.length > 0
+            ? `
+              <table class="events-table" data-testid="events-table">
+                <thead>
+                  <tr>
+                    <th class="timestamp-col">Timestamp</th>
+                    <th class="event-type-col">Event Type</th>
+                    <th class="json-col">JSON</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${events.map((eventRecord, index) => {
+                    const isError = 'message' in eventRecord && 'json' in eventRecord
+                    if (isError) {
+                      return `
+                        <tr data-testid="event-row-${index}">
+                          <td class="timestamp-col">-</td>
+                          <td class="event-type-col">error</td>
+                          <td class="json-col">
+                            <div class="json-content">${escapeHtml(eventRecord.json)}</div>
+                          </td>
+                        </tr>
+                      `
+                    } else {
+                      return `
+                        <tr data-testid="event-row-${index}">
+                          <td class="timestamp-col">${new Date(eventRecord.timestamp).toLocaleString()}</td>
+                          <td class="event-type-col">${escapeHtml(eventRecord.event.type || 'unknown')}</td>
+                          <td class="json-col">
+                            <div class="json-content">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
+                          </td>
+                        </tr>
+                      `
+                    }
+                  }).join('')}
+                </tbody>
+              </table>
+            `
+            : '<div class="no-events" data-testid="no-events-message">No events found for this task</div>'
+          }
+        </div>
+      </body>
+      </html>
+    `
+
+    res.send(html)
+  } catch (error) {
+    console.error('Error generating task events page:', error)
+    res.status(500).send('An error occurred while generating the task events page')
+  }
+})
+
 
 export default router

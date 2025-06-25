@@ -809,6 +809,24 @@ p {
   background-color: #e0e0e0;
 }
 
+.events-button {
+  margin-left: 10px;
+  padding: 2px 6px;
+  font-size: 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #333;
+  display: inline-block;
+}
+
+.events-button:hover {
+  background-color: #e0e0e0;
+  text-decoration: none;
+}
+
 /* REP data container styles */
 .rep-data-container {
   padding: 10px;
