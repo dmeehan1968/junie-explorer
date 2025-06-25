@@ -96,9 +96,9 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                         ${generateStepTotalsTable(stepTotals)}
                       </div>
                       <div class="task-buttons">
-                        <button class="task-action-button toggle-raw-data" data-task="${index}" data-testid="json-button">JSON</button>
                         <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="task-action-button" data-testid="events-button">Events</a>
                         <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-action-button" data-testid="steps-button">Steps</a>
+                        <button class="task-action-button toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
                       </div>
                       <div id="raw-data-${index}" class="raw-data-container" data-testid="json-viewer" style="display: none;">
                         <div id="json-renderer-${index}" class="json-renderer"></div>

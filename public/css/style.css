@@ -830,40 +830,36 @@ p {
 /* Task buttons container */
 .task-buttons {
   display: flex;
-  gap: 0;
+  gap: 10px;
   margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  overflow: hidden;
 }
 
 /* Task action buttons */
 .task-action-button {
   flex: 1;
-  padding: 8px 12px;
-  font-size: 14px;
-  background-color: #f8f9fa;
-  border: none;
-  border-right: 1px solid #ccc;
-  cursor: pointer;
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #3498db;
+  color: white;
   text-decoration: none;
-  color: #333;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
   text-align: center;
-  transition: background-color 0.2s ease;
   font-family: inherit;
-}
-
-.task-action-button:last-child {
-  border-right: none;
+  font-size: 14px;
 }
 
 .task-action-button:hover {
-  background-color: #e9ecef;
+  background-color: #2980b9;
   text-decoration: none;
 }
 
 .task-action-button:active {
-  background-color: #dee2e6;
+  background-color: #2471a3;
 }
 
 /* REP data container styles */
