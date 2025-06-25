@@ -1,6 +1,7 @@
 import fs from "fs-extra"
 import path from "path"
 import { inspect } from "util"
+import { z } from "zod"
 import {
   AgentState,
   JuniePlan,
@@ -11,6 +12,24 @@ import {
   SummaryMetrics,
 } from "./schema.js"
 import { Step } from "./Step.js"
+
+export const Event = z.object({
+  type: z.string(),
+}).passthrough()
+export type Event = z.infer<typeof Event>
+
+export const EventRecord = z.object({
+  event: Event,
+  timestampMs: z.coerce.date(),
+}).passthrough().transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
+export type EventRecord = z.infer<typeof EventRecord>
+
+export const SimpleError = z.object({
+  type: z.literal('error'),
+  message: z.string(),
+  json: z.string(),
+}).passthrough()
+export type SimpleError = z.infer<typeof SimpleError>
 
 export class Task {
   readonly id: string
@@ -24,7 +43,7 @@ export class Task {
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
-  private _events: any[] = []
+  private _events: (EventRecord|SimpleError)[] = []
   private _trajectory: any[] = []
 
   constructor(public readonly logPath: string) {
@@ -102,15 +121,15 @@ export class Task {
       const content = fs.readFileSync(root, 'utf-8')
       this._events = content
         .split('\n')
-        .filter(line => line.trim())
-        .map(line => {
+        .filter(json => json.trim())
+        .map(json => {
           try {
-            return JSON.parse(line)
+            return EventRecord.parse(JSON.parse(json))
           } catch (error) {
             return {
               type: 'error',
               message: String(error),
-              line,
+              json,
             }
           }
         })
