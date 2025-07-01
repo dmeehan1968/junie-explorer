@@ -24,13 +24,6 @@ export const EventRecord = z.object({
 }).passthrough().transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
 export type EventRecord = z.infer<typeof EventRecord>
 
-export const SimpleError = z.object({
-  type: z.literal('error'),
-  message: z.string(),
-  json: z.string(),
-}).passthrough()
-export type SimpleError = z.infer<typeof SimpleError>
-
 export class Task {
   readonly id: string
   readonly created: Date
@@ -43,7 +36,7 @@ export class Task {
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
-  private _events: (EventRecord|SimpleError)[] = []
+  private _events: EventRecord[] = []
   private _trajectory: any[] = []
 
   constructor(public readonly logPath: string) {
@@ -126,13 +119,12 @@ export class Task {
           try {
             return EventRecord.parse(JSON.parse(json))
           } catch (error) {
-            return {
-              type: 'error',
-              message: String(error),
-              json,
-            }
+            console.log(error, json)
+            return undefined
           }
         })
+        .filter((event): event is EventRecord => !!event)
+        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
     }
 
     return this._events

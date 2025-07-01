@@ -470,27 +470,15 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                       }
                     }
                     
-                    if (isError) {
-                      return `
-                        <tr data-testid="event-row-${index}">
-                          <td class="timestamp-col">${timestampDisplay}</td>
-                          <td class="event-type-col">error</td>
-                          <td class="json-col">
-                            <div class="json-content">${escapeHtml(eventRecord.json)}</div>
-                          </td>
-                        </tr>
-                      `
-                    } else {
-                      return `
-                        <tr data-testid="event-row-${index}">
-                          <td class="timestamp-col">${timestampDisplay}</td>
-                          <td class="event-type-col">${escapeHtml(eventRecord.event.type || 'unknown')}</td>
-                          <td class="json-col">
-                            <div class="json-content">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
-                          </td>
-                        </tr>
-                      `
-                    }
+                    return `
+                      <tr data-testid="event-row-${index}">
+                        <td class="timestamp-col">${timestampDisplay}</td>
+                        <td class="event-type-col">${escapeHtml(eventRecord.event.type || 'unknown')}</td>
+                        <td class="json-col">
+                          <div class="json-content">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
+                        </td>
+                      </tr>
+                    `
                   }).join('')}
                 </tbody>
               </table>
