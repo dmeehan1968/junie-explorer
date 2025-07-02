@@ -388,6 +388,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
         <link rel="stylesheet" href="/css/style.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
         <script src="/js/reloadPage.js"></script>
+        <script src="/js/taskEventChart.js"></script>
       </head>
       <body>
         <div class="container">
@@ -421,6 +422,24 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
               </div>
             ` : ''}
           </div>
+
+          ${events.length > 0 ? `
+            <div class="event-timeline-container">
+              <h3>Event Timeline</h3>
+              <canvas id="event-timeline-chart" class="event-timeline-chart"></canvas>
+            </div>
+            <script>
+              window.taskEvents = ${JSON.stringify(events.map(e => ({
+                timestamp: e.timestamp.toISOString(),
+                event: { type: e.event.type },
+              })))};
+              // Convert ISO strings back to Date objects
+              window.taskEvents = window.taskEvents.map(e => ({
+                ...e,
+                timestamp: new Date(e.timestamp)
+              }));
+            </script>
+          ` : ''}
 
           ${events.length > 0 ? `
             <div class="event-filters">

@@ -1166,6 +1166,32 @@ p {
   color: white;
 }
 
+/* Event Timeline Chart Styles */
+.event-timeline-container {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.event-timeline-container h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.event-timeline-chart {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 15px;
@@ -1189,5 +1215,14 @@ p {
 
   .steps-table th, .steps-table td {
     padding: 8px 5px;
+  }
+
+  .event-timeline-container {
+    padding: 15px;
+    margin: 15px 0;
+  }
+
+  .event-timeline-container h3 {
+    font-size: 16px;
   }
 }

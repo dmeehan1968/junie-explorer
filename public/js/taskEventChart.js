@@ -1,0 +1,292 @@
+// Task Event Timeline Chart
+class TaskEventChart {
+  constructor(canvasId, events) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.events = events;
+    this.eventTypes = [...new Set(events.map(e => e.event.type))].sort();
+    this.eventPairs = this.calculateEventPairs();
+    this.timeRange = this.calculateTimeRange();
+    
+    // Chart dimensions and styling
+    this.margin = { top: 20, right: 20, bottom: 60, left: 200 };
+    this.rowHeight = 40;
+    this.minBarWidth = 8; // Minimum width for bars to be visible
+    this.circleRadius = 4;
+    
+    this.setupCanvas();
+    this.render();
+  }
+  
+  calculateEventPairs() {
+    const pairs = [];
+    const singleEvents = [];
+    
+    // Define event pairs that represent start/end of operations
+    const pairMappings = {
+      'BeforeArtifactBuildingStarted': 'AfterArtifactBuildingFinished',
+      'AgentActionExecutionStarted': 'AgentActionExecutionFinished',
+      'ActionRequestBuildingStarted': 'ActionRequestBuildingFinished',
+      'BeforeStepStartedEvent': 'AfterStepFinishedEvent',
+      'SemanticCheckStarted': 'SemanticCheckFinished',
+      'ErrorCheckerStarted': 'ErrorCheckerFinished'
+    };
+    
+    // Group events by type
+    const eventsByType = {};
+    this.events.forEach(event => {
+      const type = event.event.type;
+      if (!eventsByType[type]) {
+        eventsByType[type] = [];
+      }
+      eventsByType[type].push(event);
+    });
+    
+    // Find pairs
+    Object.entries(pairMappings).forEach(([startType, endType]) => {
+      const startEvents = eventsByType[startType] || [];
+      const endEvents = eventsByType[endType] || [];
+      
+      // Match start events with their corresponding end events
+      startEvents.forEach(startEvent => {
+        // Find the next end event after this start event
+        const endEvent = endEvents.find(e => e.timestamp > startEvent.timestamp);
+        if (endEvent) {
+          pairs.push({
+            type: startType,
+            startTime: startEvent.timestamp,
+            endTime: endEvent.timestamp,
+            duration: endEvent.timestamp.getTime() - startEvent.timestamp.getTime()
+          });
+        } else {
+          // Start event without matching end event - treat as single event
+          singleEvents.push({
+            type: startType,
+            timestamp: startEvent.timestamp
+          });
+        }
+      });
+    });
+    
+    // Add events that don't have pairs as single events
+    this.events.forEach(event => {
+      const type = event.event.type;
+      const isStartEvent = Object.keys(pairMappings).includes(type);
+      const isEndEvent = Object.values(pairMappings).includes(type);
+      
+      if (!isStartEvent && !isEndEvent) {
+        singleEvents.push({
+          type: type,
+          timestamp: event.timestamp
+        });
+      }
+    });
+    
+    return { pairs, singleEvents };
+  }
+  
+  calculateTimeRange() {
+    if (this.events.length === 0) {
+      return { start: new Date(), end: new Date() };
+    }
+    
+    const timestamps = this.events.map(e => e.timestamp.getTime());
+    const start = new Date(Math.min(...timestamps));
+    const end = new Date(Math.max(...timestamps));
+    
+    // Add some padding
+    const padding = (end.getTime() - start.getTime()) * 0.05;
+    return {
+      start: new Date(start.getTime() - padding),
+      end: new Date(end.getTime() + padding)
+    };
+  }
+  
+  setupCanvas() {
+    const chartHeight = this.eventTypes.length * this.rowHeight + this.margin.top + this.margin.bottom;
+    this.canvas.height = chartHeight;
+    this.canvas.width = this.canvas.offsetWidth;
+    
+    // Set up high DPI rendering
+    const dpr = window.devicePixelRatio || 1;
+    const rect = this.canvas.getBoundingClientRect();
+    this.canvas.width = rect.width * dpr;
+    this.canvas.height = chartHeight * dpr;
+    this.ctx.scale(dpr, dpr);
+    this.canvas.style.width = rect.width + 'px';
+    this.canvas.style.height = chartHeight + 'px';
+    
+    this.chartWidth = rect.width - this.margin.left - this.margin.right;
+    this.chartHeight = this.eventTypes.length * this.rowHeight;
+  }
+  
+  timeToX(timestamp) {
+    const totalTime = this.timeRange.end.getTime() - this.timeRange.start.getTime();
+    const elapsed = timestamp.getTime() - this.timeRange.start.getTime();
+    return this.margin.left + (elapsed / totalTime) * this.chartWidth;
+  }
+  
+  typeToY(eventType) {
+    const index = this.eventTypes.indexOf(eventType);
+    return this.margin.top + index * this.rowHeight + this.rowHeight / 2;
+  }
+  
+  render() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Draw background
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Draw grid lines
+    this.drawGrid();
+    
+    // Draw event type labels
+    this.drawEventTypeLabels();
+    
+    // Draw time axis
+    this.drawTimeAxis();
+    
+    // Draw event pairs (bars)
+    this.drawEventPairs();
+    
+    // Draw single events (circles)
+    this.drawSingleEvents();
+  }
+  
+  drawGrid() {
+    this.ctx.strokeStyle = '#e0e0e0';
+    this.ctx.lineWidth = 1;
+    
+    // Horizontal grid lines
+    this.eventTypes.forEach((type, index) => {
+      const y = this.margin.top + index * this.rowHeight;
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.margin.left, y);
+      this.ctx.lineTo(this.margin.left + this.chartWidth, y);
+      this.ctx.stroke();
+    });
+    
+    // Vertical grid lines (time markers)
+    const timeSpan = this.timeRange.end.getTime() - this.timeRange.start.getTime();
+    const numTicks = 5;
+    for (let i = 0; i <= numTicks; i++) {
+      const time = this.timeRange.start.getTime() + (timeSpan * i / numTicks);
+      const x = this.timeToX(new Date(time));
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, this.margin.top);
+      this.ctx.lineTo(x, this.margin.top + this.chartHeight);
+      this.ctx.stroke();
+    }
+  }
+  
+  drawEventTypeLabels() {
+    this.ctx.fillStyle = '#333333';
+    this.ctx.font = '12px Arial';
+    this.ctx.textAlign = 'right';
+    this.ctx.textBaseline = 'middle';
+    
+    this.eventTypes.forEach((type, index) => {
+      const y = this.typeToY(type);
+      this.ctx.fillText(type, this.margin.left - 10, y);
+    });
+  }
+  
+  drawTimeAxis() {
+    this.ctx.fillStyle = '#333333';
+    this.ctx.font = '11px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'top';
+    
+    const timeSpan = this.timeRange.end.getTime() - this.timeRange.start.getTime();
+    const numTicks = 5;
+    
+    for (let i = 0; i <= numTicks; i++) {
+      const time = new Date(this.timeRange.start.getTime() + (timeSpan * i / numTicks));
+      const x = this.timeToX(time);
+      
+      // Format time based on the span
+      let timeLabel;
+      if (timeSpan < 60000) { // Less than 1 minute
+        timeLabel = time.toLocaleTimeString('en-US', { 
+          hour12: false, 
+          minute: '2-digit', 
+          second: '2-digit', 
+          fractionalSecondDigits: 3 
+        });
+      } else if (timeSpan < 3600000) { // Less than 1 hour
+        timeLabel = time.toLocaleTimeString('en-US', { 
+          hour12: false, 
+          minute: '2-digit', 
+          second: '2-digit' 
+        });
+      } else {
+        timeLabel = time.toLocaleTimeString('en-US', { 
+          hour12: false, 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+      }
+      
+      this.ctx.fillText(timeLabel, x, this.margin.top + this.chartHeight + 10);
+    }
+  }
+  
+  drawEventPairs() {
+    this.eventPairs.pairs.forEach(pair => {
+      const startX = this.timeToX(pair.startTime);
+      const endX = this.timeToX(pair.endTime);
+      const y = this.typeToY(pair.type);
+      const barWidth = endX - startX;
+      
+      // Choose rendering style based on duration
+      if (barWidth < this.minBarWidth) {
+        // Small duration - render as circle
+        this.ctx.fillStyle = '#4CAF50';
+        this.ctx.beginPath();
+        this.ctx.arc(startX + barWidth / 2, y, this.circleRadius, 0, 2 * Math.PI);
+        this.ctx.fill();
+      } else {
+        // Longer duration - render as rounded bar
+        this.ctx.fillStyle = '#2196F3';
+        this.drawRoundedRect(startX, y - 8, barWidth, 16, 8);
+      }
+    });
+  }
+  
+  drawSingleEvents() {
+    this.eventPairs.singleEvents.forEach(event => {
+      const x = this.timeToX(event.timestamp);
+      const y = this.typeToY(event.type);
+      
+      // Render as circle
+      this.ctx.fillStyle = '#FF9800';
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, this.circleRadius, 0, 2 * Math.PI);
+      this.ctx.fill();
+    });
+  }
+  
+  drawRoundedRect(x, y, width, height, radius) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x + radius, y);
+    this.ctx.lineTo(x + width - radius, y);
+    this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    this.ctx.lineTo(x + width, y + height - radius);
+    this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    this.ctx.lineTo(x + radius, y + height);
+    this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    this.ctx.lineTo(x, y + radius);
+    this.ctx.quadraticCurveTo(x, y, x + radius, y);
+    this.ctx.closePath();
+    this.ctx.fill();
+  }
+}
+
+// Initialize chart when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  const chartCanvas = document.getElementById('event-timeline-chart');
+  if (chartCanvas && window.taskEvents) {
+    new TaskEventChart('event-timeline-chart', window.taskEvents);
+  }
+});
