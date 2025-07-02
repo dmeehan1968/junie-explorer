@@ -434,40 +434,16 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                 </thead>
                 <tbody>
                   ${events.map((eventRecord, index) => {
-                    const isError = 'message' in eventRecord && 'json' in eventRecord
-                    
                     // Calculate timestamp display
                     let timestampDisplay = '-'
-                    if (!isError) {
-                      if (index === 0) {
-                        // First record: show time only
-                        timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
-                      } else {
-                        // Subsequent records: show elapsed milliseconds since previous record
-                        const prevRecord = events[index - 1]
-                        const prevIsError = 'message' in prevRecord && 'json' in prevRecord
-                        if (!prevIsError) {
-                          const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
-                          timestampDisplay = `+${elapsed}ms`
-                        } else {
-                          // If previous record was an error, find the last valid timestamp
-                          let lastValidIndex = index - 1
-                          while (lastValidIndex >= 0) {
-                            const checkRecord = events[lastValidIndex]
-                            const checkIsError = 'message' in checkRecord && 'json' in checkRecord
-                            if (!checkIsError) {
-                              const elapsed = eventRecord.timestamp.getTime() - checkRecord.timestamp.getTime()
-                              timestampDisplay = `+${elapsed}ms`
-                              break
-                            }
-                            lastValidIndex--
-                          }
-                          if (lastValidIndex < 0) {
-                            // No valid previous timestamp found, show time only
-                            timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
-                          }
-                        }
-                      }
+                    if (index === 0) {
+                      // First record: show time only
+                      timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
+                    } else {
+                      // Subsequent records: show elapsed milliseconds since previous record
+                      const prevRecord = events[index - 1]
+                      const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
+                      timestampDisplay = `+${elapsed}ms`
                     }
                     
                     return `
