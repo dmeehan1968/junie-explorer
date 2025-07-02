@@ -36,11 +36,9 @@ function initializeEventTypeFilters() {
 // Toggle individual event type filter
 function toggleEventTypeFilter(element) {
   const eventType = element.getAttribute('data-event-type');
-  const checkbox = element.querySelector('input[type="checkbox"]');
   
   // Toggle the filter state
   eventTypeFilters[eventType] = !eventTypeFilters[eventType];
-  checkbox.checked = eventTypeFilters[eventType];
   
   // Update visual state
   if (eventTypeFilters[eventType]) {
@@ -49,8 +47,8 @@ function toggleEventTypeFilter(element) {
     element.classList.add('event-filter-disabled');
   }
   
-  // Update all/none checkbox state
-  updateAllNoneCheckbox();
+  // Update all/none toggle state
+  updateAllNoneToggle();
   
   // Apply filters
   applyEventTypeFilters();
@@ -58,18 +56,19 @@ function toggleEventTypeFilter(element) {
 
 // Toggle all/none event types
 function toggleAllEventTypes() {
-  const allNoneCheckbox = document.getElementById('all-none-checkbox');
   const allNoneElement = document.querySelector('.all-none-toggle');
-  const shouldEnableAll = !allNoneCheckbox.checked;
+  
+  // Determine current state - if all are enabled, disable all; otherwise enable all
+  const eventTypes = Object.keys(eventTypeFilters);
+  const enabledCount = eventTypes.filter(type => eventTypeFilters[type]).length;
+  const shouldEnableAll = enabledCount !== eventTypes.length;
   
   // Update all event type filters
   const eventFilters = document.querySelectorAll('.event-filter[data-event-type]');
   eventFilters.forEach(filter => {
     const eventType = filter.getAttribute('data-event-type');
-    const checkbox = filter.querySelector('input[type="checkbox"]');
     
     eventTypeFilters[eventType] = shouldEnableAll;
-    checkbox.checked = shouldEnableAll;
     
     if (shouldEnableAll) {
       filter.classList.remove('event-filter-disabled');
@@ -78,8 +77,7 @@ function toggleAllEventTypes() {
     }
   });
   
-  // Update all/none checkbox
-  allNoneCheckbox.checked = shouldEnableAll;
+  // Update all/none toggle visual state
   if (shouldEnableAll) {
     allNoneElement.classList.remove('event-filter-disabled');
   } else {
@@ -90,9 +88,8 @@ function toggleAllEventTypes() {
   applyEventTypeFilters();
 }
 
-// Update all/none checkbox based on individual filter states
-function updateAllNoneCheckbox() {
-  const allNoneCheckbox = document.getElementById('all-none-checkbox');
+// Update all/none toggle based on individual filter states
+function updateAllNoneToggle() {
   const allNoneElement = document.querySelector('.all-none-toggle');
   
   const eventTypes = Object.keys(eventTypeFilters);
@@ -100,15 +97,12 @@ function updateAllNoneCheckbox() {
   
   if (enabledCount === eventTypes.length) {
     // All enabled
-    allNoneCheckbox.checked = true;
     allNoneElement.classList.remove('event-filter-disabled');
   } else if (enabledCount === 0) {
     // None enabled
-    allNoneCheckbox.checked = false;
     allNoneElement.classList.add('event-filter-disabled');
   } else {
-    // Some enabled
-    allNoneCheckbox.checked = true;
+    // Some enabled - show as enabled since we have partial selection
     allNoneElement.classList.remove('event-filter-disabled');
   }
 }

@@ -779,9 +779,6 @@ p {
   box-shadow: none;
 }
 
-.event-filter input[type="checkbox"] {
-  display: none;
-}
 
 .event-filter label {
   margin: 0;
@@ -799,9 +796,6 @@ p {
   font-weight: bold;
 }
 
-.all-none-toggle input[type="checkbox"] {
-  display: none;
-}
 
 .all-none-toggle label {
   margin: 0;

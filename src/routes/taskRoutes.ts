@@ -428,13 +428,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
               <div class="event-filter-toolbar">
                 <div class="filter-label">Filter by Event Type:</div>
                 <div class="event-filter all-none-toggle" data-testid="all-none-toggle">
-                  <input type="checkbox" id="all-none-checkbox" checked>
-                  <label for="all-none-checkbox">All/None</label>
+                  <label>All/None</label>
                 </div>
                 ${task.eventTypes.map(eventType => `
                   <div class="event-filter" data-event-type="${escapeHtml(eventType)}" data-testid="event-filter-${escapeHtml(eventType)}">
-                    <input type="checkbox" id="event-${escapeHtml(eventType)}" checked>
-                    <label for="event-${escapeHtml(eventType)}">${escapeHtml(eventType)}</label>
+                    <label>${escapeHtml(eventType)}</label>
                   </div>
                 `).join('')}
               </div>
