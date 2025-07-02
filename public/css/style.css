@@ -1117,6 +1117,59 @@ p {
   margin-top: 20px;
 }
 
+/* Event Type Statistics Table Styles */
+.event-type-statistics {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.event-type-statistics h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.event-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: smaller;
+}
+
+.event-stats-table th,
+.event-stats-table td {
+  border: 1px solid #ddd;
+  padding: 3px 6px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.event-stats-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.event-stats-table .event-type-col {
+  width: 40%;
+}
+
+.event-stats-table .count-duration-col,
+.event-stats-table .min-duration-col,
+.event-stats-table .max-duration-col,
+.event-stats-table .avg-duration-col {
+  width: 15%;
+  text-align: right;
+}
+
 .events-table th,
 .events-table td {
   border: 1px solid #ddd;
