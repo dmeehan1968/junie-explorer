@@ -184,15 +184,17 @@ class TaskEventChart {
       let timeLabel;
       if (timeSpan < 60000) { // Less than 1 minute
         timeLabel = time.toLocaleTimeString('en-US', { 
-          hour12: false, 
-          minute: '2-digit', 
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
           second: '2-digit', 
-          fractionalSecondDigits: 3 
+          fractionalSecondDigits: 3
         });
       } else if (timeSpan < 3600000) { // Less than 1 hour
         timeLabel = time.toLocaleTimeString('en-US', { 
-          hour12: false, 
-          minute: '2-digit', 
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
           second: '2-digit' 
         });
       } else {
@@ -224,7 +226,7 @@ class TaskEventChart {
       } else {
         // Longer duration - render as rounded bar
         this.ctx.fillStyle = '#2196F3';
-        this.drawRoundedRect(startX, y - 8, barWidth, 16, 8);
+        this.drawRoundedRect(startX, y - 4, barWidth, 8, 8);
       }
     });
   }
