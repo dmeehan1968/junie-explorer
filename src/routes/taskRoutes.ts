@@ -424,7 +424,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
 
           ${events.length > 0 ? `
             <div class="event-filters">
-              <h3>Event Type Filters</h3>
               <div class="event-filter-toolbar">
                 <div class="filter-label">Filter by Event Type:</div>
                 <div class="event-filter all-none-toggle" data-testid="all-none-toggle">
