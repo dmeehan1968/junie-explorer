@@ -377,6 +377,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
 
     // Get events for the task
     const events = task.events
+    let cost = 0
 
     // Generate HTML
     const html = `
@@ -542,6 +543,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                     <th class="timestamp-col">Timestamp</th>
                     <th class="event-type-col">Event Type</th>
                     <th class="json-col">JSON</th>
+                    <th class="cost-col">Cost</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -558,6 +560,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                       timestampDisplay = `+${elapsed}ms`
                     }
                     
+                    if (eventRecord.event.type === 'LlmResponseEvent') {
+                      cost += eventRecord.event.answer.cost
+                    }
+                    
                     return `
                       <tr data-testid="event-row-${index}">
                         <td class="timestamp-col">${timestampDisplay}</td>
@@ -568,10 +574,19 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                         <td class="json-col">
                           <div class="json-content">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
                         </td>
+                        <td class="cost-col">
+                          ${eventRecord.event.type === 'LlmResponseEvent' ? eventRecord.event.answer.cost.toFixed(4) : '-'}  
+                        </td>
                       </tr>
                     `
                   }).join('')}
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3" style="text-align: right">Total Cost</td>
+                    <td class="cost-col">${cost.toFixed(4)}</td>
+                  </tr>
+                </tfoot>
               </table>
             `
             : '<div class="no-events" data-testid="no-events-message">No events found for this task</div>'
