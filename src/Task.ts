@@ -130,9 +130,7 @@ export class Task {
   }
 
   get eventTypes() {
-    const types = new Set<string>()
-    this.events.forEach(event => types.add(event.event.type))
-    return [...types.values()].sort()
+    return [...new Set(this.events.map(e => e.event.type))].sort()
   }
 
   get trajectory() {
