@@ -153,7 +153,7 @@ export const EditEvent = z.object({
 export const UnknownEvent = z.object({
   type: z.string(),
 }).passthrough()
-export const Event = z.union([
+export const Event = z.discriminatedUnion('type', [
   BeforeArtifactBuildingStarted,
   AfterArtifactBuildingFinished,
   LlmRequestEvent,
@@ -175,11 +175,19 @@ export const Event = z.union([
   ErrorCheckerStarted,
   ErrorCheckerFinished,
   EditEvent,
-  // UnknownEvent.passthrough(),
 ])
 export type Event = z.infer<typeof Event>
+
 export const EventRecord = z.object({
   event: Event,
   timestampMs: z.coerce.date(),
+  parseError: z.any().optional(),
 }).passthrough().transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
 export type EventRecord = z.infer<typeof EventRecord>
+
+export const UnknownEventRecord = z.object({
+  event: UnknownEvent,
+  timestampMs: z.coerce.date(),
+  parseError: z.any().optional(),
+}).passthrough().transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
+export type UnknownEventRecord = z.infer<typeof UnknownEventRecord>

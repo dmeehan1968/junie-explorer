@@ -1071,6 +1071,11 @@ p {
   color: #666;
 }
 
+.error {
+  background-color: #e74c3c;
+  color: white;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 15px;

@@ -1,8 +1,7 @@
 import fs from "fs-extra"
 import path from "path"
 import { inspect } from "util"
-import { z } from "zod"
-import { EventRecord, UnknownEvent } from "./eventSchema.js"
+import { EventRecord, UnknownEventRecord } from "./eventSchema.js"
 import {
   AgentState,
   JuniePlan,
@@ -93,7 +92,7 @@ export class Task {
     return this.lazyload()._patch!
   }
 
-  get events() {
+  get events(): EventRecord[] {
     if (this._events.length > 0) {
       return this._events
     }
@@ -105,20 +104,22 @@ export class Task {
       this._events = content
         .split('\n')
         .filter(json => json.trim())
-        .map((json, line) => {
+        .map((line, lineNumber) => {
+          let json: any
           try {
-            return EventRecord.parse(JSON.parse(json))
+            json = JSON.parse(line)
+          } catch (error) {
+            return {
+              type: 'jsonError',
+              timestamp: new Date(),
+              event: json,
+            }
+          }
+          try {
+            return EventRecord.parse(json)
           } catch (error: any) {
-            console.log(root, line, error.errors[0].code, error.errors[0].path, error.errors[0].message, json.slice(0, 100))
-            return z.object({
-              event: UnknownEvent,
-              timestampMs: z.coerce.date(),
-            }).transform(({ timestampMs, event, ...rest }) => ({
-              timestamp: timestampMs,
-              parseError: error.errors[0].message,
-              event,
-              ...rest,
-            })).parse(JSON.parse(json))
+            console.log(root, lineNumber, error.errors[0].code, error.errors[0].path, error.errors[0].message, line.slice(0, 100))
+            return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parse(json)
           }
         })
         .filter((event): event is EventRecord => !!event)

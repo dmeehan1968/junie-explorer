@@ -473,7 +473,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                     return `
                       <tr data-testid="event-row-${index}">
                         <td class="timestamp-col">${timestampDisplay}</td>
-                        <td class="event-type-col">${escapeHtml(eventRecord.event.type || 'unknown')}</td>
+                        <td class="event-type-col ${eventRecord.parseError ? 'error' : ''}">
+                          ${escapeHtml(eventRecord.event.type)}
+                          ${eventRecord.parseError ? '(parseError)' : ''}
+                        </td>
                         <td class="json-col">
                           <div class="json-content">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
                         </td>
