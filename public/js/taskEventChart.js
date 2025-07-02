@@ -12,7 +12,8 @@ class TaskEventChart {
     this.margin = { top: 20, right: 30, bottom: 60, left: 200 };
     this.rowHeight = 20;
     this.minBarWidth = 8; // Minimum width for bars to be visible
-    this.circleRadius = 4;
+    this.circleRadius = 3;
+    this.barHeight = 8;
     this.numTicks = 8;
     
     this.setupCanvas();
@@ -245,11 +246,11 @@ class TaskEventChart {
         this.ctx.fill();
       } else {
         // Longer duration - render as unfilled rounded bar with circle at the end
-        this.drawRoundedRect(startX, y - this.circleRadius, barWidth, this.circleRadius * 2, this.circleRadius);
+        this.drawRoundedRect(startX, y - this.barHeight / 2, barWidth, this.barHeight, this.circleRadius * 1.5);
 
         // Draw circle at the end of the bar
         this.ctx.beginPath();
-        this.ctx.arc(endX - this.circleRadius, y, this.circleRadius - 1, 0, 2 * Math.PI);
+        this.ctx.arc(endX - this.circleRadius - 1, y, this.circleRadius, 0, 2 * Math.PI);
         this.ctx.fill();
       }
     });
