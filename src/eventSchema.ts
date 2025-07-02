@@ -150,6 +150,13 @@ export const EditEvent = z.object({
   type: z.literal('EditEvent'),
   // TODO
 }).passthrough()
+export const LongDelayDetected = z.object({
+  type: z.literal('LongDelayDetected'),
+}).passthrough()
+export const LlmRequestFailed = z.object({
+  type: z.literal('LlmRequestFailed'),
+  // TODO
+})
 export const UnknownEvent = z.object({
   type: z.string(),
 }).passthrough()
@@ -174,6 +181,8 @@ export const Event = z.discriminatedUnion('type', [
   SemanticCheckFinished,
   ErrorCheckerStarted,
   ErrorCheckerFinished,
+  LongDelayDetected,
+  LlmRequestFailed,
   EditEvent,
 ])
 export type Event = z.infer<typeof Event>
