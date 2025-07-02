@@ -20,7 +20,6 @@ class TaskEventChart {
   
   calculateEventPairs() {
     const pairs = [];
-    const singleEvents = [];
     
     // Sort events by timestamp to ensure proper ordering
     const sortedEvents = [...this.events].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
@@ -40,24 +39,16 @@ class TaskEventChart {
         endTime = event.timestamp;
       }
       
-      // Decide whether to render as bar or circle based on duration
-      if (duration > 0) {
-        pairs.push({
-          type: type,
-          startTime: startTime,
-          endTime: endTime,
-          duration: duration
-        });
-      } else {
-        // First event or zero duration - treat as single event
-        singleEvents.push({
-          type: type,
-          timestamp: event.timestamp
-        });
-      }
+      // Treat all events as pairs, even those with zero duration
+      pairs.push({
+        type: type,
+        startTime: startTime,
+        endTime: endTime,
+        duration: duration
+      });
     });
     
-    return { pairs, singleEvents };
+    return { pairs };
   }
   
   calculateTimeRange() {
@@ -122,11 +113,8 @@ class TaskEventChart {
     // Draw time axis
     this.drawTimeAxis();
     
-    // Draw event pairs (bars)
-    this.drawEventPairs();
-    
-    // Draw single events (circles)
-    this.drawSingleEvents();
+    // Draw all events (unified approach)
+    this.drawEvents();
   }
   
   drawGrid() {
@@ -209,7 +197,10 @@ class TaskEventChart {
     }
   }
   
-  drawEventPairs() {
+  drawEvents() {
+    // Use the same color for both circles and bars
+    this.ctx.fillStyle = '#2196F3';
+    
     this.eventPairs.pairs.forEach(pair => {
       const startX = this.timeToX(pair.startTime);
       const endX = this.timeToX(pair.endTime);
@@ -219,28 +210,13 @@ class TaskEventChart {
       // Choose rendering style based on duration
       if (barWidth < this.minBarWidth) {
         // Small duration - render as circle
-        this.ctx.fillStyle = '#4CAF50';
         this.ctx.beginPath();
         this.ctx.arc(startX + barWidth / 2, y, this.circleRadius, 0, 2 * Math.PI);
         this.ctx.fill();
       } else {
         // Longer duration - render as rounded bar
-        this.ctx.fillStyle = '#2196F3';
         this.drawRoundedRect(startX, y - 4, barWidth, 8, 8);
       }
-    });
-  }
-  
-  drawSingleEvents() {
-    this.eventPairs.singleEvents.forEach(event => {
-      const x = this.timeToX(event.timestamp);
-      const y = this.typeToY(event.type);
-      
-      // Render as circle
-      this.ctx.fillStyle = '#FF9800';
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, this.circleRadius, 0, 2 * Math.PI);
-      this.ctx.fill();
     });
   }
   
