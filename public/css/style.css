@@ -1119,11 +1119,11 @@ p {
 
 /* Event Type Statistics Table Styles */
 .event-type-statistics {
-  margin: 20px 0;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
 }
 
 .event-type-statistics h3 {
@@ -1219,13 +1219,64 @@ p {
   color: white;
 }
 
-/* Event Timeline Chart Styles */
-.event-timeline-container {
+/* Collapsible Section Styles */
+.collapsible-section {
   margin: 20px 0;
-  padding: 20px;
   background-color: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+}
+
+.collapsible-header {
+  padding: 15px 20px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+  transition: background-color 0.2s ease;
+}
+
+.collapsible-header:hover {
+  background-color: #e9ecef;
+}
+
+.collapsible-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.collapsible-toggle {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: normal;
+}
+
+.collapsible-content {
+  padding: 0 20px 20px 20px;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.collapsible-section.collapsed .collapsible-content {
+  display: none;
+}
+
+.collapsible-section.collapsed .collapsible-header {
+  border-radius: 8px;
+}
+
+/* Event Timeline Chart Styles */
+.event-timeline-container {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
 }
 
 .event-timeline-container h3 {

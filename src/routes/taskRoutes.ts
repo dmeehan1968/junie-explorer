@@ -425,9 +425,16 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
           </div>
 
           ${events.length > 0 ? `
-            <div class="event-timeline-container">
-              <h3>Event Timeline</h3>
-              <canvas id="event-timeline-chart" class="event-timeline-chart"></canvas>
+            <div class="collapsible-section collapsed" data-testid="event-timeline-section">
+              <div class="collapsible-header" data-testid="event-timeline-header">
+                <h3>Event Timeline</h3>
+                <span class="collapsible-toggle">Click to expand</span>
+              </div>
+              <div class="collapsible-content">
+                <div class="event-timeline-container">
+                  <canvas id="event-timeline-chart" class="event-timeline-chart"></canvas>
+                </div>
+              </div>
             </div>
             <script>
               window.taskEvents = ${JSON.stringify(events.map(e => ({
@@ -443,64 +450,71 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
           ` : ''}
 
           ${events.length > 0 ? `
-            <div class="event-type-statistics">
-              <h3>Event Type Statistics</h3>
-              <table class="event-stats-table" data-testid="event-stats-table">
-                <thead>
-                  <tr>
-                    <th class="event-type-col">Event Type</th>
-                    <th class="count-duration-col">Sample Count</th>
-                    <th class="min-duration-col">Min Duration (ms)</th>
-                    <th class="max-duration-col">Max Duration (ms)</th>
-                    <th class="avg-duration-col">Avg Duration (ms)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${(() => {
-                    // Calculate durations for each event
-                    const eventDurations = events.map((eventRecord, index) => {
-                      let duration = 0
-                      if (index > 0) {
-                        const prevRecord = events[index - 1]
-                        duration = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
-                      }
-                      return {
-                        type: eventRecord.event.type,
-                        duration: duration
-                      }
-                    })
+            <div class="collapsible-section collapsed" data-testid="event-statistics-section">
+              <div class="collapsible-header" data-testid="event-statistics-header">
+                <h3>Event Type Statistics</h3>
+                <span class="collapsible-toggle">Click to expand</span>
+              </div>
+              <div class="collapsible-content">
+                <div class="event-type-statistics">
+                  <table class="event-stats-table" data-testid="event-stats-table">
+                    <thead>
+                      <tr>
+                        <th class="event-type-col">Event Type</th>
+                        <th class="count-duration-col">Sample Count</th>
+                        <th class="min-duration-col">Min Duration (ms)</th>
+                        <th class="max-duration-col">Max Duration (ms)</th>
+                        <th class="avg-duration-col">Avg Duration (ms)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${(() => {
+                        // Calculate durations for each event
+                        const eventDurations = events.map((eventRecord, index) => {
+                          let duration = 0
+                          if (index > 0) {
+                            const prevRecord = events[index - 1]
+                            duration = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
+                          }
+                          return {
+                            type: eventRecord.event.type,
+                            duration: duration
+                          }
+                        })
 
-                    // Group by event type and calculate statistics
-                    const eventTypeStats = new Map<string, number[]>(task.eventTypes.map(eventType => [eventType, []]))
-                    eventDurations.forEach(({ type, duration }) => {
-                      if (!eventTypeStats.has(type)) {
-                        eventTypeStats.set(type, [])
-                      }
-                      eventTypeStats.get(type)!.push(duration)
-                    })
+                        // Group by event type and calculate statistics
+                        const eventTypeStats = new Map<string, number[]>(task.eventTypes.map(eventType => [eventType, []]))
+                        eventDurations.forEach(({ type, duration }) => {
+                          if (!eventTypeStats.has(type)) {
+                            eventTypeStats.set(type, [])
+                          }
+                          eventTypeStats.get(type)!.push(duration)
+                        })
 
-                    // Calculate min, max, avg for each event type
-                    const statsRows: string[] = []
-                    for (const [eventType, durations] of eventTypeStats.entries()) {
-                      const min = Math.min(...durations)
-                      const max = Math.max(...durations)
-                      const avg = durations.reduce((sum, d) => sum + d, 0) / durations.length
-                      
-                      statsRows.push(`
-                        <tr data-testid="event-stats-row-${escapeHtml(eventType)}">
-                          <td class="event-type-col">${escapeHtml(eventType)}</td>
-                          <td class="count-duration-col">${durations.length}</td>
-                          <td class="min-duration-col">${min}</td>
-                          <td class="max-duration-col">${max}</td>
-                          <td class="avg-duration-col">${Math.round(avg)}</td>
-                        </tr>
-                      `)
-                    }
-                    
-                    return statsRows.join('')
-                  })()}
-                </tbody>
-              </table>
+                        // Calculate min, max, avg for each event type
+                        const statsRows: string[] = []
+                        for (const [eventType, durations] of eventTypeStats.entries()) {
+                          const min = Math.min(...durations)
+                          const max = Math.max(...durations)
+                          const avg = durations.reduce((sum, d) => sum + d, 0) / durations.length
+                          
+                          statsRows.push(`
+                            <tr data-testid="event-stats-row-${escapeHtml(eventType)}">
+                              <td class="event-type-col">${escapeHtml(eventType)}</td>
+                              <td class="count-duration-col">${durations.length}</td>
+                              <td class="min-duration-col">${min}</td>
+                              <td class="max-duration-col">${max}</td>
+                              <td class="avg-duration-col">${Math.round(avg)}</td>
+                            </tr>
+                          `)
+                        }
+                        
+                        return statsRows.join('')
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           ` : ''}
 
@@ -565,6 +579,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
         </div>
 
         <script src="/js/taskEventFilters.js"></script>
+        <script src="/js/collapsibleSections.js"></script>
       </body>
       </html>
     `

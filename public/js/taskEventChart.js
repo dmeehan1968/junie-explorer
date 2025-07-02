@@ -72,19 +72,48 @@ class TaskEventChart {
   setupCanvas() {
     const chartHeight = this.eventTypes.length * this.rowHeight + this.margin.top + this.margin.bottom;
     this.canvas.height = chartHeight;
-    this.canvas.width = this.canvas.offsetWidth;
+    
+    // Get the container width - prioritize parent container width over canvas width
+    let containerWidth = 0;
+    
+    // Try to get width from parent containers in order of preference
+    const eventTimelineContainer = this.canvas.closest('.event-timeline-container');
+    const collapsibleContent = this.canvas.closest('.collapsible-content');
+    const collapsibleSection = this.canvas.closest('.collapsible-section');
+    
+    if (eventTimelineContainer && eventTimelineContainer.offsetWidth > 0) {
+      containerWidth = eventTimelineContainer.offsetWidth;
+    } else if (collapsibleContent && collapsibleContent.offsetWidth > 0) {
+      containerWidth = collapsibleContent.offsetWidth - 40; // Account for padding (20px on each side)
+    } else if (collapsibleSection && collapsibleSection.offsetWidth > 0) {
+      containerWidth = collapsibleSection.offsetWidth - 40; // Account for padding
+    } else if (this.canvas.offsetWidth > 0) {
+      containerWidth = this.canvas.offsetWidth;
+    } else {
+      // Final fallback - use a reasonable default
+      containerWidth = 800;
+    }
+    
+    this.canvas.width = containerWidth;
     
     // Set up high DPI rendering
     const dpr = window.devicePixelRatio || 1;
     const rect = this.canvas.getBoundingClientRect();
-    this.canvas.width = rect.width * dpr;
+    const actualWidth = rect.width || containerWidth;
+    this.canvas.width = actualWidth * dpr;
     this.canvas.height = chartHeight * dpr;
     this.ctx.scale(dpr, dpr);
-    this.canvas.style.width = rect.width + 'px';
+    this.canvas.style.width = actualWidth + 'px';
     this.canvas.style.height = chartHeight + 'px';
     
-    this.chartWidth = rect.width - this.margin.left - this.margin.right;
+    this.chartWidth = actualWidth - this.margin.left - this.margin.right;
     this.chartHeight = this.eventTypes.length * this.rowHeight;
+  }
+  
+  // Method to resize and redraw the chart
+  resize() {
+    this.setupCanvas();
+    this.render();
   }
   
   timeToX(timestamp) {
@@ -246,6 +275,6 @@ class TaskEventChart {
 document.addEventListener('DOMContentLoaded', function() {
   const chartCanvas = document.getElementById('event-timeline-chart');
   if (chartCanvas && window.taskEvents) {
-    new TaskEventChart('event-timeline-chart', window.taskEvents);
+    window.taskEventChart = new TaskEventChart('event-timeline-chart', window.taskEvents);
   }
 });
