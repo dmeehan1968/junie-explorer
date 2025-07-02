@@ -10,7 +10,7 @@ class TaskEventChart {
     
     // Chart dimensions and styling
     this.margin = { top: 20, right: 20, bottom: 60, left: 200 };
-    this.rowHeight = 40;
+    this.rowHeight = 20;
     this.minBarWidth = 8; // Minimum width for bars to be visible
     this.circleRadius = 4;
     
