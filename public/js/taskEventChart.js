@@ -22,59 +22,34 @@ class TaskEventChart {
     const pairs = [];
     const singleEvents = [];
     
-    // Define event pairs that represent start/end of operations
-    const pairMappings = {
-      'BeforeArtifactBuildingStarted': 'AfterArtifactBuildingFinished',
-      'AgentActionExecutionStarted': 'AgentActionExecutionFinished',
-      'ActionRequestBuildingStarted': 'ActionRequestBuildingFinished',
-      'BeforeStepStartedEvent': 'AfterStepFinishedEvent',
-      'SemanticCheckStarted': 'SemanticCheckFinished',
-      'ErrorCheckerStarted': 'ErrorCheckerFinished'
-    };
+    // Sort events by timestamp to ensure proper ordering
+    const sortedEvents = [...this.events].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     
-    // Group events by type
-    const eventsByType = {};
-    this.events.forEach(event => {
+    // Calculate duration for each event based on difference from previous event
+    sortedEvents.forEach((event, index) => {
       const type = event.event.type;
-      if (!eventsByType[type]) {
-        eventsByType[type] = [];
+      let duration = 0;
+      let startTime = event.timestamp;
+      let endTime = event.timestamp;
+      
+      if (index > 0) {
+        // Calculate duration as difference from previous event
+        const previousEvent = sortedEvents[index - 1];
+        duration = event.timestamp.getTime() - previousEvent.timestamp.getTime();
+        startTime = previousEvent.timestamp;
+        endTime = event.timestamp;
       }
-      eventsByType[type].push(event);
-    });
-    
-    // Find pairs
-    Object.entries(pairMappings).forEach(([startType, endType]) => {
-      const startEvents = eventsByType[startType] || [];
-      const endEvents = eventsByType[endType] || [];
       
-      // Match start events with their corresponding end events
-      startEvents.forEach(startEvent => {
-        // Find the next end event after this start event
-        const endEvent = endEvents.find(e => e.timestamp > startEvent.timestamp);
-        if (endEvent) {
-          pairs.push({
-            type: startType,
-            startTime: startEvent.timestamp,
-            endTime: endEvent.timestamp,
-            duration: endEvent.timestamp.getTime() - startEvent.timestamp.getTime()
-          });
-        } else {
-          // Start event without matching end event - treat as single event
-          singleEvents.push({
-            type: startType,
-            timestamp: startEvent.timestamp
-          });
-        }
-      });
-    });
-    
-    // Add events that don't have pairs as single events
-    this.events.forEach(event => {
-      const type = event.event.type;
-      const isStartEvent = Object.keys(pairMappings).includes(type);
-      const isEndEvent = Object.values(pairMappings).includes(type);
-      
-      if (!isStartEvent && !isEndEvent) {
+      // Decide whether to render as bar or circle based on duration
+      if (duration > 0) {
+        pairs.push({
+          type: type,
+          startTime: startTime,
+          endTime: endTime,
+          duration: duration
+        });
+      } else {
+        // First event or zero duration - treat as single event
         singleEvents.push({
           type: type,
           timestamp: event.timestamp
