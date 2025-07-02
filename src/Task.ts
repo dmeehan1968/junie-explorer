@@ -129,6 +129,12 @@ export class Task {
     return this._events
   }
 
+  get eventTypes() {
+    const types = new Set<string>()
+    this.events.forEach(event => types.add(event.event.type))
+    return [...types.values()].sort()
+  }
+
   get trajectory() {
     if (this._trajectory.length > 0) {
       return this._trajectory
