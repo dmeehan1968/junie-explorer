@@ -47,17 +47,29 @@ export const LlmResponseEvent = z.object({
       capabilities: z.object({
         inputPrice: z.number(),
         outputPrice: z.number(),
-        cacheInputPrice: z.number(),
+        cacheInputPrice: z.number().default(() => 0),
+        cacheCreateInputPrice: z.number().default(() => 0),
       }).passthrough(),
     }).passthrough(),
     contentChoices: z.object({
       type: z.string(),
       content: z.string(),
     }).passthrough().array(),
-    inputTokens: z.number().int().optional(),
-    outputTokens: z.number().int().optional(),
+    inputTokens: z.number().int().default(() => 0),
+    outputTokens: z.number().int().default(() => 0),
+    cacheInputTokens: z.number().int().default(() => 0),
+    cacheCreateInputTokens: z.number().int().default(() => 0),
     time: z.number().optional(),
-  }).passthrough(),
+  }).passthrough().transform(answer => {
+    const million = 1_000_000
+    return {
+      ...answer,
+      cost: (answer.inputTokens / million) * answer.llm.capabilities.inputPrice
+        + (answer.outputTokens / million) * answer.llm.capabilities.outputPrice
+        + (answer.cacheInputTokens / million) * answer.llm.capabilities.cacheInputPrice
+        + (answer.cacheCreateInputTokens / million) * answer.llm.capabilities.cacheCreateInputPrice,
+    }
+  }),
   id: z.string(),
 }).passthrough()
 export const TaskSummaryCreatedEvent = z.object({
