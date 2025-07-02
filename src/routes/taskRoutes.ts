@@ -422,6 +422,25 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
             ` : ''}
           </div>
 
+          ${events.length > 0 ? `
+            <div class="event-filters">
+              <h3>Event Type Filters</h3>
+              <div class="event-filter-toolbar">
+                <div class="filter-label">Filter by Event Type:</div>
+                <div class="event-filter all-none-toggle" data-testid="all-none-toggle">
+                  <input type="checkbox" id="all-none-checkbox" checked>
+                  <label for="all-none-checkbox">All/None</label>
+                </div>
+                ${task.eventTypes.map(eventType => `
+                  <div class="event-filter" data-event-type="${escapeHtml(eventType)}" data-testid="event-filter-${escapeHtml(eventType)}">
+                    <input type="checkbox" id="event-${escapeHtml(eventType)}" checked>
+                    <label for="event-${escapeHtml(eventType)}">${escapeHtml(eventType)}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
           ${events.length > 0
             ? `
               <table class="events-table" data-testid="events-table">
@@ -465,6 +484,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
             : '<div class="no-events" data-testid="no-events-message">No events found for this task</div>'
           }
         </div>
+
+        <script src="/js/taskEventFilters.js"></script>
       </body>
       </html>
     `
