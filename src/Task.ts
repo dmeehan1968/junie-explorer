@@ -2,6 +2,7 @@ import fs from "fs-extra"
 import path from "path"
 import { inspect } from "util"
 import { z } from "zod"
+import { EventRecord, UnknownEvent } from "./eventSchema.js"
 import {
   AgentState,
   JuniePlan,
@@ -12,17 +13,6 @@ import {
   SummaryMetrics,
 } from "./schema.js"
 import { Step } from "./Step.js"
-
-export const Event = z.object({
-  type: z.string(),
-}).passthrough()
-export type Event = z.infer<typeof Event>
-
-export const EventRecord = z.object({
-  event: Event,
-  timestampMs: z.coerce.date(),
-}).passthrough().transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
-export type EventRecord = z.infer<typeof EventRecord>
 
 export class Task {
   readonly id: string
@@ -115,12 +105,20 @@ export class Task {
       this._events = content
         .split('\n')
         .filter(json => json.trim())
-        .map(json => {
+        .map((json, line) => {
           try {
             return EventRecord.parse(JSON.parse(json))
-          } catch (error) {
-            console.log(error, json)
-            return undefined
+          } catch (error: any) {
+            console.log(root, line, error.errors[0].code, error.errors[0].path, error.errors[0].message, json.slice(0, 100))
+            return z.object({
+              event: UnknownEvent,
+              timestampMs: z.coerce.date(),
+            }).transform(({ timestampMs, event, ...rest }) => ({
+              timestamp: timestampMs,
+              parseError: error.errors[0].message,
+              event,
+              ...rest,
+            })).parse(JSON.parse(json))
           }
         })
         .filter((event): event is EventRecord => !!event)
