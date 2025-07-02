@@ -119,6 +119,10 @@ export const ActionRequestBuildingStarted = z.object({
   type: z.literal('ActionRequestBuildingStarted'),
   attemptNumber: z.number(),
 }).passthrough()
+export const ActionRequestBuildingFailed = z.object({
+  type: z.literal('ActionRequestBuildingFailed'),
+  attemptNumber: z.number(),
+}).passthrough()
 export const ActionRequestBuildingFinished = z.object({
   type: z.literal('ActionRequestBuildingFinished'),
   attemptNumber: z.number(),
@@ -175,6 +179,7 @@ export const Event = z.discriminatedUnion('type', [
   AgentActionExecutionFinished,
   AgentSessionUpdatedEvent,
   ActionRequestBuildingStarted,
+  ActionRequestBuildingFailed,
   ActionRequestBuildingFinished,
   TaskResultCreatedEvent,
   SemanticCheckStarted,
