@@ -9,10 +9,11 @@ class TaskEventChart {
     this.timeRange = this.calculateTimeRange();
     
     // Chart dimensions and styling
-    this.margin = { top: 20, right: 20, bottom: 60, left: 200 };
+    this.margin = { top: 20, right: 30, bottom: 60, left: 200 };
     this.rowHeight = 20;
     this.minBarWidth = 8; // Minimum width for bars to be visible
     this.circleRadius = 4;
+    this.numTicks = 8;
     
     this.setupCanvas();
     this.render();
@@ -132,9 +133,8 @@ class TaskEventChart {
     
     // Vertical grid lines (time markers)
     const timeSpan = this.timeRange.end.getTime() - this.timeRange.start.getTime();
-    const numTicks = 5;
-    for (let i = 0; i <= numTicks; i++) {
-      const time = this.timeRange.start.getTime() + (timeSpan * i / numTicks);
+    for (let i = 0; i <= this.numTicks; i++) {
+      const time = this.timeRange.start.getTime() + (timeSpan * i / this.numTicks);
       const x = this.timeToX(new Date(time));
       this.ctx.beginPath();
       this.ctx.moveTo(x, this.margin.top);
@@ -162,10 +162,9 @@ class TaskEventChart {
     this.ctx.textBaseline = 'top';
     
     const timeSpan = this.timeRange.end.getTime() - this.timeRange.start.getTime();
-    const numTicks = 8;
-    
-    for (let i = 0; i <= numTicks; i++) {
-      const time = new Date(this.timeRange.start.getTime() + (timeSpan * i / numTicks));
+
+    for (let i = 0; i <= this.numTicks; i++) {
+      const time = new Date(this.timeRange.start.getTime() + (timeSpan * i / this.numTicks));
       const x = this.timeToX(time);
       
       // Format time based on the span
