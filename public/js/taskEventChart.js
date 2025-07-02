@@ -162,7 +162,7 @@ class TaskEventChart {
     this.ctx.textBaseline = 'top';
     
     const timeSpan = this.timeRange.end.getTime() - this.timeRange.start.getTime();
-    const numTicks = 5;
+    const numTicks = 8;
     
     for (let i = 0; i <= numTicks; i++) {
       const time = new Date(this.timeRange.start.getTime() + (timeSpan * i / numTicks));
@@ -198,8 +198,10 @@ class TaskEventChart {
   }
   
   drawEvents() {
-    // Use the same color for both circles and bars
+    // Set color and style for both circles and bars
+    this.ctx.strokeStyle = '#67c100';
     this.ctx.fillStyle = '#2196F3';
+    this.ctx.lineWidth = 1;
     
     this.eventPairs.pairs.forEach(pair => {
       const startX = this.timeToX(pair.startTime);
@@ -209,13 +211,18 @@ class TaskEventChart {
       
       // Choose rendering style based on duration
       if (barWidth < this.minBarWidth) {
-        // Small duration - render as circle
+        // Small duration - render as circle only
         this.ctx.beginPath();
         this.ctx.arc(startX + barWidth / 2, y, this.circleRadius, 0, 2 * Math.PI);
         this.ctx.fill();
       } else {
-        // Longer duration - render as rounded bar
-        this.drawRoundedRect(startX, y - 4, barWidth, 8, 8);
+        // Longer duration - render as unfilled rounded bar with circle at the end
+        this.drawRoundedRect(startX, y - this.circleRadius, barWidth, this.circleRadius * 2, this.circleRadius);
+
+        // Draw circle at the end of the bar
+        this.ctx.beginPath();
+        this.ctx.arc(endX - this.circleRadius, y, this.circleRadius - 1, 0, 2 * Math.PI);
+        this.ctx.fill();
       }
     });
   }
@@ -232,7 +239,7 @@ class TaskEventChart {
     this.ctx.lineTo(x, y + radius);
     this.ctx.quadraticCurveTo(x, y, x + radius, y);
     this.ctx.closePath();
-    this.ctx.fill();
+    this.ctx.stroke();
   }
 }
 
