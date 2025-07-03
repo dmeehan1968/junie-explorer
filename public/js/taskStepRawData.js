@@ -7,9 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
       event.preventDefault();
       const stepIndex = this.getAttribute('data-step');
       const container = document.getElementById(`raw-data-${stepIndex}`);
+      console.log('click', stepIndex)
 
       // Toggle visibility
-      if (container.style.display === 'none') {
+      if (!container.style.display || container.style.display === 'none') {
         container.style.display = 'table-row';
 
         // Initialize JSON viewer if not already done
