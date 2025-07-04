@@ -18,9 +18,11 @@ export const LlmRequestEvent = z.object({
     system: z.string(),
     messages: z.object({
       type: z.string(),
-      content: z.string(),
-      kind: z.enum(['User', 'Assistant']),
+      content: z.string().optional(),
+      kind: z.enum(['User', 'Assistant']).optional(),
+      // TODO: toolUses, toolResults
     }).passthrough().array(),
+    // TODO: tools
   }).passthrough(),
   modelParameters: z.object({
     model: z.object({
@@ -54,6 +56,7 @@ export const LlmResponseEvent = z.object({
     contentChoices: z.object({
       type: z.string(),
       content: z.string(),
+      // TODO: usages
     }).passthrough().array(),
     inputTokens: z.number().int().default(() => 0),
     outputTokens: z.number().int().default(() => 0),
@@ -173,6 +176,14 @@ export const LlmRequestFailed = z.object({
   type: z.literal('LlmRequestFailed'),
   // TODO
 })
+export const McpInitStarted = z.object({
+  type: z.literal('McpInitStarted'),
+  // TODO
+})
+export const McpInitFinished = z.object({
+  type: z.literal('McpInitFinished'),
+  // TODO
+})
 export const UnknownEvent = z.object({
   type: z.string(),
 }).passthrough()
@@ -201,6 +212,8 @@ export const Event = z.discriminatedUnion('type', [
   LongDelayDetected,
   LlmRequestFailed,
   EditEvent,
+  McpInitStarted,
+  McpInitFinished,
 ])
 export type Event = z.infer<typeof Event>
 
