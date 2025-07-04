@@ -28,12 +28,12 @@ export const LlmRequestEvent = z.object({
     model: z.object({
       name: z.string(),
       provider: z.string(),
-      jbai: z.string(),
+      jbai: z.string().optional(),
       capabilities: z.object({
         inputPrice: z.number(),
         outputPrice: z.number(),
         cacheInputPrice: z.number(),
-      }).passthrough(),
+      }).passthrough().default(() => ({ inputPrice: 0, outputPrice: 0, cacheInputPrice: 0 })),
     }).passthrough(),
   }).passthrough(),
   attemptNumber: z.number(),
@@ -45,13 +45,13 @@ export const LlmResponseEvent = z.object({
     llm: z.object({
       name: z.string(),
       provider: z.string(),
-      jbai: z.string(),
+      jbai: z.string().optional(),
       capabilities: z.object({
         inputPrice: z.number(),
         outputPrice: z.number(),
         cacheInputPrice: z.number().default(() => 0),
         cacheCreateInputPrice: z.number().default(() => 0),
-      }).passthrough(),
+      }).passthrough().default(() => ({ inputPrice: 0, outputPrice: 0, cacheInputPrice: 0, cacheCreateInputPrice: 0 })),
     }).passthrough(),
     contentChoices: z.object({
       type: z.string(),
@@ -83,7 +83,7 @@ export const AgentStateUpdatedEvent = z.object({
   type: z.literal('AgentStateUpdatedEvent'),
   state: z.object({
     issue: z.object({
-      description: z.string(),
+      description: z.string().optional(),
       editorContext: z.object({
         recentFiles: z.string().array(),
         openFiles: z.string().array(),
@@ -95,7 +95,7 @@ export const AgentStateUpdatedEvent = z.object({
     ideInitialState: z.object({
       content: z.string(),
       kind: z.enum(['User', 'Assistant']),
-    }).passthrough(),
+    }).passthrough().optional(),
   }).passthrough(),
 }).passthrough()
 export const PlanUpdatedEvent = z.object({
@@ -109,6 +109,10 @@ export const AgentActionExecutionStarted = z.object({
   type: z.literal('AgentActionExecutionStarted'),
   // TODO
 }).passthrough()
+export const AgentActionExecutionFailed = z.object({
+  type: z.literal('AgentActionExecutionFailed'),
+  // TODO
+}).passthrough()
 export const BeforeStepStartedEvent = z.object({
   type: z.literal('BeforeStepStartedEvent'),
   // TODO
@@ -117,6 +121,9 @@ export const StepMetaInfoAppearedEvent = z.object({
   type: z.literal('StepMetaInfoAppearedEvent'),
   stepName: z.string(),
   stepType: z.string(),
+}).passthrough()
+export const StepSummaryCreatedEvent = z.object({
+  type: z.literal('StepSummaryCreatedEvent'),
 }).passthrough()
 export const AfterStepFinishedEvent = z.object({
   type: z.literal('AfterStepFinishedEvent'),
@@ -147,6 +154,10 @@ export const ActionRequestBuildingFinished = z.object({
 }).passthrough()
 export const TaskResultCreatedEvent = z.object({
   type: z.literal('TaskResultCreatedEvent'),
+  // TODO
+}).passthrough()
+export const TaskReportCreatedEvent = z.object({
+  type: z.literal('TaskReportCreatedEvent'),
   // TODO
 }).passthrough()
 export const SemanticCheckStarted = z.object({
@@ -193,13 +204,16 @@ export const Event = z.discriminatedUnion('type', [
   LlmRequestEvent,
   LlmResponseEvent,
   TaskSummaryCreatedEvent,
+  TaskReportCreatedEvent,
   AgentStateUpdatedEvent,
   PlanUpdatedEvent,
   AgentActionExecutionStarted,
+  AgentActionExecutionFinished,
+  AgentActionExecutionFailed,
   BeforeStepStartedEvent,
   StepMetaInfoAppearedEvent,
   AfterStepFinishedEvent,
-  AgentActionExecutionFinished,
+  StepSummaryCreatedEvent,
   AgentSessionUpdatedEvent,
   ActionRequestBuildingStarted,
   ActionRequestBuildingFailed,
