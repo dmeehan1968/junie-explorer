@@ -48,8 +48,8 @@ export type AgentIssue = z.infer<typeof AgentIssue>
 export const AgentObservation = z.object({
   element: z.object({
     type: z.string(),
-    content: z.string(),
-    kind: z.enum(['Assistant', 'User']),
+    content: z.string().optional(),
+    kind: z.enum(['Assistant', 'User']).optional(),
   }).nullish(),
   action: z.string().nullish(), // as well as the 'special commands', this can include any CLI command
 })
