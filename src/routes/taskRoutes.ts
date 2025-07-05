@@ -114,6 +114,116 @@ function prepareStepGraphData(steps: Step[]): {
   }
 }
 
+// Function to prepare data for the LLM events metrics over time graph
+function prepareLlmEventGraphData(events: EventRecord[]): {
+  labels: string[],
+  datasets: any[],
+  timeUnit: string,
+  stepSize: number
+} {
+  // Filter for LlmResponseEvent events only
+  const llmEvents = events.filter(event => event.event.type === 'LlmResponseEvent')
+  
+  if (llmEvents.length === 0) {
+    return {
+      labels: [],
+      datasets: [],
+      timeUnit: 'minute',
+      stepSize: 1
+    }
+  }
+
+  // Use the actual timestamps from the event data
+  const eventTimes = llmEvents.map(event => event.timestamp)
+
+  // Find min and max dates
+  const minDate = eventTimes.length > 0 ? new Date(Math.min(...eventTimes.map(date => date.getTime()))) : new Date()
+  const maxDate = eventTimes.length > 0 ? new Date(Math.max(...eventTimes.map(date => date.getTime()))) : new Date()
+
+  // Calculate the date range in milliseconds
+  const dateRange = maxDate.getTime() - minDate.getTime()
+
+  // Determine the appropriate time unit based on the date range
+  let timeUnit = 'minute' // default for events (usually short timeframe)
+  let stepSize = 1
+
+  // Constants for time calculations
+  const MINUTE = 60 * 1000
+  const HOUR = 60 * MINUTE
+  const DAY = 24 * HOUR
+  const WEEK = 7 * DAY
+  const MONTH = 30 * DAY
+  const YEAR = 365 * DAY
+
+  // Minimum number of labels we want to display
+  const MIN_LABELS = 5
+
+  if (dateRange < MINUTE * 5) {
+    timeUnit = 'second'
+    stepSize = Math.max(1, Math.floor(dateRange / (1000 * MIN_LABELS)))
+  } else if (dateRange < HOUR) {
+    timeUnit = 'minute'
+    stepSize = Math.max(1, Math.floor(dateRange / (MINUTE * MIN_LABELS)))
+  } else if (dateRange < DAY) {
+    timeUnit = 'hour'
+    stepSize = Math.max(1, Math.floor(dateRange / (HOUR * MIN_LABELS)))
+  } else if (dateRange < WEEK) {
+    timeUnit = 'day'
+    stepSize = Math.max(1, Math.floor(dateRange / (DAY * MIN_LABELS)))
+  } else if (dateRange < MONTH) {
+    timeUnit = 'week'
+    stepSize = Math.max(1, Math.floor(dateRange / (WEEK * MIN_LABELS)))
+  } else if (dateRange < YEAR) {
+    timeUnit = 'month'
+    stepSize = Math.max(1, Math.floor(dateRange / (MONTH * MIN_LABELS)))
+  } else {
+    timeUnit = 'year'
+    stepSize = Math.max(1, Math.floor(dateRange / (YEAR * MIN_LABELS)))
+  }
+
+  // Create datasets for cost and aggregate tokens
+  const costData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: (event.event as any).answer.cost,
+  }))
+
+  const tokenData = llmEvents.map(event => {
+    const answer = (event.event as any).answer
+    return {
+      x: event.timestamp.toISOString(),
+      y: answer.inputTokens + answer.outputTokens + answer.cacheInputTokens,
+    }
+  })
+
+  const datasets = [
+    {
+      label: 'Cost',
+      data: costData,
+      borderColor: 'rgb(54, 162, 235)',
+      backgroundColor: 'rgba(54, 162, 235, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y',
+    },
+    {
+      label: 'Tokens (Input + Output + Cache)',
+      data: tokenData,
+      borderColor: 'rgb(255, 99, 132)',
+      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1',
+    },
+  ]
+
+  return {
+    labels: llmEvents.map(event => event.timestamp.toISOString()),
+    datasets,
+    timeUnit,
+    stepSize,
+  }
+}
+
 // Generate HTML for metrics table headers (used only for steps table, not for totals)
 const metricsHeaders = `
   <th>Input</th>
@@ -379,6 +489,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
     const events = task.events
     let cost = 0
 
+    // Prepare LLM event graph data
+    const llmGraphData = prepareLlmEventGraphData(events)
+    const hasLlmEvents = llmGraphData.labels.length > 0
+
     // Generate HTML
     const html = `
       <!DOCTYPE html>
@@ -389,8 +503,18 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
         <title>Task ${task.id} Events</title>
         <link rel="stylesheet" href="/css/style.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+        ${hasLlmEvents
+      ? `<script>
+              // Define the LLM chart data as a global variable
+              window.llmChartData = ${JSON.stringify(llmGraphData)};
+            </script>`
+      : ''
+    }
         <script src="/js/reloadPage.js"></script>
         <script src="/js/taskEventChart.js"></script>
+        <script src="/js/taskEventLlmChart.js"></script>
       </head>
       <body>
         <div class="container">
@@ -424,6 +548,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
               </div>
             ` : ''}
           </div>
+
+          ${hasLlmEvents ? `
+            <div class="graph-container">
+              <canvas id="llmMetricsChart"></canvas>
+            </div>
+          ` : ''}
 
           ${events.length > 0 ? `
             <div class="collapsible-section collapsed" data-testid="event-timeline-section">
