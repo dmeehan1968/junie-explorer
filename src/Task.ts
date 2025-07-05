@@ -37,14 +37,10 @@ export class Task {
     this.plan = task.plan
 
     this.metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
-    // for (const step of this.steps.values()) {
-    //   this.metrics.inputTokens += step.metrics.inputTokens
-    //   this.metrics.outputTokens += step.metrics.outputTokens
-    //   this.metrics.cacheTokens += step.metrics.cacheTokens
-    //   this.metrics.cost += step.metrics.cost + step.metrics.cachedCost
-    //   this.metrics.time += step.metrics.modelTime
-    // }
 
+    // we need to temporarily load events in order to aggregate metrics
+    // but we don't need to keep them in memory (as it can be a big overhead)
+    // they will be lazy loaded when necessary
     const events = this.loadEvents()
     for (const event of events) {
       if (event.event.type === 'LlmResponseEvent') {
@@ -55,7 +51,6 @@ export class Task {
         this.metrics.time += event.event.answer.time ?? 0
       }
     }
-
   }
 
   get steps() {
