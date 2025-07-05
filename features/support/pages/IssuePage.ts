@@ -10,7 +10,7 @@ export class IssuePage extends BasePage {
     taskDetails: '[data-testid="task-details"]',
     taskMetrics: '[data-testid="task-metrics"]',
     taskDescription: '[data-testid="task-description"]',
-    taskLink: '[data-testid="task-link"]',
+    taskItem: '[data-testid="task-item"]',
     noTasksMessage: '[data-testid="no-tasks-message"]',
     jsonButton: '[data-testid="json-button"]',
     jsonViewer: '[data-testid="json-viewer"]'
@@ -45,7 +45,7 @@ export class IssuePage extends BasePage {
   }
 
   async clickOnFirstTask(): Promise<void> {
-    await this.click(`${this.selectors.taskLink}:first-child`);
+    await this.click(`${this.selectors.taskItem}:first-child [data-testid="steps-button"]`);
   }
 
   async isNoTasksMessageVisible(): Promise<boolean> {
@@ -57,7 +57,7 @@ export class IssuePage extends BasePage {
   }
 
   async clickJsonButton(): Promise<void> {
-    await this.click(`${this.selectors.jsonButton}:first-child`);
+    await this.click(`${this.selectors.jsonButton}`);
   }
 
   async isJsonViewerVisible(): Promise<boolean> {

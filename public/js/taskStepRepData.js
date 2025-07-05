@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const container = document.getElementById(`rep-data-${stepIndex}`);
 
       // Toggle visibility
-      if (container.style.display === 'none') {
+      if (!container.style.display || container.style.display === 'none') {
         container.style.display = 'table-row';
 
         // Initialize REP viewer if not already done

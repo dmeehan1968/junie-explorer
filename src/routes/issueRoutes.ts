@@ -84,20 +84,22 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
         const stepTotals = task.metrics
 
         return `
-                    <li class="task-item">
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-link" data-testid="task-link">
-                        <div class="task-header">
-                          <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
-                          <div class="task-date">
-                            Created: ${new Date(task.created).toLocaleString()}
-                            <button class="toggle-raw-data" data-task="${index}" data-testid="json-button">JSON</button>
-                          </div>
+                    <li class="task-item" data-testid="task-item">
+                      <div class="task-header">
+                        <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
+                        <div class="task-date">
+                          Created: ${new Date(task.created).toLocaleString()}
                         </div>
-                        ${task.context.description ? `<div class="task-description" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
-                        <div class="task-details" data-testid="task-details">
-                          ${generateStepTotalsTable(stepTotals)}
-                        </div>
-                      </a>
+                      </div>
+                      ${task.context.description ? `<div class="task-description" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                      <div class="task-details" data-testid="task-details">
+                        ${generateStepTotalsTable(stepTotals)}
+                      </div>
+                      <div class="task-buttons">
+                        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="task-action-button" data-testid="events-button">Events</a>
+                        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-action-button" data-testid="steps-button">Steps</a>
+                        <button class="task-action-button toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
+                      </div>
                       <div id="raw-data-${index}" class="raw-data-container" data-testid="json-viewer" style="display: none;">
                         <div id="json-renderer-${index}" class="json-renderer"></div>
                       </div>
