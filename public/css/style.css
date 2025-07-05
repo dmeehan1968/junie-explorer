@@ -1330,3 +1330,61 @@ p {
     font-size: 16px;
   }
 }
+
+/* Provider Filter Styles */
+.provider-filters {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+
+.filter-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  cursor: pointer;
+  padding: 6px 12px;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.filter-controls label:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.filter-controls input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.filter-controls label:has(input:checked) {
+  background-color: #007bff;
+  color: #ffffff;
+  border-color: #007bff;
+}
+
+@media (max-width: 768px) {
+  .filter-controls {
+    gap: 10px;
+  }
+  
+  .filter-controls label {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+}

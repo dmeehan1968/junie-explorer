@@ -119,7 +119,8 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   labels: string[],
   datasets: any[],
   timeUnit: string,
-  stepSize: number
+  stepSize: number,
+  providers: string[]
 } {
   // Filter for LlmResponseEvent events only
   const llmEvents = events.filter(event => event.event.type === 'LlmResponseEvent')
@@ -129,9 +130,13 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
       labels: [],
       datasets: [],
       timeUnit: 'minute',
-      stepSize: 1
+      stepSize: 1,
+      providers: []
     }
   }
+
+  // Extract unique providers
+  const providers = [...new Set(llmEvents.map(event => (event.event as any).answer.llm.provider))].sort()
 
   // Use the actual timestamps from the event data
   const eventTimes = llmEvents.map(event => event.timestamp)
@@ -221,6 +226,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
     datasets,
     timeUnit,
     stepSize,
+    providers,
   }
 }
 
@@ -509,6 +515,25 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
       ? `<script>
               // Define the LLM chart data as a global variable
               window.llmChartData = ${JSON.stringify(llmGraphData)};
+              // Define the LLM events data for filtering
+              window.llmEvents = ${JSON.stringify(events.filter(e => e.event.type === 'LlmResponseEvent').map(e => ({
+                timestamp: e.timestamp.toISOString(),
+                event: {
+                  type: e.event.type,
+                  answer: {
+                    llm: { provider: (e.event as any).answer.llm.provider },
+                    cost: (e.event as any).answer.cost,
+                    inputTokens: (e.event as any).answer.inputTokens,
+                    outputTokens: (e.event as any).answer.outputTokens,
+                    cacheInputTokens: (e.event as any).answer.cacheInputTokens
+                  }
+                }
+              })))};
+              // Convert ISO strings back to Date objects
+              window.llmEvents = window.llmEvents.map(e => ({
+                ...e,
+                timestamp: new Date(e.timestamp)
+              }));
             </script>`
       : ''
     }
@@ -550,8 +575,25 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
           </div>
 
           ${hasLlmEvents ? `
-            <div class="graph-container">
-              <canvas id="llmMetricsChart"></canvas>
+            <div class="collapsible-section" data-testid="event-metrics-section">
+              <div class="collapsible-header" data-testid="event-metrics-header">
+                <h3>Event Metrics</h3>
+                <span class="collapsible-toggle">Click to collapse</span>
+              </div>
+              <div class="collapsible-content">
+                <div class="provider-filters">
+                  <div class="filter-controls">
+                    <label><input type="checkbox" id="all-providers" checked> All</label>
+                    <label><input type="checkbox" id="none-providers"> None</label>
+                    ${llmGraphData.providers.map(provider => `
+                      <label><input type="checkbox" class="provider-checkbox" data-provider="${provider}" checked> ${provider}</label>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="graph-container">
+                  <canvas id="llmMetricsChart"></canvas>
+                </div>
+              </div>
             </div>
           ` : ''}
 
