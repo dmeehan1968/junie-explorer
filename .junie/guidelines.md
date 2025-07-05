@@ -142,3 +142,8 @@ Potential areas for improvement:
 - Implement project and issue browsing
 - Add authentication for multi-user environments
 - Enhance the UI with more interactive elements
+
+# MCP Tools
+
+- Use Jetbrains
+- Use context7
