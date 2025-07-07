@@ -1,6 +1,7 @@
 import fs from "fs-extra"
 import path from "path"
 import { inspect } from "util"
+import { EventRecord, UnknownEventRecord } from "./eventSchema.js"
 import {
   AgentState,
   JuniePlan,
@@ -18,13 +19,13 @@ export class Task {
   readonly context: JunieTaskContext
   readonly isDeclined: boolean
   readonly plan: JuniePlan[]
-  readonly steps: Map<number, Step> = new Map()
+  readonly _steps: Map<number, Step> = new Map()
   readonly metrics: SummaryMetrics
   private _previousTasksInfo?: PreviousTasksInfo | null
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
-  private _events: any[] = []
+  private _events: EventRecord[] = []
   private _trajectory: any[] = []
 
   constructor(public readonly logPath: string) {
@@ -35,20 +36,35 @@ export class Task {
     this.isDeclined = task.isDeclined
     this.plan = task.plan
 
+    this.metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+
+    // we need to temporarily load events in order to aggregate metrics
+    // but we don't need to keep them in memory (as it can be a big overhead)
+    // they will be lazy loaded when necessary
+    const events = this.loadEvents()
+    for (const event of events) {
+      if (event.event.type === 'LlmResponseEvent') {
+        this.metrics.cost += event.event.answer.cost
+        this.metrics.inputTokens += event.event.answer.inputTokens
+        this.metrics.outputTokens += event.event.answer.outputTokens
+        this.metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
+        this.metrics.time += event.event.answer.time ?? 0
+      }
+    }
+  }
+
+  get steps() {
+    if (this._steps.size) {
+      return this._steps
+    }
+
     const root = path.join(this.logPath, '../../..', this.id, 'step_+([0-9]).*{swe,chat}_next*')
     fs.globSync(root)
       .map(path => new Step(path))
       .sort((a, b) => a.id - b.id)
-      .map(step => this.steps.set(step.id, step))
+      .map(step => this._steps.set(step.id, step))
 
-    this.metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
-    for (const step of this.steps.values()) {
-      this.metrics.inputTokens += step.metrics.inputTokens
-      this.metrics.outputTokens += step.metrics.outputTokens
-      this.metrics.cacheTokens += step.metrics.cacheTokens
-      this.metrics.cost += step.metrics.cost + step.metrics.cachedCost
-      this.metrics.time += step.metrics.modelTime
-    }
+    return this._steps
   }
 
   getStepById(id: number) {
@@ -91,32 +107,52 @@ export class Task {
     return this.lazyload()._patch!
   }
 
-  get events() {
-    if (this._events.length > 0) {
-      return this._events
-    }
+  private loadEvents(): EventRecord[] {
 
     const root = path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
 
     if (fs.existsSync(root)) {
       const content = fs.readFileSync(root, 'utf-8')
-      this._events = content
+      return content
         .split('\n')
-        .filter(line => line.trim())
-        .map(line => {
+        .filter(json => json.trim())
+        .map((line, lineNumber) => {
+          let json: any
           try {
-            return JSON.parse(line)
+            json = JSON.parse(line)
           } catch (error) {
             return {
-              type: 'error',
-              message: String(error),
-              line,
+              type: 'jsonError',
+              timestamp: new Date(),
+              event: json,
             }
           }
+          try {
+            return EventRecord.parse(json)
+          } catch (error: any) {
+            console.log(root, lineNumber, error.errors[0].code, error.errors[0].path, error.errors[0].message, line.slice(0, 100))
+            return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parse(json)
+          }
         })
+        .filter((event): event is EventRecord => !!event)
+        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
     }
 
+    return []
+  }
+
+  get events(): EventRecord[] {
+    if (this._events.length > 0) {
+      return this._events
+    }
+
+    this._events = this.loadEvents()
+
     return this._events
+  }
+
+  get eventTypes() {
+    return [...new Set(this.events.map(e => e.event.type))].sort()
   }
 
   get trajectory() {

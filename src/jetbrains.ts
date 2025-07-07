@@ -39,7 +39,9 @@ export class JetBrains {
 
   preload() {
     this.logger.log('Reading logs...')
+    const start = Date.now()
     this.metrics  // forces a full load
+    console.log('Loaded in ', (Date.now() - start) / 1000, 'seconds')
   }
 
   reload() {
