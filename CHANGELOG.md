@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-07-07
+
+### Features
+- Add LLM event metrics chart to task events (dd78669)
+- Add provider filtering and interaction to LLM event metrics chart (f150f1f)
+- Add cost calculation and default values to event schema (775bf16)
+- Display cost calculations and improve JSON column layout in task events table (3f633ac)
+- Add collapsible sections for improved UI interaction (cc72746)
+
+### Code Improvements
+- Refactor metrics calculation and streamline event handling (826488e)
+- Refactor Task and Event Handling Logic (c35780b)
+- Add `McpInitStarted` and `McpInitFinished` event types to event schema (992dc1f, 5f20232)
+- Add `ActionRequestBuildingFailed` event type to event schema (23ba6cb)
+- Allow toggling visibility on rows with unset `style.display` (7d795ba)
+- Adjust bar and circle rendering dimensions in TaskEventChart (bdf2095)
+
+### Documentation
+- Add guidelines for recommended MCP tools (4990723)
+
 ## [1.6.2] - 2025-06-20
 
 ### Documentation
