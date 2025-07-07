@@ -196,7 +196,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
     const answer = (event.event as any).answer
     return {
       x: event.timestamp.toISOString(),
-      y: answer.inputTokens + answer.outputTokens + answer.cacheInputTokens,
+      y: answer.inputTokens + answer.outputTokens + answer.cacheCreateInputTokens,
     }
   })
 
@@ -525,7 +525,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                     cost: (e.event as any).answer.cost,
                     inputTokens: (e.event as any).answer.inputTokens,
                     outputTokens: (e.event as any).answer.outputTokens,
-                    cacheInputTokens: (e.event as any).answer.cacheInputTokens
+                    cacheInputTokens: (e.event as any).answer.cacheInputTokens,
+                    cacheCreateInputTokens: (e.event as any).answer.cacheCreateInputTokens,
                   }
                 }
               })))};

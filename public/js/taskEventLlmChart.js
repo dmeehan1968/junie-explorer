@@ -51,7 +51,7 @@ function filterChartData(selectedProviders) {
     const answer = event.event.answer;
     return {
       x: event.timestamp.toISOString(),
-      y: answer.inputTokens + answer.outputTokens + answer.cacheInputTokens,
+      y: answer.inputTokens + answer.outputTokens + answer.cacheCreateInputTokens,
     };
   });
   
@@ -79,9 +79,8 @@ function updateChart() {
   document.querySelectorAll('.provider-checkbox:checked').forEach(checkbox => {
     selectedProviders.push(checkbox.dataset.provider);
   });
-  
-  const filteredData = filterChartData(selectedProviders);
-  llmChart.data = filteredData;
+
+  llmChart.data = filterChartData(selectedProviders);
   llmChart.update();
 }
 
