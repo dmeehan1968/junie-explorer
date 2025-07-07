@@ -9,7 +9,7 @@ export class RepresentationFileService {
       step.logPath, 
       '../../representations', 
       task.id, 
-      `step_${step.id.toString().padStart(2, '0')}.*{swe,chat}_next*`
+      `step_${step.id.toString().padStart(2, '0')}.{*{swe,chat}_next*,junie_single_step_{chat,issue}}`
     );
     
     const files = fs.globSync(root);

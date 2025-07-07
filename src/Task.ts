@@ -58,7 +58,7 @@ export class Task {
       return this._steps
     }
 
-    const root = path.join(this.logPath, '../../..', this.id, 'step_+([0-9]).*{swe,chat}_next*')
+    const root = path.join(this.logPath, '../../..', this.id, 'step_+([0-9]).{*{swe,chat}_next*,junie_single_step_{chat,issue}}')
     fs.globSync(root)
       .map(path => new Step(path))
       .sort((a, b) => a.id - b.id)

@@ -100,22 +100,22 @@ export type JunieTask = z.infer<typeof JunieTaskSchema>
 
 const StepContent = z.object({
   llmResponse: z.object({
-    type: z.enum(['com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage']),
+    type: z.string(),
     content: z.string(),
-    kind: z.enum(['Assistant', 'User']),
-  }).optional(),
+    kind: z.enum(['Assistant', 'User']).optional(),
+  }).passthrough().optional(),
   actionRequest: z.object({
-    type: z.enum(['com.intellij.ml.llm.matterhorn.ej.core.actions.SimpleActionRequest']),
+    type: z.string(),
     name: z.string(),
-    arguments: z.string(),
+    arguments: z.string().optional(),
     description: z.string(),
-  }).optional(),
+  }).passthrough().optional(),
   actionResult: z.object({
-    type: z.enum(['com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage']),
-    content: z.string(),
-    kind: z.enum(['Assistant', 'User']),
-  }).optional(),
-})
+    type: z.string(),
+    content: z.string().optional(),
+    kind: z.enum(['Assistant', 'User']).optional(),
+  }).passthrough().optional(),
+}).passthrough()
 export type StepContent = z.infer<typeof StepContent>
 
 const Dependencies = z.object({
