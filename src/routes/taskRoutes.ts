@@ -499,11 +499,22 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
     const llmGraphData = prepareLlmEventGraphData(events)
     const hasLlmEvents = llmGraphData.labels.length > 0
 
-    // Filter action events for Action Timeline
-    const actionEvents = events.filter(e => 
-      e.event.type === 'AgentActionExecutionStarted' || 
-      e.event.type === 'AgentActionExecutionFinished'
-    )
+    // Filter and flatten action events for Action Timeline
+    const actionEvents = events
+      .filter(e => 
+        e.event.type === 'AgentActionExecutionStarted' || 
+        e.event.type === 'AgentActionExecutionFinished'
+      )
+      .map(e => ({
+        timestamp: e.timestamp,
+        eventType: e.event.type,
+        actionName: e.event.type === 'AgentActionExecutionStarted' 
+          ? (e.event as any).actionToExecute?.name || ''
+          : '',
+        inputParamValue: e.event.type === 'AgentActionExecutionStarted' 
+          ? ((e.event as any).actionToExecute?.inputParams?.[0]?.value?.toString() || '')
+          : ''
+      }))
     const hasActionEvents = actionEvents.length > 0
 
     // Generate HTML
@@ -646,12 +657,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
             <script>
               window.taskActionEvents = ${JSON.stringify(actionEvents.map(e => ({
                 timestamp: e.timestamp.toISOString(),
-                event: {
-                  type: e.event.type,
-                  actionToExecute: e.event.type === 'AgentActionExecutionStarted' ? {
-                    name: (e.event as any).actionToExecute.name
-                  } : null
-                }
+                eventType: e.eventType,
+                actionName: e.actionName,
+                inputParamValue: e.inputParamValue
               })))};
               // Convert ISO strings back to Date objects
               window.taskActionEvents = window.taskActionEvents.map(e => ({

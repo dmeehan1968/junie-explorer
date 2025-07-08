@@ -5,11 +5,13 @@ class TaskActionChart {
     this.ctx = this.canvas.getContext('2d');
     this.events = events;
     this.actionPairs = this.calculateActionPairs();
-    this.actionNames = [...new Set(this.actionPairs.pairs.map(p => p.actionName))].sort();
+    this.actionNames = [...new Set(this.actionPairs.pairs.map(p => 
+      (p.actionName + ' ' + (p.inputParamValue || '')).trim()
+    ))];
     this.timeRange = this.calculateTimeRange();
     
     // Chart dimensions and styling
-    this.margin = { top: 20, right: 30, bottom: 60, left: 200 };
+    this.margin = { top: 20, right: 30, bottom: 60, left: 300 };
     this.rowHeight = 20;
     this.minBarWidth = 8; // Minimum width for bars to be visible
     this.circleRadius = 3;
@@ -28,16 +30,17 @@ class TaskActionChart {
     const sortedEvents = [...this.events].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     
     sortedEvents.forEach(event => {
-      const eventType = event.event.type;
+      const eventType = event.eventType;
       
       if (eventType === 'AgentActionExecutionStarted') {
-        const actionName = event.event.actionToExecute?.name;
+        const actionName = event.actionName;
+        const inputParamValue = event.inputParamValue;
         if (actionName) {
-          startedEvents.set(actionName, event);
+          startedEvents.set(actionName, { ...event, inputParamValue });
         }
       } else if (eventType === 'AgentActionExecutionFinished') {
         // For finished events, we need to find the corresponding started event
-        // Since AgentActionExecutionFinished might not have actionToExecute, 
+        // Since AgentActionExecutionFinished might not have actionName, 
         // we'll match with the most recent unmatched started event
         let matchedActionName = null;
         let matchedStartEvent = null;
@@ -56,6 +59,7 @@ class TaskActionChart {
           const duration = event.timestamp.getTime() - matchedStartEvent.timestamp.getTime();
           pairs.push({
             actionName: matchedActionName,
+            inputParamValue: matchedStartEvent.inputParamValue,
             startTime: matchedStartEvent.timestamp,
             endTime: event.timestamp,
             duration: duration
@@ -71,6 +75,7 @@ class TaskActionChart {
     for (const [actionName, startEvent] of startedEvents.entries()) {
       pairs.push({
         actionName: actionName,
+        inputParamValue: startEvent.inputParamValue,
         startTime: startEvent.timestamp,
         endTime: startEvent.timestamp,
         duration: 0
@@ -267,9 +272,10 @@ class TaskActionChart {
     this.actionPairs.pairs.forEach(pair => {
       const startX = this.timeToX(pair.startTime);
       const endX = this.timeToX(pair.endTime);
-      const y = this.actionNameToY(pair.actionName);
+      const labelName = (pair.actionName + ' ' + (pair.inputParamValue || '')).trim();
+      const y = this.actionNameToY(labelName);
       const barWidth = endX - startX;
-      
+
       // Choose rendering style based on duration
       if (barWidth < this.minBarWidth) {
         // Small duration - render as circle only
@@ -299,7 +305,6 @@ class TaskActionChart {
     this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
     this.ctx.lineTo(x, y + radius);
     this.ctx.quadraticCurveTo(x, y, x + radius, y);
-    this.closePath();
     this.ctx.stroke();
   }
 }
