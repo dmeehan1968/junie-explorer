@@ -499,6 +499,13 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
     const llmGraphData = prepareLlmEventGraphData(events)
     const hasLlmEvents = llmGraphData.labels.length > 0
 
+    // Filter action events for Action Timeline
+    const actionEvents = events.filter(e => 
+      e.event.type === 'AgentActionExecutionStarted' || 
+      e.event.type === 'AgentActionExecutionFinished'
+    )
+    const hasActionEvents = actionEvents.length > 0
+
     // Generate HTML
     const html = `
       <!DOCTYPE html>
@@ -541,6 +548,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
         <script src="/js/reloadPage.js"></script>
         <script src="/js/taskEventChart.js"></script>
         <script src="/js/taskEventLlmChart.js"></script>
+        <script src="/js/taskActionChart.js"></script>
       </head>
       <body>
         <div class="container">
@@ -617,6 +625,36 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
               })))};
               // Convert ISO strings back to Date objects
               window.taskEvents = window.taskEvents.map(e => ({
+                ...e,
+                timestamp: new Date(e.timestamp)
+              }));
+            </script>
+          ` : ''}
+
+          ${hasActionEvents ? `
+            <div class="collapsible-section collapsed" data-testid="action-timeline-section">
+              <div class="collapsible-header" data-testid="action-timeline-header">
+                <h3>Action Timeline</h3>
+                <span class="collapsible-toggle">Click to expand</span>
+              </div>
+              <div class="collapsible-content">
+                <div class="action-timeline-container">
+                  <canvas id="action-timeline-chart" class="action-timeline-chart"></canvas>
+                </div>
+              </div>
+            </div>
+            <script>
+              window.taskActionEvents = ${JSON.stringify(actionEvents.map(e => ({
+                timestamp: e.timestamp.toISOString(),
+                event: {
+                  type: e.event.type,
+                  actionToExecute: e.event.type === 'AgentActionExecutionStarted' ? {
+                    name: (e.event as any).actionToExecute.name
+                  } : null
+                }
+              })))};
+              // Convert ISO strings back to Date objects
+              window.taskActionEvents = window.taskActionEvents.map(e => ({
                 ...e,
                 timestamp: new Date(e.timestamp)
               }));
