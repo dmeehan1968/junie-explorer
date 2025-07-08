@@ -361,7 +361,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
                       <td>
                         <div class="title-container">
                           ${step.id}
-                          <button class="toggle-raw-data" data-step="${step.id}">JSON</button>
+                          <button class="toggle-json-data" data-step="${step.id}">JSON</button>
                           <button class="toggle-rep-data" data-step="${step.id}">REP</button>
                         </div>
                       </td>
