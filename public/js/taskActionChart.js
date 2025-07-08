@@ -1,22 +1,22 @@
 // Task Action Timeline Chart
 class TaskActionChart {
+
   constructor(canvasId, events) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d');
     this.events = events;
     this.actionPairs = this.calculateActionPairs();
-    this.actionNames = [...new Set(this.actionPairs.pairs.map(p => 
-      (p.actionName + ' ' + (p.inputParamValue || '')).trim()
-    ))];
+    this.actionNames = [...new Set(this.actionPairs.pairs.map(p => (p.actionName + ' ' + (p.inputParamValue || '')).trim()))];
     this.timeRange = this.calculateTimeRange();
     
     // Chart dimensions and styling
-    this.margin = { top: 20, right: 30, bottom: 60, left: 300 };
+    this.margin = { top: 20, right: 30, bottom: 60, left: 500 };
     this.rowHeight = 20;
     this.minBarWidth = 8; // Minimum width for bars to be visible
     this.circleRadius = 3;
     this.barHeight = 8;
     this.numTicks = 8;
+    this.maxLabelLength = 80;
     
     this.setupCanvas();
     this.render();
@@ -218,7 +218,8 @@ class TaskActionChart {
     
     this.actionNames.forEach((actionName, index) => {
       const y = this.actionNameToY(actionName);
-      this.ctx.fillText(actionName, this.margin.left - 10, y);
+      const name = actionName.length <= this.maxLabelLength ? actionName : actionName.substring(0, (this.maxLabelLength/2)-2) + '...' + actionName.substring(actionName.length - (this.maxLabelLength/2)-2);
+      this.ctx.fillText(name, this.margin.left - 10, y);
     });
   }
   
