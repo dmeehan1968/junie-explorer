@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-07-08
+
+### Features
+- Add action timeline chart for visualizing agent actions (c5aac9c)
+- Enhance action timeline with input parameter support and improved visualization (864ec53)
+- Optimize action timeline chart for long labels and improved readability (3d3ba0e)
+
+### Code Improvements
+- Enhance event schema for agent action execution (65a9f11)
+
+### UI Improvements
+- Adjust container max-width to 1440px in `style.css` (b5566a7)
+- Fix erroneous left margin on 'raw json' button (0b091c7)
+
 ## [2.0.2] - 2025-07-07
 
 ### Bug Fixes
