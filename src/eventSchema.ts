@@ -115,16 +115,16 @@ export const AgentActionExecutionStarted = z.object({
       ParameterValue: z.string(),
       name: z.string(),
       value: z.union([z.string(), z.number(), z.boolean()]),
-    }).array().optional(),
+    }).passthrough().array().optional(),
     description: z.string(),
-  })
+  }).passthrough(),
 }).passthrough()
 export const AgentActionExecutionFailed = AgentActionExecutionStarted.extend({
   type: z.literal('AgentActionExecutionFailed'),
   result: z.object({
     text: z.string(),
     images: z.any().array(),
-  }).optional(),
+  }).passthrough().optional(),
 }).passthrough()
 export const BeforeStepStartedEvent = z.object({
   type: z.literal('BeforeStepStartedEvent'),
