@@ -107,11 +107,24 @@ export const PlanUpdatedEvent = z.object({
 }).passthrough()
 export const AgentActionExecutionStarted = z.object({
   type: z.literal('AgentActionExecutionStarted'),
-  // TODO
+  actionToExecute: z.object({
+    type: z.string(),
+    name: z.string(),
+    id: z.string().optional(),
+    inputParams: z.object({
+      ParameterValue: z.string(),
+      name: z.string(),
+      value: z.union([z.string(), z.number(), z.boolean()]),
+    }).array().optional(),
+    description: z.string(),
+  })
 }).passthrough()
-export const AgentActionExecutionFailed = z.object({
+export const AgentActionExecutionFailed = AgentActionExecutionStarted.extend({
   type: z.literal('AgentActionExecutionFailed'),
-  // TODO
+  result: z.object({
+    text: z.string(),
+    images: z.any().array(),
+  }).optional(),
 }).passthrough()
 export const BeforeStepStartedEvent = z.object({
   type: z.literal('BeforeStepStartedEvent'),
