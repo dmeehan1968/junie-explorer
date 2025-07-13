@@ -1,7 +1,7 @@
 // Initialize the raw data viewers when the page loads
 document.addEventListener('DOMContentLoaded', function() {
   // Add click handlers to the toggle buttons
-  const toggleButtons = document.querySelectorAll('.toggle-raw-data');
+  const toggleButtons = document.querySelectorAll('.toggle-json-data');
   toggleButtons.forEach(button => {
     button.addEventListener('click', function(event) {
       event.preventDefault();
