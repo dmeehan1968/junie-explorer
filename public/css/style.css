@@ -1229,6 +1229,63 @@ p {
   color: white;
 }
 
+/* Task Trajectories Table Styles */
+.trajectories-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.trajectories-table th,
+.trajectories-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.trajectories-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.trajectories-table .timestamp-col {
+  width: 180px;
+  white-space: nowrap;
+}
+
+.trajectories-table .role-col {
+  width: 100px;
+  text-align: center;
+}
+
+.trajectories-table .content-col {
+  max-width: 600px;
+  max-height: 200px;
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.trajectories-table .role-user {
+  background-color: #e3f2fd;
+}
+
+.trajectories-table .role-assistant {
+  background-color: #f3e5f5;
+}
+
+.trajectories-table .role-system {
+  background-color: #e8f5e8;
+}
+
+.no-trajectories {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+}
+
 /* Collapsible Section Styles */
 .collapsible-section {
   margin: 20px 0;

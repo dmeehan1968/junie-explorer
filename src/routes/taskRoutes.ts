@@ -852,57 +852,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
         <link rel="stylesheet" href="/css/style.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
         <script src="/js/reloadPage.js"></script>
-        <style>
-          .trajectories-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
-          .trajectories-table th,
-          .trajectories-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            vertical-align: top;
-          }
-          .trajectories-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-          }
-          .timestamp-col {
-            width: 180px;
-            white-space: nowrap;
-          }
-          .role-col {
-            width: 100px;
-            text-align: center;
-          }
-          .content-col {
-            max-width: 600px;
-            max-height: 200px;
-            overflow: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: monospace;
-            font-size: 12px;
-            line-height: 1.4;
-          }
-          .role-user {
-            background-color: #e3f2fd;
-          }
-          .role-assistant {
-            background-color: #f3e5f5;
-          }
-          .role-system {
-            background-color: #e8f5e8;
-          }
-          .no-trajectories {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-style: italic;
-          }
-        </style>
       </head>
       <body>
         <div class="container">
