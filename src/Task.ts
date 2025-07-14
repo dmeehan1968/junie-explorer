@@ -1,6 +1,7 @@
 import fs from "fs-extra"
 import path from "path"
 import { inspect } from "util"
+import { z } from "zod"
 import { EventRecord, UnknownEventRecord } from "./eventSchema.js"
 import {
   AgentState,
@@ -12,6 +13,26 @@ import {
   SummaryMetrics,
 } from "./schema.js"
 import { Step } from "./Step.js"
+
+export const Trajectory = z.object({
+  timestamp: z.number().int().transform(seconds => new Date(seconds*1000)),
+  subagent: z.object({
+    agent_type: z.string(),
+    agent_version: z.string(),
+    agent_model_version: z.string(),
+    agent_configuration: z.string().transform(s => JSON.parse(s)),
+  }).passthrough(),
+  content: z.string(),
+  role: z.enum(['user', 'system', 'assistant']),
+  is_demo: z.boolean().optional(),
+}).passthrough()
+export type Trajectory = z.infer<typeof Trajectory>
+
+export const TrajectoryError = z.object({
+  error: z.unknown(),
+  data: z.unknown(),
+})
+export type TrajectoryError = z.infer<typeof TrajectoryError>
 
 export class Task {
   readonly id: string
@@ -26,7 +47,7 @@ export class Task {
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
   private _events: EventRecord[] = []
-  private _trajectory: any[] = []
+  private _trajectories: (Trajectory|TrajectoryError)[] = []
 
   constructor(public readonly logPath: string) {
     const task = this.load()
@@ -155,32 +176,29 @@ export class Task {
     return [...new Set(this.events.map(e => e.event.type))].sort()
   }
 
-  get trajectory() {
-    if (this._trajectory.length > 0) {
-      return this._trajectory
+  get trajectories() {
+    if (this._trajectories.length > 0) {
+      return this._trajectories
     }
 
     const root = path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
 
     if (fs.existsSync(root)) {
       const content = fs.readFileSync(root, 'utf-8')
-      this._trajectory = content
+      this._trajectories = content
         .split('\n')
         .filter(line => line.trim())
-        .map(line => {
+        .map((line, index) => {
           try {
-            return JSON.parse(line)
+            return Trajectory.parse(JSON.parse(line))
           } catch (error) {
-            return {
-              type: 'error',
-              message: String(error),
-              line,
-            }
+            console.error(`Trajectory error in ${root}:${index}`, error)
+            return TrajectoryError.parse({ error, line })
           }
         })
     }
 
-    return this._trajectory
+    return this._trajectories
   }
 
   toJSON() {
@@ -192,7 +210,7 @@ export class Task {
       isDeclined: this.isDeclined,
       plan: this.plan,
       events: [...this.events ?? []],
-      trajectory: [...this.trajectory ?? []],
+      trajectories: [...this.trajectories ?? []],
       steps: [...this.steps?.values() ?? []],
       metrics: this.metrics,
       previousTasksInfo: this.previousTasksInfo,
