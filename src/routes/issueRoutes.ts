@@ -97,6 +97,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                       </div>
                       <div class="task-buttons">
                         <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="task-action-button" data-testid="events-button">Events</a>
+                        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/trajectories" class="task-action-button" data-testid="trajectories-button">Trajectories</a>
                         <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-action-button" data-testid="steps-button">Steps</a>
                         <button class="task-action-button toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
                       </div>
