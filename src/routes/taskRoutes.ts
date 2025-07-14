@@ -1,14 +1,12 @@
 import express from 'express'
-import fs from "fs-extra"
 import { marked } from 'marked'
-import path from "path"
+import { EventRecord } from '../eventSchema.js'
 import { JetBrains } from "../jetbrains.js"
+import { RepresentationService } from '../services/representationService.js'
+import { Step } from "../Step.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
-import { Step } from "../Step.js"
-import { RepresentationService } from '../services/representationService.js'
-import { EventRecord } from '../eventSchema.js'
 
 const router = express.Router()
 
@@ -124,14 +122,14 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
 } {
   // Filter for LlmResponseEvent events only
   const llmEvents = events.filter(event => event.event.type === 'LlmResponseEvent')
-  
+
   if (llmEvents.length === 0) {
     return {
       labels: [],
       datasets: [],
       timeUnit: 'minute',
       stepSize: 1,
-      providers: []
+      providers: [],
     }
   }
 
@@ -446,35 +444,35 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
 // API endpoint to get representations for a specific step
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex/representations', async (req, res) => {
   try {
-    const jetBrains = req.app.locals.jetBrains as JetBrains;
-    const { projectName, issueId, taskId, stepIndex } = req.params;
+    const jetBrains = req.app.locals.jetBrains as JetBrains
+    const { projectName, issueId, taskId, stepIndex } = req.params
 
     const htmlContent = await RepresentationService.getStepRepresentation(
       jetBrains,
       projectName,
       issueId,
       taskId,
-      stepIndex
-    );
+      stepIndex,
+    )
 
-    res.setHeader('Content-Type', 'text/html');
-    res.send(htmlContent);
+    res.setHeader('Content-Type', 'text/html')
+    res.send(htmlContent)
   } catch (error) {
-    console.error('Error fetching step representations:', error);
+    console.error('Error fetching step representations:', error)
 
     if (error instanceof Error) {
       if (error.message === 'Step not found') {
-        return res.status(404).send('Step not found');
+        return res.status(404).send('Step not found')
       }
       if (error.message === 'No representation files found') {
-        return res.status(404).send('No representation files found');
+        return res.status(404).send('No representation files found')
       }
       if (error.message === 'More than one representation file found') {
-        return res.status(400).send('More than one representation file found');
+        return res.status(400).send('More than one representation file found')
       }
     }
 
-    res.status(500).send('An error occurred while fetching step representations');
+    res.status(500).send('An error occurred while fetching step representations')
   }
 })
 
@@ -501,19 +499,19 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
 
     // Filter and flatten action events for Action Timeline
     const actionEvents = events
-      .filter(e => 
-        e.event.type === 'AgentActionExecutionStarted' || 
-        e.event.type === 'AgentActionExecutionFinished'
+      .filter(e =>
+        e.event.type === 'AgentActionExecutionStarted' ||
+        e.event.type === 'AgentActionExecutionFinished',
       )
       .map(e => ({
         timestamp: e.timestamp,
         eventType: e.event.type,
-        actionName: e.event.type === 'AgentActionExecutionStarted' 
+        actionName: e.event.type === 'AgentActionExecutionStarted'
           ? (e.event as any).actionToExecute?.name || ''
           : '',
-        inputParamValue: e.event.type === 'AgentActionExecutionStarted' 
+        inputParamValue: e.event.type === 'AgentActionExecutionStarted'
           ? ((e.event as any).actionToExecute?.inputParams?.[0]?.value?.toString() || '')
-          : ''
+          : '',
       }))
     const hasActionEvents = actionEvents.length > 0
 
@@ -535,19 +533,19 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
               window.llmChartData = ${JSON.stringify(llmGraphData)};
               // Define the LLM events data for filtering
               window.llmEvents = ${JSON.stringify(events.filter(e => e.event.type === 'LlmResponseEvent').map(e => ({
-                timestamp: e.timestamp.toISOString(),
-                event: {
-                  type: e.event.type,
-                  answer: {
-                    llm: { provider: (e.event as any).answer.llm.provider },
-                    cost: (e.event as any).answer.cost,
-                    inputTokens: (e.event as any).answer.inputTokens,
-                    outputTokens: (e.event as any).answer.outputTokens,
-                    cacheInputTokens: (e.event as any).answer.cacheInputTokens,
-                    cacheCreateInputTokens: (e.event as any).answer.cacheCreateInputTokens,
-                  }
-                }
-              })))};
+        timestamp: e.timestamp.toISOString(),
+        event: {
+          type: e.event.type,
+          answer: {
+            llm: { provider: (e.event as any).answer.llm.provider },
+            cost: (e.event as any).answer.cost,
+            inputTokens: (e.event as any).answer.inputTokens,
+            outputTokens: (e.event as any).answer.outputTokens,
+            cacheInputTokens: (e.event as any).answer.cacheInputTokens,
+            cacheCreateInputTokens: (e.event as any).answer.cacheCreateInputTokens,
+          },
+        },
+      })))};
               // Convert ISO strings back to Date objects
               window.llmEvents = window.llmEvents.map(e => ({
                 ...e,
@@ -631,9 +629,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
             </div>
             <script>
               window.taskEvents = ${JSON.stringify(events.map(e => ({
-                timestamp: e.timestamp.toISOString(),
-                event: { type: e.event.type },
-              })))};
+      timestamp: e.timestamp.toISOString(),
+      event: { type: e.event.type },
+    })))};
               // Convert ISO strings back to Date objects
               window.taskEvents = window.taskEvents.map(e => ({
                 ...e,
@@ -656,11 +654,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
             </div>
             <script>
               window.taskActionEvents = ${JSON.stringify(actionEvents.map(e => ({
-                timestamp: e.timestamp.toISOString(),
-                eventType: e.eventType,
-                actionName: e.actionName,
-                inputParamValue: e.inputParamValue
-              })))};
+      timestamp: e.timestamp.toISOString(),
+      eventType: e.eventType,
+      actionName: e.actionName,
+      inputParamValue: e.inputParamValue,
+    })))};
               // Convert ISO strings back to Date objects
               window.taskActionEvents = window.taskActionEvents.map(e => ({
                 ...e,
@@ -689,36 +687,36 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                     </thead>
                     <tbody>
                       ${(() => {
-                        // Calculate durations for each event
-                        const eventDurations = events.map((eventRecord, index) => {
-                          let duration = 0
-                          if (index > 0) {
-                            const prevRecord = events[index - 1]
-                            duration = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
-                          }
-                          return {
-                            type: eventRecord.event.type,
-                            duration: duration
-                          }
-                        })
+      // Calculate durations for each event
+      const eventDurations = events.map((eventRecord, index) => {
+        let duration = 0
+        if (index > 0) {
+          const prevRecord = events[index - 1]
+          duration = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
+        }
+        return {
+          type: eventRecord.event.type,
+          duration: duration,
+        }
+      })
 
-                        // Group by event type and calculate statistics
-                        const eventTypeStats = new Map<string, number[]>(task.eventTypes.map(eventType => [eventType, []]))
-                        eventDurations.forEach(({ type, duration }) => {
-                          if (!eventTypeStats.has(type)) {
-                            eventTypeStats.set(type, [])
-                          }
-                          eventTypeStats.get(type)!.push(duration)
-                        })
+      // Group by event type and calculate statistics
+      const eventTypeStats = new Map<string, number[]>(task.eventTypes.map(eventType => [eventType, []]))
+      eventDurations.forEach(({ type, duration }) => {
+        if (!eventTypeStats.has(type)) {
+          eventTypeStats.set(type, [])
+        }
+        eventTypeStats.get(type)!.push(duration)
+      })
 
-                        // Calculate min, max, avg for each event type
-                        const statsRows: string[] = []
-                        for (const [eventType, durations] of eventTypeStats.entries()) {
-                          const min = Math.min(...durations)
-                          const max = Math.max(...durations)
-                          const avg = durations.reduce((sum, d) => sum + d, 0) / durations.length
-                          
-                          statsRows.push(`
+      // Calculate min, max, avg for each event type
+      const statsRows: string[] = []
+      for (const [eventType, durations] of eventTypeStats.entries()) {
+        const min = Math.min(...durations)
+        const max = Math.max(...durations)
+        const avg = durations.reduce((sum, d) => sum + d, 0) / durations.length
+
+        statsRows.push(`
                             <tr data-testid="event-stats-row-${escapeHtml(eventType)}">
                               <td class="event-type-col">${escapeHtml(eventType)}</td>
                               <td class="count-duration-col">${durations.length}</td>
@@ -727,10 +725,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                               <td class="avg-duration-col">${Math.round(avg)}</td>
                             </tr>
                           `)
-                        }
-                        
-                        return statsRows.join('')
-                      })()}
+      }
+
+      return statsRows.join('')
+    })()}
                     </tbody>
                   </table>
                 </div>
@@ -755,7 +753,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
           ` : ''}
 
           ${events.length > 0
-            ? `
+      ? `
               <table class="events-table" data-testid="events-table">
                 <thead>
                   <tr>
@@ -767,23 +765,23 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                 </thead>
                 <tbody>
                   ${events.map((eventRecord, index) => {
-                    // Calculate timestamp display
-                    let timestampDisplay = '-'
-                    if (index === 0) {
-                      // First record: show time only
-                      timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
-                    } else {
-                      // Subsequent records: show elapsed milliseconds since previous record
-                      const prevRecord = events[index - 1]
-                      const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
-                      timestampDisplay = `+${elapsed}ms`
-                    }
-                    
-                    if (eventRecord.event.type === 'LlmResponseEvent') {
-                      cost += eventRecord.event.answer.cost
-                    }
-                    
-                    return `
+        // Calculate timestamp display
+        let timestampDisplay = '-'
+        if (index === 0) {
+          // First record: show time only
+          timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
+        } else {
+          // Subsequent records: show elapsed milliseconds since previous record
+          const prevRecord = events[index - 1]
+          const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
+          timestampDisplay = `+${elapsed}ms`
+        }
+
+        if (eventRecord.event.type === 'LlmResponseEvent') {
+          cost += eventRecord.event.answer.cost
+        }
+
+        return `
                       <tr data-testid="event-row-${index}">
                         <td class="timestamp-col">${timestampDisplay}</td>
                         <td class="event-type-col ${eventRecord.parseError ? 'error' : ''}">
@@ -798,7 +796,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                         </td>
                       </tr>
                     `
-                  }).join('')}
+      }).join('')}
                 </tbody>
                 <tfoot>
                   <tr>
@@ -808,8 +806,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
                 </tfoot>
               </table>
             `
-            : '<div class="no-events" data-testid="no-events-message">No events found for this task</div>'
-          }
+      : '<div class="no-events" data-testid="no-events-message">No events found for this task</div>'
+    }
         </div>
 
         <script src="/js/taskEventFilters.js"></script>
@@ -887,7 +885,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
           </div>
 
           ${trajectories.length > 0
-            ? `
+      ? `
               <table class="trajectories-table" data-testid="trajectories-table">
                 <thead>
                   <tr>
@@ -898,42 +896,42 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
                 </thead>
                 <tbody>
                   ${trajectories.map((trajectory, index) => {
-                    // Handle trajectory errors
-                    if ('error' in trajectory) {
-                      return `
+        // Handle trajectory errors
+        if ('error' in trajectory) {
+          return `
                         <tr data-testid="trajectory-error-row-${index}">
                           <td class="timestamp-col">-</td>
                           <td class="role-col">ERROR</td>
                           <td class="content-col">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</td>
                         </tr>
                       `
-                    }
-                    
-                    // Type guard to ensure we have a valid trajectory
-                    if ('timestamp' in trajectory && 'role' in trajectory && 'content' in trajectory) {
-                      return `
+        }
+
+        // Type guard to ensure we have a valid trajectory
+        if ('timestamp' in trajectory && 'role' in trajectory && 'content' in trajectory) {
+          return `
                         <tr data-testid="trajectory-row-${index}" class="role-${trajectory.role}">
                           <td class="timestamp-col">${trajectory.timestamp.toLocaleString()}</td>
                           <td class="role-col">${escapeHtml(trajectory.role)}</td>
-                          <td class="content-col">${marked(escapeHtml(trajectory.content))}</td>
+                          <td class="content-col">${escapeHtml(trajectory.content)}</td>
                         </tr>
                       `
-                    }
-                    
-                    // Fallback for unknown trajectory format
-                    return `
+        }
+
+        // Fallback for unknown trajectory format
+        return `
                       <tr data-testid="trajectory-unknown-row-${index}">
                         <td class="timestamp-col">-</td>
                         <td class="role-col">UNKNOWN</td>
                         <td class="content-col">Unknown trajectory format</td>
                       </tr>
                     `
-                  }).join('')}
+      }).join('')}
                 </tbody>
               </table>
             `
-            : '<div class="no-trajectories" data-testid="no-trajectories-message">No trajectories found for this task</div>'
-          }
+      : '<div class="no-trajectories" data-testid="no-trajectories-message">No trajectories found for this task</div>'
+    }
         </div>
       </body>
       </html>

@@ -1260,11 +1260,15 @@ p {
 }
 
 .trajectories-table .content-col {
-  max-width: 600px;
   max-height: 200px;
   overflow: auto;
-  font-size: 14px;
-  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: keep-all;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: break-word;
 }
 
 .trajectories-table .role-user {
