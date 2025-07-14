@@ -913,7 +913,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
                         <tr data-testid="trajectory-row-${index}" class="role-${trajectory.role}">
                           <td class="timestamp-col">${trajectory.timestamp.toLocaleString()}</td>
                           <td class="role-col">${escapeHtml(trajectory.role)}</td>
-                          <td class="content-col"><div class="content-wrapper">${escapeHtml(trajectory.content)}</div></td>
+                          <td class="content-col"><div class="content-wrapper">${escapeHtml(trajectory.content.trim())}</div></td>
                         </tr>
                       `
         }
