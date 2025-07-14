@@ -902,7 +902,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
                         <tr data-testid="trajectory-error-row-${index}">
                           <td class="timestamp-col">-</td>
                           <td class="role-col">ERROR</td>
-                          <td class="content-col">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</td>
+                          <td class="content-col"><div class="content-wrapper">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</div></td>
                         </tr>
                       `
         }
@@ -913,7 +913,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
                         <tr data-testid="trajectory-row-${index}" class="role-${trajectory.role}">
                           <td class="timestamp-col">${trajectory.timestamp.toLocaleString()}</td>
                           <td class="role-col">${escapeHtml(trajectory.role)}</td>
-                          <td class="content-col">${escapeHtml(trajectory.content)}</td>
+                          <td class="content-col"><div class="content-wrapper">${escapeHtml(trajectory.content)}</div></td>
                         </tr>
                       `
         }
@@ -923,7 +923,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
                       <tr data-testid="trajectory-unknown-row-${index}">
                         <td class="timestamp-col">-</td>
                         <td class="role-col">UNKNOWN</td>
-                        <td class="content-col">Unknown trajectory format</td>
+                        <td class="content-col"><div class="content-wrapper">Unknown trajectory format</div></td>
                       </tr>
                     `
       }).join('')}
