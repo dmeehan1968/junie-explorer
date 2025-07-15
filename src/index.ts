@@ -5,7 +5,11 @@ import homeRoutes from './routes/homeRoutes.js'
 import issueRoutes from './routes/issueRoutes.js'
 import notFoundRoutes from './routes/notFoundRoutes.js'
 import projectRoutes from './routes/projectRoutes.js'
-import taskRoutes from './routes/taskRoutes.js'
+import taskStepsRoute from './routes/taskStepsRoute.js'
+import taskStepDataRoute from './routes/taskStepDataRoute.js'
+import taskStepRepresentationsRoute from './routes/taskStepRepresentationsRoute.js'
+import taskEventsRoute from './routes/taskEventsRoute.js'
+import taskTrajectoriesRoute from './routes/taskTrajectoriesRoute.js'
 import { JetBrains } from "./jetbrains.js"
 
 const __filename = fileURLToPath(import.meta.url)
@@ -42,7 +46,11 @@ export function createServer(options: ServerOptions = {}) {
   app.use('/', homeRoutes)
   app.use('/', projectRoutes)
   app.use('/', issueRoutes)
-  app.use('/', taskRoutes)
+  app.use('/', taskStepsRoute)
+  app.use('/', taskStepDataRoute)
+  app.use('/', taskStepRepresentationsRoute)
+  app.use('/', taskEventsRoute)
+  app.use('/', taskTrajectoriesRoute)
 
   // Add not found page (must be after routes)
   app.use(notFoundRoutes)

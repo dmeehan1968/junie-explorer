@@ -6,7 +6,7 @@ export const Trajectory = z.object({
     agent_type: z.string(),
     agent_version: z.string(),
     agent_model_version: z.string(),
-    agent_configuration: z.string().transform(s => JSON.parse(s)),
+    agent_configuration: z.string().transform(s => s ? JSON.parse(s) : s),
   }).passthrough(),
   content: z.string(),
   role: z.enum(['user', 'system', 'assistant']),
