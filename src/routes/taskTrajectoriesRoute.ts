@@ -88,7 +88,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
             <div class="task-meta">
               <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
               <div class="task-download">
-                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="download-link">Download Trajectories</a>
+                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="reload-button">Download Trajectories as JSONL</a>
               </div>
             </div>
             ${task.context.description ? `
