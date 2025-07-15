@@ -108,9 +108,13 @@ export class Task {
     return this.lazyload()._patch!
   }
 
+  get eventsFile() {
+    return path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
+  }
+
   private loadEvents(): EventRecord[] {
 
-    const root = path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
+    const root = this.eventsFile
 
     if (fs.existsSync(root)) {
       const content = fs.readFileSync(root, 'utf-8')
@@ -156,12 +160,16 @@ export class Task {
     return [...new Set(this.events.map(e => e.event.type))].sort()
   }
 
+  get trajectoriesFile() {
+    return path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
+  }
+
   get trajectories() {
     if (this._trajectories.length > 0) {
       return this._trajectories
     }
 
-    const root = path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
+    const root = this.trajectoriesFile
 
     if (fs.existsSync(root)) {
       const content = fs.readFileSync(root, 'utf-8')
@@ -189,7 +197,9 @@ export class Task {
       context: this.context,
       isDeclined: this.isDeclined,
       plan: this.plan,
+      eventsFile: this.eventsFile,
       events: [...this.events ?? []],
+      trajectoriesFile: this.trajectoriesFile,
       trajectories: [...this.trajectories ?? []],
       steps: [...this.steps?.values() ?? []],
       metrics: this.metrics,
