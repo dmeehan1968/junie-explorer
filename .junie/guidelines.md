@@ -86,7 +86,7 @@ The new class-based data model with enhanced functionality:
 
 ## Automated Testing
 - Use `npm run dev` in background and note process ID
-- Allow up to 1 minute for server to start, confirmed by "Server is running on <URL>" output
+- Use `curl` to probe for server readiness, repeat for up to 60 seconds total
 - Perform browser testing (e.g Playright or human)
 - Kill the background process ID after testing
 
