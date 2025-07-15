@@ -1,4 +1,6 @@
 import express from 'express'
+import fs from 'fs-extra'
+import path from 'path'
 import { marked } from 'marked'
 import { EventRecord } from '../eventSchema.js'
 import { JetBrains } from "../jetbrains.js"
@@ -122,6 +124,34 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 }
 
+// Task events download route
+router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
+
+    if (!project || !issue || !task) {
+      return res.status(404).send('Task not found')
+    }
+
+    if (!fs.existsSync(task.eventsFile)) {
+      return res.status(404).send('Events file not found')
+    }
+
+    const filename = path.basename(task.eventsFile)
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    res.setHeader('Content-Type', 'application/jsonl')
+    
+    res.sendFile(path.resolve(task.eventsFile))
+  } catch (error) {
+    console.error('Error downloading events file:', error)
+    res.status(500).send('An error occurred while downloading the events file')
+  }
+})
+
 // Task events page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
@@ -229,6 +259,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
           <div class="task-details">
             <div class="task-meta">
               <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
+              <div class="task-download">
+                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class="download-link">Download Events</a>
+              </div>
             </div>
             ${task.context.description ? `
               <div class="task-description">

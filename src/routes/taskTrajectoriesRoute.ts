@@ -1,9 +1,39 @@
 import express from 'express'
+import fs from 'fs-extra'
+import path from 'path'
 import { marked } from 'marked'
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 
 const router = express.Router()
+
+// Task trajectories download route
+router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories/download', (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = jetBrains.getProjectByName(projectName)
+    const issue = project?.getIssueById(issueId)
+    const task = issue?.getTaskById(taskId)
+
+    if (!project || !issue || !task) {
+      return res.status(404).send('Task not found')
+    }
+
+    if (!fs.existsSync(task.trajectoriesFile)) {
+      return res.status(404).send('Trajectories file not found')
+    }
+
+    const filename = path.basename(task.trajectoriesFile)
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    res.setHeader('Content-Type', 'application/jsonl')
+    
+    res.sendFile(path.resolve(task.trajectoriesFile))
+  } catch (error) {
+    console.error('Error downloading trajectories file:', error)
+    res.status(500).send('An error occurred while downloading the trajectories file')
+  }
+})
 
 // Task trajectories page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (req, res) => {
@@ -57,6 +87,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
           <div class="task-details">
             <div class="task-meta">
               <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
+              <div class="task-download">
+                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="download-link">Download Trajectories</a>
+              </div>
             </div>
             ${task.context.description ? `
               <div class="task-description">

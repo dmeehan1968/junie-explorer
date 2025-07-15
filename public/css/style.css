@@ -528,6 +528,27 @@ p {
   margin-bottom: 10px;
 }
 
+.task-download {
+  margin-left: auto;
+}
+
+.download-link {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 4px 8px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.download-link:hover {
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+}
+
 /* Graph Container Styles */
 .graph-container {
   width: 100%;
