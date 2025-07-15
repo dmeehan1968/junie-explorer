@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-07-15
+
+### Features
+- Add task trajectories route for detailed visualization (57f068b)
+- Add download routes and links for task events and trajectories (ff78109)
+- Add schema validation for trajectory data and improve error handling (d0d9120)
+
+### Code Improvements
+- Extract `Trajectory` schema into a separate module (2f57f1c)
+- Split `taskRoutes.ts` file in modules per route (8af2075)
+- Refactor and centralize event and trajectory file path logic (63edeac)
+- Refactor and tidy up `taskRoutes.ts` and adjust trajectory table styles (de01fcb)
+- Enhance event schema with passthrough support for flexible properties (3f61c26)
+
+### UI Improvements
+- Update download link text and button styles for tasks (061dc5f)
+- Trim trajectory content and set max width for content column (0466acd)
+- Wrap trajectory content in a container and adjust styles (79510ad)
+- Move inline styles for trajectories table to CSS file (43bb4f2)
+- Rename button class for raw data toggle functionality (5d0582a)
+
+### Documentation
+- Update automated testing guidelines in documentation (8b91781)
+- Update testing workflow and guidelines in documentation (0fdce11)
+
 ## [2.1.0] - 2025-07-08
 
 ### Features
