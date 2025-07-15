@@ -81,8 +81,14 @@ The new class-based data model with enhanced functionality:
 ## Development Workflow
 1. **Setup**: Clone the repository and run `npm install`
 2. **Development**: Use `npm run dev` to start the development server
-3. **Testing**: Use `npm test` to run the test script
+3. **Testing**: Use `npm test` to run the acceptance tests
 4. **Building**: There is no build step, typescript can be run directly via loader ts-node/esm. tsconfig.json includes noEmit=true
+
+## Automated Testing
+- Use `npm run dev` in background and note process ID
+- Allow up to 1 minute for server to start, confirmed by "Server is running on <URL>" output
+- Perform browser testing (e.g Playright or human)
+- Kill the background process ID after testing
 
 ## Code Conventions
 - Use TypeScript interfaces for type definitions
@@ -142,8 +148,3 @@ Potential areas for improvement:
 - Implement project and issue browsing
 - Add authentication for multi-user environments
 - Enhance the UI with more interactive elements
-
-# MCP Tools
-
-- Use Jetbrains
-- Use context7
