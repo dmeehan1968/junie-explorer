@@ -4,9 +4,10 @@
   "author": "Dave Meehan <dave_meehan@replicated.co.uk>",
   "license": "SEE LICENSE IN LICENCE",
   "description": "Utility App for drilling into log files for JetBrains Junie",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "type": "module",
   "scripts": {
+    "start": "bun run dev",
     "dev": "bun run build:static && bun src/index.ts",
     "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @pending\"",
     "playwright:install": "playwright install",
@@ -39,7 +40,7 @@
     "typescript": "^5.5.3"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "bun": ">=1.2.18"
   },
   "private": true
 }
