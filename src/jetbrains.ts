@@ -1,8 +1,8 @@
 import fs from "fs-extra"
-import os from "os"
-import path from "path"
-import { fileURLToPath } from "url"
-import { inspect } from 'util'
+import os from "node:os"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
+import { inspect } from 'node:util'
 import { Project } from "./Project.js"
 import { SummaryMetrics } from "./schema.js"
 

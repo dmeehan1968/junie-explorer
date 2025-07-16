@@ -7,14 +7,23 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings --enable-source-maps\" node src/index.ts",
+    "dev": "bun run build:static && bun src/index.ts",
     "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @pending\"",
-    "playwright:install": "playwright install"
+    "playwright:install": "playwright install",
+    "build:static": "make-vfs --dir ./public --content-format string --outfile ./src/bun/public.ts",
+    "build:bun": "bun build --compile src/index.ts --minify --sourcemap",
+    "build:apple:x64": "bun run build:bun --target=bun-darwin-x64 --outfile dist/junie-explorer-apple-x64",
+    "build:apple:arm64": "bun run build:bun --target=bun-darwin-arm64 --outfile dist/junie-explorer-apple-arm64",
+    "build:linux:x64": "bun run build:bun --target=bun-linux-x64 --outfile dist/junie-explorer-linux-x64",
+    "build:linux:arm64": "bun run build:bun --target=bun-linux-arm64 --outfile dist/junie-explorer-linux-arm64",
+    "build:windows:x64": "bun run build:bun --target=bun-windows-x64 --outfile dist/junie-explorer-windows-x64",
+    "build": "bun run build:static && bun run build:apple:x64 && bun run build:apple:arm64 && bun run build:linux:x64 && bun run build:linux:arm64 && bun run build:windows:x64"
   },
   "dependencies": {
     "express": "^4.18.2",
     "fs-extra": "^11.1.1",
     "marked": "^15.0.12",
+    "mime-types": "^3.0.1",
     "zod": "^3.25.63"
   },
   "devDependencies": {
@@ -24,6 +33,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/marked": "^5.0.2",
     "@types/node": "^22.15.30",
+    "make-vfs": "^1.0.16",
     "playwright": "^1.40.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"

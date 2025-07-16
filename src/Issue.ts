@@ -1,6 +1,6 @@
 import fs from "fs-extra"
-import path from "path"
-import { inspect } from "util"
+import path from "node:path"
+import { inspect } from "node:util"
 import { JunieChainSchema, SummaryMetrics } from "./schema.js"
 import { Task } from "./Task.js"
 

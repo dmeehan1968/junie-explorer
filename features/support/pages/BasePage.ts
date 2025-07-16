@@ -1,5 +1,4 @@
 import { Page } from '@playwright/test'
-import path from "path"
 
 export abstract class BasePage {
 

@@ -1,6 +1,6 @@
 import express from 'express'
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'node:path'
 import { marked } from 'marked'
 import { EventRecord } from '../eventSchema.js'
 import { JetBrains } from "../jetbrains.js"

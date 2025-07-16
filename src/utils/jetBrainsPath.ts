@@ -1,5 +1,5 @@
-import os from 'os';
-import path from 'path';
+import os from 'node:os';
+import path from 'node:path';
 
 // Get username from environment variable or OS
 const username = process.env.USER || os.userInfo().username;

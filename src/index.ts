@@ -1,6 +1,6 @@
 import express from 'express'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import homeRoutes from './routes/homeRoutes.js'
 import issueRoutes from './routes/issueRoutes.js'
 import notFoundRoutes from './routes/notFoundRoutes.js'
@@ -11,6 +11,8 @@ import taskStepRepresentationsRoute from './routes/taskStepRepresentationsRoute.
 import taskEventsRoute from './routes/taskEventsRoute.js'
 import taskTrajectoriesRoute from './routes/taskTrajectoriesRoute.js'
 import { JetBrains } from "./jetbrains.js"
+import publicFiles from "./bun/public.js"
+import mime from 'mime'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -31,7 +33,17 @@ export function createServer(options: ServerOptions = {}) {
   const app = express()
 
   // Serve static files
-  app.use(express.static(path.join(__dirname, '../public')))
+  // app.use(express.static(path.join(__dirname, '../public')))
+  app.use((req, res, next) => {
+    const url = req.url.slice(1)
+    if (!(url in publicFiles)) {
+      return next()
+    }
+    const route = publicFiles[url as never]
+    const contentType = mime.lookup(url, '')
+    if (!route || !contentType) return next()
+    return res.contentType(contentType).send(route)
+  })
   app.use((req, res, next) => {
     req.app.locals.jetBrains = jetBrainsInstance
     next()

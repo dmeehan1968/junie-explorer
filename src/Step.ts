@@ -1,5 +1,5 @@
 import fs from "fs-extra"
-import { inspect } from "util"
+import { inspect } from "node:util"
 import { Dependencies, Description, JunieStatistics, JunieStepSchema, StepContent } from "./schema.js"
 
 export interface Metrics {

@@ -1,6 +1,6 @@
 import fs from "fs-extra"
-import path from "path"
-import { inspect } from "util"
+import path from "node:path"
+import { inspect } from "node:util"
 import { EventRecord, UnknownEventRecord } from "./eventSchema.js"
 import {
   AgentState,
@@ -59,9 +59,12 @@ export class Task {
       return this._steps
     }
 
-    const root = path.join(this.logPath, '../../..', this.id, 'step_+([0-9]).{*{swe,chat}_next*,junie_single_step_{chat,issue}}')
-    fs.globSync(root)
-      .map(path => new Step(path))
+    const steps = fs.readdirSync(path.resolve(this.logPath, '../../..', this.id), { withFileTypes: true })
+      .filter(file => file.isFile() && /^step_[0-9]+\.((.*(swe|chat)_next.*)|(junie_single_step_(chat|issue)))$/.test(file.name))
+      .sort((a, b) => a.name.localeCompare(b.name))
+
+    steps
+      .map(file => new Step(path.join(file.parentPath, file.name)))
       .sort((a, b) => a.id - b.id)
       .map(step => this._steps.set(step.id, step))
 
