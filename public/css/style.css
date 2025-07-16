@@ -1301,8 +1301,16 @@ p {
   background-color: #e3f2fd;
 }
 
+.trajectories-table .role-user_reflection {
+  background-color: #bcedff;
+}
+
 .trajectories-table .role-assistant {
   background-color: #f3e5f5;
+}
+
+.trajectories-table .role-assistant_reflection {
+  background-color: #fbc9ff;
 }
 
 .trajectories-table .role-system {

@@ -9,7 +9,7 @@ export const Trajectory = z.object({
     agent_configuration: z.string().transform(s => s ? JSON.parse(s) : s),
   }).passthrough(),
   content: z.string(),
-  role: z.enum(['user', 'system', 'assistant']),
+  role: z.enum(['user', 'system', 'assistant', 'assistant_reflection', 'user_reflection']),
   is_demo: z.boolean().optional(),
 }).passthrough()
 export type Trajectory = z.infer<typeof Trajectory>

@@ -12,7 +12,7 @@ import taskEventsRoute from './routes/taskEventsRoute.js'
 import taskTrajectoriesRoute from './routes/taskTrajectoriesRoute.js'
 import { JetBrains } from "./jetbrains.js"
 import publicFiles from "./bun/public.js"
-import mime from 'mime'
+import mime from 'mime-types'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -34,13 +34,15 @@ export function createServer(options: ServerOptions = {}) {
 
   // Serve static files
   // app.use(express.static(path.join(__dirname, '../public')))
+
+  // Serve static files from import created by make-vfs
   app.use((req, res, next) => {
     const url = req.url.slice(1)
     if (!(url in publicFiles)) {
       return next()
     }
     const route = publicFiles[url as never]
-    const contentType = mime.lookup(url, '')
+    const contentType = mime.lookup(url)
     if (!route || !contentType) return next()
     return res.contentType(contentType).send(route)
   })
