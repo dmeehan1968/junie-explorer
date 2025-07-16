@@ -138,8 +138,8 @@ Requirements for this project are documented using Gherkin feature files located
 - Update the package.json version to the new version
 - Update CHANGELOG.md to include the changes separated by version (use the first line of the commit and include the commit hash) 
 - Make sure the latest version release date is today (use `date` CLI to get current)
-- Run `npm install` to update the package-lock.json
-- Commit CHANGELOG.md, package.json and package-lock.json
+- Run `bun install` to update the package-lock.json
+- Commit CHANGELOG.md, package.json and bun.lock
 - Add a tag with the new version (prefix the version with `v`, e.g. v1.0.0)
 
 ## Future Enhancements
