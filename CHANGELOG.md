@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2025-07-16
+
+### Features
+- Add support for Bun and improve module imports (28ff297)
+- Migrate to Bun runtime and update project setup (8485e62)
+
+### Code Improvements
+- Update dependencies, enhance CSS, and extend role schema (974ed39)
+- Update release process guidelines for Bun compatibility (3349a27)
+- Add `bun.lock` file for Bun dependency management (b541994)
+- Remove `package-lock.json` file (0145f4e)
+- Remove `bun.lock` file (fb158ae)
+
 ## [2.2.0] - 2025-07-15
 
 ### Features
