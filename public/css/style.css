@@ -1287,8 +1287,14 @@ p {
 .trajectories-table .content-wrapper {
   max-height: 200px;
   overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: keep-all;
+  font-family: monospace;
   font-size: 13px;
   line-height: 1.4;
+  overflow-wrap: break-word;
+  padding: 8px;
 }
 
 .trajectories-table .role-user {
