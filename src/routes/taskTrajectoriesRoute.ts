@@ -11,13 +11,12 @@ const renderer = new marked.Renderer()
 
 renderer.html = (html) => {
   // Escape HTML tags
-  // console.log(html)
   return html.text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+    .replace(/'/g, '&apos;')
 }
 
 // Task trajectories download route
