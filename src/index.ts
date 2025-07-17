@@ -25,7 +25,7 @@ export interface ServerOptions {
 
 export function createServer(options: ServerOptions = {}) {
   const {
-    jetBrainsInstance = new JetBrains(),
+    jetBrainsInstance = new JetBrains({ logPath: process.env.JETBRAINS_LOG_PATH }),
     port = process.env.PORT || 3000,
     preload = true
   } = options
@@ -79,9 +79,7 @@ export function createServer(options: ServerOptions = {}) {
 
 // Start the server when this file is run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const { app, port } = createServer({
-    jetBrainsInstance: new JetBrains(),
-  })
+  const { app, port } = createServer()
   const server = app.listen(port, () => {
     const address = server.address()
     if (address === null || typeof address === 'string') {

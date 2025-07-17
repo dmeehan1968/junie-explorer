@@ -31,11 +31,14 @@ export class Issue {
       return this._tasks
     }
 
-    const root = path.join(this.logPath, '..', path.parse(this.logPath).name, 'task-*.json')
-    fs.globSync(root)
-      .map(path => new Task(path))
-      .sort((a, b) => a.created.getTime() - b.created.getTime())
-      .forEach(task => this._tasks.set(task.id, task))
+    const taskPath = path.join(this.logPath, '..', path.parse(this.logPath).name)
+    if (fs.existsSync(taskPath)) {
+      const root = path.join(taskPath, 'task-*.json')
+      fs.globSync(root)
+        .map(path => new Task(path))
+        .sort((a, b) => a.created.getTime() - b.created.getTime())
+        .forEach(task => this._tasks.set(task.id, task))
+    }
 
     return this._tasks
   }
