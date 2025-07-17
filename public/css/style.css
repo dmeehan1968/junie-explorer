@@ -1289,6 +1289,110 @@ p {
   overflow: auto;
   font-size: 13px;
   line-height: 1.4;
+  padding: 8px;
+}
+
+/* Sensible defaults for child elements in trajectories table content wrapper */
+.trajectories-table .content-wrapper h1,
+.trajectories-table .content-wrapper h2,
+.trajectories-table .content-wrapper h3,
+.trajectories-table .content-wrapper h4,
+.trajectories-table .content-wrapper h5,
+.trajectories-table .content-wrapper h6 {
+  margin-top: 12px;
+  margin-bottom: 8px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #333;
+}
+
+.trajectories-table .content-wrapper h1 {
+  font-size: 18px;
+}
+
+.trajectories-table .content-wrapper h2 {
+  font-size: 16px;
+}
+
+.trajectories-table .content-wrapper h3 {
+  font-size: 15px;
+}
+
+.trajectories-table .content-wrapper h4,
+.trajectories-table .content-wrapper h5,
+.trajectories-table .content-wrapper h6 {
+  font-size: 14px;
+}
+
+.trajectories-table .content-wrapper p {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.trajectories-table .content-wrapper ul,
+.trajectories-table .content-wrapper ol {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-left: 20px;
+}
+
+.trajectories-table .content-wrapper li {
+  margin-bottom: 4px;
+}
+
+.trajectories-table .content-wrapper pre {
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.trajectories-table .content-wrapper code {
+  font-family: monospace;
+  background-color: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.trajectories-table .content-wrapper pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
+.trajectories-table .content-wrapper blockquote {
+  border-left: 3px solid #ddd;
+  padding-left: 10px;
+  margin: 8px 0;
+  color: #555;
+}
+
+.trajectories-table .content-wrapper a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.trajectories-table .content-wrapper a:hover {
+  text-decoration: underline;
+}
+
+.trajectories-table .content-wrapper table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.trajectories-table .content-wrapper table th,
+.trajectories-table .content-wrapper table td {
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.trajectories-table .content-wrapper table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
 }
 
 .trajectories-table .role-user {
