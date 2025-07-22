@@ -78,11 +78,7 @@ export function createServer(options: ServerOptions = {}) {
 }
 
 // Start the server when this file is run directly
-const currentFileUrl = import.meta.url
-const scriptPath = fileURLToPath(currentFileUrl)
-const mainPath = path.resolve(process.argv[1])
-
-if (path.resolve(scriptPath) === mainPath) {
+if (path.resolve(__filename) === path.resolve(process.argv[1])) {
   const { app, port } = createServer()
   const server = app.listen(port, () => {
     const address = server.address()
