@@ -129,12 +129,18 @@ export class JetBrains {
     const ideNameMap: Record<string, string> = {
       'AppCode': 'AppCode',
       'CLion': 'CLion',
+      'CodeWithMe': 'CodeWithMe',
       'DataGrip': 'DataGrip',
+      'Fleet': 'Fleet',
       'GoLand': 'GoLand',
       'IntelliJIdea': 'IntelliJ_IDEA',
+      'Kotlin': 'Kotlin',
       'PhpStorm': 'PhpStorm',
       'PyCharm': 'PyCharm',
+      'Qodana': 'Qodana',
+      'Resharper': 'ReSharper',
       'Rider': 'Rider',
+      'RustRover': 'RustRover',
       'WebStorm': 'WebStorm',
     }
     const mappedName = ideNameMap[ideName] ?? 'AI'
