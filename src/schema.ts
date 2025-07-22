@@ -6,7 +6,7 @@ export const JunieChainSchema = z.object({
   }),
   name: z.string().or(z.null()),
   created: z.coerce.date(),
-  state: z.enum(['Done', 'Stopped', 'Finished', 'Running', 'Declined', 'Failed']),
+  state: z.enum(['Done', 'Stopped', 'Finished', 'Running', 'Declined', 'Failed', 'WaitingUserInput']),
   error: z.any().optional(),
 })
 export type JunieChain = z.infer<typeof JunieChainSchema>
