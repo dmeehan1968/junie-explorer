@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2025-07-22
+
+### Features
+- Add new IDE names to `ideNameMap` in `jetbrains.ts` (closes #22) (b8b066c)
+- Add `WaitingUserInput` state to `JunieChainSchema` (93661bd)
+- Enable Markdown rendering for task trajectories (deb6312)
+
+### Bug Fixes
+- Fix start not working for windows (109dc94)
+
+### Code Improvements
+- Simplify server start condition (35bc338)
+- Merge pull request #23 from yohannlog/main (54b0371)
+- Improve task loading and enhance server initialization (17f1e3e)
+- Revert "Enable Markdown rendering for task trajectories" (d09fcaa)
+- Revert "Enhance `.content-wrapper` styles in `style.css`" (1939424)
+- Revert "Escape single quotes consistently in `taskTrajectoriesRoute.ts`" (0462359)
+
+### UI Improvements
+- Escape single quotes consistently in `taskTrajectoriesRoute.ts` (aca6513)
+- Enhance `.content-wrapper` styles in `style.css` (f5893d6)
+
 ## [2.3.0] - 2025-07-16
 
 ### Features
