@@ -114,7 +114,7 @@ export const AgentActionExecutionStarted = z.object({
     inputParams: z.object({
       ParameterValue: z.string(),
       name: z.string(),
-      value: z.union([z.string(), z.number(), z.boolean()]),
+      value: z.any(),
     }).passthrough().array().optional(),
     description: z.string(),
   }).passthrough(),
