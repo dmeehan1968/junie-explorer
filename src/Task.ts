@@ -132,7 +132,10 @@ export class Task {
             return {
               type: 'jsonError',
               timestamp: new Date(),
-              event: json,
+              event: {
+                type: 'unparsed',
+                data: line,
+              },
             }
           }
           try {
