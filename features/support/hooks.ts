@@ -1,6 +1,6 @@
 import { After, AfterAll, Before, BeforeAll } from '@cucumber/cucumber'
 import { Server } from 'http'
-import { createServer } from '../../src/index.js'
+import { createServer } from "../../src/createServer.js"
 import { JetBrains } from '../../src/jetbrains.js'
 import { MuteLogger } from "./MuteLogger.js"
 import { ICustomWorld } from './world.js'
