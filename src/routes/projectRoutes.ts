@@ -122,7 +122,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
     const color = `hsl(${hue}, 70%, 60%)`
 
     return {
-      label: escapeHtml(issue.name),
+      label: issue.name,
       data: [{ x: issue.created, y: issue.metrics.cost }],
       borderColor: color,
       backgroundColor: color,
