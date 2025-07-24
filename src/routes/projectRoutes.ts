@@ -7,38 +7,10 @@ import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUti
 
 const router = express.Router()
 
-// Function to generate HTML for issue metrics table
-const generateIssueMetricsTable = (issue: Issue): string => {
-  return `
-  <table class="step-totals-table">
-    <thead>
-      <tr>
-        <th>Created</th>
-        <th>Input Tokens</th>
-        <th>Output Tokens</th>
-        <th>Cache Tokens</th>
-        <th>Cost</th>
-        <th>Total Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td data-testid="issue-created-date">${new Date(issue.created).toLocaleString()}</td>
-        <td data-testid="issue-input-tokens">${formatNumber(issue.metrics.inputTokens)}</td>
-        <td data-testid="issue-output-tokens">${formatNumber(issue.metrics.outputTokens)}</td>
-        <td data-testid="issue-cache-tokens">${formatNumber(issue.metrics.cacheTokens)}</td>
-        <td data-testid="issue-cost">${issue.metrics.cost.toFixed(4)}</td>
-        <td data-testid="issue-total-time">${formatSeconds(issue.metrics.time / 1000)}</td>
-      </tr>
-    </tbody>
-  </table>
-`
-}
-
-// Function to generate HTML for project summary metrics table
-const generateProjectSummaryTable = (project: Project): string => {
+// Function to generate HTML for combined issues table with project summary footer
+const generateIssuesTable = (project: Project): string => {
   if (project.issues.size === 0) {
-    return ''
+    return '<p data-testid="no-issues-message">No issues found for this project</p>'
   }
 
   const sortedIssues = [...project.issues.values()].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
@@ -49,28 +21,58 @@ const generateProjectSummaryTable = (project: Project): string => {
 
   return `
   <div class="project-summary">
-    <h3>Project Summary</h3>
-    <table class="project-summary-table" data-testid="project-summary-table">
+    <h3>Project Issues</h3>
+    <table class="project-summary-table issues-table" data-testid="issues-table">
       <thead>
         <tr>
+          <th style="text-align: left;">Issue Description</th>
           <th>Input Tokens</th>
           <th>Output Tokens</th>
           <th>Cache Tokens</th>
           <th>Cost</th>
-          <th>Total Time</th>
-          <th>Elapsed Time</th>
+          <th>Time</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
+        ${sortedIssues.map(issue => `
         <tr>
+          <td style="text-align: left;" data-testid="issue-description">
+            <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="issue-link" data-testid="issue-link">
+              ${escapeHtml(issue.name)}
+            </a>
+          </td>
+          <td data-testid="issue-input-tokens">${formatNumber(issue.metrics.inputTokens)}</td>
+          <td data-testid="issue-output-tokens">${formatNumber(issue.metrics.outputTokens)}</td>
+          <td data-testid="issue-cache-tokens">${formatNumber(issue.metrics.cacheTokens)}</td>
+          <td data-testid="issue-cost">${issue.metrics.cost.toFixed(4)}</td>
+          <td data-testid="issue-total-time">${formatSeconds(issue.metrics.time / 1000)}</td>
+          <td data-testid="issue-status">
+            <span class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</span>
+          </td>
+        </tr>
+        `).join('')}
+      </tbody>
+      <tfoot>
+        <tr style="font-weight: bold; background-color: #f8f9fa;">
+          <td style="text-align: left;" data-testid="summary-label">Project Summary</td>
           <td data-testid="summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
           <td data-testid="summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
           <td data-testid="summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
           <td data-testid="summary-cost">${project.metrics.cost.toFixed(4)}</td>
           <td data-testid="summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
-          <td data-testid="summary-elapsed-time">${formatElapsedTime(elapsedTimeSec)}</td>
+          <td></td>
         </tr>
-      </tbody>
+        <tr style="font-weight: bold; background-color: #f8f9fa;">
+          <td style="text-align: left;"></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td data-testid="summary-elapsed-time">${formatElapsedTime(elapsedTimeSec)}</td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 `
@@ -198,31 +200,11 @@ router.get('/project/:projectName', (req, res) => {
           ${project.issues.size > 0
       ? `<div class="graph-container" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
-              </div>
-              ${generateProjectSummaryTable(project)}`
+              </div>`
       : ''
     }
 
-          <ul class="issue-list" data-testid="issues-list">
-            ${project.issues.size > 0
-      ? [...project.issues.values()].map(issue => {
-        return `
-                    <li class="issue-item">
-                      <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issue.id)}" class="issue-link" data-testid="issue-link">
-                        <div class="issue-container">
-                          <div class="issue-name" data-testid="issue-name">${escapeHtml(issue.name)}</div>
-                          <div class="issue-state state-${issue.state.toLowerCase()}" data-testid="issue-state">${issue.state}</div>
-                        </div>
-                        <div class="issue-metrics">
-                          ${generateIssueMetricsTable(issue)}
-                        </div>
-                      </a>
-                    </li>
-                  `
-      }).join('')
-      : '<li data-testid="no-issues-message">No issues found for this project</li>'
-    }
-          </ul>
+          ${generateIssuesTable(project)}
         </div>
       </body>
       </html>

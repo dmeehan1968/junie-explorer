@@ -265,6 +265,28 @@ p {
   color: inherit;
 }
 
+/* Issue link styles within table cells */
+.issues-table .issue-link {
+  display: inline;
+  color: #3498db;
+  text-decoration: none;
+}
+
+.issues-table .issue-link:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
+
+/* Issues table footer styling */
+.issues-table tfoot tr {
+  border-top: 2px solid #ddd;
+}
+
+.issues-table tfoot td {
+  font-weight: bold;
+  background-color: #f8f9fa !important;
+}
+
 /* Task List Styles */
 .task-list {
   list-style: none;
