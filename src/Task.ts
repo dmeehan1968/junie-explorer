@@ -42,7 +42,7 @@ export class Task {
     // we need to temporarily load events in order to aggregate metrics
     // but we don't need to keep them in memory (as it can be a big overhead)
     // they will be lazy loaded when necessary
-    const events = this.loadEvents()
+    let events = this.loadEvents()
     for (const event of events) {
       if (event.event.type === 'LlmResponseEvent') {
         this.metrics.cost += event.event.answer.cost
@@ -52,6 +52,7 @@ export class Task {
         this.metrics.time += event.event.answer.time ?? 0
       }
     }
+    events.splice(0)
   }
 
   get steps() {
