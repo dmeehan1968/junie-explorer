@@ -3,7 +3,7 @@
 ## Project Overview
 Junie Explorer is a full-stack web application built with Node.js and TypeScript that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
 
-## Features
+### Features
 - Lists all JetBrains IDE directories found in `/Users/<username>/Library/Caches/JetBrains`
 - Displays projects within each IDE
 - Shows issues, tasks, events, trajectories, and steps within projects
@@ -14,7 +14,7 @@ Junie Explorer is a full-stack web application built with Node.js and TypeScript
 
 See the [Documentation](docs/overview.md) for details
 
-## Tech Stack
+### Tech Stack
 - **Backend**: Bun with Express.js
 - **Language**: TypeScript
 - **Build Tools**: ts-node, TypeScript compiler
@@ -23,21 +23,13 @@ See the [Documentation](docs/overview.md) for details
   - fs-extra: Enhanced file system operations
   - marked: Markdown parsing library
 
-## External Development Dependencies
+### External Development Dependencies
 - Bun 1.2.18+ - Must be installed by the user
 
-## Pre-built executables
+### Pre-built executables
 
 Single File Executables are available from Junie Explorer 2.3+.  You can download these from the 
 [Github Releases](https://github.com/dmeehan1968/junie-explorer/releases) page.
-
-## Installation For Development
-1. Install Bun ([Install Instruction](https://bun.com/docs/installation))
-2. Clone the repository
-3. Install dependencies:
-```bash
-bun install
-```
 
 ## Usage
 
@@ -62,21 +54,65 @@ From: <pathname>
 Server is running on http://localhost:60123
 ```
 
-### Development Mode
+### Memory Reporting
+
+Enabled memory usage statistics after each reload with the `MEMORY_REPORT={truthy}` environment variable (works with
+both binaries and the development mode)
+
+```shell
+MEMORY_REPORT=true junie-explorer-apple-arm64
+```
+
+You will get a table printed after each scan of the logs showing the history of memory use (i.e. after hitting 'reload'
+on any of the pages):
+
+```text
+Memory usage (MB):
+┌──────────────────────────┬──────────────┬────────────────┬──────────────────┬──────────────────┬──────────────────────┐
+│                          │ arrayBuffers │ external       │ heapTotal        │ heapUsed         │ rss                  │
+├──────────────────────────┼──────────────┼────────────────┼──────────────────┼──────────────────┼──────────────────────┤
+│ 2025-07-24T11:13:55.317Z │ 0.00         │ 1.99           │ 7.02             │ 5.30             │ 68.61                │
+│ 2025-07-24T11:14:14.765Z │ 0.94 (+0.94) │ 34.39 (+32.40) │ 159.36 (+152.34) │ 42.71 (+37.41)   │ 3,239.38 (+3,170.77) │
+│ 2025-07-24T11:15:13.297Z │ 0.46 (-0.48) │ 24.77 (-9.62)  │ 126.02 (-33.34)  │ 246.88 (+204.17) │ 3,842.45 (+603.08)   │
+└──────────────────────────┴──────────────┴────────────────┴──────────────────┴──────────────────┴──────────────────────┘
+```
+
+The memory usage is taken immediately after the scanning of logs, and likely before garbage collection can occur, but its
+not guaranteed to be a reflection of peak memory usage.
+
+##  Development
+
+## Development Workflow
+1. **Setup**: Clone the repository and run `bun install`
+2. **Development**: Use `bun run dev` to start the development server
+3. **Testing**: Use `bun run test` to run the test script
+4. **Production**: Use `bun run start` to run the compiled application
+
+### Installation For Development
+1. Install Bun ([Install Instruction](https://bun.com/docs/installation))
+2. Clone the repository
+3. Install dependencies:
+```bash
+bun install
+```
+
+### Run
 To run the application in development mode:
 ```bash
 bun run dev
 ```
 This will start the server using ts-node, which compiles and runs TypeScript code on-the-fly.
 
-### Testing
+## Testing
 To test the application functionality:
 ```bash
 npm test
 ```
 This will run a test script that checks if the JetBrains directory exists and lists all IDE directories found there.
 
-## Directory Structure
+## Miscellaneous
+
+### Directory Structure
 ```
 junie-explorer/
 ├── .junie/                  # Project documentation and guidelines
@@ -126,7 +162,7 @@ junie-explorer/
 └── README.md                # Project readme
 ```
 
-## Data Model
+### Data Model
 
 The new class-based data model with enhanced functionality:
 - `JetBrains`: Main class that manages IDE installations and projects
@@ -141,7 +177,8 @@ The new class-based data model with enhanced functionality:
   - `AgentState`: Agent state management for AI interactions
   - `SummaryMetrics`: Aggregated metrics across projects and tasks
 
-## JetBrains Cache File Structure
+### JetBrains Cache File Structure
+
 The application reads files from the JetBrains cache directory, which is located at:
 - Windows: `%APPDATA%\..\Local\JetBrains`
 - macOS: `/Users/<username>/Library/Caches/JetBrains`
@@ -174,13 +211,7 @@ When loading the application state, the system:
 
 This hierarchical structure allows the application to display a comprehensive view of all JetBrains projects, issues, tasks, and steps across different IDE installations.
 
-## Development Workflow
-1. **Setup**: Clone the repository and run `bun install`
-2. **Development**: Use `bun run dev` to start the development server
-3. **Testing**: Use `npm test` to run the test script
-4. **Production**: Use `npm start` to run the compiled application
-
-## Requirements Documentation
+## Acceptance Tests
 Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth and documentation for the expected behavior of the application.
 
 ### Feature Files
