@@ -72,10 +72,13 @@ export const JunieTaskContext = z.object({
 export type JunieTaskContext = z.infer<typeof JunieTaskContext>
 
 export const PreviousTasksInfo = z.object({
-  agentState: AgentState,
+  agentState: AgentState.nullish(),
   patch: z.string().nullish(),
   sessionHistory: SessionHistory.nullish(),
-})
+  steps: z.string().array().nullish(),
+  filesEdited: z.string().array().nullish(),
+  filesRemoved: z.string().array().nullish(),
+}).passthrough()
 export type PreviousTasksInfo = z.infer<typeof PreviousTasksInfo>
 
 export const JunieTaskSchema = z.object({
