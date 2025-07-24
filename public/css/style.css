@@ -270,11 +270,24 @@ p {
   display: inline;
   color: #3498db;
   text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .issues-table .issue-link:hover {
   color: #2980b9;
   text-decoration: underline;
+}
+
+/* Issue description column styling */
+.issues-table td[data-testid="issue-description"] {
+  width: 30%;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  vertical-align: top;
+  padding: 12px 8px;
 }
 
 /* Issues table footer styling */
