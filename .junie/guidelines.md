@@ -79,16 +79,17 @@ The new class-based data model with enhanced functionality:
   - `SummaryMetrics`: Aggregated metrics across projects and tasks
 
 ## Development Workflow
-1. **Setup**: Clone the repository and run `npm install`
-2. **Development**: Use `npm run dev` to start the development server
-3. **Testing**: Use `npm test` to run the acceptance tests
-4. **Building**: There is no build step, typescript can be run directly via loader ts-node/esm. tsconfig.json includes noEmit=true
+1. **Setup**: Clone the repository and run `bun install`
+2. **Development**: Use `bun run dev` to start the development server
+3. **Testing**: Use `bun test` to run the acceptance tests
+4. **Building**: Use the above commands which incorporate any build steps needed
 
 ## Automated Testing
-- Use `npm run dev` in background and note process ID
+- Use `bun run dev` in background and note process ID
 - Use `curl` to probe for server readiness, repeat for up to 60 seconds total
 - Perform browser testing (e.g Playright or human)
 - Kill the background process ID after testing
+- Static assets are built into the bundle, so the server much be restarted to incorporate any static changes
 
 ## Code Conventions
 - Use TypeScript interfaces for type definitions
@@ -104,8 +105,8 @@ The new class-based data model with enhanced functionality:
 
 ## Deployment
 The application is designed to be run locally, but could be deployed to a server if needed:
-1. Build the application with `npm run build`
-2. Start the server with `npm start`
+1. Build the application with `bun run build`
+2. Start the server with `bun start`
 3. Access the application at `http://localhost:3000` (or configured port)
 
 ## Requirements Documentation
