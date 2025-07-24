@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run dev",
-    "dev": "bun run build:static && bun src/index.ts",
+    "dev": "bun install && bun run build:static && bun src/index.ts",
     "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @pending\"",
     "playwright:install": "playwright install",
     "build:static": "make-vfs --dir ./public --content-format string --outfile ./src/bun/public.ts",
@@ -18,7 +18,7 @@
     "build:linux:x64": "bun run build:bun --target=bun-linux-x64 --outfile dist/junie-explorer-linux-x64",
     "build:linux:arm64": "bun run build:bun --target=bun-linux-arm64 --outfile dist/junie-explorer-linux-arm64",
     "build:windows:x64": "bun run build:bun --target=bun-windows-x64 --outfile dist/junie-explorer-windows-x64",
-    "build": "bun run build:static && bun run build:apple:x64 && bun run build:apple:arm64 && bun run build:linux:x64 && bun run build:linux:arm64 && bun run build:windows:x64"
+    "build": "bun install && bun run build:static && bun run build:apple:x64 && bun run build:apple:arm64 && bun run build:linux:x64 && bun run build:linux:arm64 && bun run build:windows:x64"
   },
   "dependencies": {
     "express": "^4.18.2",
