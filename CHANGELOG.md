@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.3] - 2025-07-24
+
+### Bug Fixes
+- Fix validation error on null agentState (4f50811)
+
+### Code Improvements
+- Allow `.passthrough()` on all schemas for flexible property handling (5236726)
+
+### Documentation
+- Update README.md formatting and add memory reporting documentation (6351b07)
+
 ## [2.4.2] - 2025-07-24
 
 ### Features
