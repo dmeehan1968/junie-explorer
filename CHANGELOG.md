@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] - 2025-07-24
+
+### Features
+- Add the MEMORY_REPORT environment variable to print memory usage after each reload (0675490)
+
+### Code Improvements
+- Add `bun install` to `dev` and `build` scripts in `package.json` (ca52886)
+- Update error event structure for unparsed JSON lines (ec43338)
+- Remove `escapeHtml` from issue label in `projectRoutes.ts` (8a3346d)
+
 ## [2.4.1] - 2025-07-23
 
 ### Code Improvements
