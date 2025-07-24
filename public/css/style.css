@@ -271,7 +271,7 @@ p {
   color: #3498db;
   text-decoration: none;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: bold;
   line-height: 1.4;
 }
 
@@ -282,7 +282,7 @@ p {
 
 /* Issue description column styling */
 .issues-table td[data-testid="issue-description"] {
-  width: 30%;
+  width: 40%;
   word-wrap: break-word;
   word-break: break-word;
   white-space: normal;
@@ -641,7 +641,7 @@ p {
 .step-totals-table td, .metrics-table td, .project-summary-table td {
   padding: 8px;
   border-bottom: 1px solid #ddd;
-  vertical-align: middle;
+  vertical-align: top;
   text-align: center;
 }
 
