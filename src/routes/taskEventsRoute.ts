@@ -126,11 +126,11 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
 }
 
 // Task events download route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', (req, res) => {
+router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
 
@@ -154,11 +154,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', 
 })
 
 // Task events page route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res) => {
+router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
 

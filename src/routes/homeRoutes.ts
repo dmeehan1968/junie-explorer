@@ -196,11 +196,11 @@ function prepareProjectsGraphData(projects: Project[]): {
 }
 
 // Homepage route (now shows projects instead of IDEs)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
 
-    const projects: Project[] = Array.from(jetBrains.projects.values())
+    const projects: Project[] = Array.from((await jetBrains.projects).values())
 
     // Get all unique IDE names from all projects
     const allIdes = new Set<string>()
@@ -315,12 +315,12 @@ router.get('/', (req, res) => {
 })
 
 // API endpoint to get projects by name
-router.get('/api/projects', (req, res) => {
+router.get('/api/projects', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
-    const allProjects: Project[] = Array.from(jetBrains.projects.values())
+    const allProjects: Project[] = Array.from((await jetBrains.projects).values())
 
     // Filter projects by name if names are provided
     const projects: Project[] = projectNames.length > 0
@@ -335,13 +335,13 @@ router.get('/api/projects', (req, res) => {
 })
 
 // API endpoint to get graph data for selected projects
-router.get('/api/projects/graph', (req, res) => {
+router.get('/api/projects/graph', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
 
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
-    const allProjects: Project[] = Array.from(jetBrains.projects.values())
+    const allProjects: Project[] = Array.from((await jetBrains.projects).values())
 
     // Filter projects by name if names are provided
     const projects: Project[] = projectNames.length > 0

@@ -13,7 +13,7 @@ export class RepresentationService {
     stepIndex: string
   ): Promise<string> {
     // Validate and get entities
-    const project = jetBrains.getProjectByName(projectName);
+    const project = await jetBrains.getProjectByName(projectName);
     const issue = project?.getIssueById(issueId);
     const task = issue?.getTaskById(taskId);
     const step = task?.getStepById(parseInt(stepIndex, 10));

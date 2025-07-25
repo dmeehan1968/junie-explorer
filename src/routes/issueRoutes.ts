@@ -26,11 +26,11 @@ const generateStepTotalsTable = (summaryData: SummaryMetrics): string => {
 }
 
 // Issue tasks page route
-router.get('/project/:projectName/issue/:issueId', (req, res) => {
+router.get('/project/:projectName/issue/:issueId', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
 
     if (!project || !issue) {
@@ -124,11 +124,11 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
 })
 
 // API endpoint to get task data for a specific issue
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
 

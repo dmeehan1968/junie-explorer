@@ -150,12 +150,12 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 }
 
 // Project issues page route
-router.get('/project/:projectName', (req, res) => {
+router.get('/project/:projectName', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
 
   try {
     const { projectName } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
 
     if (!project) {
       return res.status(404).send('Project not found')

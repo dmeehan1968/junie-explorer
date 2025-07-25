@@ -31,7 +31,7 @@ export class JetBrains {
   private readonly _logPath: string | undefined
   private readonly logger: { log: (...message: any[]) => void }
 
-  private _metrics: SummaryMetrics | undefined
+  private _metrics: Promise<SummaryMetrics> | undefined
 
   constructor(options?: JetBrainsOptions) {
     if (!options) {
@@ -61,7 +61,10 @@ export class JetBrains {
   }
 
   private formatMemory(before: number, after: number, options: FormatMemoryOptions = {}) {
-    const toMB = (bytes: number) => Intl.NumberFormat(this.getCurrentLocaleFromEnv() ?? [], { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(bytes / 1024 / 1024)  //.toFixed(2)
+    const toMB = (bytes: number) => Intl.NumberFormat(this.getCurrentLocaleFromEnv() ?? [], {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(bytes / 1024 / 1024)  //.toFixed(2)
     if (!options.showChange) {
       return toMB(after)
     }
@@ -70,11 +73,11 @@ export class JetBrains {
     return `${toMB(after)} (${sign}${toMB(change)})`
   }
 
-  preload() {
+  async preload() {
     this.logger.log('Reading logs...')
     const start = Date.now()
 
-    this.metrics  // forces a full load
+    await this.metrics  // forces a full load
 
     const duration = (Date.now() - start) / 1000
 
@@ -105,85 +108,97 @@ export class JetBrains {
     }
   }
 
-  reload() {
-    this._projects.clear()
+  async reload() {
+    this._projects = undefined
     this._metrics = undefined
-    this.preload()
+    await this.preload()
   }
 
-  private _projects: Map<string, Project> = new Map()
+  private _projects: Promise<Map<string, Project>> | undefined = undefined
 
-  get metrics() {
+  get metrics(): Promise<SummaryMetrics> {
     if (this._metrics) {
       return this._metrics
     }
-    this._metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
-    for (const project of this.projects.values()) {
-      this._metrics.inputTokens += project.metrics.inputTokens
-      this._metrics.outputTokens += project.metrics.outputTokens
-      this._metrics.cacheTokens += project.metrics.cacheTokens
-      this._metrics.cost += project.metrics.cost
-      this._metrics.time += project.metrics.time
-    }
+    this._metrics = new Promise(async (resolve) => {
+      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
-    return this._metrics!
+      const projects = await this.projects
+      for (const project of projects.values()) {
+        metrics.inputTokens += project.metrics.inputTokens
+        metrics.outputTokens += project.metrics.outputTokens
+        metrics.cacheTokens += project.metrics.cacheTokens
+        metrics.cost += project.metrics.cost
+        metrics.time += project.metrics.time
+      }
+
+      return resolve(metrics)
+    })
+
+    return this._metrics
   }
 
-  getProjectByName(name: string) {
-    return this.projects.get(name)
+  async getProjectByName(name: string) {
+    return (await this.projects).get(name)
   }
 
-  get projects() {
-    if (this._projects.size) {
+  get projects(): Promise<Map<string, Project>> {
+    if (this._projects) {
       return this._projects
     }
 
-    const ideDirs = fs.readdirSync(this.logPath, { withFileTypes: true })
-      .filter(entry => entry.isDirectory())
+    this._projects = new Promise(async (resolve) => {
 
-    for (const ideDir of ideDirs) {
-      const root = path.join(this.logPath, ideDir.name, 'projects')
+      const projects = new Map<string, Project>()
 
-      if (!fs.existsSync(root)) {
-        this.logger.log('Skipping', ideDir.name, 'because it does not have a projects directory')
-        continue
+      const ideDirs = fs.readdirSync(this.logPath, { withFileTypes: true })
+        .filter(entry => entry.isDirectory())
+
+      for (const ideDir of ideDirs) {
+        const root = path.join(this.logPath, ideDir.name, 'projects')
+
+        if (!fs.existsSync(root)) {
+          this.logger.log('Skipping', ideDir.name, 'because it does not have a projects directory')
+          continue
+        }
+
+        const entries = fs.readdirSync(root, { withFileTypes: true })
+
+        entries.filter(entry => entry.isDirectory())
+          .map(entry => ({ name: entry.name, logPath: path.join(root, entry.name, 'matterhorn', '.matterhorn') }))
+          .filter(entry => fs.existsSync(entry.logPath) && fs.statSync(entry.logPath).isDirectory())
+          .forEach(entry => {
+            const existing = projects.get(entry.name)
+            const ideName = ideDir.name.replace(/\d+(\.\d+)?/, '')
+            if (!existing) {
+              projects.set(entry.name, new Project(entry.name, entry.logPath, ideName, this.logger))
+              return
+            }
+            existing.addLogPath(entry.logPath, ideName)
+          })
       }
 
-      fs.readdirSync(root, { withFileTypes: true })
-        .filter(entry => entry.isDirectory())
-        .map(entry => ({ name: entry.name, logPath: path.join(root, entry.name, 'matterhorn', '.matterhorn') }))
-        .filter(entry => fs.existsSync(entry.logPath) && fs.statSync(entry.logPath).isDirectory())
-        .forEach(entry => {
-          const existing = this._projects.get(entry.name)
-          const ideName = ideDir.name.replace(/\d+(\.\d+)?/, '')
-          if (!existing) {
-            this._projects.set(entry.name, new Project(entry.name, entry.logPath, ideName, this.logger))
-            return
-          }
-          existing.addLogPath(entry.logPath, ideName)
-        })
-
-    }
-
-    this._projects = new Map([...this._projects.entries()].sort((a, b) => a[0].localeCompare(b[0])))
+      return resolve(new Map([...projects.entries()].sort((a, b) => a[0].localeCompare(b[0]))))
+    })
 
     return this._projects
-
   }
 
   get projectsPath() {
     return path.join(this.logPath, 'projects')
   }
 
-  get ideNames() {
-    const names = new Set<string>()
-    for (const project of this.projects.values()) {
-      for (const ideName of project.ideNames) {
-        names.add(ideName)
+  get ideNames(): Promise<string[]> {
+    return new Promise(async (resolve) => {
+      const names = new Set<string>()
+      for (const project of (await this.projects).values()) {
+        for (const ideName of project.ideNames) {
+          names.add(ideName)
+        }
       }
-    }
-    return [...names]
+      return [...names]
+    })
   }
 
   getIDEIcon(ideName: string): string {
@@ -235,7 +250,7 @@ export class JetBrains {
       logPath: this.logPath,
       username: this.username,
       projectsPath: this.projectsPath,
-      projects: [...this.projects],
+      // projects: [...this.projects],
       metrics: this.metrics,
     }
   }

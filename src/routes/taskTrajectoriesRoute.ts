@@ -9,11 +9,11 @@ import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 const router = express.Router()
 
 // Task trajectories download route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories/download', (req, res) => {
+router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories/download', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
 
@@ -37,11 +37,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories/downl
 })
 
 // Task trajectories page route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (req, res) => {
+router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
 

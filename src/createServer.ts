@@ -49,8 +49,8 @@ export async function createServer(options: ServerOptions = {}) {
     next()
   })
   // Add refresh endpoint
-  app.get('/refresh', (req, res) => {
-    jetBrainsInstance.reload()
+  app.get('/refresh', async (req, res) => {
+    await jetBrainsInstance.reload()
     res.redirect(req.headers.referer || '/')
   })
 
@@ -69,7 +69,7 @@ export async function createServer(options: ServerOptions = {}) {
 
   // Initialize app state if requested
   if (preload) {
-    jetBrainsInstance.preload()
+    await jetBrainsInstance.preload()
   }
 
   return { app, jetBrainsInstance, port }

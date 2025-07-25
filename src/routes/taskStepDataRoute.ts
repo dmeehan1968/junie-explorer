@@ -4,11 +4,11 @@ import { JetBrains } from "../jetbrains.js"
 const router = express.Router()
 
 // API endpoint to get step data for a specific task
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex', (req, res) => {
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepIndex', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId, stepIndex } = req.params
-    const project = jetBrains.getProjectByName(projectName)
+    const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
     const step = task?.getStepById(parseInt(stepIndex, 10))
