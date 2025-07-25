@@ -17,11 +17,13 @@ export class Project {
     this.logger = logger ?? console
   }
 
-  private _issues: Map<string, Issue> = new Map()
+  private _issues: Map<string, Issue> | undefined = undefined
   get issues() {
-    if (this._issues.size) {
+    if (this._issues) {
       return this._issues
     }
+
+    this._issues = new Map()
 
     for (const logPath of this._logPaths) {
       this.logger.log('From:', logPath)
@@ -29,14 +31,14 @@ export class Project {
       fs.globSync(root)
         .map(path => new Issue(path))
         .sort((a, b) => a.name.localeCompare(b.name))
-        .forEach(issue => this._issues.set(issue.id, issue))
+        .forEach(issue => this._issues!.set(issue.id, issue))
     }
 
     this._issues = new Map([...this._issues.entries()].sort((a, b) =>
       b[1].created.getTime() - a[1].created.getTime(),
     ))
 
-    return this._issues
+    return this._issues!
   }
 
   getIssueById(id: string) {
@@ -68,7 +70,7 @@ export class Project {
   addLogPath(logPath: string, ideName: string) {
     this._logPaths.push(logPath)
     this._ideNames.add(ideName)
-    this._issues.clear()
+    this._issues?.clear()
     this._metrics = undefined
   }
 
