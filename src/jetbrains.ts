@@ -126,11 +126,12 @@ export class JetBrains {
 
       const projects = await this.projects
       for (const project of projects.values()) {
-        metrics.inputTokens += project.metrics.inputTokens
-        metrics.outputTokens += project.metrics.outputTokens
-        metrics.cacheTokens += project.metrics.cacheTokens
-        metrics.cost += project.metrics.cost
-        metrics.time += project.metrics.time
+        const projectMetrics = await project.metrics
+        metrics.inputTokens += projectMetrics.inputTokens
+        metrics.outputTokens += projectMetrics.outputTokens
+        metrics.cacheTokens += projectMetrics.cacheTokens
+        metrics.cost += projectMetrics.cost
+        metrics.time += projectMetrics.time
       }
 
       return resolve(metrics)

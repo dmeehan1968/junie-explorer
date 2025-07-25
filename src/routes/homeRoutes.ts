@@ -6,7 +6,7 @@ import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 const router = express.Router()
 
 // Function to prepare data for the projects graph
-function prepareProjectsGraphData(projects: Project[]): {
+async function prepareProjectsGraphData(projects: Project[]): Promise<{
   datasets: Array<{
     label: string;
     data: Array<{ x: string; y: number }>;
@@ -20,7 +20,7 @@ function prepareProjectsGraphData(projects: Project[]): {
   timeUnit: string;
   stepSize: number;
   projectNames: string[];
-} {
+}> {
   // Group issues by day and project
   const issuesByDay: Record<string, Record<string, { cost: number; tokens: number }>> = {}
   const projectColors: Record<string, string> = {}
@@ -36,8 +36,8 @@ function prepareProjectsGraphData(projects: Project[]): {
   let maxDate = new Date(0)
 
   // Process each project's issues
-  projects.forEach(project => {
-    project.issues.forEach(issue => {
+  for (const project of projects) {
+    (await project.issues).forEach(issue => {
       const date = new Date(issue.created)
       const day = date.toISOString().split('T')[0] // YYYY-MM-DD format
 
@@ -58,7 +58,7 @@ function prepareProjectsGraphData(projects: Project[]): {
       issuesByDay[day][project.name].cost += issue.metrics.cost
       issuesByDay[day][project.name].tokens += issue.metrics.inputTokens + issue.metrics.outputTokens
     })
-  })
+  }
 
   // Determine the appropriate time unit based on the date range
   let timeUnit: string = 'day' // default
@@ -280,26 +280,26 @@ router.get('/', async (req, res) => {
 
           <ul class="project-list" data-testid="projects-list">
             ${projects.length > 0
-      ? projects.map(project => `
-                <li class="project-item" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
-                  <div class="project-checkbox-container">
-                    <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
-                           class="project-checkbox" 
-                           data-project-name="${project.name}" 
-                           onchange="handleProjectSelection(this)">
-                  </div>
-                  <a href="/project/${encodeURIComponent(project.name)}" class="project-link" data-testid="project-link-${project.name}">
-                    <div class="project-name" data-testid="project-name">${project.name}</div>
-                    <div class="issue-count">${project.issues.size} issues</div>
-                    <div class="ide-icons" data-testid="ide-icons">
-                      ${project.ideNames.map(ide => `
-                        <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
-                      `).join('')}
+              ? (await Promise.all(projects.map(async project => `
+                  <li class="project-item" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
+                    <div class="project-checkbox-container">
+                      <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
+                             class="project-checkbox" 
+                             data-project-name="${project.name}" 
+                             onchange="handleProjectSelection(this)">
                     </div>
-                  </a>
-                </li>
-              `).join('')
-      : '<li data-testid="empty-projects-message">No JetBrains projects found</li>'
+                    <a href="/project/${encodeURIComponent(project.name)}" class="project-link" data-testid="project-link-${project.name}">
+                      <div class="project-name" data-testid="project-name">${project.name}</div>
+                      <div class="issue-count">${(await project.issues).size} issues</div>
+                      <div class="ide-icons" data-testid="ide-icons">
+                        ${project.ideNames.map(ide => `
+                          <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+                        `).join('')}
+                      </div>
+                    </a>
+                  </li>
+                `))).join('')
+              : '<li data-testid="empty-projects-message">No JetBrains projects found</li>'
     }
           </ul>
         </div>
@@ -363,7 +363,7 @@ router.get('/api/projects/graph', async (req, res) => {
       timeUnit: string;
       stepSize: number;
       projectNames: string[];
-    } = prepareProjectsGraphData(projects)
+    } = await prepareProjectsGraphData(projects)
 
     res.json(graphData)
   } catch (error) {

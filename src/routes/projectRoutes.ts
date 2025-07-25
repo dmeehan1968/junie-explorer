@@ -9,17 +9,17 @@ import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUti
 const router = express.Router()
 
 // Function to generate HTML for combined issues table with project summary footer
-const generateIssuesTable = (project: Project, locale: string | undefined): string => {
-  if (project.issues.size === 0) {
+const generateIssuesTable = async (project: Project): Promise<string> => {
+  if ((await project.issues).size === 0) {
     return '<p data-testid="no-issues-message">No issues found for this project</p>'
   }
 
-  const sortedIssues = [...project.issues.values()].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+  const sortedIssues = [...(await project.issues).values()].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
   const oldestIssue = sortedIssues[sortedIssues.length - 1]
   const newestIssue = sortedIssues[0]
   const elapsedTimeMs = new Date(newestIssue.created).getTime() - new Date(oldestIssue.created).getTime()
   const elapsedTimeSec = elapsedTimeMs / 1000
-
+  const metrics = await project.metrics
   return `
   <div class="project-summary">
     <div class="issues-header-flex">
@@ -41,11 +41,11 @@ const generateIssuesTable = (project: Project, locale: string | undefined): stri
         <tr class="summary-row">
           <td class="text-left" data-testid="header-summary-label">Project Summary</td>
           <td class="text-left"></td>
-          <td class="text-right" data-testid="header-summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
-          <td class="text-right" data-testid="header-summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
-          <td class="text-right" data-testid="header-summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
-          <td class="text-right" data-testid="header-summary-cost">${project.metrics.cost.toFixed(2)}</td>
-          <td class="text-right" data-testid="header-summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
+          <td class="text-right" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
+          <td class="text-right" data-testid="header-summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
+          <td class="text-right" data-testid="header-summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
+          <td class="text-right" data-testid="header-summary-cost">${metrics.cost.toFixed(2)}</td>
+          <td class="text-right" data-testid="header-summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
           <td class="text-right"></td>
         </tr>
       </thead>
@@ -73,11 +73,11 @@ const generateIssuesTable = (project: Project, locale: string | undefined): stri
         <tr class="summary-row">
           <td class="text-left" data-testid="summary-label">Project Summary</td>
           <td class="text-left"></td>
-          <td class="text-right" data-testid="summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
-          <td class="text-right" data-testid="summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
-          <td class="text-right" data-testid="summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
-          <td class="text-right" data-testid="summary-cost">${project.metrics.cost.toFixed(2)}</td>
-          <td class="text-right" data-testid="summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
+          <td class="text-right" data-testid="summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
+          <td class="text-right" data-testid="summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
+          <td class="text-right" data-testid="summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
+          <td class="text-right" data-testid="summary-cost">${metrics.cost.toFixed(2)}</td>
+          <td class="text-right" data-testid="summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
           <td class="text-right"></td>
         </tr>
       </tfoot>
@@ -162,7 +162,7 @@ router.get('/project/:projectName', async (req, res) => {
     }
 
     // Prepare graph data
-    const graphData = prepareGraphData([...project.issues.values()])
+    const graphData = prepareGraphData([...(await project.issues).values()])
 
     // Generate HTML
     const html = `
@@ -176,7 +176,7 @@ router.get('/project/:projectName', async (req, res) => {
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-        ${project.issues.size > 0
+        ${(await project.issues).size > 0
       ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
@@ -205,7 +205,7 @@ router.get('/project/:projectName', async (req, res) => {
             `).join('')}
           </div>
 
-          ${project.issues.size > 0
+          ${(await project.issues).size > 0
       ? `<div class="graph-container" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>`

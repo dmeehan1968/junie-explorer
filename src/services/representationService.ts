@@ -14,7 +14,7 @@ export class RepresentationService {
   ): Promise<string> {
     // Validate and get entities
     const project = await jetBrains.getProjectByName(projectName);
-    const issue = project?.getIssueById(issueId);
+    const issue = await project?.getIssueById(issueId);
     const task = issue?.getTaskById(taskId);
     const step = task?.getStepById(parseInt(stepIndex, 10));
 

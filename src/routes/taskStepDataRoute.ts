@@ -9,7 +9,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
   try {
     const { projectName, issueId, taskId, stepIndex } = req.params
     const project = await jetBrains.getProjectByName(projectName)
-    const issue = project?.getIssueById(issueId)
+    const issue = await project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
     const step = task?.getStepById(parseInt(stepIndex, 10))
 

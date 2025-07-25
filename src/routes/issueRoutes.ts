@@ -31,7 +31,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
   try {
     const { projectName, issueId } = req.params
     const project = await jetBrains.getProjectByName(projectName)
-    const issue = project?.getIssueById(issueId)
+    const issue = await project?.getIssueById(issueId)
 
     if (!project || !issue) {
       return res.status(404).send('Issue not found')
@@ -130,7 +130,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId', async (req, 
     const { projectName, issueId, taskId } = req.params
     const project = await jetBrains.getProjectByName(projectName)
     const issue = project?.getIssueById(issueId)
-    const task = issue?.getTaskById(taskId)
+    const task = (await issue)?.getTaskById(taskId)
 
     if (!task) {
       return res.status(404).json({ error: 'Task not found' })

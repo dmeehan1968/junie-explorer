@@ -132,7 +132,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
   try {
     const { projectName, issueId, taskId } = req.params
     const project = await jetBrains.getProjectByName(projectName)
-    const issue = project?.getIssueById(issueId)
+    const issue = await project?.getIssueById(issueId)
     const task = issue?.getTaskById(taskId)
 
     if (!project || !issue || !task) {
