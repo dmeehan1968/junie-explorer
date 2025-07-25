@@ -73,7 +73,6 @@ export class JetBrains {
   preload() {
     this.logger.log('Reading logs...')
     const start = Date.now()
-    const memoryBefore = process.memoryUsage()
 
     this.metrics  // forces a full load
 
