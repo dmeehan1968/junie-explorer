@@ -21,7 +21,7 @@ export interface ServerOptions {
   preload?: boolean
 }
 
-export function createServer(options: ServerOptions = {}) {
+export async function createServer(options: ServerOptions = {}) {
   const {
     jetBrainsInstance = new JetBrains({ logPath: process.env.JETBRAINS_LOG_PATH }),
     port = process.env.PORT || 3000,

@@ -19,7 +19,7 @@ BeforeAll(async function () {
   globalServerPort = 3001;
 
   // Create and start the server
-  const { app } = createServer({
+  const { app } = await createServer({
     jetBrainsInstance: globalJetBrainsInstance,
     port: globalServerPort,
     preload: true,

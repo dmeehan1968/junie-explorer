@@ -1,6 +1,6 @@
 import { createServer } from "./createServer.js"
 
-const { app, port } = createServer()
+const { app, port } = await createServer()
 const server = app.listen(port, () => {
   const address = server.address()
   if (address === null || typeof address === 'string') {
