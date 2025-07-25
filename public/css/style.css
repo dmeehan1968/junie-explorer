@@ -280,7 +280,12 @@ p {
   text-decoration: underline;
 }
 
-/* Issue description column styling */
+/* Issues table general cell styling - prevent text wrapping by default */
+.issues-table td {
+  white-space: nowrap;
+}
+
+/* Issue description column styling - allow text wrapping */
 .issues-table td[data-testid="issue-description"] {
   width: 40%;
   word-wrap: break-word;
@@ -298,6 +303,41 @@ p {
 .issues-table tfoot td {
   font-weight: bold;
   background-color: #f8f9fa !important;
+}
+
+/* Issues table header container */
+.issues-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.issues-header-title {
+  margin: 0;
+}
+
+.issues-elapsed-time {
+  font-weight: bold;
+}
+
+/* Issues table alignment classes */
+.project-summary-table .text-left {
+  text-align: left !important;
+}
+
+.project-summary-table .text-right {
+  text-align: right !important;
+}
+
+.width-30 {
+  width: 30%;
+}
+
+/* Issues table summary row styling */
+.summary-row {
+  font-weight: bold;
+  background-color: #f8f9fa;
 }
 
 /* Task List Styles */

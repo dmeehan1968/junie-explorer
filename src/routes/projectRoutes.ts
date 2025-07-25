@@ -21,63 +21,63 @@ const generateIssuesTable = (project: Project): string => {
 
   return `
   <div class="project-summary">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h3 style="margin: 0;">Project Issues</h3>
-      <span style="font-weight: bold;" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
+    <div class="issues-header-flex">
+      <h3 class="issues-header-title">Project Issues</h3>
+      <span class="issues-elapsed-time" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
     </div>
     <table class="project-summary-table issues-table" data-testid="issues-table">
       <thead>
         <tr>
-          <th style="text-align: left; width: 30%;">Issue Description</th>
-          <th style="text-align: left;">Timestamp</th>
-          <th style="text-align: right;">Input Tokens</th>
-          <th style="text-align: right;">Output Tokens</th>
-          <th style="text-align: right;">Cache Tokens</th>
-          <th style="text-align: right;">Cost</th>
-          <th style="text-align: right;">Time</th>
-          <th style="text-align: right;">Status</th>
+          <th class="text-left width-30">Issue Description</th>
+          <th class="text-left">Timestamp</th>
+          <th class="text-right">Input Tokens</th>
+          <th class="text-right">Output Tokens</th>
+          <th class="text-right">Cache Tokens</th>
+          <th class="text-right">Cost</th>
+          <th class="text-right">Time</th>
+          <th class="text-right">Status</th>
         </tr>
-        <tr style="font-weight: bold; background-color: #f8f9fa;">
-          <td style="text-align: left;" data-testid="header-summary-label">Project Summary</td>
-          <td style="text-align: left;"></td>
-          <td style="text-align: right;" data-testid="header-summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
-          <td style="text-align: right;" data-testid="header-summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
-          <td style="text-align: right;" data-testid="header-summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
-          <td style="text-align: right;" data-testid="header-summary-cost">${project.metrics.cost.toFixed(2)}</td>
-          <td style="text-align: right;" data-testid="header-summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
-          <td style="text-align: right;"></td>
+        <tr class="summary-row">
+          <td class="text-left" data-testid="header-summary-label">Project Summary</td>
+          <td class="text-left"></td>
+          <td class="text-right" data-testid="header-summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
+          <td class="text-right" data-testid="header-summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
+          <td class="text-right" data-testid="header-summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
+          <td class="text-right" data-testid="header-summary-cost">${project.metrics.cost.toFixed(2)}</td>
+          <td class="text-right" data-testid="header-summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
+          <td class="text-right"></td>
         </tr>
       </thead>
       <tbody>
         ${sortedIssues.map(issue => `
         <tr>
-          <td style="text-align: left;" data-testid="issue-description">
+          <td class="text-left" data-testid="issue-description">
             <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="issue-link" data-testid="issue-link">
               ${escapeHtml(issue.name)}
             </a>
           </td>
-          <td style="text-align: left;" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString()}</td>
-          <td style="text-align: right;" data-testid="issue-input-tokens">${formatNumber(issue.metrics.inputTokens)}</td>
-          <td style="text-align: right;" data-testid="issue-output-tokens">${formatNumber(issue.metrics.outputTokens)}</td>
-          <td style="text-align: right;" data-testid="issue-cache-tokens">${formatNumber(issue.metrics.cacheTokens)}</td>
-          <td style="text-align: right;" data-testid="issue-cost">${issue.metrics.cost.toFixed(4)}</td>
-          <td style="text-align: right;" data-testid="issue-total-time">${formatSeconds(issue.metrics.time / 1000)}</td>
-          <td style="text-align: right;" data-testid="issue-status">
+          <td class="text-left" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString()}</td>
+          <td class="text-right" data-testid="issue-input-tokens">${formatNumber(issue.metrics.inputTokens)}</td>
+          <td class="text-right" data-testid="issue-output-tokens">${formatNumber(issue.metrics.outputTokens)}</td>
+          <td class="text-right" data-testid="issue-cache-tokens">${formatNumber(issue.metrics.cacheTokens)}</td>
+          <td class="text-right" data-testid="issue-cost">${issue.metrics.cost.toFixed(4)}</td>
+          <td class="text-right" data-testid="issue-total-time">${formatSeconds(issue.metrics.time / 1000)}</td>
+          <td class="text-right" data-testid="issue-status">
             <span class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</span>
           </td>
         </tr>
         `).join('')}
       </tbody>
       <tfoot>
-        <tr style="font-weight: bold; background-color: #f8f9fa;">
-          <td style="text-align: left;" data-testid="summary-label">Project Summary</td>
-          <td style="text-align: left;"></td>
-          <td style="text-align: right;" data-testid="summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
-          <td style="text-align: right;" data-testid="summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
-          <td style="text-align: right;" data-testid="summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
-          <td style="text-align: right;" data-testid="summary-cost">${project.metrics.cost.toFixed(2)}</td>
-          <td style="text-align: right;" data-testid="summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
-          <td style="text-align: right;"></td>
+        <tr class="summary-row">
+          <td class="text-left" data-testid="summary-label">Project Summary</td>
+          <td class="text-left"></td>
+          <td class="text-right" data-testid="summary-input-tokens">${formatNumber(project.metrics.inputTokens)}</td>
+          <td class="text-right" data-testid="summary-output-tokens">${formatNumber(project.metrics.outputTokens)}</td>
+          <td class="text-right" data-testid="summary-cache-tokens">${formatNumber(project.metrics.cacheTokens)}</td>
+          <td class="text-right" data-testid="summary-cost">${project.metrics.cost.toFixed(2)}</td>
+          <td class="text-right" data-testid="summary-total-time">${formatSeconds(project.metrics.time / 1000)}</td>
+          <td class="text-right"></td>
         </tr>
       </tfoot>
     </table>
