@@ -21,12 +21,12 @@ export class Task {
   readonly isDeclined: boolean
   readonly plan: JuniePlan[]
   readonly _steps: Map<number, Step> = new Map()
-  readonly metrics: SummaryMetrics
+  private _metrics: SummaryMetrics | undefined = undefined
   private _previousTasksInfo?: PreviousTasksInfo | null
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
-  private _events: EventRecord[] = []
+  private _events: EventRecord[] | undefined = undefined
   private _trajectories: (Trajectory|TrajectoryError)[] = []
 
   constructor(public readonly logPath: string) {
@@ -36,23 +36,35 @@ export class Task {
     this.context = task.context
     this.isDeclined = task.isDeclined
     this.plan = task.plan
+  }
 
-    this.metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+  get metrics() {
+    if (this._metrics) {
+      return this._metrics
+    }
 
-    // we need to temporarily load events in order to aggregate metrics
-    // but we don't need to keep them in memory (as it can be a big overhead)
-    // they will be lazy loaded when necessary
-    let events = this.loadEvents()
+    this._metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+
+    // metrics needs to load events, but not retain them
+    // but if metrics are already loaded (retained), then just use them
+    // avoid events getter so we can discard them
+    const events = this._events ?? this.loadEvents()
+
     for (const event of events) {
       if (event.event.type === 'LlmResponseEvent') {
-        this.metrics.cost += event.event.answer.cost
-        this.metrics.inputTokens += event.event.answer.inputTokens
-        this.metrics.outputTokens += event.event.answer.outputTokens
-        this.metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
-        this.metrics.time += event.event.answer.time ?? 0
+        this._metrics.cost += event.event.answer.cost
+        this._metrics.inputTokens += event.event.answer.inputTokens
+        this._metrics.outputTokens += event.event.answer.outputTokens
+        this._metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
+        this._metrics.time += event.event.answer.time ?? 0
       }
     }
-    events.splice(0)
+
+    if (!this._events) {
+      events.splice(0)
+    }
+
+    return this._metrics!
   }
 
   get steps() {
@@ -154,7 +166,7 @@ export class Task {
   }
 
   get events(): EventRecord[] {
-    if (this._events.length > 0) {
+    if (this._events) {
       return this._events
     }
 
@@ -209,7 +221,7 @@ export class Task {
       trajectoriesFile: this.trajectoriesFile,
       trajectories: [...this.trajectories ?? []],
       steps: [...this.steps?.values() ?? []],
-      metrics: this.metrics,
+      metrics: this._metrics,
       previousTasksInfo: this.previousTasksInfo,
       finalAgentState: this.finalAgentState,
       sessionHistory: this.sessionHistory,

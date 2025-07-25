@@ -82,7 +82,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
             ${issue.tasks.size > 0
       ? [...issue.tasks.values()].map((task, index) => {
         // Use aggregated metrics from task
-        const stepTotals = task.metrics
+        const stepTotals = task._metrics
 
         return `
                     <li class="task-item" data-testid="task-item">
