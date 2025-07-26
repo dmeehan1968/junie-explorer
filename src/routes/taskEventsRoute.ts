@@ -167,7 +167,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
     }
 
     // Get events for the task
-    const events = task.events
+    const events = await task.events
     let cost = 0
 
     // Prepare LLM event graph data
@@ -366,7 +366,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
                       </tr>
                     </thead>
                     <tbody>
-                      ${(() => {
+                      ${await (async () => {
       // Calculate durations for each event
       const eventDurations = events.map((eventRecord, index) => {
         let duration = 0
@@ -381,7 +381,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
       })
 
       // Group by event type and calculate statistics
-      const eventTypeStats = new Map<string, number[]>(task.eventTypes.map(eventType => [eventType, []]))
+      const eventTypeStats = new Map<string, number[]>((await task.eventTypes).map(eventType => [eventType, []]))
       eventDurations.forEach(({ type, duration }) => {
         if (!eventTypeStats.has(type)) {
           eventTypeStats.set(type, [])
@@ -423,7 +423,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
                 <div class="event-filter all-none-toggle" data-testid="all-none-toggle">
                   <label>All/None</label>
                 </div>
-                ${task.eventTypes.map(eventType => `
+                ${(await task.eventTypes).map(eventType => `
                   <div class="event-filter" data-event-type="${escapeHtml(eventType)}" data-testid="event-filter-${escapeHtml(eventType)}">
                     <label>${escapeHtml(eventType)}</label>
                   </div>

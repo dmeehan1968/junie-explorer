@@ -26,7 +26,7 @@ export class Task {
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
-  private _events: EventRecord[] | undefined = undefined
+  private _events: Promise<EventRecord[]> | undefined = undefined
   private _trajectories: (Trajectory|TrajectoryError)[] = []
 
   constructor(public readonly logPath: string) {
@@ -50,8 +50,8 @@ export class Task {
       // metrics needs to load events, but not retain them
       // but if metrics are already loaded (retained), then just use them
       // avoid events getter so we can discard them
-      const events = this._events ?? this.loadEvents()
-      // console.log(this.eventsFile, events.length, 'events')
+      const events = this._events ? await this._events : await this.loadEvents()
+      console.log(this.eventsFile, events.length, 'events')
 
       for (const event of events) {
         if (event.event.type === 'LlmResponseEvent') {
@@ -135,12 +135,12 @@ export class Task {
     return path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
   }
 
-  private loadEvents(): EventRecord[] {
+  private async loadEvents(): Promise<EventRecord[]> {
 
     const root = this.eventsFile
 
     if (fs.existsSync(root)) {
-      const content = fs.readFileSync(root, 'utf-8')
+      const content = await fs.promises.readFile(root, 'utf-8')
       return content
         .split('\n')
         .filter(json => json.trim())
@@ -172,18 +172,23 @@ export class Task {
     return []
   }
 
-  get events(): EventRecord[] {
+  get events(): Promise<EventRecord[]> {
     if (this._events) {
       return this._events
     }
 
-    this._events = this.loadEvents()
+    this._events = new Promise(async (resolve) => {
+      return resolve(await this.loadEvents())
+    })
 
     return this._events
   }
 
-  get eventTypes() {
-    return [...new Set(this.events.map(e => e.event.type))].sort()
+  get eventTypes(): Promise<string[]> {
+    return new Promise(async (resolve) => {
+      const events = await this.events
+      return resolve(events.map(e => e.event.type))
+    })
   }
 
   get trajectoriesFile() {
@@ -224,7 +229,7 @@ export class Task {
       isDeclined: this.isDeclined,
       plan: this.plan,
       eventsFile: this.eventsFile,
-      events: [...this.events ?? []],
+      // events: [...this.events ?? []],
       trajectoriesFile: this.trajectoriesFile,
       trajectories: [...this.trajectories ?? []],
       steps: [...this.steps?.values() ?? []],
