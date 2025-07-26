@@ -58,11 +58,11 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             </a>
           </td>
           <td class="text-left" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString(locale)}</td>
-          <td class="text-right" data-testid="issue-input-tokens">${formatNumber(issue.metrics.inputTokens)}</td>
-          <td class="text-right" data-testid="issue-output-tokens">${formatNumber(issue.metrics.outputTokens)}</td>
-          <td class="text-right" data-testid="issue-cache-tokens">${formatNumber(issue.metrics.cacheTokens)}</td>
-          <td class="text-right" data-testid="issue-cost">${issue.metrics.cost.toFixed(4)}</td>
-          <td class="text-right" data-testid="issue-total-time">${formatSeconds(issue.metrics.time / 1000)}</td>
+          <td class="text-right" data-testid="issue-input-tokens">${formatNumber((await issue.metrics).inputTokens)}</td>
+          <td class="text-right" data-testid="issue-output-tokens">${formatNumber((await issue.metrics).outputTokens)}</td>
+          <td class="text-right" data-testid="issue-cache-tokens">${formatNumber((await issue.metrics).cacheTokens)}</td>
+          <td class="text-right" data-testid="issue-cost">${(await issue.metrics).cost.toFixed(4)}</td>
+          <td class="text-right" data-testid="issue-total-time">${formatSeconds((await issue.metrics).time / 1000)}</td>
           <td class="text-right" data-testid="issue-status">
             <span class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</span>
           </td>
