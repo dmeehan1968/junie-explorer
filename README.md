@@ -1,11 +1,15 @@
 # Junie Explorer - Project Guidelines
 
 ## Project Overview
-Junie Explorer is a full-stack web application built with Node.js and TypeScript that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
+Junie Explorer is a full-stack web application built with [Bun](https://bun.com) and
+[TypeScript](https://typescriptlang.org) that provides a simple interface to browse JetBrains 
+IDE directories found in the user's cache folder. 
+
+The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of 
+all projects across IDE's found on the system.
 
 ### Features
-- Lists all JetBrains IDE directories found in `/Users/<username>/Library/Caches/JetBrains`
-- Displays projects within each IDE
+- Lists all JetBrains Project logs found in `/Users/<username>/Library/Caches/JetBrains`
 - Shows issues, tasks, events, trajectories, and steps within projects
 - Shows raw JSON logs for each issue with expand/collapse for ease of navigation
 - Provides metrics and statistics for issues and tasks
