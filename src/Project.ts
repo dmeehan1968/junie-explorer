@@ -66,6 +66,8 @@ export class Project {
         metrics.time += issueMetrics.time
       }))
 
+      this._logPaths.forEach(logPath => console.log(path.resolve(logPath, '../..')))
+
       return resolve(metrics)
     })
 
