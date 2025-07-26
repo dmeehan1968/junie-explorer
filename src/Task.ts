@@ -51,7 +51,7 @@ export class Task {
       // but if metrics are already loaded (retained), then just use them
       // avoid events getter so we can discard them
       const events = this._events ? await this._events : await this.loadEvents()
-      console.log(this.eventsFile, events.length, 'events')
+      // console.log(this.eventsFile, events.length, 'events')
 
       for (const event of events) {
         if (event.event.type === 'LlmResponseEvent') {
@@ -141,7 +141,7 @@ export class Task {
 
     if (fs.existsSync(root)) {
       const content = await fs.promises.readFile(root, 'utf-8')
-      return content
+      const events = await Promise.all(content
         .split('\n')
         .filter(json => json.trim())
         .map((line, lineNumber) => {
@@ -159,14 +159,16 @@ export class Task {
             }
           }
           try {
-            return EventRecord.parse(json)
+            return EventRecord.parseAsync(json)
           } catch (error: any) {
             console.log(root, lineNumber, error.errors[0].code, error.errors[0].path, error.errors[0].message, line.slice(0, 100))
-            return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parse(json)
+            return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parseAsync(json)
           }
-        })
-        .filter((event): event is EventRecord => !!event)
-        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+        }))
+
+        return events
+          .filter((event): event is EventRecord => !!event)
+          .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
     }
 
     return []
