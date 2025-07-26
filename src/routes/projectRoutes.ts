@@ -9,7 +9,7 @@ import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUti
 const router = express.Router()
 
 // Function to generate HTML for combined issues table with project summary footer
-const generateIssuesTable = async (project: Project): Promise<string> => {
+const generateIssuesTable = async (project: Project, locale: string | undefined): Promise<string> => {
   if ((await project.issues).size === 0) {
     return '<p data-testid="no-issues-message">No issues found for this project</p>'
   }
@@ -211,7 +211,7 @@ router.get('/project/:projectName', async (req, res) => {
               </div>`
       : ''
     }
-          ${generateIssuesTable(project, getLocaleFromRequest(req))}
+          ${await generateIssuesTable(project, getLocaleFromRequest(req))}
         </div>
       </body>
       </html>
