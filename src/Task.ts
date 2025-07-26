@@ -78,7 +78,6 @@ export class Task {
       // but if metrics are already loaded (retained), then just use them
       // avoid events getter so we can discard them
       const events = this._events ? await this._events : await this.loadEvents()
-      // console.log(this.eventsFile, events.length, 'events')
 
       for (const event of events) {
         if (event.event.type === 'LlmResponseEvent') {

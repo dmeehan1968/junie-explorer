@@ -62,7 +62,6 @@ export class Issue {
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
       const tasks = [...(await this.tasks).values()]
-      // console.log(this.logPath, tasks.length, 'tasks')
       await Promise.all(tasks.map(async (task) => {
         const taskMetrics = await task.metrics
         metrics.inputTokens += taskMetrics.inputTokens
