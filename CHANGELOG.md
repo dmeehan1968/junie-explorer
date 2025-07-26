@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2025-07-26
+
+### Features
+- Introduce worker pool for parallel event loading (d24ac3b)
+- Add `@types/bun` dependency for improved type support (ed096e4)
+
+### Performance Improvements
+- Make events handling fully asynchronous (6df6ede)
+- Make task metrics fully asynchronous (e0e8a07)
+- Optimize metrics aggregation logic (991caef)
+- Make issues and metrics retrieval fully asynchronous (89eae86, 2414377)
+- Make project issues and metrics asynchronous (0329bdc)
+- Make project and metrics management asynchronous (0d35b19)
+- Make `createServer` asynchronous (7d34b7b)
+- Lazy-load and optimize `_issues` handling in `Project` class (c544231)
+- Refactor metrics and events handling in `Task` class (f349915)
+- Refactor and optimize event loading and parsing (5d10d77)
+- Deduplicate and sort event types retrieval (d512661)
+
+### UI Improvements
+- Fix date/time formatting to use browser locale (8a63d7b)
+- Refactor project issues table styling and structure (3f96065)
+- Update project summary and styling for issue table improvements (d175711)
+- Enhance issues table with timestamp and improved styling (0387a77)
+- Streamline project issues into a single table (f2ca670)
+
+### Code Improvements
+- Remove commented-out debug statement and enhance documentation (513af32)
+- Log resolved paths for debugging purposes in `Project` class (43924a8)
+- Remove commented-out debug logs in `Issue` and `Task` classes (2b24c5e)
+- Comment out debug logs and refactor event parsing logic (62f8082)
+- Fix task metrics reference in `issueRoutes.ts` (11ef54b)
+- Remove unused memory usage logging in `preload` (3272b85)
+
+### Documentation
+- Update `.junie/guidelines.md` to include new workflow instructions (05e7212)
+- Update `.junie/guidelines.md` to reflect transition to Bun for local development (158b805)
+
+### Bug Fixes
+- Fix rebase on main (4b5aae4)
+
 ## [2.4.3] - 2025-07-24
 
 ### Bug Fixes
