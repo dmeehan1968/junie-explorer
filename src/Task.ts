@@ -227,8 +227,8 @@ export class Task {
 
   get eventTypes(): Promise<string[]> {
     return new Promise(async (resolve) => {
-      const events = await this.events
-      return resolve(events.map(e => e.event.type))
+      const events = [...new Set((await this.events).map(e => e.event.type))].sort()
+      return resolve(events)
     })
   }
 
