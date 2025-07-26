@@ -28,7 +28,7 @@ export class Project {
       const issues = new Map()
 
       for (const logPath of this._logPaths) {
-        this.logger.log('From:', logPath)
+        // this.logger.log('From:', logPath)
         const root = path.join(logPath, 'issues', 'chain-*.json')
 
         fs.globSync(root)
@@ -57,14 +57,14 @@ export class Project {
     this._metrics = new Promise(async (resolve) => {
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
-      for (const issue of (await this.issues).values()) {
+      await Promise.all([...(await this.issues).values()].map(async (issue) => {
         const issueMetrics = await issue.metrics
         metrics.inputTokens += issueMetrics.inputTokens
         metrics.outputTokens += issueMetrics.outputTokens
         metrics.cacheTokens += issueMetrics.cacheTokens
         metrics.cost += issueMetrics.cost
         metrics.time += issueMetrics.time
-      }
+      }))
 
       return resolve(metrics)
     })

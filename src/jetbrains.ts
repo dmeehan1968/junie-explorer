@@ -122,17 +122,28 @@ export class JetBrains {
     }
 
     this._metrics = new Promise(async (resolve) => {
-      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+      // const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
-      const projects = await this.projects
-      for (const project of projects.values()) {
-        const projectMetrics = await project.metrics
-        metrics.inputTokens += projectMetrics.inputTokens
-        metrics.outputTokens += projectMetrics.outputTokens
-        metrics.cacheTokens += projectMetrics.cacheTokens
-        metrics.cost += projectMetrics.cost
-        metrics.time += projectMetrics.time
-      }
+      const projects = await Promise.all([...(await this.projects).values()].map(async project => project.metrics))
+      const metrics = projects.reduce((acc, cur) => {
+        return {
+          ...acc,
+          inputTokens: acc.inputTokens + cur.inputTokens,
+          outputTokens: acc.outputTokens + cur.outputTokens,
+          cacheTokens: acc.cacheTokens + cur.cacheTokens,
+          cost: acc.cost + cur.cost,
+          time: acc.time + cur.time,
+        }
+      }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 } satisfies SummaryMetrics)
+
+      // await Promise.all([...(await this.projects)].map(async ([, project]) => {
+      //   const projectMetrics = await project.metrics
+      //   metrics.inputTokens += projectMetrics.inputTokens
+      //   metrics.outputTokens += projectMetrics.outputTokens
+      //   metrics.cacheTokens += projectMetrics.cacheTokens
+      //   metrics.cost += projectMetrics.cost
+      //   metrics.time += projectMetrics.time
+      // }))
 
       return resolve(metrics)
     })

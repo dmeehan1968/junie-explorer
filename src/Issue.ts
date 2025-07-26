@@ -61,13 +61,13 @@ export class Issue {
 
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
-      for (const task of (await this.tasks).values()) {
+      await Promise.all([...(await this.tasks).values()].map(async (task) => {
         metrics.inputTokens += task.metrics.inputTokens
         metrics.outputTokens += task.metrics.outputTokens
         metrics.cacheTokens += task.metrics.cacheTokens
         metrics.cost += task.metrics.cost
         metrics.time += task.metrics.time
-      }
+      }))
 
       resolve(metrics)
 
