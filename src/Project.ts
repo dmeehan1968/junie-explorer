@@ -84,16 +84,4 @@ export class Project {
     this._metrics = undefined
   }
 
-  toJSON() {
-    return {
-      name: this.name,
-      logPaths: this._logPaths,
-      // issues: [...this.issues],
-      metrics: this.metrics,
-    }
-  }
-
-  [inspect.custom]() {
-    return this.toJSON()
-  }
 }

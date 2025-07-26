@@ -257,29 +257,4 @@ export class Task {
 
     return this._trajectories
   }
-
-  toJSON() {
-    return {
-      logPath: this.logPath,
-      id: this.id,
-      created: this.created,
-      context: this.context,
-      isDeclined: this.isDeclined,
-      plan: this.plan,
-      eventsFile: this.eventsFile,
-      // events: [...this.events ?? []],
-      trajectoriesFile: this.trajectoriesFile,
-      trajectories: [...this.trajectories ?? []],
-      steps: [...this.steps?.values() ?? []],
-      metrics: this._metrics,
-      previousTasksInfo: this.previousTasksInfo,
-      finalAgentState: this.finalAgentState,
-      sessionHistory: this.sessionHistory,
-      patch: this.patch,
-    }
-  }
-
-  [inspect.custom]() {
-    return this.toJSON()
-  }
 }

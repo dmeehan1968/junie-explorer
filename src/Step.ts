@@ -93,23 +93,4 @@ export class Step {
     return this.lazyload()._description
   }
 
-  toJSON() {
-    return {
-      logPath: this.logPath,
-      id: this.id,
-      startTime: this.startTime,
-      endTime: this.endTime,
-      title: this.title,
-      reasoning: this.reasoning,
-      statistics: this.statistics,
-      metrics: this.metrics,
-      content: this.content,
-      dependencies: this.dependencies,
-      description: this.description,
-    }
-  }
-
-  [inspect.custom]() {
-    return this.toJSON()
-  }
 }

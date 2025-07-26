@@ -132,15 +132,32 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId', async (req, 
   try {
     const { projectName, issueId, taskId } = req.params
     const project = await jetBrains.getProjectByName(projectName)
-    const issue = project?.getIssueById(issueId)
-    const task = (await issue)?.getTaskById(taskId)
+    const issue = await project?.getIssueById(issueId)
+    const task = await issue?.getTaskById(taskId)
 
     if (!task) {
       return res.status(404).json({ error: 'Task not found' })
     }
 
     // Return the task data with only public fields
-    res.json(task)
+    res.json({
+      logPath: task.logPath,
+      id: task.id,
+      created: task.created,
+      context: task.context,
+      isDeclined: task.isDeclined,
+      plan: task.plan,
+      eventsFile: task.eventsFile,
+      events: await task.events,
+      trajectoriesFile: task.trajectoriesFile,
+      trajectories: task.trajectories,
+      steps: task.steps,
+      metrics: await task.metrics,
+      previousTasksInfo: task.previousTasksInfo,
+      finalAgentState: task.finalAgentState,
+      sessionHistory: task.sessionHistory,
+      patch: task.patch,
+    })
   } catch (error) {
     console.error('Error fetching task data:', error)
     res.status(500).json({ error: 'An error occurred while fetching task data' })

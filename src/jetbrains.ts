@@ -287,18 +287,5 @@ export class JetBrains {
     }
   }
 
-  toJSON() {
-    return {
-      logPath: this.logPath,
-      username: this.username,
-      projectsPath: this.projectsPath,
-      // projects: [...this.projects],
-      metrics: this.metrics,
-    }
-  }
-
-  [inspect.custom]() {
-    return this.toJSON()
-  }
 }
 

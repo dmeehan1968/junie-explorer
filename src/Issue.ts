@@ -82,20 +82,4 @@ export class Issue {
     return (await this.tasks).get(`${this.id} ${id}`)
   }
 
-  toJSON() {
-    return {
-      logPath: this.logPath,
-      id: this.id,
-      name: this.name,
-      created: this.created,
-      state: this.state,
-      error: this.error,
-      // tasks: [...this._tasks],
-      metrics: this.metrics,
-    }
-  }
-
-  [inspect.custom]() {
-    return this.toJSON()
-  }
 }
