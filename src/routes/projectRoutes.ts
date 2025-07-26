@@ -11,7 +11,8 @@ const router = express.Router()
 
 // Function to generate HTML for combined issues table with project summary footer
 const generateIssuesTable = async (project: Project, locale: string | undefined): Promise<string> => {
-  if ((await project.issues).size === 0) {
+  const issuesCount = (await project.issues).size
+  if (issuesCount === 0) {
     return '<p data-testid="no-issues-message">No issues found for this project</p>'
   }
 
@@ -24,7 +25,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
   return `
   <div class="project-summary">
     <div class="issues-header-flex">
-      <h3 class="issues-header-title">Project Issues</h3>
+      <h3 class="issues-header-title">${issuesCount} Project Issue${issuesCount !== 1 ? 's' : ''}</h3>
       <span class="issues-elapsed-time" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
     </div>
     <table class="project-summary-table issues-table" data-testid="issues-table">
