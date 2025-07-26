@@ -166,6 +166,49 @@ p {
   100% { transform: rotate(360deg); }
 }
 
+/* Version banner styles */
+.version-banner {
+  background-color: #f39c12;
+  border: 1px solid #e67e22;
+  border-radius: 4px;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.version-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.version-text {
+  color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.version-link {
+  background-color: #fff;
+  color: #e67e22;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid #e67e22;
+}
+
+.version-link:hover {
+  background-color: #e67e22;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 
 /* Issue List Styles */
 .issue-list {

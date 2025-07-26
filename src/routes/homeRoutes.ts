@@ -238,6 +238,14 @@ router.get('/', async (req, res) => {
             <h1>Junie Explorer</h1>
             <button id="reload-button" class="reload-button" data-testid="reload-button" onclick="reloadPage()">Reload</button>
           </div>
+          ${jetBrains.version ? `
+          <div class="version-banner" data-testid="version-banner">
+            <div class="version-content">
+              <span class="version-text">New version available: ${jetBrains.version.tag_name}</span>
+              <a href="${jetBrains.version.html_url}" target="_blank" class="version-link" data-testid="version-link">View Release</a>
+            </div>
+          </div>
+          ` : ''}
           <p data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
 
           <div class="ide-filter-toolbar" data-testid="ide-filter-toolbar">
