@@ -26,8 +26,9 @@ interface FormatMemoryOptions {
 }
 
 export interface Version {
-  tag_name: string,
-  html_url: string,
+  currentVersion: string,
+  newVersion: string,
+  releaseUrl: string,
 }
 
 export class JetBrains {
@@ -269,11 +270,13 @@ export class JetBrains {
 
     const response = await fetch('https://api.github.com/repos/dmeehan1968/junie-explorer/releases/latest')
     const latest = await response.json()
+    const currentVersion = JSON.parse(publicFiles['version.txt'])
 
-    if (semver.lt(JSON.parse(publicFiles['version.txt']), latest.tag_name)) {
+    if (semver.lt(currentVersion, latest.tag_name)) {
       this._version = {
-        tag_name: latest.tag_name,
-        html_url: latest.html_url
+        currentVersion,
+        newVersion: latest.tag_name,
+        releaseUrl: latest.html_url
       }
 
       const width = 80
