@@ -3,6 +3,7 @@ import { marked } from 'marked'
 import { JetBrains } from "../jetbrains.js"
 import { Step } from "../Step.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
 
@@ -194,7 +195,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', (req, res) => {
 
           <div class="task-details">
             <div class="task-meta">
-              <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
+              <div class="task-created">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
             </div>
             <div class="task-content-container${(!task.plan || task.plan.length === 0) ? ' no-plan' : ''}">
               ${task.context.description ? `

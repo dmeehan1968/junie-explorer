@@ -5,6 +5,7 @@ import { marked } from 'marked'
 import { EventRecord } from '../eventSchema.js'
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 
 const router = express.Router()
 
@@ -258,7 +259,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', (req, res
 
           <div class="task-details">
             <div class="task-meta">
-              <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
+              <div class="task-created">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
               <div class="task-download">
                 <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class="reload-button">Download Events as JSONL</a>
               </div>

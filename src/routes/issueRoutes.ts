@@ -2,6 +2,7 @@ import express from 'express'
 import { marked } from "marked"
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { formatSeconds } from '../utils/timeUtils.js'
 import { SummaryMetrics } from "../schema.js"
 
@@ -73,7 +74,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
           </div>
 
           <div class="issue-details">
-            <div class="issue-created" data-testid="issue-date">Created: ${new Date(issue.created).toLocaleString()}</div>
+            <div class="issue-created" data-testid="issue-date">Created: ${new Date(issue.created).toLocaleString(getLocaleFromRequest(req))}</div>
             <div class="issue-state state-${issue.state.toLowerCase()}" data-testid="issue-state">${issue.state}</div>
           </div>
 
@@ -88,7 +89,7 @@ router.get('/project/:projectName/issue/:issueId', (req, res) => {
                       <div class="task-header">
                         <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
                         <div class="task-date">
-                          Created: ${new Date(task.created).toLocaleString()}
+                          Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}
                         </div>
                       </div>
                       ${task.context.description ? `<div class="task-description" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}

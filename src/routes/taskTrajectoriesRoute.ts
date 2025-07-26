@@ -4,6 +4,7 @@ import path from 'node:path'
 import { marked } from 'marked'
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 
 const router = express.Router()
 
@@ -86,7 +87,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
 
           <div class="task-details">
             <div class="task-meta">
-              <div class="task-created">Created: ${new Date(task.created).toLocaleString()}</div>
+              <div class="task-created">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
               <div class="task-download">
                 <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="reload-button">Download Trajectories as JSONL</a>
               </div>
@@ -126,7 +127,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', (re
         if ('timestamp' in trajectory && 'role' in trajectory && 'content' in trajectory) {
           return `
                         <tr data-testid="trajectory-row-${index}" class="role-${trajectory.role}">
-                          <td class="timestamp-col">${trajectory.timestamp.toLocaleString()}</td>
+                          <td class="timestamp-col">${trajectory.timestamp.toLocaleString(getLocaleFromRequest(req))}</td>
                           <td class="role-col">${escapeHtml(trajectory.role)}</td>
                           <td class="content-col"><div class="content-wrapper">${escapeHtml(trajectory.content.trim())}</div></td>
                         </tr>

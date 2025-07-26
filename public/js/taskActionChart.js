@@ -238,7 +238,7 @@ class TaskActionChart {
       // Format time based on the span
       let timeLabel;
       if (timeSpan < 60000) { // Less than 1 minute
-        timeLabel = time.toLocaleTimeString('en-US', { 
+        timeLabel = time.toLocaleTimeString(undefined, {
           hour12: false,
           hour: '2-digit',
           minute: '2-digit',
@@ -246,14 +246,14 @@ class TaskActionChart {
           fractionalSecondDigits: 3
         });
       } else if (timeSpan < 3600000) { // Less than 1 hour
-        timeLabel = time.toLocaleTimeString('en-US', { 
+        timeLabel = time.toLocaleTimeString(undefined, {
           hour12: false,
           hour: '2-digit',
           minute: '2-digit',
           second: '2-digit' 
         });
       } else {
-        timeLabel = time.toLocaleTimeString('en-US', { 
+        timeLabel = time.toLocaleTimeString(undefined, {
           hour12: false, 
           hour: '2-digit', 
           minute: '2-digit' 

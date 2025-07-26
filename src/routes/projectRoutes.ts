@@ -3,12 +3,13 @@ import { Issue } from "../Issue.js"
 import { JetBrains } from "../jetbrains.js"
 import { Project } from "../Project.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
 
 const router = express.Router()
 
 // Function to generate HTML for combined issues table with project summary footer
-const generateIssuesTable = (project: Project): string => {
+const generateIssuesTable = (project: Project, locale: string | undefined): string => {
   if (project.issues.size === 0) {
     return '<p data-testid="no-issues-message">No issues found for this project</p>'
   }
@@ -56,7 +57,7 @@ const generateIssuesTable = (project: Project): string => {
               ${escapeHtml(issue.name)}
             </a>
           </td>
-          <td class="text-left" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString()}</td>
+          <td class="text-left" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString(locale)}</td>
           <td class="text-right" data-testid="issue-input-tokens">${formatNumber(issue.metrics.inputTokens)}</td>
           <td class="text-right" data-testid="issue-output-tokens">${formatNumber(issue.metrics.outputTokens)}</td>
           <td class="text-right" data-testid="issue-cache-tokens">${formatNumber(issue.metrics.cacheTokens)}</td>
@@ -210,8 +211,7 @@ router.get('/project/:projectName', (req, res) => {
               </div>`
       : ''
     }
-
-          ${generateIssuesTable(project)}
+          ${generateIssuesTable(project, getLocaleFromRequest(req))}
         </div>
       </body>
       </html>

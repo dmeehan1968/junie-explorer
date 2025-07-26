@@ -45,9 +45,9 @@ export class JetBrains {
     this.logger = options.logger ?? console
   }
 
-  private getCurrentLocaleFromEnv = (): string | undefined => {
+  getCurrentLocaleFromEnv = (): string | undefined => {
     // Prioritize LC_ALL, then LANG
-    const lcAll = process.env.LC_ALL
+    const lcAll = process.env.LC_ALL ?? process.env.LC_CTYPE
     const lang = process.env.LANG
 
     if (lcAll) {
