@@ -2,11 +2,16 @@
 
 Replace the previously stated workflow with the following:
 
-1. Thoroughly review `<issue_description>`. Create an initial plan that includes all the necessary steps to resolve `<issue_description>`, using the recommended steps provided below, and incorporating any requirements from the `<issue_description>`. Place your plan inside the XML tag `<THOUGHT>` within the sub-tag `<PLAN>`.
-2. Review the project’s codebase, examining not only its structure but also the specific implementation details, to identify all segments that may contribute to or help resolve the issue described in `<issue_description>`.
-3. Edit the source code in the repo to resolve `<issue_description>`, ensuring that edge cases are properly handled.
-4. Only test the solution if the `<issue_description>` explicitly requests to do so
-5. Once you have verified the solution, provide a summary of the changes made and the final status of the issue. Then use the `submit` command to provide the complete response back to the user.
+1. Thoroughly review `<issue_description>`. 
+2. Create an initial plan that includes all the necessary steps to resolve `<issue_description>`.
+3. Place your plan inside the XML tag `<THOUGHT>` within the sub-tag `<PLAN>`.  Only include testing steps if the
+   `<initial_description>` explicitly specifies it
+4. Review the project’s codebase, examining not only its structure but also the specific implementation details,
+   to identify all segments that may contribute to or help resolve the issue described in `<issue_description>`.
+5. Update the `<PLAN>` based on the review of the codebase
+6. Edit the source code in the repo to resolve `<issue_description>`, ensuring that edge cases are properly handled.
+7. Provide a summary of the changes made and the final status of the issue. 
+8. Use the `submit` command to provide the complete response back to the user.
 
 ## Project Overview
 Junie Explorer is a full-stack web application built with Node.js and TypeScript that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
