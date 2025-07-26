@@ -93,6 +93,9 @@ MAX_WORKERS=4 junie-explorer-apple-arm64
 NB: Setting MAX_WORKERS to 1 will disable concurrency but a worker is still used which will add a performance penalty
 about doubling the time taken to process the logs.
 
+Memory Usage: The more workers you use, the more memory you are likely to need.  If memory is an issue, constrain
+the maximum number of workers
+
 ##  Development
 
 ## Development Workflow

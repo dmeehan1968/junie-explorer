@@ -28,7 +28,6 @@ export class Project {
       const issues = new Map()
 
       for (const logPath of this._logPaths) {
-        // this.logger.log('From:', logPath)
         const root = path.join(logPath, 'issues', 'chain-*.json')
 
         fs.globSync(root)
@@ -66,7 +65,7 @@ export class Project {
         metrics.time += issueMetrics.time
       }))
 
-      this._logPaths.forEach(logPath => console.log(path.resolve(logPath, '../..')))
+      this._logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
 
       return resolve(metrics)
     })
