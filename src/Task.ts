@@ -13,6 +13,13 @@ import {
 } from "./schema.js"
 import { Step } from "./Step.js"
 import { Trajectory, TrajectoryError } from "./trajectorySchema.js"
+import {
+  FixedThreadPool,
+  availableParallelism,
+  DynamicThreadPool,
+  AbstractPool,
+  WorkerOptions, ThreadPoolOptions,
+} from "poolifier-web-worker"
 
 export class Task {
   readonly id: string
@@ -28,6 +35,26 @@ export class Task {
   private _patch?: string | null
   private _events: Promise<EventRecord[]> | undefined = undefined
   private _trajectories: (Trajectory|TrajectoryError)[] = []
+
+  // Static worker pool for loading events
+  private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, { events: EventRecord[] }> | undefined
+
+  private static get workerPool() {
+    if (!this._workerPool) {
+      const maxParallelism = Math.min(availableParallelism(), parseInt(process.env.MAX_WORKERS ?? availableParallelism().toString()))
+      const isDynamic = maxParallelism > 1
+      const workerPath = new URL('./workers/loadEventsWorker.ts', import.meta.url)
+      const options: ThreadPoolOptions = {
+        errorEventHandler: (e) => {
+          console.error('Worker pool error:', e)
+        },
+      }
+      this._workerPool = isDynamic
+        ? new DynamicThreadPool(1, maxParallelism, workerPath, options)
+        : new FixedThreadPool(maxParallelism, workerPath, options)
+    }
+    return this._workerPool
+  }
 
   constructor(public readonly logPath: string) {
     const task = this.load()
@@ -136,7 +163,19 @@ export class Task {
   }
 
   private async loadEvents(): Promise<EventRecord[]> {
+    try {
+      const result = await Task.workerPool.execute({
+        eventsFilePath: this.eventsFile
+      })
+      return result.events
+    } catch (error) {
+      console.error('Error loading events with worker pool:', error)
+      // Fallback to original implementation if worker fails
+      return this.loadEventsOriginal()
+    }
+  }
 
+  private async loadEventsOriginal(): Promise<EventRecord[]> {
     const root = this.eventsFile
 
     if (fs.existsSync(root)) {

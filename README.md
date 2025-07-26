@@ -80,6 +80,19 @@ Memory usage (MB):
 The memory usage is taken immediately after the scanning of logs, and likely before garbage collection can occur, but its
 not guaranteed to be a reflection of peak memory usage.
 
+### Max Workers
+
+When loading the logs, concurrent workers are used to improve performance.  By default, the maximum concurrency
+supported by your system will be used (CPU cores).  If you want to limit the concurrency to avoid interference
+with other processes, you can use the MAX_WORKERS environment variable:
+
+```shell
+MAX_WORKERS=4 junie-explorer-apple-arm64
+```
+
+NB: Setting MAX_WORKERS to 1 will disable concurrency but a worker is still used which will add a performance penalty
+about doubling the time taken to process the logs.
+
 ##  Development
 
 ## Development Workflow
