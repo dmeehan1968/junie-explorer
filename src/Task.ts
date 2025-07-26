@@ -1,6 +1,13 @@
 import fs from "fs-extra"
 import path from "node:path"
 import { inspect } from "node:util"
+import {
+  AbstractPool,
+  availableParallelism,
+  DynamicThreadPool,
+  FixedThreadPool,
+  ThreadPoolOptions,
+} from "poolifier-web-worker"
 import { EventRecord, UnknownEventRecord } from "./eventSchema.js"
 import {
   AgentState,
@@ -13,13 +20,6 @@ import {
 } from "./schema.js"
 import { Step } from "./Step.js"
 import { Trajectory, TrajectoryError } from "./trajectorySchema.js"
-import {
-  FixedThreadPool,
-  availableParallelism,
-  DynamicThreadPool,
-  AbstractPool,
-  WorkerOptions, ThreadPoolOptions,
-} from "poolifier-web-worker"
 
 export class Task {
   readonly id: string
@@ -34,7 +34,7 @@ export class Task {
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
   private _events: Promise<EventRecord[]> | undefined = undefined
-  private _trajectories: (Trajectory|TrajectoryError)[] = []
+  private _trajectories: (Trajectory | TrajectoryError)[] = []
 
   // Static worker pool for loading events
   private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, { events: EventRecord[] }> | undefined
@@ -165,7 +165,7 @@ export class Task {
   private async loadEvents(): Promise<EventRecord[]> {
     try {
       const result = await Task.workerPool.execute({
-        eventsFilePath: this.eventsFile
+        eventsFilePath: this.eventsFile,
       })
       return result.events
     } catch (error) {
@@ -179,8 +179,8 @@ export class Task {
     const root = this.eventsFile
 
     if (fs.existsSync(root)) {
-      const content = await fs.promises.readFile(root, 'utf-8')
-      const events = await Promise.all(content
+      const content = fs.readFileSync(root, 'utf-8')
+      return content
         .split('\n')
         .filter(json => json.trim())
         .map((line, lineNumber) => {
@@ -198,16 +198,14 @@ export class Task {
             }
           }
           try {
-            return EventRecord.parseAsync(json)
+            return EventRecord.parse(json)
           } catch (error: any) {
-            console.log(root, lineNumber, error.errors[0].code, error.errors[0].path, error.errors[0].message, line.slice(0, 100))
-            return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parseAsync(json)
+            console.log(this.eventsFile, lineNumber, error.errors[0].code, error.errors[0].path, error.errors[0].message, line.slice(0, 100))
+            return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parse(json)
           }
-        }))
-
-        return events
-          .filter((event): event is EventRecord => !!event)
-          .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+        })
+        .filter((event): event is EventRecord => !!event)
+        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
     }
 
     return []
