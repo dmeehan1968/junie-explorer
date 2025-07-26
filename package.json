@@ -11,7 +11,8 @@
     "dev": "bun install && bun run build:static && bun src/index.ts",
     "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @pending\"",
     "playwright:install": "playwright install",
-    "build:static": "make-vfs --dir ./public --content-format string --outfile ./src/bun/public.ts",
+    "build:version": "sed -n 's/.*\"version\": \"\\(.*\\)\",/\"\\1\"/p' package.json > public/version.txt",
+    "build:static": "bun run build:version && make-vfs --dir ./public --content-format string --outfile ./src/bun/public.ts",
     "build:bun": "bun build --compile src/index.ts --minify --sourcemap",
     "build:apple:x64": "bun run build:bun --target=bun-darwin-x64 --outfile dist/junie-explorer-apple-x64",
     "build:apple:arm64": "bun run build:bun --target=bun-darwin-arm64 --outfile dist/junie-explorer-apple-arm64",
@@ -22,11 +23,13 @@
   },
   "dependencies": {
     "@types/bun": "^1.2.19",
+    "@types/semver": "^7.7.0",
     "express": "^4.18.2",
     "fs-extra": "^11.1.1",
     "marked": "^15.0.12",
     "mime-types": "^3.0.1",
     "poolifier-web-worker": "^0.5.7",
+    "semver": "^7.7.2",
     "zod": "^3.25.63"
   },
   "devDependencies": {

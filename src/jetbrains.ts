@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url"
 import { inspect } from 'node:util'
 import { Project } from "./Project.js"
 import { SummaryMetrics } from "./schema.js"
+import publicFiles from "./bun/public.js"
+import semver from "semver"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -32,6 +34,10 @@ export class JetBrains {
   private readonly logger: { log: (...message: any[]) => void }
 
   private _metrics: Promise<SummaryMetrics> | undefined
+  private _version: {
+    tag_name: string,
+    html_url: string,
+  } | undefined
 
   constructor(options?: JetBrainsOptions) {
     if (!options) {
@@ -74,6 +80,12 @@ export class JetBrains {
   }
 
   async preload() {
+    try {
+      await this.checkForUpdates()
+    } catch (error) {
+      console.error('Unable to check for updates:', error)
+    }
+
     this.logger.log('Reading logs...')
     const start = Date.now()
 
@@ -122,7 +134,6 @@ export class JetBrains {
     }
 
     this._metrics = new Promise(async (resolve) => {
-      // const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
       const projects = await Promise.all([...(await this.projects).values()].map(async project => project.metrics))
       const metrics = projects.reduce((acc, cur) => {
@@ -135,15 +146,6 @@ export class JetBrains {
           time: acc.time + cur.time,
         }
       }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 } satisfies SummaryMetrics)
-
-      // await Promise.all([...(await this.projects)].map(async ([, project]) => {
-      //   const projectMetrics = await project.metrics
-      //   metrics.inputTokens += projectMetrics.inputTokens
-      //   metrics.outputTokens += projectMetrics.outputTokens
-      //   metrics.cacheTokens += projectMetrics.cacheTokens
-      //   metrics.cost += projectMetrics.cost
-      //   metrics.time += projectMetrics.time
-      // }))
 
       return resolve(metrics)
     })
@@ -255,6 +257,29 @@ export class JetBrains {
 
   get username() {
     return os.userInfo().username
+  }
+
+  get version() {
+    return this._version
+  }
+
+  async checkForUpdates() {
+
+    const response = await fetch('https://api.github.com/repos/dmeehan1968/junie-explorer/releases/latest')
+    const latest = await response.json()
+
+    if (semver.lt(JSON.parse(publicFiles['version.txt']), latest.tag_name)) {
+      this._version = {
+        tag_name: latest.tag_name,
+        html_url: latest.html_url
+      }
+
+      const width = 80
+      console.log('┌' + '─'.repeat(width) + '┐')
+      console.log('│' + ` New version available: ${latest.tag_name} `.padEnd(width) + '│')
+      console.log('│' + ` ${latest.html_url.padEnd(width-1)}` + '│')
+      console.log('└' + '─'.repeat(width) + '┘')
+    }
   }
 
   toJSON() {
