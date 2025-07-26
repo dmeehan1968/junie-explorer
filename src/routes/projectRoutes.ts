@@ -52,11 +52,9 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
       </thead>
       <tbody>
         ${(await Promise.all(sortedIssues.map(async issue => `
-        <tr>
+        <tr class="clickable-row" onclick="window.location.href='/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}'">
           <td class="text-left" data-testid="issue-description">
-            <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="issue-link" data-testid="issue-link">
-              ${escapeHtml(issue.name)}
-            </a>
+            ${escapeHtml(issue.name)}
           </td>
           <td class="text-left" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString(locale)}</td>
           <td class="text-right" data-testid="issue-input-tokens">${formatNumber((await issue.metrics).inputTokens)}</td>

@@ -383,6 +383,29 @@ p {
   background-color: #f8f9fa;
 }
 
+/* Clickable row styling for issues table */
+.issues-table .clickable-row {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.issues-table .clickable-row:hover {
+  background-color: #e3f2fd;
+  border-left: 3px solid #2196f3;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+  transform: translateX(2px);
+}
+
+.issues-table .clickable-row td[data-testid="issue-description"] {
+  color: #1976d2;
+  font-weight: bold;
+}
+
+.issues-table .clickable-row:hover td[data-testid="issue-description"] {
+  color: #0d47a1;
+}
+
 /* Task List Styles */
 .task-list {
   list-style: none;
