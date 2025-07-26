@@ -81,9 +81,9 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
 
           <ul class="task-list" data-testid="tasks-list">
             ${tasks?.size ?? 0 > 0
-      ? [...tasks?.values() ?? []].map((task, index) => {
+      ? (await Promise.all([...tasks?.values() ?? []].map(async (task, index) => {
         // Use aggregated metrics from task
-        const stepTotals = task.metrics
+        const stepTotals = await task.metrics
 
         return `
                     <li class="task-item" data-testid="task-item">
@@ -108,7 +108,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
                       </div>
                     </li>
                   `
-      }).join('')
+      }))).join('')
       : '<li data-testid="no-tasks-message">No tasks found for this issue</li>'
     }
           </ul>

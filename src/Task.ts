@@ -21,7 +21,7 @@ export class Task {
   readonly isDeclined: boolean
   readonly plan: JuniePlan[]
   readonly _steps: Map<number, Step> = new Map()
-  private _metrics: SummaryMetrics | undefined = undefined
+  private _metrics: Promise<SummaryMetrics> | undefined = undefined
   private _previousTasksInfo?: PreviousTasksInfo | null
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
@@ -38,31 +38,38 @@ export class Task {
     this.plan = task.plan
   }
 
-  get metrics() {
+  get metrics(): Promise<SummaryMetrics> {
     if (this._metrics) {
       return this._metrics
     }
 
-    this._metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+    this._metrics = new Promise(async (resolve) => {
 
-    // metrics needs to load events, but not retain them
-    // but if metrics are already loaded (retained), then just use them
-    // avoid events getter so we can discard them
-    const events = this._events ?? this.loadEvents()
+      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
-    for (const event of events) {
-      if (event.event.type === 'LlmResponseEvent') {
-        this._metrics.cost += event.event.answer.cost
-        this._metrics.inputTokens += event.event.answer.inputTokens
-        this._metrics.outputTokens += event.event.answer.outputTokens
-        this._metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
-        this._metrics.time += event.event.answer.time ?? 0
+      // metrics needs to load events, but not retain them
+      // but if metrics are already loaded (retained), then just use them
+      // avoid events getter so we can discard them
+      const events = this._events ?? this.loadEvents()
+      // console.log(this.eventsFile, events.length, 'events')
+
+      for (const event of events) {
+        if (event.event.type === 'LlmResponseEvent') {
+          metrics.cost += event.event.answer.cost
+          metrics.inputTokens += event.event.answer.inputTokens
+          metrics.outputTokens += event.event.answer.outputTokens
+          metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
+          metrics.time += event.event.answer.time ?? 0
+        }
       }
-    }
 
-    if (!this._events) {
-      events.splice(0)
-    }
+      if (!this._events) {
+        events.splice(0)
+      }
+
+      return resolve(metrics)
+
+    })
 
     return this._metrics!
   }
