@@ -1,5 +1,7 @@
 // Function to generate version banner HTML
-export function VersionBanner(version: { tag_name: string; html_url: string } | undefined): string {
+import { Version } from "../jetbrains.js"
+
+export function VersionBanner(version?: Version): string {
   if (!version) {
     return ''
   }

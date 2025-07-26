@@ -25,6 +25,11 @@ interface FormatMemoryOptions {
   showChange?: boolean
 }
 
+export interface Version {
+  tag_name: string,
+  html_url: string,
+}
+
 export class JetBrains {
 
   private readonly memory: Record<string, ReturnType<typeof process.memoryUsage>> = {
@@ -34,10 +39,7 @@ export class JetBrains {
   private readonly logger: { log: (...message: any[]) => void }
 
   private _metrics: Promise<SummaryMetrics> | undefined
-  private _version: {
-    tag_name: string,
-    html_url: string,
-  } | undefined
+  private _version?: Version
 
   constructor(options?: JetBrainsOptions) {
     if (!options) {

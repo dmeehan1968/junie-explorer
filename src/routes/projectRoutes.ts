@@ -5,6 +5,7 @@ import { Project } from "../Project.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
+import { VersionBanner } from '../utils/versionBanner.js'
 
 const router = express.Router()
 
@@ -192,6 +193,7 @@ router.get('/project/:projectName', async (req, res) => {
             <h1>Junie Explorer: ${project.name}</h1>
             <button id="reload-button" class="reload-button" data-testid="reload-button" onclick="reloadPage()">Reload</button>
           </div>
+          ${VersionBanner(jetBrains.version)}
           <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
