@@ -10,7 +10,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/step/:stepInde
     const { projectName, issueId, taskId, stepIndex } = req.params
     const project = await jetBrains.getProjectByName(projectName)
     const issue = await project?.getIssueById(issueId)
-    const task = issue?.getTaskById(taskId)
+    const task = await issue?.getTaskById(taskId)
     const step = task?.getStepById(parseInt(stepIndex, 10))
 
     if (!project || !issue || !task || !step) {

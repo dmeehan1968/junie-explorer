@@ -50,7 +50,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         </tr>
       </thead>
       <tbody>
-        ${sortedIssues.map(issue => `
+        ${(await Promise.all(sortedIssues.map(async issue => `
         <tr>
           <td class="text-left" data-testid="issue-description">
             <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="issue-link" data-testid="issue-link">
@@ -67,7 +67,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             <span class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</span>
           </td>
         </tr>
-        `).join('')}
+        `))).join('')}
       </tbody>
       <tfoot>
         <tr class="summary-row">
@@ -87,7 +87,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
 }
 
 // Function to prepare data for the cost over time graph
-function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[], timeUnit: string, stepSize: number } {
+async function prepareGraphData(issues: Issue[]): Promise<{ labels: string[], datasets: any[], timeUnit: string, stepSize: number }> {
   // Sort issues by creation date
   const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
 
@@ -125,7 +125,7 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
   }
 
   // Create datasets for each issue
-  const datasets = sortedIssues.map((issue, index) => {
+  const datasets = await Promise.all(sortedIssues.map(async (issue, index) => {
 
     // Generate a color based on index
     const hue = (index * 137) % 360 // Use golden ratio to spread colors
@@ -133,13 +133,13 @@ function prepareGraphData(issues: Issue[]): { labels: string[], datasets: any[],
 
     return {
       label: issue.name,
-      data: [{ x: issue.created, y: issue.metrics.cost }],
+      data: [{ x: issue.created, y: (await issue.metrics).cost }],
       borderColor: color,
       backgroundColor: color,
       fill: false,
       tension: 0.1,
     }
-  })
+  }))
 
   return {
     labels: [minDate.toISOString(), maxDate.toISOString()],
@@ -162,7 +162,7 @@ router.get('/project/:projectName', async (req, res) => {
     }
 
     // Prepare graph data
-    const graphData = prepareGraphData([...(await project.issues).values()])
+    const graphData = await prepareGraphData([...(await project.issues).values()])
 
     // Generate HTML
     const html = `

@@ -32,6 +32,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
     const { projectName, issueId } = req.params
     const project = await jetBrains.getProjectByName(projectName)
     const issue = await project?.getIssueById(issueId)
+    const tasks = await issue?.tasks
 
     if (!project || !issue) {
       return res.status(404).send('Issue not found')
@@ -79,8 +80,8 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
           </div>
 
           <ul class="task-list" data-testid="tasks-list">
-            ${issue.tasks.size > 0
-      ? [...issue.tasks.values()].map((task, index) => {
+            ${tasks?.size ?? 0 > 0
+      ? [...tasks?.values() ?? []].map((task, index) => {
         // Use aggregated metrics from task
         const stepTotals = task.metrics
 

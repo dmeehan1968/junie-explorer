@@ -37,7 +37,7 @@ async function prepareProjectsGraphData(projects: Project[]): Promise<{
 
   // Process each project's issues
   for (const project of projects) {
-    (await project.issues).forEach(issue => {
+    for (const [, issue] of await project.issues) {
       const date = new Date(issue.created)
       const day = date.toISOString().split('T')[0] // YYYY-MM-DD format
 
@@ -55,9 +55,10 @@ async function prepareProjectsGraphData(projects: Project[]): Promise<{
         }
       }
 
-      issuesByDay[day][project.name].cost += issue.metrics.cost
-      issuesByDay[day][project.name].tokens += issue.metrics.inputTokens + issue.metrics.outputTokens
-    })
+      const metrics = await issue.metrics
+      issuesByDay[day][project.name].cost += metrics.cost
+      issuesByDay[day][project.name].tokens += metrics.inputTokens + metrics.outputTokens
+    }
   }
 
   // Determine the appropriate time unit based on the date range

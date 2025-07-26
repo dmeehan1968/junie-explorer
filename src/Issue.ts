@@ -10,8 +10,8 @@ export class Issue {
   readonly created: Date
   readonly state: string
   readonly error?: any
-  private readonly _tasks: Map<string, Task> = new Map()
-  private _metrics?: SummaryMetrics
+  private _tasks: Promise<Map<string, Task>> | undefined = undefined
+  private _metrics: Promise<SummaryMetrics> | undefined = undefined
 
   constructor(public readonly logPath: string) {
     const issue = JunieChainSchema.safeParse(fs.readJsonSync(logPath))
@@ -27,42 +27,57 @@ export class Issue {
   }
 
   get tasks() {
-    if (this._tasks.size) {
+    if (this._tasks) {
       return this._tasks
     }
 
-    const taskPath = path.join(this.logPath, '..', path.parse(this.logPath).name)
-    if (fs.existsSync(taskPath)) {
-      const root = path.join(taskPath, 'task-*.json')
-      fs.globSync(root)
-        .map(path => new Task(path))
-        .sort((a, b) => a.created.getTime() - b.created.getTime())
-        .forEach(task => this._tasks.set(task.id, task))
-    }
+    this._tasks = new Promise(async (resolve) => {
+
+      const tasks = new Map<string, Task>()
+
+      const taskPath = path.join(this.logPath, '..', path.parse(this.logPath).name)
+
+      if (fs.existsSync(taskPath)) {
+        const root = path.join(taskPath, 'task-*.json')
+        fs.globSync(root)
+          .map(path => new Task(path))
+          .sort((a, b) => a.created.getTime() - b.created.getTime())
+          .forEach(task => tasks.set(task.id, task))
+      }
+
+      resolve(tasks)
+
+    })
 
     return this._tasks
   }
 
-  get metrics() {
+  get metrics(): Promise<SummaryMetrics> {
     if (this._metrics) {
       return this._metrics
     }
 
-    this._metrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+    this._metrics = new Promise(async (resolve) => {
 
-    for (const task of this.tasks.values()) {
-      this._metrics.inputTokens += task.metrics.inputTokens
-      this._metrics.outputTokens += task.metrics.outputTokens
-      this._metrics.cacheTokens += task.metrics.cacheTokens
-      this._metrics.cost += task.metrics.cost
-      this._metrics.time += task.metrics.time
-    }
+      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+
+      for (const task of (await this.tasks).values()) {
+        metrics.inputTokens += task.metrics.inputTokens
+        metrics.outputTokens += task.metrics.outputTokens
+        metrics.cacheTokens += task.metrics.cacheTokens
+        metrics.cost += task.metrics.cost
+        metrics.time += task.metrics.time
+      }
+
+      resolve(metrics)
+
+    })
 
     return this._metrics
   }
 
-  getTaskById(id: string) {
-    return this._tasks.get(`${this.id} ${id}`)
+  async getTaskById(id: string) {
+    return (await this.tasks).get(`${this.id} ${id}`)
   }
 
   toJSON() {
@@ -73,7 +88,7 @@ export class Issue {
       created: this.created,
       state: this.state,
       error: this.error,
-      tasks: [...this._tasks],
+      // tasks: [...this._tasks],
       metrics: this.metrics,
     }
   }

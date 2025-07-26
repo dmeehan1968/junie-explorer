@@ -15,7 +15,7 @@ export class RepresentationService {
     // Validate and get entities
     const project = await jetBrains.getProjectByName(projectName);
     const issue = await project?.getIssueById(issueId);
-    const task = issue?.getTaskById(taskId);
+    const task = await issue?.getTaskById(taskId);
     const step = task?.getStepById(parseInt(stepIndex, 10));
 
     if (!project || !issue || !task || !step) {

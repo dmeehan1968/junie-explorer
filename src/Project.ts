@@ -58,11 +58,12 @@ export class Project {
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
       for (const issue of (await this.issues).values()) {
-        metrics.inputTokens += issue.metrics.inputTokens
-        metrics.outputTokens += issue.metrics.outputTokens
-        metrics.cacheTokens += issue.metrics.cacheTokens
-        metrics.cost += issue.metrics.cost
-        metrics.time += issue.metrics.time
+        const issueMetrics = await issue.metrics
+        metrics.inputTokens += issueMetrics.inputTokens
+        metrics.outputTokens += issueMetrics.outputTokens
+        metrics.cacheTokens += issueMetrics.cacheTokens
+        metrics.cost += issueMetrics.cost
+        metrics.time += issueMetrics.time
       }
 
       return resolve(metrics)
