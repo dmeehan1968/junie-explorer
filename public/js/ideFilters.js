@@ -93,7 +93,7 @@ function applyFilters(ideFilters, searchTerm = '') {
   });
 
   // Show or hide the "no matching projects" message
-  const projectList = document.querySelector('.project-list');
+  const projectList = document.getElementById('project-list');
   let noMatchMessage = document.getElementById('no-match-message');
 
   if (visibleCount === 0) {

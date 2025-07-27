@@ -1443,16 +1443,6 @@
   .mx-auto {
     margin-inline: auto;
   }
-  .input-sm {
-    --size: calc(var(--size-field, 0.25rem) * 8);
-    font-size: 0.75rem;
-    &[type="number"] {
-      &::-webkit-inner-spin-button {
-        margin-block: calc(0.25rem * -2);
-        margin-inline-end: calc(0.25rem * -3);
-      }
-    }
-  }
   .label {
     display: inline-flex;
     align-items: center;

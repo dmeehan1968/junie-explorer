@@ -253,7 +253,7 @@ router.get('/', async (req, res) => {
               </div>
             `).join('')}
             <div class="ml-auto">
-              <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered input-sm w-64">
+              <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered w-64">
             </div>
           </div>
 
@@ -282,7 +282,7 @@ router.get('/', async (req, res) => {
             </div>
           </div>
 
-          <ul class="space-y-3" data-testid="projects-list">
+          <ul class="space-y-3" id="project-list" data-testid="projects-list">
             ${projects.length > 0
               ? (await Promise.all(projects.map(async project => `
                   <li class="project-item flex items-center p-4 bg-base-200 border-l-4 border-primary rounded transition-all duration-300 hover:bg-base-300 hover:translate-x-1" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
