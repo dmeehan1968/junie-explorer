@@ -2,3 +2,5 @@
 @plugin "daisyui" {
     themes: light --default, dark --prefersdark;
 }
+@source not "src/bun/public.ts";
+@source not "public/css/app.css";
