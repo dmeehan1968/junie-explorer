@@ -246,7 +246,7 @@ router.get('/', async (req, res) => {
           <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
 
           <div class="flex flex-wrap gap-3 mb-5 p-3 bg-base-200 rounded" data-testid="ide-filter-toolbar">
-            <div class="font-medium text-base-content">Filter by IDE</div>
+            <div class="font-medium text-base-content flex items-center">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
               <div class="ide-filter cursor-pointer transition-all duration-300 p-1 rounded hover:bg-base-300" data-testid="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
                 <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
