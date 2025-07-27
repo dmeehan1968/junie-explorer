@@ -8,9 +8,10 @@
   "type": "module",
   "scripts": {
     "start": "bun run dev",
-    "dev": "bun install && bun run build:static && bun src/index.ts",
+    "dev": "bun install && bun run build:css && bun run build:static && bun src/index.ts",
     "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @pending\"",
     "playwright:install": "playwright install",
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/css/app.css",
     "build:version": "sed -n 's/.*\"version\": \"\\(.*\\)\",/\"\\1\"/p' package.json > public/version.txt",
     "build:static": "bun run build:version && make-vfs --dir ./public --content-format string --outfile ./src/bun/public.ts",
     "build:bun": "bun build --compile --minify --sourcemap src/index.ts",
@@ -22,6 +23,7 @@
     "build": "bun install && bun run build:static && bun run build:apple:x64 && bun run build:apple:arm64 && bun run build:linux:x64 && bun run build:linux:arm64 && bun run build:windows:x64"
   },
   "dependencies": {
+    "@tailwindcss/cli": "^4.1.11",
     "@types/bun": "^1.2.19",
     "@types/semver": "^7.7.0",
     "express": "^4.18.2",
@@ -30,6 +32,7 @@
     "mime-types": "^3.0.1",
     "poolifier-web-worker": "^0.5.7",
     "semver": "^7.7.2",
+    "tailwindcss": "^4.1.11",
     "zod": "^3.25.63"
   },
   "devDependencies": {
@@ -40,6 +43,7 @@
     "@types/marked": "^5.0.2",
     "@types/mime-types": "^3.0.1",
     "@types/node": "^22.15.30",
+    "daisyui": "^5.0.47",
     "make-vfs": "^1.0.16",
     "playwright": "^1.40.0",
     "ts-node": "^10.9.2",
