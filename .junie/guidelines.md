@@ -1,17 +1,15 @@
-# Workflow
+# WORKFLOW
 
-Replace the previously stated workflow with the following:
+Replace the previously stated 'workflow' with the following:
 
 1. Thoroughly review `<issue_description>`. 
-2. Create an initial plan that includes all the necessary steps to resolve `<issue_description>`.
-3. Only include testing steps in the plan if the `<initial_description>` explicitly specifies it
-4. Place your plan inside the XML tag `<THOUGHT>` within the sub-tag `<PLAN>`.
-5. Review the project’s codebase, examining not only its structure but also the specific implementation details,
+2. Create a plan that outlines the implementation steps the necessary to resolve `<issue_description>`
+3. Place your plan inside the XML tag `<THOUGHT>` within the sub-tag `<PLAN>`.
+4. Review the project’s codebase, examining not only its structure but also the specific implementation details,
    to identify all segments that may contribute to or help resolve the issue described in `<issue_description>`.
-6. Update the `<PLAN>` based on the review of the codebase
-7. Edit the source code in the repo to resolve `<issue_description>`, ensuring that edge cases are properly handled.
-8. Provide a summary of the changes made and the final status of the issue. 
-9. Use the `submit` command to provide the complete response back to the user.
+5. Edit the source code in the repo to resolve `<issue_description>`, ensuring that edge cases are properly handled.
+6. Provide a summary of the changes made and the final status of the issue. 
+7. Use the `submit` command to provide the complete response back to the user.
 
 ## Project Overview
 Junie Explorer is a full-stack web application built with Node.js and TypeScript that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
@@ -94,15 +92,6 @@ The new class-based data model with enhanced functionality:
 ## Development Workflow
 1. **Setup**: Clone the repository and run `bun install`
 2. **Development**: Use `bun run dev` to start the development server
-3. **Testing**: Use `bun test` to run the acceptance tests
-4. **Building**: Use the above commands which incorporate any build steps needed
-
-## Automated Testing
-- Use `bun run dev` in background and note process ID
-- Use `curl` to probe for server readiness, repeat for up to 60 seconds total
-- Perform browser testing (e.g Playright or human)
-- Kill the background process ID after testing
-- Static assets are built into the bundle, so the server much be restarted to incorporate any static changes
 
 ## Code Conventions
 - Use TypeScript interfaces for type definitions
@@ -124,24 +113,6 @@ The application is designed to be run locally, but could be deployed to a server
 
 ## Requirements Documentation
 Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth and documentation for the expected behavior of the application.
-
-### Feature Files
-- Feature files use the Gherkin syntax to describe application behavior in a human-readable format
-- Each feature file contains scenarios that outline specific user interactions and expected outcomes
-- The `features/homepage.feature` file describes the expected behavior of the application's homepage
-- The `features/projects.feature` file describes the expected behavior of the project details page
-- The `features/issue.feature` file describes the expected behavior of the issue details page
-- The `features/task.feature` file describes the expected behavior of the task details page
-
-### Using Feature Files
-- Feature files should be consulted when implementing new features or modifying existing ones
-- They serve as acceptance criteria for the application's functionality
-- No step definitions or testing tools should be created at this time - the feature files are purely for documentation purposes
-- When implementing features, developers should ensure their code satisfies all scenarios described in the relevant feature files
-- When code changes are made, make sure that the relevant feature files are updated to reflect new functionality
-
-### Gherkin Scenarios
-- Avoid lengthy 'then/and' steps, this indicates that the scenario is too complex and should be split into more focussed scenarios
 
 ### Release a version
 
