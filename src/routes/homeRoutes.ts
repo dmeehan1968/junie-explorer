@@ -3,6 +3,7 @@ import { JetBrains } from "../jetbrains.js"
 import { Project } from '../Project.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { VersionBanner } from '../utils/versionBanner.js'
+import { ReloadButton } from '../utils/reloadButton.js'
 
 const router = express.Router()
 
@@ -237,10 +238,7 @@ router.get('/', async (req, res) => {
         <div class="max-w-7xl mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer</h1>
-            <button id="reload-button" class="btn btn-primary" data-testid="reload-button" onclick="reloadPage()">
-              <span class="loading loading-spinner loading-sm hidden"></span>
-              <span>Reload</span>
-            </button>
+            ${ReloadButton()}
           </div>
           ${VersionBanner(jetBrains.version)}
           <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
