@@ -6,23 +6,26 @@ import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { formatSeconds } from '../utils/timeUtils.js'
 import { SummaryMetrics } from "../schema.js"
 import { VersionBanner } from '../utils/versionBanner.js'
+import { ReloadButton } from '../utils/reloadButton.js'
 
 const router = express.Router()
 
 // Function to generate HTML for step totals table
 const generateStepTotalsTable = (summaryData: SummaryMetrics): string => {
   return `
-  <table class="step-totals-table" data-testid="task-metrics">
-    <tbody>
-      <tr>
-        <td>Input Tokens: ${summaryData.inputTokens}</td>
-        <td>Output Tokens: ${summaryData.outputTokens}</td>
-        <td>Cache Tokens: ${summaryData.cacheTokens}</td>
-        <td>Cost: ${summaryData.cost.toFixed(4)}</td>
-        <td>Total Time: ${formatSeconds(summaryData.time / 1000)}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="overflow-x-auto mb-4" data-testid="task-metrics">
+    <table class="table table-compact w-full bg-base-100">
+      <tbody>
+        <tr>
+          <td class="text-sm"><span class="font-semibold">Input Tokens:</span> ${summaryData.inputTokens}</td>
+          <td class="text-sm"><span class="font-semibold">Output Tokens:</span> ${summaryData.outputTokens}</td>
+          <td class="text-sm"><span class="font-semibold">Cache Tokens:</span> ${summaryData.cacheTokens}</td>
+          <td class="text-sm"><span class="font-semibold">Cost:</span> ${summaryData.cost.toFixed(4)}</td>
+          <td class="text-sm"><span class="font-semibold">Total Time:</span> ${formatSeconds(summaryData.time / 1000)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 `
 }
 
@@ -42,78 +45,82 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" data-theme="light">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${escapeHtml(issue.name)} Tasks</title>
-        <link rel="stylesheet" href="/css/style.css">
-        <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
+        <link rel="stylesheet" href="/css/app.css">
+        <link rel="icon" href="/icons/favicon.png" type="image/png">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
         <script src="/js/reloadPage.js"></script>
         <script src="/js/taskRawData.js"></script>
       </head>
-      <body>
-        <div class="container">
-          <div class="header-container">
-            <h1>Junie Explorer: ${escapeHtml(issue.name)}</h1>
-            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+      <body class="bg-base-200 p-5">
+        <div class="max-w-7xl mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
+          <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${escapeHtml(issue.name)}</h1>
+            ${ReloadButton()}
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
-              <li class="breadcrumb-item active">${escapeHtml(issue.name)}</li>
-            </ol>
+          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation" class="mb-5">
+            <div class="breadcrumbs">
+              <ul>
+                <li><a href="/" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-projects">Projects</a></li>
+                <li><a href="/project/${encodeURIComponent(projectName)}" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-project-name">${projectName}</a></li>
+                <li class="text-base-content/70">${escapeHtml(issue.name)}</li>
+              </ul>
+            </div>
           </nav>
 
-          <div class="ide-icons" data-testid="ide-icons">
+          <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
             `).join('')}
           </div>
 
-          <div class="issue-details">
-            <div class="issue-created" data-testid="issue-date">Created: ${new Date(issue.created).toLocaleString(getLocaleFromRequest(req))}</div>
-            <div class="issue-state state-${issue.state.toLowerCase()}" data-testid="issue-state">${issue.state}</div>
+          <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
+            <div class="text-sm text-base-content/70" data-testid="issue-date">Created: ${new Date(issue.created).toLocaleString(getLocaleFromRequest(req))}</div>
+            <div class="badge badge-primary" data-testid="issue-state">${issue.state}</div>
           </div>
 
-          <ul class="task-list" data-testid="tasks-list">
+          <div class="space-y-4" data-testid="tasks-list">
             ${tasks?.size ?? 0 > 0
       ? (await Promise.all([...tasks?.values() ?? []].map(async (task, index) => {
         // Use aggregated metrics from task
         const stepTotals = await task.metrics
 
         return `
-                    <li class="task-item" data-testid="task-item">
-                      <div class="task-header">
-                        <div class="task-id">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</div>
-                        <div class="task-date">
-                          Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}
+                    <div class="card bg-base-100 shadow-md border border-base-300 hover:shadow-lg transition-all duration-300" data-testid="task-item">
+                      <div class="card-body">
+                        <div class="flex justify-between items-center mb-4">
+                          <h3 class="text-xl font-bold text-primary">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</h3>
+                          <div class="text-sm text-base-content/70">
+                            Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}
+                          </div>
+                        </div>
+                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-warning/10 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                        <div data-testid="task-details">
+                          ${generateStepTotalsTable(stepTotals)}
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="events-button">Events</a>
+                          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/trajectories" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="trajectories-button">Trajectories</a>
+                          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="steps-button">Steps</a>
+                          <button class="btn btn-secondary btn-sm flex-1 min-w-0 toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
+                        </div>
+                        <div id="raw-data-${index}" class="mt-4 p-4 bg-base-200 rounded-lg border border-base-300" data-testid="json-viewer" style="display: none;">
+                          <div id="json-renderer-${index}" class="text-sm"></div>
                         </div>
                       </div>
-                      ${task.context.description ? `<div class="task-description" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
-                      <div class="task-details" data-testid="task-details">
-                        ${generateStepTotalsTable(stepTotals)}
-                      </div>
-                      <div class="task-buttons">
-                        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="task-action-button" data-testid="events-button">Events</a>
-                        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/trajectories" class="task-action-button" data-testid="trajectories-button">Trajectories</a>
-                        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="task-action-button" data-testid="steps-button">Steps</a>
-                        <button class="task-action-button toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
-                      </div>
-                      <div id="raw-data-${index}" class="raw-data-container" data-testid="json-viewer" style="display: none;">
-                        <div id="json-renderer-${index}" class="json-renderer"></div>
-                      </div>
-                    </li>
+                    </div>
                   `
       }))).join('')
-      : '<li data-testid="no-tasks-message">No tasks found for this issue</li>'
+      : '<div class="p-4 text-center text-base-content/70" data-testid="no-tasks-message">No tasks found for this issue</div>'
     }
-          </ul>
+          </div>
         </div>
       </body>
       </html>

@@ -4,7 +4,6 @@ async function reloadPage() {
   const loading = button?.querySelector('.loading');
   if (button) {
     button.disabled = true;
-    button.classList.add('btn-disabled');
     loading?.classList.remove('hidden');
     const response = await fetch('/refresh');
     if (response.ok && response.redirected) {
