@@ -106,17 +106,33 @@ junie-explorer/
 ```
 
 ## Tech Stack
-- **Backend**: Node.js with Express.js
-- **Language**: TypeScript
-- **Build Tools**: ts-node, TypeScript compiler
-- **Dependencies**:
+- **Runtime**: Bun (>=1.2.18) with Express.js web framework
+- **Language**: TypeScript with ES modules
+- **Build Tools**: 
+  - Bun build system with cross-platform compilation
+  - make-vfs for static asset bundling
+  - TypeScript compiler for type checking
+- **Core Dependencies**:
   - express: Web server framework
   - fs-extra: Enhanced file system operations
+  - zod: Runtime type validation and schema parsing
+  - marked: Markdown parsing and rendering
+  - mime-types: MIME type utilities
+  - semver: Semantic version parsing and comparison
+  - poolifier-web-worker: Worker pool management for parallel processing
 
 ## Functionality
-1. **Directory Scanning**: The application scans the JetBrains cache directory to find all IDE installations.
-2. **Web Interface**: Provides a clean, responsive web interface to display the found directories.
-3. **Static File Serving**: Serves CSS and other static assets.
+1. **JetBrains IDE Discovery**: Scans the JetBrains cache directory to find all IDE installations and their associated project data.
+2. **Log Analysis & Processing**: Comprehensive analysis of JetBrains Junie log files with support for chains, tasks, steps, and events.
+3. **Project Management**: Multi-IDE project discovery, issue tracking, and metrics calculation with lazy-loaded data access.
+4. **Task & Step Analysis**: Detailed task management with step-by-step analysis, timing metrics, and performance tracking.
+5. **Data Visualization**: Interactive charts and graphs for project metrics, issue trends, and task performance analysis.
+6. **Event Tracking**: Event processing and trajectory analysis for AI agent interactions.
+7. **Metrics & Reporting**: Aggregated statistics including token usage, costs, timing data, and request metrics.
+8. **Worker-Based Processing**: Parallel processing using worker pools for efficient handling of large datasets.
+9. **Multi-Language Support**: Internationalization support with locale-aware formatting and time utilities.
+10. **Web Interface**: Responsive web interface with collapsible sections, filtering, and interactive data exploration.
+11. **Static Asset Management**: Efficient static file serving using make-vfs bundling system.
 
 ## Data Model
 The application uses a comprehensive class-based data model with enhanced functionality for managing JetBrains IDE data and AI agent interactions:
@@ -165,6 +181,9 @@ Comprehensive Zod schemas for data validation and type safety (src/schema.ts):
 ## Development Workflow
 1. **Setup**: Clone the repository and run `bun install`
 2. **Development**: Use `bun run dev` to start the development server
+
+## Single File Executable
+- Uses `bun --compile` to create a single executable file for each target platform
 
 ## Code Conventions
 - Use TypeScript interfaces for type definitions
