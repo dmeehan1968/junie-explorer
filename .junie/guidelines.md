@@ -119,18 +119,48 @@ junie-explorer/
 3. **Static File Serving**: Serves CSS and other static assets.
 
 ## Data Model
-The new class-based data model with enhanced functionality:
-- `JetBrains`: Main class that manages IDE installations and projects
-- `Project`: Enhanced project class with multiple IDE support
-- `Issue`: Issue class with comprehensive metadata handling
-- `Task`: Task class with agent state and session history
-- `Step`: Step class with detailed content and statistics
-- `Schema definitions` (schema.ts): Comprehensive Zod schemas including:
-  - `JunieChain`: Chain metadata with state management
-  - `JunieTask`: Task definitions with context and planning
-  - `JunieStep`: Step definitions with reasoning and statistics
-  - `AgentState`: Agent state management for AI interactions
-  - `SummaryMetrics`: Aggregated metrics across projects and tasks
+The application uses a comprehensive class-based data model with enhanced functionality for managing JetBrains IDE data and AI agent interactions:
+
+### Core Classes
+- **`JetBrains`** (src/jetbrains.ts): Main orchestration class that manages IDE installations, projects discovery, metrics aggregation, memory reporting, version checking, and provides utility methods for path resolution and IDE icon management.
+
+- **`Project`** (src/Project.ts): Project management class with multi-IDE support that handles issue discovery, metrics calculation, log path management, and provides lazy-loaded access to project issues and aggregated statistics.
+
+- **`Issue`** (src/Issue.ts): Issue management class that loads and validates chain data using JunieChainSchema, manages task collections, calculates aggregated metrics from tasks, and provides access to issue metadata (ID, name, creation date, state, errors).
+
+- **`Task`** (src/Task.ts): Comprehensive task management class with advanced features including:
+  - Worker pool management for parallel processing
+  - Step collection and management
+  - Event loading and processing with worker threads
+  - Trajectory data handling
+  - Agent state and session history management
+  - Metrics calculation and aggregation
+  - Support for task context, planning, and previous task information
+
+- **`Step`** (src/Step.ts): Detailed step management class that handles individual step data including:
+  - Timing information (start/end times)
+  - Reasoning and statistics tracking
+  - Comprehensive metrics (tokens, costs, timing, requests)
+  - Lazy-loaded content, dependencies, and descriptions
+  - JSON schema validation using JunieStepSchema
+
+### Schema Definitions
+Comprehensive Zod schemas for data validation and type safety (src/schema.ts):
+
+- **`JunieChain`**: Chain metadata with UUID identification, state management, and error handling
+- **`JunieTask`**: Task definitions with context, planning, agent state, and session history
+- **`JunieStep`**: Step definitions with reasoning, statistics, content, and dependencies
+- **`AgentState`**: Agent state management for AI interactions including issue context and observations
+- **`SessionHistory`**: Session tracking for viewed files, imports, created files, and code sections
+- **`SummaryMetrics`**: Aggregated metrics interface for tokens, costs, and timing across projects and tasks
+- **`JunieStatistics`**: Detailed statistics schema for performance and usage tracking
+- **`StepContent`**: Content structure for LLM responses, action requests, and results
+- **`PreviousTasksInfo`**: Context from previous tasks including agent state and file modifications
+
+### Additional Schemas
+- **Event Schemas** (src/eventSchema.ts): Event data structures for tracking application events and activities
+- **Trajectory Schemas** (src/trajectorySchema.ts): Trajectory and error schemas for agent interaction tracking
+- **Analysis Types** (src/types.ts): Statistical analysis interfaces including aggregates, step statistics, and task analysis structures
 
 ## Development Workflow
 1. **Setup**: Clone the repository and run `bun install`
