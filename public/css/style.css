@@ -1425,6 +1425,37 @@ p {
   max-width: 500px;
 }
 
+.trajectories-table .content-cell-container {
+  position: relative;
+}
+
+.trajectories-table .content-toggle-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+  color: #6c757d;
+  opacity: 0.6;
+}
+
+.trajectories-table .content-toggle-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  color: #495057;
+  opacity: 1.0;
+}
+
 .trajectories-table .content-wrapper {
   max-height: 200px;
   overflow: auto;
@@ -1436,6 +1467,11 @@ p {
   line-height: 1.4;
   overflow-wrap: break-word;
   padding: 8px;
+  transition: max-height 0.3s ease;
+}
+
+.trajectories-table .content-wrapper.expanded {
+  max-height: none;
 }
 
 .trajectories-table .role-user {

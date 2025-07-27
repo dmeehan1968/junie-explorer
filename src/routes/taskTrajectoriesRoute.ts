@@ -64,6 +64,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         <link rel="stylesheet" href="/css/style.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
         <script src="/js/reloadPage.js"></script>
+        <script src="/js/trajectoryToggle.js"></script>
       </head>
       <body>
         <div class="container">
@@ -120,7 +121,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         <tr data-testid="trajectory-error-row-${index}">
                           <td class="timestamp-col">-</td>
                           <td class="role-col">ERROR</td>
-                          <td class="content-col"><div class="content-wrapper">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</div></td>
+                          <td class="content-col">
+                            <div class="content-cell-container">
+                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">⇅</button>
+                              <div class="content-wrapper">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</div>
+                            </div>
+                          </td>
                         </tr>
                       `
         }
@@ -131,7 +137,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         <tr data-testid="trajectory-row-${index}" class="role-${trajectory.role}">
                           <td class="timestamp-col">${trajectory.timestamp.toLocaleString(getLocaleFromRequest(req))}</td>
                           <td class="role-col">${escapeHtml(trajectory.role)}</td>
-                          <td class="content-col"><div class="content-wrapper">${escapeHtml(trajectory.content.trim())}</div></td>
+                          <td class="content-col">
+                            <div class="content-cell-container">
+                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">⇅</button>
+                              <div class="content-wrapper">${escapeHtml(trajectory.content.trim())}</div>
+                            </div>
+                          </td>
                         </tr>
                       `
         }
@@ -141,7 +152,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                       <tr data-testid="trajectory-unknown-row-${index}">
                         <td class="timestamp-col">-</td>
                         <td class="role-col">UNKNOWN</td>
-                        <td class="content-col"><div class="content-wrapper">Unknown trajectory format</div></td>
+                        <td class="content-col">
+                          <div class="content-cell-container">
+                            <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">⇅</button>
+                            <div class="content-wrapper">Unknown trajectory format</div>
+                          </div>
+                        </td>
                       </tr>
                     `
       }).join('')}
