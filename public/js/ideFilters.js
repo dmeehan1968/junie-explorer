@@ -17,7 +17,7 @@ function initializeFilters() {
       if (ide && parsedFilters[ide] !== undefined) {
         ideFilters[ide] = parsedFilters[ide];
         if (!parsedFilters[ide]) {
-          element.classList.add('ide-filter-disabled');
+          element.classList.add('opacity-50', 'grayscale');
         }
       } else {
         ideFilters[ide] = true; // Default to selected
@@ -49,9 +49,9 @@ function toggleIdeFilter(element) {
 
   // Update the visual state
   if (ideFilters[ide]) {
-    element.classList.remove('ide-filter-disabled');
+    element.classList.remove('opacity-50', 'grayscale');
   } else {
-    element.classList.add('ide-filter-disabled');
+    element.classList.add('opacity-50', 'grayscale');
   }
 
   // Save to local storage

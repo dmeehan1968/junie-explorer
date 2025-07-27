@@ -216,12 +216,12 @@ router.get('/', async (req, res) => {
     // Generate HTML
     const html: string = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" data-theme="light">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Junie Explorer</title>
-        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -233,76 +233,76 @@ router.get('/', async (req, res) => {
         <script src="/js/projectSelection.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
-      <body>
-        <div class="container">
-          <div class="header-container">
-            <h1>Junie Explorer</h1>
-            <button id="reload-button" class="reload-button" data-testid="reload-button" onclick="reloadPage()">Reload</button>
+      <body class="bg-base-200 p-5">
+        <div class="max-w-7xl mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
+          <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer</h1>
+            <button id="reload-button" class="btn btn-primary" data-testid="reload-button" onclick="reloadPage()">Reload</button>
           </div>
           ${VersionBanner(jetBrains.version)}
-          <p data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
+          <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
 
-          <div class="ide-filter-toolbar" data-testid="ide-filter-toolbar">
-            <div class="filter-label">Filter by IDE</div>
+          <div class="flex flex-wrap gap-3 mb-5 p-3 bg-base-200 rounded" data-testid="ide-filter-toolbar">
+            <div class="font-medium text-base-content">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
-              <div class="ide-filter" data-testid="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
-                <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" />
+              <div class="ide-filter cursor-pointer transition-all duration-300 p-1 rounded hover:bg-base-300" data-testid="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
+                <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
               </div>
             `).join('')}
-            <div class="project-search">
-              <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)">
+            <div class="ml-auto">
+              <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered input-sm w-64">
             </div>
           </div>
 
-          <div id="projects-graph-container" class="graph-container">
+          <div id="projects-graph-container" class="h-96 mb-5 p-4 bg-base-100 rounded-lg border border-base-300 hidden">
             <canvas id="projectsMetricsChart"></canvas>
           </div>
 
-          <div class="project-selection-header">
-            <div class="select-all-container">
-              <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()">
-              <label for="select-all-projects">Select All</label>
+          <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()" class="checkbox checkbox-primary">
+              <label for="select-all-projects" class="font-medium cursor-pointer">Select All</label>
             </div>
-            <div class="display-options">
-              <div class="radio-group">
-                <div>
-                  <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)">
-                  <label for="display-both">Both</label>
-                </div>
-                <div>
-                  <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)">
-                  <label for="display-cost">Cost</label>
-                </div>
-                <div>
-                  <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)">
-                  <label for="display-tokens">Tokens</label>
-                </div>
+            <div class="flex gap-4">
+              <div class="flex items-center gap-2">
+                <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)" class="radio radio-primary">
+                <label for="display-both" class="cursor-pointer">Both</label>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)" class="radio radio-primary">
+                <label for="display-cost" class="cursor-pointer">Cost</label>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)" class="radio radio-primary">
+                <label for="display-tokens" class="cursor-pointer">Tokens</label>
               </div>
             </div>
           </div>
 
-          <ul class="project-list" data-testid="projects-list">
+          <ul class="space-y-3" data-testid="projects-list">
             ${projects.length > 0
               ? (await Promise.all(projects.map(async project => `
-                  <li class="project-item" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
-                    <div class="project-checkbox-container">
+                  <li class="project-item flex items-center p-4 bg-base-200 border-l-4 border-primary rounded transition-all duration-300 hover:bg-base-300 hover:translate-x-1" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
+                    <div class="mr-4">
                       <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
-                             class="project-checkbox" 
+                             class="project-checkbox checkbox checkbox-primary" 
                              data-project-name="${project.name}" 
                              onchange="handleProjectSelection(this)">
                     </div>
-                    <a href="/project/${encodeURIComponent(project.name)}" class="project-link" data-testid="project-link-${project.name}">
-                      <div class="project-name" data-testid="project-name">${project.name}</div>
-                      <div class="issue-count">${(await project.issues).size} issues</div>
-                      <div class="ide-icons" data-testid="ide-icons">
+                    <a href="/project/${encodeURIComponent(project.name)}" class="flex-1 flex items-center justify-between text-decoration-none hover:text-primary transition-colors" data-testid="project-link-${project.name}">
+                      <div class="flex-1">
+                        <div class="project-name font-bold text-lg text-primary mb-1" data-testid="project-name">${project.name}</div>
+                        <div class="text-sm text-base-content/70">${(await project.issues).size} issues</div>
+                      </div>
+                      <div class="flex gap-1 ml-4" data-testid="ide-icons">
                         ${project.ideNames.map(ide => `
-                          <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+                          <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
                         `).join('')}
                       </div>
                     </a>
                   </li>
                 `))).join('')
-              : '<li data-testid="empty-projects-message">No JetBrains projects found</li>'
+              : '<li class="p-4 text-center text-base-content/70" data-testid="empty-projects-message">No JetBrains projects found</li>'
     }
           </ul>
         </div>
