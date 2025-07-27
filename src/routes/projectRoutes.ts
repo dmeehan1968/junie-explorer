@@ -6,14 +6,37 @@ import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
 import { VersionBanner } from '../utils/versionBanner.js'
+import { ReloadButton } from '../utils/reloadButton.js'
 
 const router = express.Router()
+
+// Function to generate colored status badge based on issue state
+const getStatusBadge = (state: string): string => {
+  const lowerState = state.toLowerCase()
+  
+  // Map states to colors based on original CSS
+  const stateStyles: { [key: string]: string } = {
+    'done': 'bg-green-100 text-green-700 border border-green-200',
+    'completed': 'bg-green-100 text-green-700 border border-green-200',
+    'finished': 'bg-teal-100 text-teal-700 border border-teal-200',
+    'stopped': 'bg-red-100 text-red-800 border border-red-400',
+    'failed': 'bg-red-200 text-red-500 border border-red-200',
+    'in-progress': 'bg-blue-100 text-blue-700 border border-blue-200',
+    'running': 'bg-blue-100 text-blue-700 border border-blue-200',
+    'new': 'bg-yellow-100 text-orange-600 border border-yellow-200',
+    'declined': 'bg-gray-100 text-gray-600 border border-gray-200'
+  }
+  
+  const styleClass = stateStyles[lowerState] || stateStyles[lowerState.replace(/\s+/g, '-')] || 'bg-gray-100 text-gray-600 border border-gray-200'
+  
+  return `<span class="inline-block px-2 py-1 text-xs font-bold rounded ${styleClass} whitespace-nowrap">${state}</span>`
+}
 
 // Function to generate HTML for combined issues table with project summary footer
 const generateIssuesTable = async (project: Project, locale: string | undefined): Promise<string> => {
   const issuesCount = (await project.issues).size
   if (issuesCount === 0) {
-    return '<p data-testid="no-issues-message">No issues found for this project</p>'
+    return '<p class="p-4 text-center text-base-content/70" data-testid="no-issues-message">No issues found for this project</p>'
   }
 
   const sortedIssues = [...(await project.issues).values()].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
@@ -23,65 +46,67 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
   const elapsedTimeSec = elapsedTimeMs / 1000
   const metrics = await project.metrics
   return `
-  <div class="project-summary">
-    <div class="issues-header-flex">
-      <h3 class="issues-header-title">${issuesCount} Project Issue${issuesCount !== 1 ? 's' : ''}</h3>
-      <span class="issues-elapsed-time" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
+  <div class="mb-5 bg-gray-200 rounded shadow-sm p-4">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-primary">${issuesCount} Project Issue${issuesCount !== 1 ? 's' : ''}</h3>
+      <span class="font-bold text-base-content" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
     </div>
-    <table class="project-summary-table issues-table" data-testid="issues-table">
-      <thead>
-        <tr>
-          <th class="text-left width-30">Issue Description</th>
-          <th class="text-left">Timestamp</th>
-          <th class="text-right">Input Tokens</th>
-          <th class="text-right">Output Tokens</th>
-          <th class="text-right">Cache Tokens</th>
-          <th class="text-right">Cost</th>
-          <th class="text-right">Time</th>
-          <th class="text-right">Status</th>
-        </tr>
-        <tr class="summary-row">
-          <td class="text-left" data-testid="header-summary-label">Project Summary</td>
-          <td class="text-left"></td>
-          <td class="text-right" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
-          <td class="text-right" data-testid="header-summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
-          <td class="text-right" data-testid="header-summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
-          <td class="text-right" data-testid="header-summary-cost">${metrics.cost.toFixed(2)}</td>
-          <td class="text-right" data-testid="header-summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
-          <td class="text-right"></td>
-        </tr>
-      </thead>
-      <tbody>
-        ${(await Promise.all(sortedIssues.map(async issue => `
-        <tr class="clickable-row" onclick="window.location.href='/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}'">
-          <td class="text-left" data-testid="issue-description">
-            ${escapeHtml(issue.name)}
-          </td>
-          <td class="text-left" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString(locale)}</td>
-          <td class="text-right" data-testid="issue-input-tokens">${formatNumber((await issue.metrics).inputTokens)}</td>
-          <td class="text-right" data-testid="issue-output-tokens">${formatNumber((await issue.metrics).outputTokens)}</td>
-          <td class="text-right" data-testid="issue-cache-tokens">${formatNumber((await issue.metrics).cacheTokens)}</td>
-          <td class="text-right" data-testid="issue-cost">${(await issue.metrics).cost.toFixed(4)}</td>
-          <td class="text-right" data-testid="issue-total-time">${formatSeconds((await issue.metrics).time / 1000)}</td>
-          <td class="text-right" data-testid="issue-status">
-            <span class="issue-state state-${issue.state.toLowerCase()}">${issue.state}</span>
-          </td>
-        </tr>
-        `))).join('')}
-      </tbody>
-      <tfoot>
-        <tr class="summary-row">
-          <td class="text-left" data-testid="summary-label">Project Summary</td>
-          <td class="text-left"></td>
-          <td class="text-right" data-testid="summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
-          <td class="text-right" data-testid="summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
-          <td class="text-right" data-testid="summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
-          <td class="text-right" data-testid="summary-cost">${metrics.cost.toFixed(2)}</td>
-          <td class="text-right" data-testid="summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
-          <td class="text-right"></td>
-        </tr>
-      </tfoot>
-    </table>
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full bg-white" data-testid="issues-table">
+        <thead>
+          <tr class="!bg-gray-100">
+            <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
+            <th class="text-left whitespace-nowrap">Timestamp</th>
+            <th class="text-right whitespace-nowrap">Input Tokens</th>
+            <th class="text-right whitespace-nowrap">Output Tokens</th>
+            <th class="text-right whitespace-nowrap">Cache Tokens</th>
+            <th class="text-right whitespace-nowrap">Cost</th>
+            <th class="text-right whitespace-nowrap">Time</th>
+            <th class="text-right whitespace-nowrap">Status</th>
+          </tr>
+          <tr class="!bg-gray-50 font-bold text-black">
+            <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
+            <td class="text-left whitespace-nowrap"></td>
+            <td class="text-right whitespace-nowrap" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="header-summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="header-summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="header-summary-cost">${metrics.cost.toFixed(2)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="header-summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
+            <td class="text-right whitespace-nowrap"></td>
+          </tr>
+        </thead>
+        <tbody>
+          ${(await Promise.all(sortedIssues.map(async issue => `
+          <tr class="cursor-pointer hover:!bg-blue-100 transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md" onclick="window.location.href='/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}'">
+            <td class="text-left font-bold text-primary hover:text-primary-focus whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
+              ${escapeHtml(issue.name)}
+            </td>
+            <td class="text-left whitespace-nowrap" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString(locale)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens">${formatNumber((await issue.metrics).inputTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens">${formatNumber((await issue.metrics).outputTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens">${formatNumber((await issue.metrics).cacheTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="issue-cost">${(await issue.metrics).cost.toFixed(4)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="issue-total-time">${formatSeconds((await issue.metrics).time / 1000)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="issue-status">
+              ${getStatusBadge(issue.state)}
+            </td>
+          </tr>
+          `))).join('')}
+        </tbody>
+        <tfoot>
+          <tr class="!bg-gray-50 font-bold border-t-2 border-gray-300">
+            <td class="text-left whitespace-nowrap" data-testid="summary-label">Project Summary</td>
+            <td class="text-left whitespace-nowrap"></td>
+            <td class="text-right whitespace-nowrap" data-testid="summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="summary-cost">${metrics.cost.toFixed(2)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
+            <td class="text-right whitespace-nowrap"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </div>
 `
 }
@@ -167,12 +192,12 @@ router.get('/project/:projectName', async (req, res) => {
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" data-theme="light">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${project.name} Issues</title>
-        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -186,28 +211,30 @@ router.get('/project/:projectName', async (req, res) => {
         <script src="/js/issueGraph.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
-      <body>
-        <div class="container">
-          <div class="header-container">
-            <h1>Junie Explorer: ${project.name}</h1>
-            <button id="reload-button" class="reload-button" data-testid="reload-button" onclick="reloadPage()">Reload</button>
+      <body class="bg-base-200 p-5">
+        <div class="max-w-7xl mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
+          <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${project.name}</h1>
+            ${ReloadButton()}
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
-              <li class="breadcrumb-item active">${project.name}</li>
-            </ol>
+          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation" class="mb-5">
+            <div class="breadcrumbs">
+              <ul>
+                <li><a href="/" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-projects">Projects</a></li>
+                <li class="text-base-content/70">${project.name}</li>
+              </ul>
+            </div>
           </nav>
 
-          <div class="ide-icons" data-testid="ide-icons">
+          <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
             `).join('')}
           </div>
 
           ${(await project.issues).size > 0
-      ? `<div class="graph-container" data-testid="cost-over-time-graph">
+      ? `<div class="h-96 mb-5 p-4 bg-base-100 rounded-lg border border-base-300" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>`
       : ''

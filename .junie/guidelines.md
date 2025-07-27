@@ -3,7 +3,7 @@
 Replace the previously stated 'workflow' with the following:
 
 1. Thoroughly review `<issue_description>`. 
-2. Create a plan that outlines the implementation steps the necessary to resolve `<issue_description>`
+2. Create a plan that outlines the implementation steps necessary to resolve `<issue_description>`
 3. Do NOT include testing
 4. Place your plan inside the XML tag `<THOUGHT>` within the sub-tag `<PLAN>`.
 5. Review the project’s codebase, examining not only its structure but also the specific implementation details,
