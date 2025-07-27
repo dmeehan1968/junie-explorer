@@ -260,20 +260,20 @@ router.get('/', async (req, res) => {
 
           <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
             <div class="flex items-center gap-2">
-              <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()" class="checkbox checkbox-primary">
+              <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()" class="checkbox checkbox-primary checkbox-sm">
               <label for="select-all-projects" class="font-medium cursor-pointer">Select All</label>
             </div>
             <div class="flex gap-4">
               <div class="flex items-center gap-2">
-                <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)" class="radio radio-primary">
+                <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
                 <label for="display-both" class="cursor-pointer">Both</label>
               </div>
               <div class="flex items-center gap-2">
-                <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)" class="radio radio-primary">
+                <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
                 <label for="display-cost" class="cursor-pointer">Cost</label>
               </div>
               <div class="flex items-center gap-2">
-                <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)" class="radio radio-primary">
+                <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
                 <label for="display-tokens" class="cursor-pointer">Tokens</label>
               </div>
             </div>
@@ -285,16 +285,16 @@ router.get('/', async (req, res) => {
                   <li class="project-item flex items-center p-4 bg-base-200 border-l-4 border-primary rounded transition-all duration-300 hover:bg-base-300 hover:translate-x-1" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
                     <div class="mr-4">
                       <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
-                             class="project-checkbox checkbox checkbox-primary" 
+                             class="project-checkbox checkbox checkbox-primary checkbox-sm" 
                              data-project-name="${project.name}" 
                              onchange="handleProjectSelection(this)">
                     </div>
                     <a href="/project/${encodeURIComponent(project.name)}" class="flex-1 flex items-center justify-between text-decoration-none hover:text-primary transition-colors" data-testid="project-link-${project.name}">
-                      <div class="flex-1">
-                        <div class="project-name font-bold text-lg text-primary mb-1" data-testid="project-name">${project.name}</div>
-                        <div class="text-sm text-base-content/70">${(await project.issues).size} issues</div>
+                      <div class="flex items-center justify-between flex-1">
+                        <div class="project-name font-bold text-lg text-primary" data-testid="project-name">${project.name}</div>
+                        <div class="text-sm text-base-content/70 mr-4">${(await project.issues).size} issues</div>
                       </div>
-                      <div class="flex gap-1 ml-4" data-testid="ide-icons">
+                      <div class="flex gap-1" data-testid="ide-icons">
                         ${project.ideNames.map(ide => `
                           <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
                         `).join('')}
