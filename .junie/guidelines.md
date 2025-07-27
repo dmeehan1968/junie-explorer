@@ -17,49 +17,92 @@ Junie Explorer is a full-stack web application built with Node.js and TypeScript
 ## Directory Structure
 ```
 junie-explorer/
+├── .gitignore               # Git ignore file
 ├── .junie/                  # Project documentation and guidelines
 │   └── guidelines.md        # Project guidelines and documentation
+├── .npmrc                   # NPM configuration
+├── .nvmrc                   # Node version specification
+├── CHANGELOG.md             # Project changelog
+├── CODE_OF_CONDUCT.md       # Code of conduct
+├── CONTRIBUTING.md          # Contributing guidelines
+├── LICENSE                  # Project license
+├── README.md                # Project readme
+├── bun.lock                 # Bun lockfile
+├── cucumber.js              # Cucumber configuration
+├── docs/                    # Documentation
+│   └── overview.md          # Project overview documentation
 ├── features/                # Gherkin feature files for requirements documentation
 │   ├── homepage.feature     # Homepage requirements specification
-│   ├── projects.feature     # Projects page requirements
 │   ├── issue.feature        # Issue page requirements
+│   ├── projects.feature     # Projects page requirements
 │   └── task.feature         # Task page requirements
+├── fixtures/                # Test fixtures and sample data
+├── package.json             # Project dependencies and scripts
 ├── public/                  # Static assets
 │   ├── css/                 # CSS stylesheets
 │   │   └── style.css        # Main stylesheet
-│   └── js/                  # JavaScript files
-│       ├── ideFilters.js    # Client-side script for IDE filtering
-│       ├── issueGraph.js    # Client-side script for issue graph visualization
-│       ├── projectSelection.js # Client-side script for project selection
-│       ├── reloadPage.js    # Client-side script for page reloading
-│       ├── taskRawData.js   # Client-side script for task raw data handling
-│       ├── taskStepGraph.js # Client-side script for task step graph visualization
-│       └── taskStepRawData.js # Client-side script for task step raw data handling
+│   ├── icons/               # Icon assets
+│   │   └── favicon.png      # Site favicon
+│   ├── js/                  # JavaScript files
+│   │   ├── collapsibleSections.js # Client-side script for collapsible sections
+│   │   ├── ideFilters.js    # Client-side script for IDE filtering
+│   │   ├── issueGraph.js    # Client-side script for issue graph visualization
+│   │   ├── projectSelection.js # Client-side script for project selection
+│   │   ├── reloadPage.js    # Client-side script for page reloading
+│   │   ├── taskActionChart.js # Client-side script for task action charts
+│   │   ├── taskEventChart.js # Client-side script for task event charts
+│   │   ├── taskEventFilters.js # Client-side script for task event filtering
+│   │   ├── taskEventLlmChart.js # Client-side script for task event LLM charts
+│   │   ├── taskRawData.js   # Client-side script for task raw data handling
+│   │   ├── taskStepGraph.js # Client-side script for task step graph visualization
+│   │   ├── taskStepRawData.js # Client-side script for task step raw data handling
+│   │   ├── taskStepRepData.js # Client-side script for task step representation data
+│   │   └── trajectoryToggle.js # Client-side script for trajectory toggling
+│   └── version.txt          # Version information file
+├── reports/                 # Test and analysis reports
+│   └── cucumber-report.html # Cucumber test report
 ├── src/                     # Source code
-│   ├── chart.d.ts           # Type definitions for chart library
-│   ├── index.ts             # Main application entry point
-│   ├── types.ts             # Type definitions
+│   ├── bun/                 # Bun-specific utilities
+│   │   └── public.ts        # Public asset handling for Bun
 │   ├── routes/              # Route handlers
 │   │   ├── homeRoutes.ts    # Homepage route handler
 │   │   ├── issueRoutes.ts   # Issue page route handler
 │   │   ├── notFoundRoutes.ts # Not found page route handler
 │   │   ├── projectRoutes.ts # Project page route handler
-│   │   └── taskRoutes.ts    # Task page route handler
+│   │   ├── taskEventsRoute.ts # Task events route handler
+│   │   ├── taskStepDataRoute.ts # Task step data route handler
+│   │   ├── taskStepRepresentationsRoute.ts # Task step representations route handler
+│   │   ├── taskStepsRoute.ts # Task steps route handler
+│   │   └── taskTrajectoriesRoute.ts # Task trajectories route handler
+│   ├── services/            # Service layer
+│   │   └── representationService.ts # Representation data service
 │   ├── utils/               # Utility functions
 │   │   ├── escapeHtml.ts    # HTML escaping utilities
+│   │   ├── getLocaleFromRequest.ts # Locale detection utilities
 │   │   ├── jetBrainsPath.ts # JetBrains path utilities
 │   │   ├── metricsUtils.ts  # Metrics calculation utilities
-│   │   └── timeUtils.ts     # Time and date utilities
-│   ├── Issue.ts         # Issue class implementation
-│   ├── Project.ts       # Project class implementation
-│   ├── Step.ts          # Step class implementation
-│   ├── Task.ts          # Task class implementation
-│   ├── jetbrains.ts     # Main JetBrains class implementation
-│   └── schema.ts        # Zod schemas for data validation
-├── dist/                    # Compiled JavaScript (generated)
-├── package.json             # Project dependencies and scripts
+│   │   ├── representationFileService.ts # Representation file handling
+│   │   ├── representationParser.ts # Representation data parsing
+│   │   ├── representationRenderer.ts # Representation rendering utilities
+│   │   ├── timeUtils.ts     # Time and date utilities
+│   │   └── versionBanner.ts # Version banner utilities
+│   ├── workers/             # Background workers
+│   │   └── loadEventsWorker.ts # Event loading worker
+│   ├── Issue.ts             # Issue class implementation
+│   ├── Project.ts           # Project class implementation
+│   ├── Step.ts              # Step class implementation
+│   ├── Task.ts              # Task class implementation
+│   ├── chart.d.ts           # Type definitions for chart library
+│   ├── createServer.ts      # Server creation utilities
+│   ├── eventSchema.ts       # Event data schemas
+│   ├── index.ts             # Main application entry point
+│   ├── jetbrains.ts         # Main JetBrains class implementation
+│   ├── schema.ts            # Zod schemas for data validation
+│   ├── trajectorySchema.ts  # Trajectory data schemas
+│   └── types.ts             # Type definitions
 ├── tsconfig.json            # TypeScript configuration
-└── README.md                # Project readme
+├── dist/                    # Compiled JavaScript (generated)
+└── node_modules/            # Dependencies (generated)
 ```
 
 ## Tech Stack
