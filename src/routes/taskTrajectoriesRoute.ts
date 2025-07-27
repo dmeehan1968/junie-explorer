@@ -123,7 +123,24 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                           <td class="role-col">ERROR</td>
                           <td class="content-col">
                             <div class="content-cell-container">
-                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">⇅</button>
+                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  >
+                                    <path d="M21 21l-6-6m6 6v-4.8m0 4.8h-4.8" />
+                                    <path d="M3 16.2V21m0 0h4.8M3 21l6-6" />
+                                    <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6" />
+                                    <path d="M3 7.8V3m0 0h4.8M3 3l6 6" />
+                                </svg>
+                              </button>
                               <div class="content-wrapper">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</div>
                             </div>
                           </td>
@@ -139,7 +156,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                           <td class="role-col">${escapeHtml(trajectory.role)}</td>
                           <td class="content-col">
                             <div class="content-cell-container">
-                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">⇅</button>
+                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                  <path d="M8 2L12 6H9V10H7V6H4L8 2Z"/>
+                                  <path d="M8 14L4 10H7V6H9V10H12L8 14Z"/>
+                                </svg>
+                              </button>
                               <div class="content-wrapper">${escapeHtml(trajectory.content.trim())}</div>
                             </div>
                           </td>
@@ -154,7 +176,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         <td class="role-col">UNKNOWN</td>
                         <td class="content-col">
                           <div class="content-cell-container">
-                            <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">⇅</button>
+                            <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 2L12 6H9V10H7V6H4L8 2Z"/>
+                                <path d="M8 14L4 10H7V6H9V10H12L8 14Z"/>
+                              </svg>
+                            </button>
                             <div class="content-wrapper">Unknown trajectory format</div>
                           </div>
                         </td>
