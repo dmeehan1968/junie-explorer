@@ -41,10 +41,17 @@ function toggleEventTypeFilter(element) {
   eventTypeFilters[eventType] = !eventTypeFilters[eventType];
   
   // Update visual state
+  const label = element.querySelector('label');
   if (eventTypeFilters[eventType]) {
     element.classList.remove('event-filter-disabled');
+    if (label) {
+      label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-green-100 border border-green-300 text-green-700';
+    }
   } else {
     element.classList.add('event-filter-disabled');
+    if (label) {
+      label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+    }
   }
   
   // Update all/none toggle state
@@ -67,21 +74,35 @@ function toggleAllEventTypes() {
   const eventFilters = document.querySelectorAll('.event-filter[data-event-type]');
   eventFilters.forEach(filter => {
     const eventType = filter.getAttribute('data-event-type');
+    const label = filter.querySelector('label');
     
     eventTypeFilters[eventType] = shouldEnableAll;
     
     if (shouldEnableAll) {
       filter.classList.remove('event-filter-disabled');
+      if (label) {
+        label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-green-100 border border-green-300 text-green-700';
+      }
     } else {
       filter.classList.add('event-filter-disabled');
+      if (label) {
+        label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+      }
     }
   });
   
   // Update all/none toggle visual state
+  const allNoneLabel = allNoneElement.querySelector('label');
   if (shouldEnableAll) {
     allNoneElement.classList.remove('event-filter-disabled');
+    if (allNoneLabel) {
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700';
+    }
   } else {
     allNoneElement.classList.add('event-filter-disabled');
+    if (allNoneLabel) {
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+    }
   }
   
   // Apply filters
@@ -91,6 +112,7 @@ function toggleAllEventTypes() {
 // Update all/none toggle based on individual filter states
 function updateAllNoneToggle() {
   const allNoneElement = document.querySelector('.all-none-toggle');
+  const allNoneLabel = allNoneElement.querySelector('label');
   
   const eventTypes = Object.keys(eventTypeFilters);
   const enabledCount = eventTypes.filter(type => eventTypeFilters[type]).length;
@@ -98,22 +120,32 @@ function updateAllNoneToggle() {
   if (enabledCount === eventTypes.length) {
     // All enabled
     allNoneElement.classList.remove('event-filter-disabled');
+    if (allNoneLabel) {
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700';
+    }
   } else if (enabledCount === 0) {
     // None enabled
     allNoneElement.classList.add('event-filter-disabled');
+    if (allNoneLabel) {
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+    }
   } else {
     // Some enabled - show as enabled since we have partial selection
     allNoneElement.classList.remove('event-filter-disabled');
+    if (allNoneLabel) {
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700';
+    }
   }
 }
 
 // Apply event type filters to the events table
 function applyEventTypeFilters() {
-  const eventRows = document.querySelectorAll('.events-table tbody tr');
+  const eventRows = document.querySelectorAll('table[data-testid="events-table"] tbody tr');
   let visibleCount = 0;
   
   eventRows.forEach(row => {
-    const eventTypeCell = row.querySelector('.event-type-col');
+    // The event type is in the second cell (index 1)
+    const eventTypeCell = row.cells[1];
     if (eventTypeCell) {
       const eventTypeText = eventTypeCell.textContent.trim().replace('(parseError)', '').trim();
       const shouldShow = eventTypeFilters[eventTypeText];
@@ -128,14 +160,14 @@ function applyEventTypeFilters() {
   });
   
   // Show message if no events are visible
-  const eventsTable = document.querySelector('.events-table');
+  const eventsTable = document.querySelector('table[data-testid="events-table"]');
   let noVisibleMessage = document.getElementById('no-visible-events-message');
   
   if (visibleCount === 0 && eventsTable) {
     if (!noVisibleMessage) {
       noVisibleMessage = document.createElement('div');
       noVisibleMessage.id = 'no-visible-events-message';
-      noVisibleMessage.className = 'no-events';
+      noVisibleMessage.className = 'p-4 text-center text-base-content/70';
       noVisibleMessage.textContent = 'No events match the selected filters';
       eventsTable.parentNode.insertBefore(noVisibleMessage, eventsTable.nextSibling);
     }

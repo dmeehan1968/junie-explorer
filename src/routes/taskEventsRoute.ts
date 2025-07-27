@@ -7,6 +7,7 @@ import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../utils/versionBanner.js'
+import { ReloadButton } from '../utils/reloadButton.js'
 
 const router = express.Router()
 
@@ -196,13 +197,13 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" data-theme="light">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task ${task.id} Events</title>
-        <link rel="stylesheet" href="/css/style.css">
-        <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
+        <link rel="stylesheet" href="/css/app.css">
+        <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
         ${hasLlmEvents
@@ -237,60 +238,62 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
         <script src="/js/taskEventLlmChart.js"></script>
         <script src="/js/taskActionChart.js"></script>
       </head>
-      <body>
-        <div class="container">
-          <div class="header-container">
-            <h1>Junie Explorer: Task ${task.id} Events</h1>
-            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+      <body class="bg-base-200 p-5">
+        <div class="max-w-7xl mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
+          <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Task ${task.id} Events</h1>
+            ${ReloadButton()}
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-issue-name">${issue?.name}</a></li>
-              <li class="breadcrumb-item active">Task ${task.id} Events</li>
-            </ol>
+          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation" class="mb-5">
+            <div class="breadcrumbs">
+              <ul>
+                <li><a href="/" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-projects">Projects</a></li>
+                <li><a href="/project/${encodeURIComponent(projectName)}" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-project-name">${projectName}</a></li>
+                <li><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-issue-name">${issue?.name}</a></li>
+                <li class="text-base-content/70">Task ${task.id} Events</li>
+              </ul>
+            </div>
           </nav>
 
-          <div class="ide-icons">
+          <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
             `).join('')}
           </div>
 
-          <div class="task-details">
-            <div class="task-meta">
-              <div class="task-created">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
-              <div class="task-download">
-                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class="reload-button">Download Events as JSONL</a>
+          <div class="mb-5 bg-gray-200 rounded shadow-sm p-4">
+            <div class="flex justify-between items-center mb-4">
+              <div class="text-base-content">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
+              <div>
+                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class="btn btn-primary btn-sm">Download Events as JSONL</a>
               </div>
             </div>
             ${task.context.description ? `
-              <div class="task-description">
-                <h3>Task Description</h3>
-                ${marked(escapeHtml(task.context.description))}
+              <div class="mt-4">
+                <h3 class="text-xl font-bold text-primary mb-2">Task Description</h3>
+                <div class="prose max-w-none">${marked(escapeHtml(task.context.description))}</div>
               </div>
             ` : ''}
           </div>
 
           ${hasLlmEvents ? `
-            <div class="collapsible-section" data-testid="event-metrics-section">
-              <div class="collapsible-header" data-testid="event-metrics-header">
-                <h3>Event Metrics</h3>
-                <span class="collapsible-toggle">Click to collapse</span>
+            <div class="collapsible-section mb-5 bg-base-100 rounded-lg border border-base-300" data-testid="event-metrics-section">
+              <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-t-lg hover:bg-base-200 transition-colors duration-200" data-testid="event-metrics-header">
+                <h3 class="text-xl font-bold text-primary m-0">Event Metrics</h3>
+                <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to collapse</span>
               </div>
-              <div class="collapsible-content">
-                <div class="provider-filters">
-                  <div class="filter-controls">
-                    <label><input type="checkbox" id="all-providers" checked> All</label>
-                    <label><input type="checkbox" id="none-providers"> None</label>
+              <div class="collapsible-content px-4 pb-4 block transition-all duration-300">
+                <div class="mb-4">
+                  <div class="flex flex-wrap gap-2 items-center">
+                    <label class="flex items-center gap-1"><input type="checkbox" id="all-providers" checked class="checkbox checkbox-sm"> All</label>
+                    <label class="flex items-center gap-1"><input type="checkbox" id="none-providers" class="checkbox checkbox-sm"> None</label>
                     ${llmGraphData.providers.map(provider => `
-                      <label><input type="checkbox" class="provider-checkbox" data-provider="${provider}" checked> ${provider}</label>
+                      <label class="flex items-center gap-1"><input type="checkbox" class="provider-checkbox checkbox checkbox-sm" data-provider="${provider}" checked> ${provider}</label>
                     `).join('')}
                   </div>
                 </div>
-                <div class="graph-container">
+                <div class="w-full h-96">
                   <canvas id="llmMetricsChart"></canvas>
                 </div>
               </div>
@@ -298,14 +301,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
           ` : ''}
 
           ${events.length > 0 ? `
-            <div class="collapsible-section collapsed" data-testid="event-timeline-section">
-              <div class="collapsible-header" data-testid="event-timeline-header">
-                <h3>Event Timeline</h3>
-                <span class="collapsible-toggle">Click to expand</span>
+            <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed" data-testid="event-timeline-section">
+              <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-lg hover:bg-base-200 transition-colors duration-200" data-testid="event-timeline-header">
+                <h3 class="text-xl font-bold text-primary m-0">Event Timeline</h3>
+                <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
               </div>
-              <div class="collapsible-content">
-                <div class="event-timeline-container">
-                  <canvas id="event-timeline-chart" class="event-timeline-chart"></canvas>
+              <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
+                <div class="w-full">
+                  <canvas id="event-timeline-chart" class="w-full max-w-full border border-base-300 rounded bg-base-100 shadow-sm"></canvas>
                 </div>
               </div>
             </div>
@@ -323,14 +326,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
           ` : ''}
 
           ${hasActionEvents ? `
-            <div class="collapsible-section collapsed" data-testid="action-timeline-section">
-              <div class="collapsible-header" data-testid="action-timeline-header">
-                <h3>Action Timeline</h3>
-                <span class="collapsible-toggle">Click to expand</span>
+            <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed" data-testid="action-timeline-section">
+              <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-lg hover:bg-base-200 transition-colors duration-200" data-testid="action-timeline-header">
+                <h3 class="text-xl font-bold text-primary m-0">Action Timeline</h3>
+                <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
               </div>
-              <div class="collapsible-content">
-                <div class="action-timeline-container">
-                  <canvas id="action-timeline-chart" class="action-timeline-chart"></canvas>
+              <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
+                <div class="w-full">
+                  <canvas id="action-timeline-chart" class="w-full max-w-full border border-base-300 rounded bg-base-100 shadow-sm"></canvas>
                 </div>
               </div>
             </div>
@@ -350,21 +353,21 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
           ` : ''}
 
           ${events.length > 0 ? `
-            <div class="collapsible-section collapsed" data-testid="event-statistics-section">
-              <div class="collapsible-header" data-testid="event-statistics-header">
-                <h3>Event Type Statistics</h3>
-                <span class="collapsible-toggle">Click to expand</span>
+            <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed" data-testid="event-statistics-section">
+              <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-lg hover:bg-base-200 transition-colors duration-200" data-testid="event-statistics-header">
+                <h3 class="text-xl font-bold text-primary m-0">Event Type Statistics</h3>
+                <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
               </div>
-              <div class="collapsible-content">
-                <div class="event-type-statistics">
-                  <table class="event-stats-table" data-testid="event-stats-table">
+              <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
+                <div class="overflow-x-auto">
+                  <table class="table table-zebra w-full bg-white text-sm" data-testid="event-stats-table">
                     <thead>
-                      <tr>
-                        <th class="event-type-col">Event Type</th>
-                        <th class="count-duration-col">Sample Count</th>
-                        <th class="min-duration-col">Min Duration (ms)</th>
-                        <th class="max-duration-col">Max Duration (ms)</th>
-                        <th class="avg-duration-col">Avg Duration (ms)</th>
+                      <tr class="!bg-gray-100">
+                        <th class="text-left w-2/5 whitespace-nowrap">Event Type</th>
+                        <th class="text-right whitespace-nowrap">Sample Count</th>
+                        <th class="text-right whitespace-nowrap">Min Duration (ms)</th>
+                        <th class="text-right whitespace-nowrap">Max Duration (ms)</th>
+                        <th class="text-right whitespace-nowrap">Avg Duration (ms)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -400,11 +403,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
 
         statsRows.push(`
                             <tr data-testid="event-stats-row-${escapeHtml(eventType)}">
-                              <td class="event-type-col">${escapeHtml(eventType)}</td>
-                              <td class="count-duration-col">${durations.length}</td>
-                              <td class="min-duration-col">${min}</td>
-                              <td class="max-duration-col">${max}</td>
-                              <td class="avg-duration-col">${Math.round(avg)}</td>
+                              <td class="text-left whitespace-normal break-words w-2/5">${escapeHtml(eventType)}</td>
+                              <td class="text-right whitespace-nowrap">${durations.length}</td>
+                              <td class="text-right whitespace-nowrap">${min}</td>
+                              <td class="text-right whitespace-nowrap">${max}</td>
+                              <td class="text-right whitespace-nowrap">${Math.round(avg)}</td>
                             </tr>
                           `)
       }
@@ -419,15 +422,15 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
           ` : ''}
 
           ${events.length > 0 ? `
-            <div class="event-filters">
-              <div class="event-filter-toolbar">
-                <div class="filter-label">Filter by Event Type:</div>
-                <div class="event-filter all-none-toggle" data-testid="all-none-toggle">
-                  <label>All/None</label>
+            <div class="mb-5">
+              <div class="flex flex-wrap gap-2 mb-5 p-4 bg-base-200 rounded items-center">
+                <div class="font-bold mr-2 flex items-center">Filter by Event Type:</div>
+                <div class="cursor-pointer transition-all duration-300 rounded flex items-center gap-1 event-filter all-none-toggle" data-testid="all-none-toggle">
+                  <label class="cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700">All/None</label>
                 </div>
                 ${(await task.eventTypes).map(eventType => `
-                  <div class="event-filter" data-event-type="${escapeHtml(eventType)}" data-testid="event-filter-${escapeHtml(eventType)}">
-                    <label>${escapeHtml(eventType)}</label>
+                  <div class="cursor-pointer transition-all duration-300 rounded flex items-center gap-1 event-filter" data-event-type="${escapeHtml(eventType)}" data-testid="event-filter-${escapeHtml(eventType)}">
+                    <label class="cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-green-100 border border-green-300 text-green-700">${escapeHtml(eventType)}</label>
                   </div>
                 `).join('')}
               </div>
@@ -436,16 +439,17 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
 
           ${events.length > 0
       ? `
-              <table class="events-table" data-testid="events-table">
-                <thead>
-                  <tr>
-                    <th class="timestamp-col">Timestamp</th>
-                    <th class="event-type-col">Event Type</th>
-                    <th class="json-col">JSON</th>
-                    <th class="cost-col">Cost</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <div class="overflow-x-auto">
+                <table class="table w-full bg-white" data-testid="events-table">
+                  <thead>
+                    <tr class="!bg-gray-100">
+                      <th class="text-left whitespace-nowrap w-fit">Timestamp</th>
+                      <th class="text-left whitespace-nowrap w-fit">Event Type</th>
+                      <th class="text-left whitespace-nowrap max-w-2xl">JSON</th>
+                      <th class="text-right whitespace-nowrap w-fit">Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
                   ${events.map((eventRecord, index) => {
         // Calculate timestamp display
         let timestampDisplay = '-'
@@ -465,15 +469,15 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
 
         return `
                       <tr data-testid="event-row-${index}">
-                        <td class="timestamp-col">${timestampDisplay}</td>
-                        <td class="event-type-col ${eventRecord.parseError ? 'error' : ''}">
+                        <td class="text-left whitespace-nowrap w-fit">${timestampDisplay}</td>
+                        <td class="text-left whitespace-nowrap w-fit ${eventRecord.parseError ? 'bg-red-100 text-red-800' : ''}">
                           ${escapeHtml(eventRecord.event.type)}
                           ${eventRecord.parseError ? '(parseError)' : ''}
                         </td>
-                        <td class="json-col">
-                          <div class="json-content">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
+                        <td class="text-left max-w-2xl">
+                          <div class="max-h-48 overflow-auto bg-gray-50 p-2 rounded font-mono text-xs whitespace-pre break-all">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
                         </td>
-                        <td class="cost-col">
+                        <td class="text-right whitespace-nowrap w-fit">
                           ${eventRecord.event.type === 'LlmResponseEvent' ? eventRecord.event.answer.cost.toFixed(4) : '-'}  
                         </td>
                       </tr>
@@ -481,14 +485,15 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
       }).join('')}
                 </tbody>
                 <tfoot>
-                  <tr>
-                    <td colspan="3" style="text-align: right">Total Cost</td>
-                    <td class="cost-col">${cost.toFixed(4)}</td>
+                  <tr class="!bg-gray-50 font-bold border-t-2 border-gray-300">
+                    <td colspan="3" class="text-right">Total Cost</td>
+                    <td class="text-right whitespace-nowrap">${cost.toFixed(4)}</td>
                   </tr>
                 </tfoot>
-              </table>
+                </table>
+              </div>
             `
-      : '<div class="no-events" data-testid="no-events-message">No events found for this task</div>'
+      : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
     }
         </div>
 
