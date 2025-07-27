@@ -1,11 +1,36 @@
 import express from 'express'
 import fs from 'fs-extra'
-import path from 'node:path'
 import { marked } from 'marked'
+import path from 'node:path'
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../utils/versionBanner.js'
+
+// SVG icons for expand and collapse states
+const expandIcon = `<svg 
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#000000"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 21l-6-6m6 6v-4.8m0 4.8h-4.8" />
+  <path d="M3 16.2V21m0 0h4.8M3 21l6-6" />
+  <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6" />
+  <path d="M3 7.8V3m0 0h4.8M3 3l6 6" />
+</svg>`
+
+const collapseIcon = `<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M20 20L15 15M15 15V19M15 15H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M4 20L9 15M9 15V19M9 15H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M20 4L15 9M15 9V5M15 9H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M4 4L9 9M9 9V5M9 9H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`
 
 const router = express.Router()
 
@@ -29,7 +54,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories/downl
     const filename = path.basename(task.trajectoriesFile)
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
     res.setHeader('Content-Type', 'application/jsonl')
-    
+
     res.sendFile(path.resolve(task.trajectoriesFile))
   } catch (error) {
     console.error('Error downloading trajectories file:', error)
@@ -123,23 +148,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                           <td class="role-col">ERROR</td>
                           <td class="content-col">
                             <div class="content-cell-container">
-                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#000000"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  >
-                                    <path d="M21 21l-6-6m6 6v-4.8m0 4.8h-4.8" />
-                                    <path d="M3 16.2V21m0 0h4.8M3 21l6-6" />
-                                    <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6" />
-                                    <path d="M3 7.8V3m0 0h4.8M3 3l6 6" />
-                                </svg>
+                              <button class="content-toggle-btn expand-btn" onclick="toggleContentExpansion(this)" title="Expand content">
+                                ${expandIcon}
+                              </button>
+                              <button class="content-toggle-btn collapse-btn" onclick="toggleContentExpansion(this)" title="Collapse content" style="display: none;">
+                                ${collapseIcon}
                               </button>
                               <div class="content-wrapper">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</div>
                             </div>
@@ -156,11 +169,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                           <td class="role-col">${escapeHtml(trajectory.role)}</td>
                           <td class="content-col">
                             <div class="content-cell-container">
-                              <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                  <path d="M8 2L12 6H9V10H7V6H4L8 2Z"/>
-                                  <path d="M8 14L4 10H7V6H9V10H12L8 14Z"/>
-                                </svg>
+                              <button class="content-toggle-btn expand-btn" onclick="toggleContentExpansion(this)" title="Expand content">
+                                ${expandIcon}
+                              </button>
+                              <button class="content-toggle-btn collapse-btn" onclick="toggleContentExpansion(this)" title="Collapse content" style="display: none;">
+                                ${collapseIcon}
                               </button>
                               <div class="content-wrapper">${escapeHtml(trajectory.content.trim())}</div>
                             </div>
@@ -176,11 +189,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         <td class="role-col">UNKNOWN</td>
                         <td class="content-col">
                           <div class="content-cell-container">
-                            <button class="content-toggle-btn" onclick="toggleContentExpansion(this)" title="Toggle expand/collapse">
-                              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 2L12 6H9V10H7V6H4L8 2Z"/>
-                                <path d="M8 14L4 10H7V6H9V10H12L8 14Z"/>
-                              </svg>
+                            <button class="content-toggle-btn expand-btn" onclick="toggleContentExpansion(this)" title="Expand content">
+                              ${expandIcon}
+                            </button>
+                            <button class="content-toggle-btn collapse-btn" onclick="toggleContentExpansion(this)" title="Collapse content" style="display: none;">
+                              ${collapseIcon}
                             </button>
                             <div class="content-wrapper">Unknown trajectory format</div>
                           </div>

@@ -1445,7 +1445,7 @@ p {
   z-index: 10;
   transition: all 0.2s ease;
   color: #6c757d;
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 .trajectories-table .content-toggle-btn svg {
