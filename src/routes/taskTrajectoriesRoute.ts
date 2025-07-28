@@ -6,6 +6,7 @@ import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../utils/versionBanner.js'
+import { TrajectoryRow } from '../utils/trajectoryRow.js'
 
 // SVG icons for expand and collapse states
 const expandIcon = `<svg 
@@ -140,66 +141,46 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                 </thead>
                 <tbody>
                   ${trajectories.map((trajectory, index) => {
+        const locale = getLocaleFromRequest(req)
+        
         // Handle trajectory errors
         if ('error' in trajectory) {
-          return `
-                        <tr data-testid="trajectory-error-row-${index}">
-                          <td class="timestamp-col">-</td>
-                          <td class="role-col">ERROR</td>
-                          <td class="content-col">
-                            <div class="content-cell-container">
-                              <button class="content-toggle-btn expand-btn" onclick="toggleContentExpansion(this)" title="Expand content">
-                                ${expandIcon}
-                              </button>
-                              <button class="content-toggle-btn collapse-btn" onclick="toggleContentExpansion(this)" title="Collapse content" style="display: none;">
-                                ${collapseIcon}
-                              </button>
-                              <div class="content-wrapper">Error parsing trajectory: ${escapeHtml(String(trajectory.error))}</div>
-                            </div>
-                          </td>
-                        </tr>
-                      `
+          return TrajectoryRow({
+            role: 'ERROR',
+            content: `Error parsing trajectory: ${String(trajectory.error)}`,
+            index,
+            locale,
+            expandIcon,
+            collapseIcon,
+            testIdPrefix: 'trajectory-error-row'
+          })
         }
 
         // Type guard to ensure we have a valid trajectory
         if ('timestamp' in trajectory && 'role' in trajectory && 'content' in trajectory) {
-          return `
-                        <tr data-testid="trajectory-row-${index}" class="role-${trajectory.role}">
-                          <td class="timestamp-col">${trajectory.timestamp.toLocaleString(getLocaleFromRequest(req))}</td>
-                          <td class="role-col">${escapeHtml(trajectory.role)}</td>
-                          <td class="content-col">
-                            <div class="content-cell-container">
-                              <button class="content-toggle-btn expand-btn" onclick="toggleContentExpansion(this)" title="Expand content">
-                                ${expandIcon}
-                              </button>
-                              <button class="content-toggle-btn collapse-btn" onclick="toggleContentExpansion(this)" title="Collapse content" style="display: none;">
-                                ${collapseIcon}
-                              </button>
-                              <div class="content-wrapper">${escapeHtml(trajectory.content.trim())}</div>
-                            </div>
-                          </td>
-                        </tr>
-                      `
+          return TrajectoryRow({
+            timestamp: trajectory.timestamp,
+            role: trajectory.role,
+            content: trajectory.content,
+            index,
+            locale,
+            expandIcon,
+            collapseIcon,
+            cssClass: `role-${trajectory.role}`,
+            testIdPrefix: 'trajectory-row'
+          })
         }
 
         // Fallback for unknown trajectory format
-        return `
-                      <tr data-testid="trajectory-unknown-row-${index}">
-                        <td class="timestamp-col">-</td>
-                        <td class="role-col">UNKNOWN</td>
-                        <td class="content-col">
-                          <div class="content-cell-container">
-                            <button class="content-toggle-btn expand-btn" onclick="toggleContentExpansion(this)" title="Expand content">
-                              ${expandIcon}
-                            </button>
-                            <button class="content-toggle-btn collapse-btn" onclick="toggleContentExpansion(this)" title="Collapse content" style="display: none;">
-                              ${collapseIcon}
-                            </button>
-                            <div class="content-wrapper">Unknown trajectory format</div>
-                          </div>
-                        </td>
-                      </tr>
-                    `
+        return TrajectoryRow({
+          role: 'UNKNOWN',
+          content: 'Unknown trajectory format',
+          index,
+          locale,
+          expandIcon,
+          collapseIcon,
+          testIdPrefix: 'trajectory-unknown-row'
+        })
       }).join('')}
                 </tbody>
               </table>
