@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.1] - 2025-07-28
+
+### Features
+- Add version checking and update mechanism (b050829)
+- Add version banner with link to latest release (6b1ba70)
+- Add version banner across all routes (096f200)
+- Add content toggle buttons for trajectory rows in taskTrajectoriesRoute (4d2ec81)
+- Add SVG icons for content toggle buttons in taskTrajectoriesRoute (35967c8)
+- Dynamically display issue count in project summary header (be1c031)
+
+### UI Improvements
+- Make issue rows clickable and enhance UI for improved usability (b7da9bf)
+- Refactor content toggle functionality and improve UX (8b52292)
+
+### Code Improvements
+- Refactor build script and worker thread handling, update path aliasing (b34d728)
+- Fix tasks 'Raw Json' button, remove custom `toJSON` and `[inspect.custom]` implementations for cleaner codebase (9fc4ddc)
+- Update version interface and refactor version banner rendering (closes #27) (86bc52d)
+- Refactor version banner rendering (9cb6357)
+
+### Documentation
+- Update `.junie/guidelines.md` with revised tech stack and expanded functionality details (3f82e1a)
+- Update `.junie/guidelines.md` with expanded class and schema documentation (d8e272b)
+- Update project structure documentation and directory layout (a2265f6)
+- Reorganize and simplify development guidelines (c6f3da1)
+- Reorder and refine guideline steps for resolving `<issue_description>` (4bcc24d)
+- Update guidelines for resolving `<issue_description>` (8022fc0)
+- Update README.md to reflect changes in project description and features (f2f085c)
+
 ## [2.5.0] - 2025-07-26
 
 ### Features
