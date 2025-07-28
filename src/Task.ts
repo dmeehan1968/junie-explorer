@@ -1,6 +1,5 @@
 import fs from "fs-extra"
 import path from "node:path"
-import { inspect } from "node:util"
 import {
   AbstractPool,
   availableParallelism,
@@ -41,17 +40,24 @@ export class Task {
 
   private static get workerPool() {
     if (!this._workerPool) {
+
+      // Workaround issue with Poolifier taking a URL, but Bun not loading the worker script from the fully
+      // qualified path.
+      const workerFile = fs.readFileSync('./src/workers/loadEventsWorker.ts')
+      const blob = new Blob([workerFile], { type: "application/javascript" })
+      const url = URL.createObjectURL(blob)
+      const worker = new URL(url)
+
       const maxParallelism = Math.min(availableParallelism(), parseInt(process.env.MAX_WORKERS ?? availableParallelism().toString()))
       const isDynamic = maxParallelism > 1
-      const workerPath = new URL('./workers/loadEventsWorker.ts', import.meta.url)
       const options: ThreadPoolOptions = {
         errorEventHandler: (e) => {
           console.error('Worker pool error:', e)
         },
       }
       this._workerPool = isDynamic
-        ? new DynamicThreadPool(1, maxParallelism, workerPath, options)
-        : new FixedThreadPool(maxParallelism, workerPath, options)
+        ? new DynamicThreadPool(1, maxParallelism, worker, options)
+        : new FixedThreadPool(maxParallelism, worker, options)
     }
     return this._workerPool
   }

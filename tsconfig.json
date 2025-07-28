@@ -12,7 +12,9 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "public/*": ["public/*"]
+      "@/*": [
+        "src/*"
+      ]
     }
   },
   "include": ["src", "features", "public"]
