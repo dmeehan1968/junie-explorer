@@ -6,31 +6,35 @@ function toggleContentExpansion(button) {
   // Find the content wrapper within the same container
   const container = button.parentElement;
   const contentWrapper = container.querySelector('.content-wrapper');
-  const expandBtn = container.querySelector('.expand-btn');
-  const collapseBtn = container.querySelector('.collapse-btn');
+  const expandIcon = button.querySelector('.expand-icon');
+  const collapseIcon = button.querySelector('.collapse-icon');
   
   if (!contentWrapper) {
     console.error('Content wrapper not found');
     return;
   }
   
-  if (!expandBtn || !collapseBtn) {
-    console.error('Expand or collapse button not found');
+  if (!expandIcon || !collapseIcon) {
+    console.error('Expand or collapse icon not found');
     return;
   }
   
-  // Toggle the expanded class
+  // Toggle the expanded class and button state
   const isExpanded = contentWrapper.classList.contains('expanded');
   
   if (isExpanded) {
-    // Collapse: remove expanded class and show expand button, hide collapse button
+    // Collapse: remove expanded class and show expand icon, hide collapse icon
     contentWrapper.classList.remove('expanded');
-    expandBtn.style.display = 'inline-block';
-    collapseBtn.style.display = 'none';
+    expandIcon.classList.remove('hidden');
+    collapseIcon.classList.add('hidden');
+    button.setAttribute('data-expanded', 'false');
+    button.setAttribute('title', 'Expand content');
   } else {
-    // Expand: add expanded class and show collapse button, hide expand button
+    // Expand: add expanded class and show collapse icon, hide expand icon
     contentWrapper.classList.add('expanded');
-    expandBtn.style.display = 'none';
-    collapseBtn.style.display = 'inline-block';
+    expandIcon.classList.add('hidden');
+    collapseIcon.classList.remove('hidden');
+    button.setAttribute('data-expanded', 'true');
+    button.setAttribute('title', 'Collapse content');
   }
 }

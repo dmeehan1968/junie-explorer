@@ -1,4 +1,5 @@
 import { escapeHtml } from './escapeHtml.js'
+import { ToggleComponent } from './toggleComponent.js'
 
 export interface TrajectoryRowOptions {
   timestamp?: Date
@@ -45,12 +46,12 @@ export function TrajectoryRow(options: TrajectoryRowOptions): string {
       <td class="role-col">${escapeHtml(role)}</td>
       <td class="content-col">
         <div class="content-cell-container">
-          <button class="content-toggle-btn expand-btn" onclick="toggleContentExpansion(this)" title="Expand content">
-            ${expandIcon}
-          </button>
-          <button class="content-toggle-btn collapse-btn" onclick="toggleContentExpansion(this)" title="Collapse content" style="display: none;">
-            ${collapseIcon}
-          </button>
+          ${ToggleComponent({
+            expandIcon,
+            collapseIcon,
+            testIdPrefix: 'trajectory-toggle',
+            index
+          })}
           <div class="content-wrapper">${escapeHtml(content.trim())}</div>
         </div>
       </td>
