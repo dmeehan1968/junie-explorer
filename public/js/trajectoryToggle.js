@@ -1,4 +1,22 @@
 /**
+ * Initialize toggle buttons visibility based on content overflow
+ * Should be called after the page loads to hide buttons for non-overflowing content
+ */
+function initializeToggleButtons() {
+  const toggleButtons = document.querySelectorAll('.content-toggle-btn');
+  
+  toggleButtons.forEach(button => {
+    const container = button.parentElement;
+    const contentWrapper = container.querySelector('.content-wrapper');
+    
+    if (contentWrapper && contentWrapper.scrollHeight <= contentWrapper.clientHeight) {
+      // Hide the button if content doesn't overflow
+      button.classList.add('hidden');
+    }
+  });
+}
+
+/**
  * Toggle the expansion state of trajectory content
  * @param {HTMLElement} button - The toggle button that was clicked
  */
@@ -38,3 +56,6 @@ function toggleContentExpansion(button) {
     button.setAttribute('title', 'Collapse content');
   }
 }
+
+// Initialize toggle buttons when the DOM is loaded
+document.addEventListener('DOMContentLoaded', initializeToggleButtons);
