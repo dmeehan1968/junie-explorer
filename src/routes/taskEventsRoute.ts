@@ -239,7 +239,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
         <script src="/js/taskActionChart.js"></script>
       </head>
       <body class="bg-base-200 p-5">
-        <div class="max-w-7xl mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
+        <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Task ${task.id} Events</h1>
             ${ReloadButton()}
