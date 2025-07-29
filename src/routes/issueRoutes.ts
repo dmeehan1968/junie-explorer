@@ -3,6 +3,7 @@ import { marked } from "marked"
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
+import { getStatusBadge } from "../utils/statusBadge.js"
 import { formatSeconds } from '../utils/timeUtils.js'
 import { SummaryMetrics } from "../schema.js"
 import { VersionBanner } from '../utils/versionBanner.js'
@@ -82,7 +83,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
 
           <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
             <div class="text-sm text-base-content/70" data-testid="issue-date">Created: ${new Date(issue.created).toLocaleString(getLocaleFromRequest(req))}</div>
-            <div class="badge badge-primary" data-testid="issue-state">${issue.state}</div>
+            <div data-testid="issue-state">${getStatusBadge(issue.state)}</div>
           </div>
 
           <div class="space-y-4" data-testid="tasks-list">
