@@ -228,14 +228,15 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
           ${task.steps.size > 0
       ? `
               <div class="overflow-x-auto">
-                <table class="table table-zebra w-full">
+                <table class="table table-zebra table-fixed w-full">
                   <thead>
                     <tr class="border-0">
                       <th rowspan="2" class="bg-base-200 border-r border-base-300">Step</th>
                       <th colspan="3" class="bg-base-200 text-center border-r border-base-300">Tokens</th>
                       <th colspan="2" class="bg-base-200 text-center border-r border-base-300">Costs</th>
                       <th colspan="4" class="bg-base-200 text-center border-r border-base-300">Time</th>
-                      <th colspan="2" class="bg-base-200 text-center">Requests</th>
+                      <th colspan="2" class="bg-base-200 text-center border-r border-base-300">Requests</th>
+                      <th rowspan="2" class="bg-base-200 text-center">Actions</th>
                     </tr>
                     <tr class="bg-base-200">
                       ${metricsHeaders}
@@ -245,11 +246,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                   ${[...task.steps.values()].map((step) => `
                     <tr>
                       <td>
-                        <div class="flex items-center gap-2">
-                          <span class="font-medium">${step.id}</span>
-                          <button class="btn btn-xs bg-gray-200 border-gray-400 text-gray-600 toggle-json-data" data-step="${step.id}">JSON</button>
-                          <button class="btn btn-xs bg-gray-200 border-gray-400 text-gray-600 toggle-rep-data" data-step="${step.id}">REP</button>
-                        </div>
+                        <span class="font-medium">${step.id}</span>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
                       <td>${step.metrics.outputTokens}</td>
@@ -262,15 +259,21 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                       <td>${step.metrics.modelCachedTime.toFixed(2)}s</td>
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
+                      <td>
+                        <div class="flex items-center justify-center gap-2">
+                          <button class="btn btn-xs bg-gray-200 border-gray-400 text-gray-600 toggle-json-data" data-step="${step.id}">JSON</button>
+                          <button class="btn btn-xs bg-gray-200 border-gray-400 text-gray-600 toggle-rep-data" data-step="${step.id}">REP</button>
+                        </div>
+                      </td>
                     </tr>
                     <tr id="raw-data-${step.id}" class="hidden">
-                      <td colspan="12" class="p-4 bg-base-200">
+                      <td colspan="13" class="p-4 bg-base-200">
                         <div id="json-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96 font-mono text-xs leading-relaxed"></div>
                       </td>
                     </tr>
                     <tr id="rep-data-${step.id}" class="hidden">
-                      <td colspan="12" class="p-4 bg-base-200">
-                        <div id="rep-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96 max-w-none prose"></div>
+                      <td colspan="13" class="p-4 bg-base-200">
+                        <div id="rep-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-scroll max-h-96 max-w-full prose"></div>
                       </td>
                     </tr>
                   `).join('')}
@@ -289,6 +292,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                     <td class="font-bold">${summaryData.modelCachedTime.toFixed(2)}s</td>
                     <td class="font-bold">${summaryData.requests}</td>
                     <td class="font-bold">${summaryData.cachedRequests}</td>
+                    <td></td>
                   </tr>
                 </tfoot>
                 </table>
