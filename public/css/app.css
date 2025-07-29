@@ -31,6 +31,7 @@
     --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-300: oklch(87.2% 0.01 258.338);
+    --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-black: #000;
     --color-white: #fff;
@@ -2107,6 +2108,9 @@
   .border-gray-300 {
     border-color: var(--color-gray-300);
   }
+  .border-gray-400 {
+    border-color: var(--color-gray-400);
+  }
   .border-green-200 {
     border-color: var(--color-green-200);
   }
@@ -2427,24 +2431,6 @@
     --tw-ease: var(--ease-in-out);
     transition-timing-function: var(--ease-in-out);
   }
-  .btn-outline {
-    &:not( .btn-active, :hover, :active:focus, :focus-visible, :disabled, [disabled], .btn-disabled, :checked ) {
-      --btn-shadow: "";
-      --btn-bg: #0000;
-      --btn-fg: var(--btn-color);
-      --btn-border: var(--btn-color);
-      --btn-noise: none;
-    }
-    @media (hover: none) {
-      &:hover:not( .btn-active, :active, :focus-visible, :disabled, [disabled], .btn-disabled, :checked ) {
-        --btn-shadow: "";
-        --btn-bg: #0000;
-        --btn-fg: var(--btn-color);
-        --btn-border: var(--btn-color);
-        --btn-noise: none;
-      }
-    }
-  }
   .btn-sm {
     --fontsize: 0.75rem;
     --btn-p: 0.75rem;
@@ -2558,6 +2544,21 @@
 }
 .content-wrapper.expanded {
   max-height: none !important;
+}
+.role-user {
+  background-color: oklch(93.2% 0.032 255.585);
+}
+.role-system {
+  background-color: oklch(96.2% 0.044 156.743);
+}
+.role-assistant {
+  background-color: oklch(97.3% 0.071 103.193);
+}
+.role-assistant_reflection {
+  background-color: oklch(95.3% 0.051 180.801);
+}
+.role-user_reflection {
+  background-color: oklch(93.6% 0.032 17.717);
 }
 @layer base {
   :where(:root),:root:has(input.theme-controller[value=light]:checked),[data-theme=light] {

@@ -9,3 +9,24 @@
 .content-wrapper.expanded {
   max-height: none !important;
 }
+
+/* Role-based background styles for trajectory rows */
+.role-user {
+  background-color: oklch(93.2% 0.032 255.585); /* blue-100 */
+}
+
+.role-system {
+  background-color: oklch(96.2% 0.044 156.743); /* green-100 */
+}
+
+.role-assistant {
+  background-color: oklch(97.3% 0.071 103.193); /* yellow-100 */
+}
+
+.role-assistant_reflection {
+  background-color: oklch(95.3% 0.051 180.801); /* teal-100 */
+}
+
+.role-user_reflection {
+  background-color: oklch(93.6% 0.032 17.717); /* red-100 */
+}
