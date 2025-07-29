@@ -2,6 +2,9 @@
 (function() {
   'use strict';
 
+  // Timeout tracking for delayed preview
+  let previewTimeout = null;
+
   // Get the current theme from localStorage or default to 'auto'
   function getCurrentTheme() {
     return localStorage.getItem('junie-explorer-theme') || 'auto';
@@ -39,8 +42,36 @@
     });
   }
 
-  // Make setTheme available globally
+  // Preview theme with 400ms delay (for hover)
+  function previewTheme(theme) {
+    // Clear any existing timeout
+    if (previewTimeout) {
+      clearTimeout(previewTimeout);
+    }
+    
+    // Set new timeout to apply theme after 400ms
+    previewTimeout = setTimeout(() => {
+      applyTheme(theme);
+      previewTimeout = null;
+    }, 400);
+  }
+
+  // Restore the saved theme (when leaving hover)
+  function restoreTheme() {
+    // Clear any pending preview
+    if (previewTimeout) {
+      clearTimeout(previewTimeout);
+      previewTimeout = null;
+    }
+    
+    const currentTheme = getCurrentTheme();
+    applyTheme(currentTheme);
+  }
+
+  // Make functions available globally
   window.setTheme = setTheme;
+  window.previewTheme = previewTheme;
+  window.restoreTheme = restoreTheme;
 
   // Initialize theme when DOM is ready
   if (document.readyState === 'loading') {
