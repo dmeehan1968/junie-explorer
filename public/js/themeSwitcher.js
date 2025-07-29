@@ -4,7 +4,7 @@
 
   // Get the current theme from localStorage or default to 'auto'
   function getCurrentTheme() {
-    return localStorage.getItem('theme') || 'auto';
+    return localStorage.getItem('junie-explorer-theme') || 'auto';
   }
 
   // Set theme on the html element
@@ -22,7 +22,7 @@
 
   // Set theme and save to localStorage
   function setTheme(theme) {
-    localStorage.setItem('theme', theme);
+    localStorage.setItem('junie-explorer-theme', theme);
     applyTheme(theme);
   }
 
