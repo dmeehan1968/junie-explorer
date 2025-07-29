@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const container = document.getElementById(`raw-data-${taskId}`);
 
       // Toggle visibility
-      if (container.style.display === 'none') {
-        container.style.display = 'block';
+      if (container.classList.contains('hidden')) {
+        container.classList.toggle('hidden')
 
         // Initialize JSON viewer if not already done
         if (!container.getAttribute('data-initialized')) {
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
       } else {
-        container.style.display = 'none';
+        container.classList.toggle('hidden')
       }
     });
   });

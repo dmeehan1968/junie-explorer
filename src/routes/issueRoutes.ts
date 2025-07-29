@@ -110,7 +110,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
                           <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="steps-button">Steps</a>
                           <button class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
                         </div>
-                        <div id="raw-data-${index}" class="mt-4 p-4 bg-base-200 rounded-lg border border-base-300" data-testid="json-viewer" style="display: none;">
+                        <div id="raw-data-${index}" class="mt-4 p-4 bg-base-200 rounded-lg font-mono border border-base-300 hidden" data-testid="json-viewer">
                           <div id="json-renderer-${index}" class="text-sm"></div>
                         </div>
                       </div>
