@@ -5,6 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2025-07-29
+
+### Features
+- Add theme switcher functionality and integrate across routes (11f96b7)
+- Add support for additional themes and improve theme management (235c8a8)
+- Add hover-based theme preview support to theme switcher (0c389e0)
+
+### UI Improvements
+- Expand theme dropdown layout for better accessibility (c4652f9)
+- Update color classes for theme consistency across routes (ba023dc)
+- Refactor theme switcher to improve scalability and reduce redundancy (b4fecb1)
+- Update background and table styles for improved consistency (955f22c)
+- Update table structure and button positioning in `taskStepsRoute.ts` (7ed5b27)
+- Update table and header classes for improved consistency and styling (0dc5b91)
+- Update task step container background colors for improved clarity (ed2c4ee)
+- Update role-based background colors and task description styling (5a445cd)
+- Update table class in `taskEventsRoute.ts` for improved styling consistency (66d7a87)
+- Update task description styles for consistency across routes (d5f9805)
+- Refactor status badge rendering across routes (ef45f20)
+- Update button styles and remove unused `.btn-secondary` CSS (c628116)
+- Introduce reusable Breadcrumb component and improve styles across routes (f9939d6)
+- Update table class styles and refine `prose` CSS definitions (426b043)
+- Update button styling and add role-based row background colors (124a1d6)
+- Update table layouts and improve row styling (beeb274)
+- Update table layouts and improve toggle button styling (3b3a983)
+- Update buttons and improve content expansion styling (9b22f07)
+- Refactored trajectories and steps routes to use Tailwind and DaisyUI (1910125)
+- Hide expand/collapse button when the content doesn't overflow the permitted height (c62c13f)
+- Introduce reusable toggle component and improve styling consistency (39db634)
+- Update max-width styling (86b94a3)
+- Refactor task events UI and improve styling consistency (dd67ff9)
+- Refactor issue details UI and improve styling consistency (3b96855)
+- Refactor project issues table and enhance UI/UX consistency (d7c867c)
+- Enhance UI consistency in IDE filter toolbar (906af64)
+- Improve project list handling and input styles (0a6b9a4)
+- Refine checkbox and radio inputs for consistent sizing (bcc781c)
+- Enhance UI/UX and code consistency with Tailwind CSS utilities (39a3a73)
+
+### Code Improvements
+- Update `taskRawData.js` to use class-based visibility toggling (67d0f90)
+- Improve `Task.ts` lazy-loading and caching behavior (431f39c)
+- Remove `app.css` file from VCS (7f47e7d)
+- Refactor trajectory row rendering for maintainability (b456c76)
+- Add TypeScript compiler settings to project configuration (6ce66b1)
+- Add source exclusions to input.css for improved file handling (5703d0d)
+- Use utility function for reload button rendering in `homeRoutes.ts` (0bb180d)
+- Make reload button asynchronous with improved UX (1e9e4ac)
+- Revert poolifier-web-worker workaround due to upstream fix (8a6c867)
+
+### Documentation
+- Refine development guidelines with updated steps and exclusions (76f9078)
+
+### Dependencies
+- Add Tailwind CSS to the project for utility-first styling (b4e5e08)
+
 ## [2.5.1] - 2025-07-28
 
 ### Features
