@@ -23,7 +23,7 @@ export function ToggleComponent(options: ToggleComponentOptions): string {
 
   return `
     <button 
-      class="content-toggle-btn transition-all duration-200 ease-in-out hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" 
+      class="content-toggle-btn absolute top-2 right-2 z-10 bg-white/50 hover:bg-white/100 border border-gray-300 rounded p-1 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" 
       onclick="toggleContentExpansion(this)" 
       data-testid="${testId}"
       data-expanded="false"

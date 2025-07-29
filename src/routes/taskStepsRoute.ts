@@ -229,7 +229,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
           ${task.steps.size > 0
       ? `
               <div class="overflow-x-auto">
-                <table class="table table-zebra table-compact w-full">
+                <table class="table table-zebra table-fixed w-full">
                   <thead>
                     <tr>
                       <th rowspan="2" class="bg-base-200">Step</th>
@@ -271,7 +271,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                     </tr>
                     <tr id="rep-data-${step.id}" class="hidden">
                       <td colspan="12" class="p-4 bg-base-200">
-                        <div id="rep-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96"></div>
+                        <div id="rep-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96 prose prose-sm max-w-none"></div>
                       </td>
                     </tr>
                   `).join('')}
