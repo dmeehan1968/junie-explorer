@@ -45,14 +45,14 @@ export function TrajectoryRow(options: TrajectoryRowOptions): string {
       <td class="timestamp-col">${escapeHtml(formattedTimestamp)}</td>
       <td class="role-col">${escapeHtml(role)}</td>
       <td class="content-col">
-        <div class="content-cell-container">
+        <div class="content-cell-container relative">
           ${ToggleComponent({
             expandIcon,
             collapseIcon,
             testIdPrefix: 'trajectory-toggle',
             index
           })}
-          <div class="content-wrapper">${escapeHtml(content.trim())}</div>
+          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words p-2 transition-all duration-300 ease-in-out">${escapeHtml(content.trim())}</div>
         </div>
       </td>
     </tr>

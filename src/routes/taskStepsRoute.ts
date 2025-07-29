@@ -248,8 +248,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                       <td>
                         <div class="flex items-center gap-2">
                           <span class="font-medium">${step.id}</span>
-                          <button class="btn btn-xs btn-outline" data-step="${step.id}" onclick="toggleJsonData(this)">JSON</button>
-                          <button class="btn btn-xs btn-outline" data-step="${step.id}" onclick="toggleRepData(this)">REP</button>
+                          <button class="btn btn-xs btn-outline toggle-json-data" data-step="${step.id}">JSON</button>
+                          <button class="btn btn-xs btn-outline toggle-rep-data" data-step="${step.id}">REP</button>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>

@@ -4,3 +4,8 @@
 }
 @source not "src/bun/public.ts";
 @source not "public/css/app.css";
+
+/* Custom styles for trajectory content expansion */
+.content-wrapper.expanded {
+  max-height: none !important;
+}
