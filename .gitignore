@@ -1,17 +1,18 @@
-/tmp
-/out-tsc
+# Generated during build process
+/public/css/app.css
+/src/bun/public.ts
 /dist
 
+# Packages
 /node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-/.pnp
-.pnp.js
 
-.vscode/*
+# Temporarily files for Junie to consume
 /.junie-context/
+
+# Testing
 /reports/
 /test-results/
 /fixtures/
-/src/bun/public.ts
