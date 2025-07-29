@@ -33,6 +33,7 @@ export class Task {
   private _sessionHistory?: SessionHistory | null
   private _patch?: string | null
   private _events: Promise<EventRecord[]> | undefined = undefined
+  private _eventTypes: Promise<string[]> | undefined = undefined
   private _trajectories: (Trajectory | TrajectoryError)[] = []
 
   // Static worker pool for loading events
@@ -134,6 +135,7 @@ export class Task {
   private lazyload() {
     if (this._previousTasksInfo === undefined || this._finalAgentState === undefined && this._sessionHistory === undefined && this._patch === undefined) {
       const task = this.load()
+      this._previousTasksInfo = task.previousTasksInfo
       this._finalAgentState = task.finalAgentState
       this._sessionHistory = task.sessionHistory
       this._patch = task.patch
@@ -211,22 +213,16 @@ export class Task {
   }
 
   get events(): Promise<EventRecord[]> {
-    if (this._events) {
-      return this._events
-    }
-
-    this._events = new Promise(async (resolve) => {
-      return resolve(await this.loadEvents())
-    })
-
+    this._events ??= this.loadEvents()
     return this._events
   }
 
   get eventTypes(): Promise<string[]> {
-    return new Promise(async (resolve) => {
-      const events = [...new Set((await this.events).map(e => e.event.type))].sort()
-      return resolve(events)
+    this._eventTypes ??= new Promise(async (resolve) => {
+      const eventTypes = [...new Set((await this.events).map(e => e.event.type))].sort()
+      return resolve(eventTypes)
     })
+    return this._eventTypes
   }
 
   get trajectoriesFile() {
