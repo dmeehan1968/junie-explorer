@@ -34,16 +34,17 @@ export function TrajectoryRow(options: TrajectoryRowOptions): string {
   // Format timestamp
   const formattedTimestamp = timestamp instanceof Date ? timestamp.toLocaleString(locale) : String(timestamp)
 
-  // Generate CSS classes
-  const rowClasses = cssClass || ''
+  // Generate CSS classes with alternating background colors
+  const backgroundClass = index % 2 === 0 ? 'bg-base-100' : 'bg-base-50'
+  const rowClasses = cssClass ? `${cssClass} ${backgroundClass}` : backgroundClass
 
   // Generate test ID
   const testId = `${testIdPrefix}-${index}`
 
   return `
     <tr data-testid="${testId}" ${rowClasses ? `class="${rowClasses}"` : ''}>
-      <td class="timestamp-col">${escapeHtml(formattedTimestamp)}</td>
-      <td class="role-col">${escapeHtml(role)}</td>
+      <td class="timestamp-col align-top">${escapeHtml(formattedTimestamp)}</td>
+      <td class="role-col align-top">${escapeHtml(role)}</td>
       <td class="content-col">
         <div class="content-cell-container relative">
           ${ToggleComponent({

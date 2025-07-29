@@ -100,7 +100,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
           </div>
           ${VersionBanner(jetBrains.version)}
           <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
-            <div class="breadcrumbs text-sm mb-5">
+            <div class="breadcrumbs mb-5">
               <ul>
                 <li><a href="/" data-testid="breadcrumb-projects" class="text-primary hover:text-primary-focus">Projects</a></li>
                 <li><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name" class="text-primary hover:text-primary-focus">${projectName}</a></li>
@@ -132,7 +132,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
           ${trajectories.length > 0
       ? `
               <div class="overflow-x-auto">
-                <table class="table table-zebra table-fixed table-compact w-full" data-testid="trajectories-table">
+                <table class="table table-compact w-full" data-testid="trajectories-table">
                   <thead>
                     <tr>
                       <th class="bg-base-200 w-48">Timestamp</th>

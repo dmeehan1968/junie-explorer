@@ -181,7 +181,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
           </div>
           ${VersionBanner(jetBrains.version)}
           <nav aria-label="breadcrumb" data-testi="breadcrumb-navigation">
-            <div class="breadcrumbs text-sm mb-5">
+            <div class="breadcrumbs mb-5">
               <ul>
                 <li><a href="/" data-testid="breadcrumb-projects" class="text-primary hover:text-primary-focus">Projects</a></li>
                 <li><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name" class="text-primary hover:text-primary-focus">${projectName}</a></li>
@@ -229,7 +229,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
           ${task.steps.size > 0
       ? `
               <div class="overflow-x-auto">
-                <table class="table table-zebra table-fixed w-full">
+                <table class="table table-zebra table-compact w-full">
                   <thead>
                     <tr>
                       <th rowspan="2" class="bg-base-200">Step</th>
@@ -266,7 +266,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                     </tr>
                     <tr id="raw-data-${step.id}" class="hidden">
                       <td colspan="12" class="p-4 bg-base-200">
-                        <div id="json-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96"></div>
+                        <div id="json-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96 font-mono text-xs leading-relaxed"></div>
                       </td>
                     </tr>
                     <tr id="rep-data-${step.id}" class="hidden">
