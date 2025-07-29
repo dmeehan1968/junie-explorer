@@ -359,7 +359,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               </div>
               <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
                 <div class="overflow-x-auto">
-                  <table class="table table-zebra w-full bg-white text-sm" data-testid="event-stats-table">
+                  <table class="table table-zebra table-sm w-full bg-white text-sm" data-testid="event-stats-table">
                     <thead>
                       <tr class="!bg-gray-100">
                         <th class="text-left w-2/5 whitespace-nowrap">Event Type</th>
