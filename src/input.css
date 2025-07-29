@@ -13,7 +13,7 @@
 
 /* Role-based background styles for trajectory rows */
 .role-user {
-  background-color: oklch(93.2% 0.032 255.585); /* blue-100 */
+    background-color: oklch(96.5% 0.022 255.618); /* blue-50 */
 }
 
 .role-system {
@@ -21,7 +21,7 @@
 }
 
 .role-assistant {
-  background-color: oklch(97.3% 0.071 103.193); /* yellow-100 */
+    background-color: oklch(98.5% 0.035 103.193); /* yellow-50 */
 }
 
 .role-assistant_reflection {
