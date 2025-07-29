@@ -269,7 +269,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               </div>
             </div>
             ${task.context.description ? `
-              <div class="mt-4">
+              <div class="mt-4 bg-yellow-100 p-4">
                 <h3 class="text-xl font-bold text-primary mb-2">Task Description</h3>
                 <div class="prose max-w-none">${marked(escapeHtml(task.context.description))}</div>
               </div>

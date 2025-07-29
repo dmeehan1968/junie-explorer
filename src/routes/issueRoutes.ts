@@ -101,7 +101,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
                             Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}
                           </div>
                         </div>
-                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-warning/10 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-yellow-100 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                         <div data-testid="task-details">
                           ${generateStepTotalsTable(stepTotals)}
                         </div>
