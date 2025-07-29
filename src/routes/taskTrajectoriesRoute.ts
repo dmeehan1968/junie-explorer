@@ -7,6 +7,7 @@ import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../utils/versionBanner.js'
 import { TrajectoryRow } from '../utils/trajectoryRow.js'
+import { Breadcrumb } from '../utils/breadcrumb.js'
 
 // SVG icons for expand and collapse states
 const expandIcon = `<svg 
@@ -99,16 +100,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             <button id="reload-button" class="btn btn-primary btn-sm" onclick="reloadPage()">Reload</button>
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
-            <div class="breadcrumbs mb-5">
-              <ul>
-                <li><a href="/" data-testid="breadcrumb-projects" class="text-primary hover:text-primary-focus">Projects</a></li>
-                <li><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name" class="text-primary hover:text-primary-focus">${projectName}</a></li>
-                <li><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-issue-name" class="text-primary hover:text-primary-focus">${issue?.name}</a></li>
-                <li class="text-base-content/70">Task ${task.id} Trajectories</li>
-              </ul>
-            </div>
-          </nav>
+          ${Breadcrumb({
+            items: [
+              { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
+              { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
+              { label: issue?.name || '', href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`, testId: 'breadcrumb-issue-name' },
+              { label: `Task ${task.id} Trajectories`, testId: 'breadcrumb-task-trajectories' }
+            ]
+          })}
 
           <div class="flex gap-1 mb-5">
             ${project.ideNames.map(ide => `

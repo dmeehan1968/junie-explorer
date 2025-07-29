@@ -7,6 +7,7 @@ import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
 import { VersionBanner } from '../utils/versionBanner.js'
+import { Breadcrumb } from '../utils/breadcrumb.js'
 
 const router = express.Router()
 
@@ -180,16 +181,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
             <button id="reload-button" class="btn btn-primary btn-sm" onclick="reloadPage()">Reload</button>
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testi="breadcrumb-navigation">
-            <div class="breadcrumbs mb-5">
-              <ul>
-                <li><a href="/" data-testid="breadcrumb-projects" class="text-primary hover:text-primary-focus">Projects</a></li>
-                <li><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name" class="text-primary hover:text-primary-focus">${projectName}</a></li>
-                <li><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-task-name" class="text-primary hover:text-primary-focus">${issue?.name}</a></li>
-                <li class="text-base-content/70">Task ${task.id}</li>
-              </ul>
-            </div>
-          </nav>
+          ${Breadcrumb({
+            items: [
+              { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
+              { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
+              { label: issue?.name || '', href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`, testId: 'breadcrumb-issue-name' },
+              { label: `Task ${task.id}`, testId: 'breadcrumb-task-steps' }
+            ]
+          })}
 
           <div class="flex gap-1 mb-5">
             ${project.ideNames.map(ide => `

@@ -7,6 +7,7 @@ import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
 import { VersionBanner } from '../utils/versionBanner.js'
 import { ReloadButton } from '../utils/reloadButton.js'
+import { Breadcrumb } from '../utils/breadcrumb.js'
 
 const router = express.Router()
 
@@ -46,7 +47,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
   const elapsedTimeSec = elapsedTimeMs / 1000
   const metrics = await project.metrics
   return `
-  <div class="mb-5 bg-gray-200 rounded shadow-sm p-4">
+  <div class="mb-5 bg-gray-100 rounded shadow-sm p-4">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-primary">${issuesCount} Project Issue${issuesCount !== 1 ? 's' : ''}</h3>
       <span class="font-bold text-base-content" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
@@ -54,7 +55,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
     <div class="overflow-x-auto">
       <table class="table table-zebra w-full bg-white" data-testid="issues-table">
         <thead>
-          <tr class="!bg-gray-100">
+          <tr class="!bg-gray-200">
             <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
             <th class="text-left whitespace-nowrap">Timestamp</th>
             <th class="text-right whitespace-nowrap">Input Tokens</th>
@@ -64,7 +65,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             <th class="text-right whitespace-nowrap">Time</th>
             <th class="text-right whitespace-nowrap">Status</th>
           </tr>
-          <tr class="!bg-gray-50 font-bold text-black">
+          <tr class="!bg-gray-100 font-bold text-black">
             <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
             <td class="text-right whitespace-nowrap" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
@@ -218,14 +219,12 @@ router.get('/project/:projectName', async (req, res) => {
             ${ReloadButton()}
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation" class="mb-5">
-            <div class="breadcrumbs">
-              <ul>
-                <li><a href="/" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-projects">Projects</a></li>
-                <li class="text-base-content/70">${project.name}</li>
-              </ul>
-            </div>
-          </nav>
+          ${Breadcrumb({
+            items: [
+              { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
+              { label: project.name, testId: 'breadcrumb-project-name' }
+            ]
+          })}
 
           <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `

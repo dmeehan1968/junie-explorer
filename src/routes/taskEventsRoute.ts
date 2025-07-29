@@ -8,6 +8,7 @@ import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../utils/versionBanner.js'
 import { ReloadButton } from '../utils/reloadButton.js'
+import { Breadcrumb } from '../utils/breadcrumb.js'
 
 const router = express.Router()
 
@@ -245,16 +246,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             ${ReloadButton()}
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation" class="mb-5">
-            <div class="breadcrumbs">
-              <ul>
-                <li><a href="/" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-projects">Projects</a></li>
-                <li><a href="/project/${encodeURIComponent(projectName)}" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-project-name">${projectName}</a></li>
-                <li><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-issue-name">${issue?.name}</a></li>
-                <li class="text-base-content/70">Task ${task.id} Events</li>
-              </ul>
-            </div>
-          </nav>
+          ${Breadcrumb({
+            items: [
+              { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
+              { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
+              { label: issue?.name || '', href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`, testId: 'breadcrumb-issue-name' },
+              { label: `Task ${task.id} Events`, testId: 'breadcrumb-task-events' }
+            ]
+          })}
 
           <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `

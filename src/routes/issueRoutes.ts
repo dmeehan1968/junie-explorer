@@ -7,6 +7,7 @@ import { formatSeconds } from '../utils/timeUtils.js'
 import { SummaryMetrics } from "../schema.js"
 import { VersionBanner } from '../utils/versionBanner.js'
 import { ReloadButton } from '../utils/reloadButton.js'
+import { Breadcrumb } from '../utils/breadcrumb.js'
 
 const router = express.Router()
 
@@ -65,15 +66,13 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
             ${ReloadButton()}
           </div>
           ${VersionBanner(jetBrains.version)}
-          <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation" class="mb-5">
-            <div class="breadcrumbs">
-              <ul>
-                <li><a href="/" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-projects">Projects</a></li>
-                <li><a href="/project/${encodeURIComponent(projectName)}" class="text-primary hover:text-primary-focus" data-testid="breadcrumb-project-name">${projectName}</a></li>
-                <li class="text-base-content/70">${escapeHtml(issue.name)}</li>
-              </ul>
-            </div>
-          </nav>
+          ${Breadcrumb({
+            items: [
+              { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
+              { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
+              { label: issue.name, testId: 'breadcrumb-issue-name' }
+            ]
+          })}
 
           <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
