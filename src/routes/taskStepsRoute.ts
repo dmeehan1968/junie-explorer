@@ -115,15 +115,15 @@ function prepareStepGraphData(steps: Step[]): {
 
 // Generate HTML for metrics table headers (used only for steps table, not for totals)
 const metricsHeaders = `
-  <th>Input</th>
-  <th>Output</th>
-  <th>Cache</th>
-  <th>Default</th>
-  <th>Cached</th>
-  <th>Build</th>
-  <th>Artifact</th>
-  <th>Model</th>
-  <th>Model Cached</th>
+  <th class="">Input</th>
+  <th class="">Output</th>
+  <th class="border-r border-base-300">Cache</th>
+  <th class="">Default</th>
+  <th class="border-r border-base-300">Cached</th>
+  <th class="">Build</th>
+  <th class="">Artifact</th>
+  <th class="">Model</th>
+  <th class="border-r border-base-300">Model Cached</th>
   <th>Default</th>
   <th>Cached</th>
 `
@@ -230,14 +230,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
               <div class="overflow-x-auto">
                 <table class="table table-zebra w-full">
                   <thead>
-                    <tr>
-                      <th rowspan="2" class="bg-base-200">Step</th>
-                      <th colspan="3" class="bg-base-200 text-center">Tokens</th>
-                      <th colspan="2" class="bg-base-200 text-center">Costs</th>
-                      <th colspan="4" class="bg-base-200 text-center">Time</th>
+                    <tr class="border-0">
+                      <th rowspan="2" class="bg-base-200 border-r border-base-300">Step</th>
+                      <th colspan="3" class="bg-base-200 text-center border-r border-base-300">Tokens</th>
+                      <th colspan="2" class="bg-base-200 text-center border-r border-base-300">Costs</th>
+                      <th colspan="4" class="bg-base-200 text-center border-r border-base-300">Time</th>
                       <th colspan="2" class="bg-base-200 text-center">Requests</th>
                     </tr>
-                    <tr>
+                    <tr class="bg-base-200">
                       ${metricsHeaders}
                     </tr>
                   </thead>
