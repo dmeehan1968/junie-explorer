@@ -202,13 +202,13 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
             </div>
             <div class="grid gap-4 ${(!task.plan || task.plan.length === 0) ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}">
               ${task.context.description ? `
-                <div class="bg-base-200 p-4 rounded-lg">
+                <div class="bg-yellow-50 p-4 rounded-lg">
                   <h3 class="text-lg font-semibold mb-2 text-primary">User</h3>
                   <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
                 </div>
               ` : ''}
               ${task.plan && task.plan.length > 0 ? `
-                <div class="bg-base-200 p-4 rounded-lg">
+                <div class="bg-blue-50 p-4 rounded-lg">
                   <h3 class="text-lg font-semibold mb-2 text-primary">Agent</h3>
                   <div class="prose prose-sm max-w-none">
                     ${marked(escapeHtml(task.plan.map(planItem => planItem.description).join('\n\n')))}
