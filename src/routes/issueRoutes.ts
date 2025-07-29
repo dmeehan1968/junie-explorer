@@ -16,14 +16,14 @@ const router = express.Router()
 const generateStepTotalsTable = (summaryData: SummaryMetrics): string => {
   return `
   <div class="overflow-x-auto mb-4" data-testid="task-metrics">
-    <table class="table w-full bg-base-100">
+    <table class="table w-full bg-base-300">
       <tbody>
         <tr>
-          <td class="text-sm"><span class="font-semibold">Input Tokens:</span> ${summaryData.inputTokens}</td>
-          <td class="text-sm"><span class="font-semibold">Output Tokens:</span> ${summaryData.outputTokens}</td>
-          <td class="text-sm"><span class="font-semibold">Cache Tokens:</span> ${summaryData.cacheTokens}</td>
-          <td class="text-sm"><span class="font-semibold">Cost:</span> ${summaryData.cost.toFixed(4)}</td>
-          <td class="text-sm"><span class="font-semibold">Total Time:</span> ${formatSeconds(summaryData.time / 1000)}</td>
+          <td class="text-sm text-center"><span class="font-semibold">Input Tokens:</span> ${summaryData.inputTokens}</td>
+          <td class="text-sm text-center"><span class="font-semibold">Output Tokens:</span> ${summaryData.outputTokens}</td>
+          <td class="text-sm text-center"><span class="font-semibold">Cache Tokens:</span> ${summaryData.cacheTokens}</td>
+          <td class="text-sm text-center"><span class="font-semibold">Cost:</span> ${summaryData.cost.toFixed(4)}</td>
+          <td class="text-sm text-center"><span class="font-semibold">Total Time:</span> ${formatSeconds(summaryData.time / 1000)}</td>
         </tr>
       </tbody>
     </table>
@@ -93,7 +93,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
         const stepTotals = await task.metrics
 
         return `
-                    <div class="card bg-base-100 shadow-md border border-base-300 hover:shadow-lg transition-all duration-300" data-testid="task-item">
+                    <div class="card bg-base-200 shadow-md border border-base-300 hover:shadow-lg transition-all duration-300" data-testid="task-item">
                       <div class="card-body">
                         <div class="flex justify-between items-center mb-4">
                           <h3 class="text-xl font-bold text-primary">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</h3>
@@ -101,7 +101,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
                             Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}
                           </div>
                         </div>
-                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-yellow-100 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-yellow-50 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                         <div data-testid="task-details">
                           ${generateStepTotalsTable(stepTotals)}
                         </div>

@@ -261,7 +261,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             `).join('')}
           </div>
 
-          <div class="mb-5 bg-gray-200 rounded shadow-sm p-4">
+          <div class="mb-5 bg-gray-100 rounded shadow-sm p-4">
             <div class="flex justify-between items-center mb-4">
               <div class="text-base-content">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
               <div>
@@ -269,7 +269,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               </div>
             </div>
             ${task.context.description ? `
-              <div class="mt-4 bg-yellow-100 p-4">
+              <div class="mt-4 bg-yellow-50 p-4">
                 <h3 class="text-xl font-bold text-primary mb-2">Task Description</h3>
                 <div class="prose max-w-none">${marked(escapeHtml(task.context.description))}</div>
               </div>
