@@ -149,12 +149,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" data-theme="light">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task ${task.id} Steps</title>
-        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -173,42 +173,45 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
         <script src="/js/taskStepRepData.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
-      <body>
-        <div class="container">
-          <div class="header-container">
-            <h1>Junie Explorer: Task ${task.id}</h1>
-            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+      <body class="bg-base-200 p-5">
+        <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
+          <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Task ${task.id}</h1>
+            <button id="reload-button" class="btn btn-primary btn-sm" onclick="reloadPage()">Reload</button>
           </div>
           ${VersionBanner(jetBrains.version)}
           <nav aria-label="breadcrumb" data-testi="breadcrumb-navigation">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-task-name">${issue?.name}</a></li>
-              <li class="breadcrumb-item active">Task ${task.id}</li>
-            </ol>
+            <div class="breadcrumbs text-sm mb-5">
+              <ul>
+                <li><a href="/" data-testid="breadcrumb-projects" class="text-primary hover:text-primary-focus">Projects</a></li>
+                <li><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name" class="text-primary hover:text-primary-focus">${projectName}</a></li>
+                <li><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-task-name" class="text-primary hover:text-primary-focus">${issue?.name}</a></li>
+                <li class="text-base-content/70">Task ${task.id}</li>
+              </ul>
+            </div>
           </nav>
 
-          <div class="ide-icons">
+          <div class="flex gap-1 mb-5">
             ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
             `).join('')}
           </div>
 
-          <div class="task-details">
-            <div class="task-meta">
-              <div class="task-created">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
+          <div class="mb-5">
+            <div class="mb-3">
+              <div class="text-sm text-base-content/70">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
             </div>
-            <div class="task-content-container${(!task.plan || task.plan.length === 0) ? ' no-plan' : ''}">
+            <div class="grid gap-4 ${(!task.plan || task.plan.length === 0) ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}">
               ${task.context.description ? `
-                <div class="task-description">
-                  <h3>User</h3>
-                  ${marked(escapeHtml(task.context.description))}</div>
+                <div class="bg-base-200 p-4 rounded-lg">
+                  <h3 class="text-lg font-semibold mb-2 text-primary">User</h3>
+                  <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
+                </div>
               ` : ''}
               ${task.plan && task.plan.length > 0 ? `
-                <div class="task-plan">
-                  <h3>Agent</h3>
-                  <div class="plan-content">
+                <div class="bg-base-200 p-4 rounded-lg">
+                  <h3 class="text-lg font-semibold mb-2 text-primary">Agent</h3>
+                  <div class="prose prose-sm max-w-none">
                     ${marked(escapeHtml(task.plan.map(planItem => planItem.description).join('\n\n')))}
                   </div>
                 </div>
@@ -217,7 +220,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
           </div>
 
           ${task.steps.size > 0
-      ? `<div class="graph-container">
+      ? `<div class="h-96 mb-5 p-4 bg-base-100 rounded-lg border border-base-300">
                 <canvas id="stepMetricsChart"></canvas>
               </div>`
       : ''
@@ -225,27 +228,28 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
 
           ${task.steps.size > 0
       ? `
-              <table class="steps-table">
-                <thead>
-                  <tr>
-                    <th rowspan="2">Step</th>
-                    <th colspan="3">Tokens</th>
-                    <th colspan="2">Costs</th>
-                    <th colspan="4">Time</th>
-                    <th colspan="2">Requests</th>
-                  </tr>
-                  <tr>
-                    ${metricsHeaders}
-                  </tr>
-                </thead>
+              <div class="overflow-x-auto">
+                <table class="table table-zebra table-compact w-full">
+                  <thead>
+                    <tr>
+                      <th rowspan="2" class="bg-base-200">Step</th>
+                      <th colspan="3" class="bg-base-200 text-center">Tokens</th>
+                      <th colspan="2" class="bg-base-200 text-center">Costs</th>
+                      <th colspan="4" class="bg-base-200 text-center">Time</th>
+                      <th colspan="2" class="bg-base-200 text-center">Requests</th>
+                    </tr>
+                    <tr>
+                      ${metricsHeaders}
+                    </tr>
+                  </thead>
                 <tbody>
                   ${[...task.steps.values()].map((step) => `
                     <tr>
                       <td>
-                        <div class="title-container">
-                          ${step.id}
-                          <button class="toggle-json-data" data-step="${step.id}">JSON</button>
-                          <button class="toggle-rep-data" data-step="${step.id}">REP</button>
+                        <div class="flex items-center gap-2">
+                          <span class="font-medium">${step.id}</span>
+                          <button class="btn btn-xs btn-outline" data-step="${step.id}" onclick="toggleJsonData(this)">JSON</button>
+                          <button class="btn btn-xs btn-outline" data-step="${step.id}" onclick="toggleRepData(this)">REP</button>
                         </div>
                       </td>
                       <td>${step.metrics.inputTokens}</td>
@@ -260,37 +264,38 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                       <td>${step.metrics.requests}</td>
                       <td>${step.metrics.cachedRequests}</td>
                     </tr>
-                    <tr id="raw-data-${step.id}" class="raw-data-row">
-                      <td colspan="12" class="raw-data-container">
-                        <div id="json-renderer-${step.id}" class="json-renderer"></div>
+                    <tr id="raw-data-${step.id}" class="hidden">
+                      <td colspan="12" class="p-4 bg-base-200">
+                        <div id="json-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96"></div>
                       </td>
                     </tr>
-                    <tr id="rep-data-${step.id}" class="rep-data-row">
-                      <td colspan="12" class="rep-data-container">
-                        <div id="rep-renderer-${step.id}" class="rep-renderer"></div>
+                    <tr id="rep-data-${step.id}" class="hidden">
+                      <td colspan="12" class="p-4 bg-base-200">
+                        <div id="rep-renderer-${step.id}" class="bg-base-100 p-4 rounded border overflow-auto max-h-96"></div>
                       </td>
                     </tr>
                   `).join('')}
                 </tbody>
                 <tfoot>
-                  <tr>
-                    <td><strong>Total</strong></td>
-                    <td><strong>${summaryData.inputTokens}</strong></td>
-                    <td><strong>${summaryData.outputTokens}</strong></td>
-                    <td><strong>${summaryData.cacheTokens}</strong></td>
-                    <td><strong>${summaryData.cost.toFixed(4)}</strong></td>
-                    <td><strong>${summaryData.cachedCost.toFixed(4)}</strong></td>
-                    <td><strong>${formatSeconds(summaryData.buildTime)}</strong></td>
-                    <td><strong>${formatSeconds(summaryData.artifactTime)}</strong></td>
-                    <td><strong>${formatMilliseconds(summaryData.modelTime)}</strong></td>
-                    <td><strong>${summaryData.modelCachedTime.toFixed(2)}s</strong></td>
-                    <td><strong>${summaryData.requests}</strong></td>
-                    <td><strong>${summaryData.cachedRequests}</strong></td>
+                  <tr class="bg-base-300 font-bold">
+                    <td class="font-bold">Total</td>
+                    <td class="font-bold">${summaryData.inputTokens}</td>
+                    <td class="font-bold">${summaryData.outputTokens}</td>
+                    <td class="font-bold">${summaryData.cacheTokens}</td>
+                    <td class="font-bold">${summaryData.cost.toFixed(4)}</td>
+                    <td class="font-bold">${summaryData.cachedCost.toFixed(4)}</td>
+                    <td class="font-bold">${formatSeconds(summaryData.buildTime)}</td>
+                    <td class="font-bold">${formatSeconds(summaryData.artifactTime)}</td>
+                    <td class="font-bold">${formatMilliseconds(summaryData.modelTime)}</td>
+                    <td class="font-bold">${summaryData.modelCachedTime.toFixed(2)}s</td>
+                    <td class="font-bold">${summaryData.requests}</td>
+                    <td class="font-bold">${summaryData.cachedRequests}</td>
                   </tr>
                 </tfoot>
-              </table>
+                </table>
+              </div>
             `
-      : '<p>No steps found for this task</p>'
+      : '<p class="text-center text-base-content/70 p-4">No steps found for this task</p>'
     }
         </div>
       </body>

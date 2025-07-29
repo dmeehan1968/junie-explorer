@@ -82,63 +82,64 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" data-theme="light">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task ${task.id} Trajectories</title>
-        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
         <script src="/js/reloadPage.js"></script>
         <script src="/js/trajectoryToggle.js"></script>
       </head>
-      <body>
-        <div class="container">
-          <div class="header-container">
-            <h1>Junie Explorer: Task ${task.id} Trajectories</h1>
-            <button id="reload-button" class="reload-button" onclick="reloadPage()">Reload</button>
+      <body class="bg-base-200 p-5">
+        <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
+          <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Task ${task.id} Trajectories</h1>
+            <button id="reload-button" class="btn btn-primary btn-sm" onclick="reloadPage()">Reload</button>
           </div>
           ${VersionBanner(jetBrains.version)}
           <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/" data-testid="breadcrumb-projects">Projects</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name">${projectName}</a></li>
-              <li class="breadcrumb-item"><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-issue-name">${issue?.name}</a></li>
-              <li class="breadcrumb-item active">Task ${task.id} Trajectories</li>
-            </ol>
+            <div class="breadcrumbs text-sm mb-5">
+              <ul>
+                <li><a href="/" data-testid="breadcrumb-projects" class="text-primary hover:text-primary-focus">Projects</a></li>
+                <li><a href="/project/${encodeURIComponent(projectName)}" data-testid="breadcrumb-project-name" class="text-primary hover:text-primary-focus">${projectName}</a></li>
+                <li><a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}" data-testid="breadcrumb-issue-name" class="text-primary hover:text-primary-focus">${issue?.name}</a></li>
+                <li class="text-base-content/70">Task ${task.id} Trajectories</li>
+              </ul>
+            </div>
           </nav>
 
-          <div class="ide-icons">
+          <div class="flex gap-1 mb-5">
             ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="ide-icon" />
+              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
             `).join('')}
           </div>
 
-          <div class="task-details">
-            <div class="task-meta">
-              <div class="task-created">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
-              <div class="task-download">
-                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="reload-button">Download Trajectories as JSONL</a>
-              </div>
+          <div class="mb-5">
+            <div class="flex justify-between items-center mb-3 p-4 bg-base-200 rounded-lg">
+              <div class="text-sm text-base-content/70">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
+              <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>
             </div>
             ${task.context.description ? `
-              <div class="task-description">
-                <h3>Task Description</h3>
-                ${marked(escapeHtml(task.context.description))}
+              <div class="bg-base-200 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2 text-primary">Task Description</h3>
+                <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
               </div>
             ` : ''}
           </div>
 
           ${trajectories.length > 0
       ? `
-              <table class="trajectories-table" data-testid="trajectories-table">
-                <thead>
-                  <tr>
-                    <th class="timestamp-col">Timestamp</th>
-                    <th class="role-col">Role</th>
-                    <th class="content-col">Content</th>
-                  </tr>
-                </thead>
+              <div class="overflow-x-auto">
+                <table class="table table-zebra table-compact w-full" data-testid="trajectories-table">
+                  <thead>
+                    <tr>
+                      <th class="bg-base-200 w-48">Timestamp</th>
+                      <th class="bg-base-200 w-24">Role</th>
+                      <th class="bg-base-200">Content</th>
+                    </tr>
+                  </thead>
                 <tbody>
                   ${trajectories.map((trajectory, index) => {
         const locale = getLocaleFromRequest(req)
@@ -183,9 +184,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         })
       }).join('')}
                 </tbody>
-              </table>
+                </table>
+              </div>
             `
-      : '<div class="no-trajectories" data-testid="no-trajectories-message">No trajectories found for this task</div>'
+      : '<div class="text-center text-base-content/70 p-4" data-testid="no-trajectories-message">No trajectories found for this task</div>'
     }
         </div>
       </body>
