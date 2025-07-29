@@ -30,7 +30,7 @@
     "fs-extra": "^11.1.1",
     "marked": "^15.0.12",
     "mime-types": "^3.0.1",
-    "poolifier-web-worker": "^0.5.7",
+    "poolifier-web-worker": "^0.5.8",
     "semver": "^7.7.2",
     "tailwindcss": "^4.1.11",
     "zod": "^3.25.63"

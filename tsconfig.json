@@ -10,12 +10,7 @@
     "noEmit": true,
     "types": ["node", "@playwright/test"],
     "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
+    "baseUrl": "."
   },
   "include": ["src", "features", "public"]
 }

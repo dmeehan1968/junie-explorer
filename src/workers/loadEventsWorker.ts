@@ -1,7 +1,7 @@
 import fs from "fs-extra"
 import { ThreadWorker } from "poolifier-web-worker"
 // NB: Need to use an alias as the worker doesn't load this in the same working directory for a relative path
-import { EventRecord, UnknownEventRecord } from "@/eventSchema.js"
+import { EventRecord, UnknownEventRecord } from "../eventSchema.js"
 
 interface LoadEventsInput {
   eventsFilePath: string

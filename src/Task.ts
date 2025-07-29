@@ -41,13 +41,7 @@ export class Task {
   private static get workerPool() {
     if (!this._workerPool) {
 
-      // Workaround issue with Poolifier taking a URL, but Bun not loading the worker script from the fully
-      // qualified path.
-      const workerFile = fs.readFileSync('./src/workers/loadEventsWorker.ts')
-      const blob = new Blob([workerFile], { type: "application/javascript" })
-      const url = URL.createObjectURL(blob)
-      const worker = new URL(url)
-
+      const workerPath = './src/workers/loadEventsWorker.js'
       const maxParallelism = Math.min(availableParallelism(), parseInt(process.env.MAX_WORKERS ?? availableParallelism().toString()))
       const isDynamic = maxParallelism > 1
       const options: ThreadPoolOptions = {
@@ -56,8 +50,8 @@ export class Task {
         },
       }
       this._workerPool = isDynamic
-        ? new DynamicThreadPool(1, maxParallelism, worker, options)
-        : new FixedThreadPool(maxParallelism, worker, options)
+        ? new DynamicThreadPool(1, maxParallelism, workerPath, options)
+        : new FixedThreadPool(maxParallelism, workerPath, options)
     }
     return this._workerPool
   }

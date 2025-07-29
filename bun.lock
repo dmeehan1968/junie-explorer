@@ -11,7 +11,7 @@
         "fs-extra": "^11.1.1",
         "marked": "^15.0.12",
         "mime-types": "^3.0.1",
-        "poolifier-web-worker": "^0.5.7",
+        "poolifier-web-worker": "^0.5.8",
         "semver": "^7.7.2",
         "tailwindcss": "^4.1.11",
         "zod": "^3.25.63",
@@ -501,7 +501,7 @@
 
     "playwright-core": ["playwright-core@1.54.1", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-Nbjs2zjj0htNhzgiy5wu+3w09YetDx5pkrpI/kZotDlDUaYk0HVA5xrBVPdow4SAUIlhgKcJeJg4GRKW6xHusA=="],
 
-    "poolifier-web-worker": ["poolifier-web-worker@0.5.7", "", {}, "sha512-ZdbtF54Z7ZGSJKAiR6Qk10qqB+TQuuVnppY6VH+4ffPfyou7R2M+gyqILA4BqC125I2tJTXmszL9TZ5qaTEAzA=="],
+    "poolifier-web-worker": ["poolifier-web-worker@0.5.8", "", {}, "sha512-D0XWeJEWSBG3grtcmNgMoil3LXoqeFPh0Nyi4YwBQOLCrQI/TSLE+9cd3qufJeHly6sUcr7A07Qe+ZbYzD8qMw=="],
 
     "progress": ["progress@2.0.3", "", {}, "sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA=="],
 
