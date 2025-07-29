@@ -106,7 +106,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
                             Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}
                           </div>
                         </div>
-                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-yellow-50 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
+                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-base-300 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
                         <div data-testid="task-details">
                           ${generateStepTotalsTable(stepTotals)}
                         </div>
@@ -116,7 +116,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
                           <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="steps-button">Steps</a>
                           <button class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
                         </div>
-                        <div id="raw-data-${index}" class="mt-4 p-4 bg-base-200 rounded-lg font-mono border border-base-300 hidden" data-testid="json-viewer">
+                        <div id="raw-data-${index}" class="mt-4 p-4 bg-base-300 rounded-lg font-mono border border-base-300 hidden" data-testid="json-viewer">
                           <div id="json-renderer-${index}" class="text-sm"></div>
                         </div>
                       </div>

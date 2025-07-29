@@ -45,12 +45,12 @@ function toggleEventTypeFilter(element) {
   if (eventTypeFilters[eventType]) {
     element.classList.remove('event-filter-disabled');
     if (label) {
-      label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-green-100 border border-green-300 text-green-700';
+      label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-secondary border border-secondary-300 text-secondary-content';
     }
   } else {
     element.classList.add('event-filter-disabled');
     if (label) {
-      label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+      label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-neutral border border-neutral-300 text-neutral-content';
     }
   }
   
@@ -81,12 +81,13 @@ function toggleAllEventTypes() {
     if (shouldEnableAll) {
       filter.classList.remove('event-filter-disabled');
       if (label) {
-        label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-green-100 border border-green-300 text-green-700';
+        label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-secondary border border-secondary-300 text-secondary-content';
+        label.textContent = eventType + ''
       }
     } else {
       filter.classList.add('event-filter-disabled');
       if (label) {
-        label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+        label.className = 'cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-neutral border border-neutral-300 text-neutral-content';
       }
     }
   });
@@ -96,12 +97,12 @@ function toggleAllEventTypes() {
   if (shouldEnableAll) {
     allNoneElement.classList.remove('event-filter-disabled');
     if (allNoneLabel) {
-      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700';
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-primary border border-primary-300 text-primary-content';
     }
   } else {
     allNoneElement.classList.add('event-filter-disabled');
     if (allNoneLabel) {
-      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-neutral border border-neutral-300 text-neutral-content';
     }
   }
   
@@ -121,19 +122,19 @@ function updateAllNoneToggle() {
     // All enabled
     allNoneElement.classList.remove('event-filter-disabled');
     if (allNoneLabel) {
-      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700';
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-primary border border-primary-300 text-primary-content';
     }
   } else if (enabledCount === 0) {
     // None enabled
     allNoneElement.classList.add('event-filter-disabled');
     if (allNoneLabel) {
-      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-gray-100 border border-gray-300 text-gray-600';
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-neutral border border-neutral-300 text-neutral-content';
     }
   } else {
     // Some enabled - show as enabled since we have partial selection
     allNoneElement.classList.remove('event-filter-disabled');
     if (allNoneLabel) {
-      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700';
+      allNoneLabel.className = 'cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-primary border border-primary-300 text-primary-content';
     }
   }
 }

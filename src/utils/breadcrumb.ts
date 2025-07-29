@@ -17,7 +17,7 @@ export interface BreadcrumbOptions {
  * @returns HTML string for breadcrumb navigation
  */
 export function Breadcrumb(options: BreadcrumbOptions): string {
-  const { items, className = 'mb-5' } = options
+  const { items, className = 'bg-base-200 mb-5' } = options
 
   const breadcrumbItems = items.map((item, index) => {
     const isLast = index === items.length - 1
@@ -34,7 +34,7 @@ export function Breadcrumb(options: BreadcrumbOptions): string {
 
   return `
     <nav aria-label="breadcrumb" data-testid="breadcrumb-navigation" class="${className}">
-      <div class="breadcrumbs bg-gray-100 rounded-md px-3 py-2">
+      <div class="breadcrumbs rounded-md px-3 py-2">
         <ul>
           ${breadcrumbItems}
         </ul>

@@ -266,7 +266,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             `).join('')}
           </div>
 
-          <div class="mb-5 bg-gray-100 rounded shadow-sm p-4">
+          <div class="mb-5 bg-base-100 rounded shadow-sm p-4">
             <div class="flex justify-between items-center mb-4">
               <div class="text-base-content">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
               <div>
@@ -274,7 +274,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               </div>
             </div>
             ${task.context.description ? `
-              <div class="mt-4 bg-yellow-50 p-4">
+              <div class="mt-4 bg-base-300 p-4">
                 <h3 class="text-xl font-bold text-primary mb-2">Task Description</h3>
                 <div class="prose max-w-none">${marked(escapeHtml(task.context.description))}</div>
               </div>
@@ -364,9 +364,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               </div>
               <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
                 <div class="overflow-x-auto">
-                  <table class="table table-zebra table-sm w-full bg-white text-sm" data-testid="event-stats-table">
+                  <table class="table table-zebra table-sm w-full bg-base-100 text-base-content text-sm" data-testid="event-stats-table">
                     <thead>
-                      <tr class="!bg-gray-100">
+                      <tr class="!bg-base-200">
                         <th class="text-left w-2/5 whitespace-nowrap">Event Type</th>
                         <th class="text-right whitespace-nowrap">Sample Count</th>
                         <th class="text-right whitespace-nowrap">Min Duration (ms)</th>
@@ -430,11 +430,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               <div class="flex flex-wrap gap-2 mb-5 p-4 bg-base-200 rounded items-center">
                 <div class="font-bold mr-2 flex items-center">Filter by Event Type:</div>
                 <div class="cursor-pointer transition-all duration-300 rounded flex items-center gap-1 event-filter all-none-toggle" data-testid="all-none-toggle">
-                  <label class="cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-blue-100 border border-blue-300 text-blue-700">All/None</label>
+                  <label class="cursor-pointer text-sm font-bold py-1 px-2 rounded transition-all duration-300 bg-primary border border-primary-300 text-primary-content">All/None</label>
                 </div>
                 ${(await task.eventTypes).map(eventType => `
                   <div class="cursor-pointer transition-all duration-300 rounded flex items-center gap-1 event-filter" data-event-type="${escapeHtml(eventType)}" data-testid="event-filter-${escapeHtml(eventType)}">
-                    <label class="cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-green-100 border border-green-300 text-green-700">${escapeHtml(eventType)}</label>
+                    <label class="cursor-pointer text-sm py-1 px-2 rounded transition-all duration-300 bg-secondary border border-secondary-300 text-secondary-content">${escapeHtml(eventType)}</label>
                   </div>
                 `).join('')}
               </div>
@@ -444,9 +444,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
           ${events.length > 0
       ? `
               <div class="overflow-x-auto">
-                <table class="table w-full bg-white" data-testid="events-table">
+                <table class="table w-full bg-base-100" data-testid="events-table">
                   <thead>
-                    <tr class="!bg-gray-100">
+                    <tr class="!bg-base-200 text-base-content">
                       <th class="text-left whitespace-nowrap w-fit">Timestamp</th>
                       <th class="text-left whitespace-nowrap w-fit">Event Type</th>
                       <th class="text-left whitespace-nowrap max-w-2xl">JSON</th>
@@ -472,14 +472,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
         }
 
         return `
-                      <tr data-testid="event-row-${index}">
+                      <tr data-testid="event-row-${index}" class="text-base-content">
                         <td class="text-left whitespace-nowrap w-fit">${timestampDisplay}</td>
                         <td class="text-left whitespace-nowrap w-fit ${eventRecord.parseError ? 'bg-red-100 text-red-800' : ''}">
                           ${escapeHtml(eventRecord.event.type)}
                           ${eventRecord.parseError ? '(parseError)' : ''}
                         </td>
                         <td class="text-left max-w-2xl">
-                          <div class="max-h-48 overflow-auto bg-gray-50 p-2 rounded font-mono text-xs whitespace-pre break-all">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
+                          <div class="max-h-48 overflow-auto bg-base-200 text-base-content p-2 rounded font-mono text-xs whitespace-pre break-all">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
                         </td>
                         <td class="text-right whitespace-nowrap w-fit">
                           ${eventRecord.event.type === 'LlmResponseEvent' ? eventRecord.event.answer.cost.toFixed(4) : '-'}  

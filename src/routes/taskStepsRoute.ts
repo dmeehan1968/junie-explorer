@@ -180,8 +180,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
-            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Task ${task.id}</h1>
-            <button id="reload-button" class="btn btn-primary btn-sm" onclick="reloadPage()">Reload</button>
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Task ${task.id} Trajectories</h1>
+            <div class="flex items-center gap-3">
+              ${ThemeSwitcher()}
+              ${ReloadButton()}
+            </div>
           </div>
           ${VersionBanner(jetBrains.version)}
           ${Breadcrumb({
@@ -205,13 +208,13 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
             </div>
             <div class="grid gap-4 ${(!task.plan || task.plan.length === 0) ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}">
               ${task.context.description ? `
-                <div class="bg-yellow-50 p-4 rounded-lg">
+                <div class="bg-base-200 text-base-content p-4 rounded-lg">
                   <h3 class="text-lg font-semibold mb-2 text-primary">User</h3>
                   <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
                 </div>
               ` : ''}
               ${task.plan && task.plan.length > 0 ? `
-                <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="bg-base-200 text-base-content p-4 rounded-lg">
                   <h3 class="text-lg font-semibold mb-2 text-primary">Agent</h3>
                   <div class="prose prose-sm max-w-none">
                     ${marked(escapeHtml(task.plan.map(planItem => planItem.description).join('\n\n')))}
@@ -222,7 +225,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
           </div>
 
           ${task.steps.size > 0
-      ? `<div class="h-96 mb-5 p-4 bg-base-100 rounded-lg border border-base-300">
+      ? `<div class="h-96 mb-5 p-4 bg-base-200 rounded-lg border border-base-300">
                 <canvas id="stepMetricsChart"></canvas>
               </div>`
       : ''
@@ -264,8 +267,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
                       <td>${step.metrics.cachedRequests}</td>
                       <td>
                         <div class="flex items-center justify-center gap-2">
-                          <button class="btn btn-xs bg-gray-200 border-gray-400 text-gray-600 toggle-json-data" data-step="${step.id}">JSON</button>
-                          <button class="btn btn-xs bg-gray-200 border-gray-400 text-gray-600 toggle-rep-data" data-step="${step.id}">REP</button>
+                          <button class="btn btn-xs bg-secondary text-secondary-content toggle-json-data" data-step="${step.id}">JSON</button>
+                          <button class="btn btn-xs bg-secondary text-secondary-content toggle-rep-data" data-step="${step.id}">REP</button>
                         </div>
                       </td>
                     </tr>

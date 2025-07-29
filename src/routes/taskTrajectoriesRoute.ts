@@ -127,7 +127,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>
             </div>
             ${task.context.description ? `
-              <div class="bg-yellow-50 p-4 rounded-lg">
+              <div class="bg-base-200 text-base-content p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2 text-primary">Task Description</h3>
                 <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
               </div>
@@ -172,7 +172,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             locale,
             expandIcon,
             collapseIcon,
-            cssClass: `role-${trajectory.role}`,
             testIdPrefix: 'trajectory-row'
           })
         }

@@ -27,15 +27,15 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
   const elapsedTimeSec = elapsedTimeMs / 1000
   const metrics = await project.metrics
   return `
-  <div class="mb-5 bg-gray-100 rounded shadow-sm p-4">
+  <div class="mb-5 bg-base-200 rounded shadow-sm p-4">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-primary">${issuesCount} Project Issue${issuesCount !== 1 ? 's' : ''}</h3>
       <span class="font-bold text-base-content" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
     </div>
     <div class="overflow-x-auto">
-      <table class="table table-zebra w-full bg-white" data-testid="issues-table">
+      <table class="table table-zebra w-full bg-base-100" data-testid="issues-table">
         <thead>
-          <tr class="!bg-gray-200">
+          <tr class="!bg-base-200">
             <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
             <th class="text-left whitespace-nowrap">Timestamp</th>
             <th class="text-right whitespace-nowrap">Input Tokens</th>
@@ -45,7 +45,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             <th class="text-right whitespace-nowrap">Time</th>
             <th class="text-right whitespace-nowrap">Status</th>
           </tr>
-          <tr class="!bg-gray-100 font-bold text-black">
+          <tr class="!bg-base-200 font-bold text-base-content">
             <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
             <td class="text-right whitespace-nowrap" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
@@ -58,7 +58,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         </thead>
         <tbody>
           ${(await Promise.all(sortedIssues.map(async issue => `
-          <tr class="cursor-pointer hover:!bg-blue-100 transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md" onclick="window.location.href='/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}'">
+          <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md" onclick="window.location.href='/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}'">
             <td class="text-left font-bold text-primary hover:text-primary-focus whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
               ${escapeHtml(issue.name)}
             </td>
@@ -75,7 +75,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           `))).join('')}
         </tbody>
         <tfoot>
-          <tr class="!bg-gray-50 font-bold border-t-2 border-gray-300">
+          <tr class="!bg-base-200 font-bold text-base-content">
             <td class="text-left whitespace-nowrap" data-testid="summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
             <td class="text-right whitespace-nowrap" data-testid="summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
@@ -217,7 +217,7 @@ router.get('/project/:projectName', async (req, res) => {
           </div>
 
           ${(await project.issues).size > 0
-      ? `<div class="h-96 mb-5 p-4 bg-base-100 rounded-lg border border-base-300" data-testid="cost-over-time-graph">
+      ? `<div class="h-96 mb-5 p-4 bg-base-200 rounded-lg border border-base-300" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>`
       : ''
