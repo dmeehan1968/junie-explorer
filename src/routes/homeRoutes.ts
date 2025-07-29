@@ -4,6 +4,7 @@ import { Project } from '../Project.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { VersionBanner } from '../utils/versionBanner.js'
 import { ReloadButton } from '../utils/reloadButton.js'
+import { ThemeSwitcher } from '../utils/themeSwitcher.js'
 
 const router = express.Router()
 
@@ -217,7 +218,7 @@ router.get('/', async (req, res) => {
     // Generate HTML
     const html: string = `
       <!DOCTYPE html>
-      <html lang="en" data-theme="light">
+      <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -230,6 +231,7 @@ router.get('/', async (req, res) => {
           // Define the projects data as a global variable
           window.projectsData = ${JSON.stringify(projects.map(p => ({ name: p.name, ides: p.ideNames })))};
         </script>
+        <script src="/js/themeSwitcher.js"></script>
         <script src="/js/ideFilters.js"></script>
         <script src="/js/projectSelection.js"></script>
         <script src="/js/reloadPage.js"></script>
@@ -238,7 +240,10 @@ router.get('/', async (req, res) => {
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer</h1>
-            ${ReloadButton()}
+            <div class="flex items-center gap-3">
+              ${ThemeSwitcher()}
+              ${ReloadButton()}
+            </div>
           </div>
           ${VersionBanner(jetBrains.version)}
           <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>

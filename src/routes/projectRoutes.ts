@@ -8,6 +8,7 @@ import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { ReloadButton } from '../utils/reloadButton.js'
 import { getStatusBadge } from "../utils/statusBadge.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
+import { ThemeSwitcher } from '../utils/themeSwitcher.js'
 import { VersionBanner } from '../utils/versionBanner.js'
 
 const router = express.Router()
@@ -172,7 +173,7 @@ router.get('/project/:projectName', async (req, res) => {
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en" data-theme="light">
+      <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -188,6 +189,7 @@ router.get('/project/:projectName', async (req, res) => {
             </script>`
       : ''
     }
+        <script src="/js/themeSwitcher.js"></script>
         <script src="/js/issueGraph.js"></script>
         <script src="/js/reloadPage.js"></script>
       </head>
@@ -195,7 +197,10 @@ router.get('/project/:projectName', async (req, res) => {
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${project.name}</h1>
-            ${ReloadButton()}
+            <div class="flex items-center gap-3">
+              ${ThemeSwitcher()}
+              ${ReloadButton()}
+            </div>
           </div>
           ${VersionBanner(jetBrains.version)}
           ${Breadcrumb({

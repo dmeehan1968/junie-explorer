@@ -6,8 +6,10 @@ import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../utils/versionBanner.js'
+import { ReloadButton } from '../utils/reloadButton.js'
 import { TrajectoryRow } from '../utils/trajectoryRow.js'
 import { Breadcrumb } from '../utils/breadcrumb.js'
+import { ThemeSwitcher } from '../utils/themeSwitcher.js'
 
 // SVG icons for expand and collapse states
 const expandIcon = `<svg 
@@ -83,13 +85,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en" data-theme="light">
+      <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task ${task.id} Trajectories</title>
         <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" sizes="any" type="image/png">
+        <script src="/js/themeSwitcher.js"></script>
         <script src="/js/reloadPage.js"></script>
         <script src="/js/trajectoryToggle.js"></script>
       </head>
@@ -97,7 +100,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Task ${task.id} Trajectories</h1>
-            <button id="reload-button" class="btn btn-primary btn-sm" onclick="reloadPage()">Reload</button>
+            <div class="flex items-center gap-3">
+              ${ThemeSwitcher()}
+              ${ReloadButton()}
+            </div>
           </div>
           ${VersionBanner(jetBrains.version)}
           ${Breadcrumb({

@@ -7,7 +7,9 @@ import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
 import { VersionBanner } from '../utils/versionBanner.js'
+import { ReloadButton } from '../utils/reloadButton.js'
 import { Breadcrumb } from '../utils/breadcrumb.js'
+import { ThemeSwitcher } from '../utils/themeSwitcher.js'
 
 const router = express.Router()
 
@@ -150,7 +152,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en" data-theme="light">
+      <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -169,6 +171,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId', async (req, res)
             </script>`
       : ''
     }
+        <script src="/js/themeSwitcher.js"></script>
         <script src="/js/taskStepGraph.js"></script>
         <script src="/js/taskStepRawData.js"></script>
         <script src="/js/taskStepRepData.js"></script>
