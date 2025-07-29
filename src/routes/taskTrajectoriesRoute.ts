@@ -132,7 +132,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
           ${trajectories.length > 0
       ? `
               <div class="overflow-x-auto">
-                <table class="table table-compact w-full" data-testid="trajectories-table">
+                <table class="table table-fixed w-full" data-testid="trajectories-table">
                   <thead>
                     <tr>
                       <th class="bg-base-200 w-48">Timestamp</th>

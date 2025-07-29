@@ -38,6 +38,7 @@
   "devDependencies": {
     "@cucumber/cucumber": "^10.3.1",
     "@playwright/test": "^1.40.0",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/express": "^4.17.21",
     "@types/fs-extra": "^11.0.4",
     "@types/marked": "^5.0.2",

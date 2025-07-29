@@ -43,7 +43,7 @@ export function TrajectoryRow(options: TrajectoryRowOptions): string {
 
   return `
     <tr data-testid="${testId}" ${rowClasses ? `class="${rowClasses}"` : ''}>
-      <td class="timestamp-col align-top">${escapeHtml(formattedTimestamp)}</td>
+      <td class="timestamp-col align-top text-nowrap">${escapeHtml(formattedTimestamp)}</td>
       <td class="role-col align-top">${escapeHtml(role)}</td>
       <td class="content-col">
         <div class="content-cell-container relative">
@@ -53,7 +53,7 @@ export function TrajectoryRow(options: TrajectoryRowOptions): string {
             testIdPrefix: 'trajectory-toggle',
             index
           })}
-          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words p-2 transition-all duration-300 ease-in-out">${escapeHtml(content.trim())}</div>
+          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(content.trim())}</div>
         </div>
       </td>
     </tr>

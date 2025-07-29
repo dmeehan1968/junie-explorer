@@ -14,7 +14,7 @@ const router = express.Router()
 const generateStepTotalsTable = (summaryData: SummaryMetrics): string => {
   return `
   <div class="overflow-x-auto mb-4" data-testid="task-metrics">
-    <table class="table table-compact w-full bg-base-100">
+    <table class="table w-full bg-base-100">
       <tbody>
         <tr>
           <td class="text-sm"><span class="font-semibold">Input Tokens:</span> ${summaryData.inputTokens}</td>

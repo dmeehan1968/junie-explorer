@@ -18,7 +18,7 @@ export class RepresentationRenderer {
       : await marked(escapeHtmlExceptCodeBlocks(value));
 
     return `
-      <div class="parsed-section">
+      <div class="parsed-section prose prose-sm max-w-none">
         <h3>${title}</h3>
         ${content}
       </div>
@@ -37,14 +37,14 @@ export class RepresentationRenderer {
       return sections.join('');
     }
 
-    return await marked(escapeHtmlExceptCodeBlocks(fallbackContent));
+    return `<div class="prose prose-sm max-w-none">${await marked(escapeHtmlExceptCodeBlocks(fallbackContent))}</div>`;
   }
 
   private static async renderResultSection(resultContent: string): Promise<string> {
     if (!resultContent) return '';
 
     return `
-      <div class="result-section">
+      <div class="result-section max-w-none">
         <h3>Result</h3>
         ${await marked(escapeHtmlExceptCodeBlocks(resultContent))}
       </div>
@@ -56,7 +56,7 @@ export class RepresentationRenderer {
     const resultSection = await this.renderResultSection(parsed.resultContent);
 
     return `
-      <div class="thought-section">
+      <div class="thought-section prose">
         ${thoughtSection}
       </div>
       ${resultSection}
