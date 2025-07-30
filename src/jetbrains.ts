@@ -89,7 +89,7 @@ export class JetBrains {
       console.error('Unable to check for updates:', error)
     }
 
-    this.logger.log('Reading logs...')
+    this.logger.log('Reading logs, please wait...')
     const start = Date.now()
 
     await this.metrics  // forces a full load

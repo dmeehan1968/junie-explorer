@@ -94,10 +94,12 @@ with other processes, you can use the MAX_WORKERS environment variable:
 MAX_WORKERS=4 junie-explorer-apple-arm64
 ```
 
-NB: Setting MAX_WORKERS to 1 will disable concurrency but a worker is still used which will add a performance penalty
+- Setting MAX_WORKERS to 0 will disable concurrency.
+- Setting MAX_WORKERS to 1 will disable concurrency, but a worker is still used which will add a performance penalty
 about doubling the time taken to process the logs.
-
-Memory Usage: The more workers you use, the more memory you are likely to need.  If memory is an issue, constrain
+- You cannot set MAX_WORKERS to a value greater than the number of CPU cores on your system, it will be adjusted down
+  to match the number of cores.
+- The more workers you use, the more memory you are likely to need.  If memory is an issue, constrain
 the maximum number of workers
 
 ##  Development

@@ -19,6 +19,7 @@ import {
 } from "./schema.js"
 import { Step } from "./Step.js"
 import { Trajectory, TrajectoryError } from "./trajectorySchema.js"
+import { loadEvents } from "./workers/loadEvents.js"
 
 export class Task {
   readonly id: string
@@ -37,22 +38,31 @@ export class Task {
   private _trajectories: (Trajectory | TrajectoryError)[] = []
 
   // Static worker pool for loading events
-  private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, { events: EventRecord[] }> | undefined
+  private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, { events: EventRecord[] }> | null | undefined = undefined
 
   private static get workerPool() {
-    if (!this._workerPool) {
+    const maxParallelism = Math.min(availableParallelism(), parseInt(process.env.MAX_WORKERS ?? availableParallelism().toString()))
+    if (this._workerPool) {
+      return this._workerPool
+    }
 
-      const workerPath = './src/workers/loadEventsWorker.js'
-      const maxParallelism = Math.min(availableParallelism(), parseInt(process.env.MAX_WORKERS ?? availableParallelism().toString()))
-      const isDynamic = maxParallelism > 1
-      const options: ThreadPoolOptions = {
-        errorEventHandler: (e) => {
-          console.error('Worker pool error:', e)
-        },
+    if (this._workerPool === undefined) {
+      if (maxParallelism > 0) {
+        const workerPath = './src/workers/loadEventsWorker.ts'
+        const isDynamic = maxParallelism > 1
+        const options: ThreadPoolOptions = {
+          errorEventHandler: (e) => {
+            console.error('Worker pool error:', e)
+          },
+        }
+        console.log(`Concurrency is ${maxParallelism}. Set MAX_WORKERS to configure`)
+        this._workerPool = isDynamic
+          ? new DynamicThreadPool(1, maxParallelism, workerPath, options)
+          : new FixedThreadPool(maxParallelism, workerPath, options)
+      } else {
+        this._workerPool = null
+        console.warn(`Concurrency disabled. Set MAX_WORKERS to enable`)
       }
-      this._workerPool = isDynamic
-        ? new DynamicThreadPool(1, maxParallelism, workerPath, options)
-        : new FixedThreadPool(maxParallelism, workerPath, options)
     }
     return this._workerPool
   }
@@ -165,51 +175,18 @@ export class Task {
 
   private async loadEvents(): Promise<EventRecord[]> {
     try {
-      const result = await Task.workerPool.execute({
-        eventsFilePath: this.eventsFile,
-      })
-      return result.events
+      if (Task.workerPool) {
+        const result = await Task.workerPool.execute({
+          eventsFilePath: this.eventsFile,
+        })
+        return result.events
+      }
+      return loadEvents(this.eventsFile).events
     } catch (error) {
       console.error('Error loading events with worker pool:', error)
       // Fallback to original implementation if worker fails
-      return this.loadEventsOriginal()
+      return loadEvents(this.eventsFile).events
     }
-  }
-
-  private async loadEventsOriginal(): Promise<EventRecord[]> {
-    const root = this.eventsFile
-
-    if (fs.existsSync(root)) {
-      const content = fs.readFileSync(root, 'utf-8')
-      return content
-        .split('\n')
-        .filter(json => json.trim())
-        .map((line, lineNumber) => {
-          let json: any
-          try {
-            json = JSON.parse(line)
-          } catch (error) {
-            return {
-              type: 'jsonError',
-              timestamp: new Date(),
-              event: {
-                type: 'unparsed',
-                data: line,
-              },
-            }
-          }
-          try {
-            return EventRecord.parse(json)
-          } catch (error: any) {
-            console.log(this.eventsFile, lineNumber, error.errors[0].code, error.errors[0].path, error.errors[0].message, line.slice(0, 100))
-            return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parse(json)
-          }
-        })
-        .filter((event): event is EventRecord => !!event)
-        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-    }
-
-    return []
   }
 
   get events(): Promise<EventRecord[]> {
