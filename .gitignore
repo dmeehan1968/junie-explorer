@@ -1,5 +1,6 @@
 # Generated during build process
 /public/css/app.css
+/public/version.txt
 /src/bun/public.ts
 /dist
 
