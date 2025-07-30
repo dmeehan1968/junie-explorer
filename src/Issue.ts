@@ -26,12 +26,8 @@ export class Issue {
 
   }
 
-  get tasks() {
-    if (this._tasks) {
-      return this._tasks
-    }
-
-    this._tasks = new Promise(async (resolve) => {
+  get tasks(): Promise<Map<string, Task>> {
+    this._tasks ??= new Promise(async (resolve) => {
 
       const tasks = new Map<string, Task>()
 
@@ -53,11 +49,7 @@ export class Issue {
   }
 
   get metrics(): Promise<SummaryMetrics> {
-    if (this._metrics) {
-      return this._metrics
-    }
-
-    this._metrics = new Promise(async (resolve) => {
+    this._metrics ??= new Promise(async (resolve) => {
 
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 

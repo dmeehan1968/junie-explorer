@@ -19,11 +19,7 @@ export class Project {
 
   private _issues: Promise<Map<string, Issue>> | undefined = undefined
   get issues(): Promise<Map<string, Issue>> {
-    if (this._issues) {
-      return this._issues
-    }
-
-    this._issues = new Promise(async (resolve) => {
+    this._issues ??= new Promise(async (resolve) => {
 
       const issues = new Map()
 
@@ -41,7 +37,7 @@ export class Project {
       )))
     })
 
-    return this._issues!
+    return this._issues
   }
 
   async getIssueById(id: string) {
@@ -49,11 +45,7 @@ export class Project {
   }
 
   get metrics(): Promise<SummaryMetrics> {
-    if (this._metrics) {
-      return this._metrics
-    }
-
-    this._metrics = new Promise(async (resolve) => {
+    this._metrics ??= new Promise(async (resolve) => {
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
       await Promise.all([...(await this.issues).values()].map(async (issue) => {
@@ -70,7 +62,7 @@ export class Project {
       return resolve(metrics)
     })
 
-    return this._metrics!
+    return this._metrics
   }
 
   get ideNames() {

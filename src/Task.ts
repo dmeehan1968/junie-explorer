@@ -174,19 +174,24 @@ export class Task {
   }
 
   private async loadEvents(): Promise<EventRecord[]> {
+    let events: EventRecord[] = []
+
     try {
       if (Task.workerPool) {
         const result = await Task.workerPool.execute({
           eventsFilePath: this.eventsFile,
         })
-        return result.events
+        events = result.events
+      } else {
+        events = loadEvents(this.eventsFile).events
       }
-      return loadEvents(this.eventsFile).events
     } catch (error) {
       console.error('Error loading events with worker pool:', error)
       // Fallback to original implementation if worker fails
-      return loadEvents(this.eventsFile).events
+      events = loadEvents(this.eventsFile).events
     }
+
+    return events
   }
 
   get events(): Promise<EventRecord[]> {
