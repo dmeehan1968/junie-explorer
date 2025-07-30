@@ -1,13 +1,8 @@
 import fs from "fs-extra"
 import path from "node:path"
-import {
-  AbstractPool,
-  availableParallelism,
-  DynamicThreadPool,
-  FixedThreadPool,
-  ThreadPoolOptions,
-} from "poolifier-web-worker"
-import { EventRecord, UnknownEventRecord } from "./eventSchema.js"
+import { AbstractPool, DynamicThreadPool, FixedThreadPool, ThreadPoolOptions } from "poolifier-web-worker"
+import { EventRecord } from "./eventSchema.js"
+import { getMaxConcurrency } from "./getMaxConcurrency.js"
 import {
   AgentState,
   JuniePlan,
@@ -38,30 +33,32 @@ export class Task {
   private _trajectories: (Trajectory | TrajectoryError)[] = []
 
   // Static worker pool for loading events
-  private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, { events: EventRecord[] }> | null | undefined = undefined
+  private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, {
+    events: EventRecord[]
+  }> | null | undefined = undefined
 
   private static get workerPool() {
-    const maxParallelism = Math.min(availableParallelism(), parseInt(process.env.MAX_WORKERS ?? availableParallelism().toString()))
+    const concurrency = getMaxConcurrency()
     if (this._workerPool) {
       return this._workerPool
     }
 
     if (this._workerPool === undefined) {
-      if (maxParallelism > 0) {
+      if (concurrency > 0) {
         const workerPath = './src/workers/loadEventsWorker.ts'
-        const isDynamic = maxParallelism > 1
+        const isDynamic = concurrency > 1
         const options: ThreadPoolOptions = {
           errorEventHandler: (e) => {
             console.error('Worker pool error:', e)
           },
         }
-        console.log(`Concurrency is ${maxParallelism}. Set MAX_WORKERS to configure`)
+        console.log(`Concurrency is ${concurrency}. Set environment CONCURRENCY to configure`)
         this._workerPool = isDynamic
-          ? new DynamicThreadPool(1, maxParallelism, workerPath, options)
-          : new FixedThreadPool(maxParallelism, workerPath, options)
+          ? new DynamicThreadPool(1, concurrency, workerPath, options)
+          : new FixedThreadPool(concurrency, workerPath, options)
       } else {
         this._workerPool = null
-        console.warn(`Concurrency disabled. Set MAX_WORKERS to enable`)
+        console.warn(`Concurrency disabled. Set environment CONCURRENCY > 0 to enable`)
       }
     }
     return this._workerPool
@@ -77,17 +74,14 @@ export class Task {
   }
 
   get metrics(): Promise<SummaryMetrics> {
-    if (this._metrics) {
-      return this._metrics
-    }
-
-    this._metrics = new Promise(async (resolve) => {
+    this._metrics ??= new Promise(async (resolve) => {
 
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
 
       // metrics needs to load events, but not retain them
       // but if metrics are already loaded (retained), then just use them
-      // avoid events getter so we can discard them
+      // avoid using the events getter so we can discard them
+
       const events = this._events ? await this._events : await this.loadEvents()
 
       for (const event of events) {
@@ -108,7 +102,7 @@ export class Task {
 
     })
 
-    return this._metrics!
+    return this._metrics
   }
 
   get steps() {
@@ -183,12 +177,12 @@ export class Task {
         })
         events = result.events
       } else {
-        events = loadEvents(this.eventsFile).events
+        events = (await loadEvents(this.eventsFile)).events
       }
     } catch (error) {
       console.error('Error loading events with worker pool:', error)
       // Fallback to original implementation if worker fails
-      events = loadEvents(this.eventsFile).events
+      events = (await loadEvents(this.eventsFile)).events
     }
 
     return events

@@ -3,11 +3,10 @@ import os from "node:os"
 import path from "node:path"
 import * as process from "node:process"
 import { fileURLToPath } from "node:url"
-import { inspect } from 'node:util'
+import semver from "semver"
+import publicFiles from "./bun/public.js"
 import { Project } from "./Project.js"
 import { SummaryMetrics } from "./schema.js"
-import publicFiles from "./bun/public.js"
-import semver from "semver"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -132,14 +131,12 @@ export class JetBrains {
   private _projects: Promise<Map<string, Project>> | undefined = undefined
 
   get metrics(): Promise<SummaryMetrics> {
-    if (this._metrics) {
-      return this._metrics
-    }
+    this._metrics ??= new Promise(async (resolve) => {
 
-    this._metrics = new Promise(async (resolve) => {
-
-      const projects = await Promise.all([...(await this.projects).values()].map(async project => project.metrics))
-      const metrics = projects.reduce((acc, cur) => {
+      const projectMetrics = await Promise.all([...(await this.projects).values()].map(async project => {
+        return await project.metrics
+      }))
+      const metrics = projectMetrics.reduce((acc, cur) => {
         return {
           ...acc,
           inputTokens: acc.inputTokens + cur.inputTokens,

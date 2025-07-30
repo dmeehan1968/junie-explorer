@@ -1,7 +1,7 @@
 import fs from "fs-extra"
 import { EventRecord, UnknownEventRecord } from "../eventSchema.js"
 
-export function loadEvents(eventsFile: string) {
+export async function loadEvents(eventsFile: string) {
   if (fs.existsSync(eventsFile)) {
     const content = fs.readFileSync(eventsFile, 'utf-8')
     const events = content

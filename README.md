@@ -88,16 +88,16 @@ not guaranteed to be a reflection of peak memory usage.
 
 When loading the logs, concurrent workers are used to improve performance.  By default, the maximum concurrency
 supported by your system will be used (CPU cores).  If you want to limit the concurrency to avoid interference
-with other processes, you can use the MAX_WORKERS environment variable:
+with other processes, you can use the CONCURRENCY environment variable:
 
 ```shell
-MAX_WORKERS=4 junie-explorer-apple-arm64
+CONCURRENCY=4 junie-explorer-apple-arm64
 ```
 
-- Setting MAX_WORKERS to 0 will disable concurrency.
-- Setting MAX_WORKERS to 1 will disable concurrency, but a worker is still used which will add a performance penalty
+- Setting CONCURRENCY to 0 will disable concurrency.
+- Setting CONCURRENCY to 1 will disable concurrency, but a worker is still used which will add a performance penalty
 about doubling the time taken to process the logs.
-- You cannot set MAX_WORKERS to a value greater than the number of CPU cores on your system, it will be adjusted down
+- You cannot set CONCURRENCY to a value greater than the number of CPU cores on your system, it will be adjusted down
   to match the number of cores.
 - The more workers you use, the more memory you are likely to need.  If memory is an issue, constrain
 the maximum number of workers

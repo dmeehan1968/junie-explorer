@@ -15,7 +15,7 @@ async function loadEventsFunction(data?: LoadEventsInput): Promise<LoadEventsOut
     throw new Error('No data provided')
   }
   const { eventsFilePath } = data
-  return loadEvents(eventsFilePath)
+  return await loadEvents(eventsFilePath)
 }
 
 export default new ThreadWorker(loadEventsFunction, {
