@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.1] - 2025-07-30
+
+### Code Improvements
+- Rename MAX_WORKERS to CONCURRENCY, disable worker usage when CONCURRENCY is 0 (0e6f568)
+- Refactor promise initialization and improve event handling logic (41921fa)
+- Refactor event loading logic and improve worker pool handling (74f85e4)
+
+### Build System
+- Ignore version.txt from version control (7e47da9)
+
 ## [2.6.0] - 2025-07-29
 
 ### Features
