@@ -1,23 +1,23 @@
-import { literal, z } from "zod"
+import { z } from "zod"
 
-export const BeforeArtifactBuildingStarted = z.object({
+export const BeforeArtifactBuildingStarted = z.looseObject({
   type: z.literal('BeforeArtifactBuildingStarted'),
-  requestId: z.object({
+  requestId: z.looseObject({
     data: z.string(),
-  }).passthrough(),
-}).passthrough()
-export const AfterArtifactBuildingFinished = z.object({
+  }),
+})
+export const AfterArtifactBuildingFinished = z.looseObject({
   type: z.literal('AfterArtifactBuildingFinished'),
-  requestId: z.object({
+  requestId: z.looseObject({
     data: z.string(),
-  }).passthrough(),
-}).passthrough()
-export const ContentChoice = z.object({
+  }),
+})
+export const ContentChoice = z.looseObject({
   content: z.string(),
 })
 export const AIToolUseAnswerChoice = ContentChoice.extend({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'),
-  usages: z.object({
+  usages: z.looseObject({
     toolId: z.string(),
     toolName: z.string(),
     toolParams: z.object({
@@ -26,37 +26,37 @@ export const AIToolUseAnswerChoice = ContentChoice.extend({
       value: z.any(),
     }).array().default(() => ([])),
   }).array().default(() => ([])),
-}).passthrough()
+})
 
 export const AIContentAnswerChoice = ContentChoice.extend({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.AIContentAnswerChoice'),
-}).passthrough()
+})
 
-export const BaseCapabilities = z.object({
+export const BaseCapabilities = z.looseObject({
   inputPrice: z.number(),
   outputPrice: z.number(),
   cacheInputPrice: z.number().default(() => 0),
   cacheCreateInputPrice: z.number().default(() => 0),
-}).passthrough()
+})
 
-export const LLMBase = z.object({
+export const LLMBase = z.looseObject({
   provider: z.string(),
   name: z.string(),
   inputPrice: z.number().optional(),              // deprecated
   outputPrice: z.number().optional(),             // deprecated
   cacheInputPrice: z.number().optional(),         // deprecated
   cacheCreateInputPrice: z.number().optional(),   // deprecated
-}).passthrough()
+})
 
 export const OpenAIo3 = LLMBase.extend({
   jbai: z.literal('openai-o3'),
   capabilities: BaseCapabilities.optional()
-}).passthrough()
+})
 
 export const OpenAI4oMini = LLMBase.extend({
   jbai: z.literal('openai-gpt-4o-mini'),
   capabilities: BaseCapabilities.optional()
-}).passthrough()
+})
 
 export const AnthropicSonnet37 = LLMBase.extend({
   jbai: z.literal('anthropic-claude-3.7-sonnet'),
@@ -66,14 +66,14 @@ export const AnthropicSonnet37 = LLMBase.extend({
       maxDimension: z.number(),
       maxPixels: z.number(),
       maxDimensionDivider: z.number(),
-    }).passthrough().optional(),
+    }).optional(),
     supportsAssistantMessageResuming: z.boolean().default(() => false),
   }).optional(),
-}).passthrough()
+})
 
 export const AnthropicSonnet4 = AnthropicSonnet37.extend({
   jbai: z.literal('anthropic-claude-4-sonnet'),
-}).passthrough()
+})
 
 // Need to do manual discrimination because there are multiple data formats and models and not a singular way to
 // discriminate and then transform them.  So this is a two part process, transform them into common formats
@@ -154,32 +154,32 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AnthropicSonnet4,
 ]).parse(data))
 
-export const MatterhornChatMessage = z.object({
+export const ChatMessage = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage'),
   content: z.string(),
   kind: z.enum(['User', 'Assistant']).optional(),
-}).passthrough()
+})
 
-export const MatterhornMultiPartChatMessage = z.object({
+export const MultiPartChatMessage = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage'),
   parts: z.discriminatedUnion('type', [
-    z.object({
+    z.looseObject({
       type: z.literal('text'),
       text: z.string(),
     }),
-    z.object({
+    z.looseObject({
       type: z.literal('image'),
       contentType: z.string(),
       base64: z.string(),
     })
   ]).array(),
   kind: z.enum(['User', 'Assistant']).optional(),
-}).passthrough()
+})
 
-export const MatterhornAssistantChatMessageWithToolUses = z.object({
+export const AssistantChatMessageWithToolUses = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses'),
   content: z.string(),
-  toolUses: z.object({
+  toolUses: z.looseObject({
     id: z.string(),
     name: z.string(),
     input: z.object({
@@ -187,59 +187,85 @@ export const MatterhornAssistantChatMessageWithToolUses = z.object({
       name: z.string(),
       value: z.any(),
     }).array()
-  }).passthrough().array(),
-}).passthrough()
+  }).array(),
+})
 
-export const MatterhornUserChatMessageWithToolResults = z.object({
+export const UserChatMessageWithToolResults = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults'),
-  toolResults: z.object({
+  toolResults: z.looseObject({
     id: z.string(),
     content: z.string(),
     isError: z.boolean(),
-  }).passthrough().array(),
-}).passthrough()
+  }).array(),
+})
 
-export const Tools = z.object({
+export const AbstractToolProperty = z.looseObject({
   name: z.string(),
   description: z.string().optional(),
-  params: z.object({
-    MatterhornToolProperty: z.string(),
-    name: z.string(),
-    primitiveType: z.string().optional(),
-    description: z.string().optional(),
-    required: z.boolean(),
-  }).passthrough().array().default(() => ([]))
-}).passthrough().array().default(() => ([]))
+  required: z.boolean().default(() => false)
+})
 
-export const LlmRequestEvent = z.object({
+export const ToolPrimitiveProperty = AbstractToolProperty.extend({
+  MatterhornToolProperty: z.literal('MatterhornToolPrimitiveProperty'),
+  primitiveType: z.enum(['STRING', 'INTEGER', 'NUMBER', 'BOOLEAN']).optional(),
+})
+
+export const ToolArrayProperty = AbstractToolProperty.extend({
+  MatterhornToolProperty: z.literal('MatterhornToolArrayProperty'),
+  get itemType() {
+    return ToolAnyProperty
+  }
+})
+
+export const ToolObjectProperty = AbstractToolProperty.extend({
+  MatterhornToolProperty: z.literal('MatterhornToolObjectProperty'),
+  get properties() {
+    return ToolAnyProperty.array()
+  }
+})
+
+export const ToolAnyProperty = z.union([
+  ToolPrimitiveProperty,
+  ToolArrayProperty,
+  ToolObjectProperty,
+])
+
+export const Tools = z.looseObject({
+  name: z.string(),
+  description: z.string().optional(),
+  type: z.string().optional(),
+  params: ToolAnyProperty.array().default(() => ([])),
+}).array().default(() => ([]))
+
+export const LlmRequestEvent = z.looseObject({
   type: z.literal('LlmRequestEvent'),
-  chat: z.object({
+  chat: z.looseObject({
     system: z.string(),
     messages: z.discriminatedUnion('type', [
-      MatterhornChatMessage,
-      MatterhornMultiPartChatMessage,
-      MatterhornAssistantChatMessageWithToolUses,
-      MatterhornUserChatMessageWithToolResults,
+      ChatMessage,
+      MultiPartChatMessage,
+      AssistantChatMessageWithToolUses,
+      UserChatMessageWithToolResults,
     ]).array(),
     tools: Tools
-  }).passthrough(),
-  modelParameters: z.object({
+  }),
+  modelParameters: z.looseObject({
     model: LLM,
     prompt_cache_enabled: z.boolean().default(() => false),
     temperature: z.number().optional(),
     n: z.number().optional(),
-    stop: z.record(z.string()).optional(),
+    stop: z.record(z.string(), z.string()).optional(),
     max_tokens: z.number().optional(),
     user: z.string().optional(),
-  }).passthrough(),
+  }),
   attemptNumber: z.number(),
   id: z.string(),
-}).passthrough()
+})
 
-export const LlmResponseEvent = z.object({
+export const LlmResponseEvent = z.looseObject({
   type: z.literal('LlmResponseEvent'),
   id: z.string(),
-  answer: z.object({
+  answer: z.looseObject({
     llm: LLM,
     contentChoices: z.discriminatedUnion('type', [AIContentAnswerChoice, AIToolUseAnswerChoice]).array(),
     inputTokens: z.number().int().default(() => 0),
@@ -247,7 +273,7 @@ export const LlmResponseEvent = z.object({
     cacheInputTokens: z.number().int().default(() => 0),
     cacheCreateInputTokens: z.number().int().default(() => 0),
     time: z.number().optional(),
-  }).passthrough().transform(answer => {
+  }).transform(answer => {
     const million = 1_000_000
     return {
       ...answer,
@@ -257,39 +283,39 @@ export const LlmResponseEvent = z.object({
         + (answer.cacheCreateInputTokens / million) * (answer.llm?.capabilities?.cacheCreateInputPrice ?? answer.llm?.cacheCreateInputPrice ?? 0),
     }
   }),
-}).passthrough()
-export const TaskSummaryCreatedEvent = z.object({
+})
+export const TaskSummaryCreatedEvent = z.looseObject({
   type: z.literal('TaskSummaryCreatedEvent'),
   taskSummary: z.string(),
-}).passthrough()
-export const AgentStateUpdatedEvent = z.object({
+})
+export const AgentStateUpdatedEvent = z.looseObject({
   type: z.literal('AgentStateUpdatedEvent'),
   state: z.object({
-    issue: z.object({
+    issue: z.looseObject({
       description: z.string().optional(),
       editorContext: z.object({
         recentFiles: z.string().array(),
         openFiles: z.string().array(),
       }),
-    }).passthrough(),
-    observations: z.object({
+    }),
+    observations: z.looseObject({
       // TODO
-    }).passthrough().array(),
-    ideInitialState: z.object({
+    }).array(),
+    ideInitialState: z.looseObject({
       content: z.string(),
       kind: z.enum(['User', 'Assistant']),
-    }).passthrough().optional(),
-  }).passthrough(),
-}).passthrough()
-export const PlanUpdatedEvent = z.object({
+    }).optional(),
+  }),
+})
+export const PlanUpdatedEvent = z.looseObject({
   type: z.literal('PlanUpdatedEvent'),
-  plan: z.object({
+  plan: z.looseObject({
     description: z.string(),
     status: z.string(),
-  }).passthrough().array(),
-}).passthrough()
+  }).array(),
+})
 
-const ParamsObject = z.record(z.any())
+const ParamsObject = z.record(z.string(), z.any())
 type ParamsObject = z.infer<typeof ParamsObject>
 const ParamsArray = z.object({
   ParameterValue: z.string(),
@@ -304,137 +330,137 @@ const ParamsArray = z.object({
 
 export const AgentActionExecutionStarted = z.object({
   type: z.literal('AgentActionExecutionStarted'),
-  actionToExecute: z.object({
+  actionToExecute: z.looseObject({
     type: z.string(),
     name: z.string(),
     id: z.string().optional(),
     inputParams: z.union([ParamsObject, ParamsArray]).optional(),
     description: z.string().optional(),
-  }).passthrough(),
-}).passthrough()
+  }),
+})
 export const AgentActionExecutionFailed = AgentActionExecutionStarted.extend({
   type: z.literal('AgentActionExecutionFailed'),
-  result: z.object({
+  result: z.looseObject({
     text: z.string(),
     images: z.any().array(),
-  }).passthrough().optional(),
-}).passthrough()
+  }).optional(),
+})
 
-export const AgentInteractionStarted = z.object({
+export const AgentInteractionStarted = z.looseObject({
   type: z.literal('AgentInteractionStarted'),
-  interaction: z.object({
-    interactionId: z.object({
+  interaction: z.looseObject({
+    interactionId: z.looseObject({
       id: z.string(),
     }),
-    runCancelableInteraction: z.object({
+    runCancelableInteraction: z.looseObject({
       name: z.string(),
-    }).passthrough().optional(),
+    }).optional(),
     askInteraction: z.object({
       question: z.string(),
-    }).passthrough().optional(),
-  }).passthrough(),
-}).passthrough()
+    }).optional(),
+  }),
+})
 export type AgentInteractionStarted = z.infer<typeof AgentInteractionStarted>
 
 export const AgentInteractionFinished = z.object({
   type: z.literal('AgentInteractionFinished'),
-  interactionId: z.object({
+  interactionId: z.looseObject({
     id: z.string(),
-  }).passthrough(),
-}).passthrough()
+  }),
+})
 export type AgentInteractionFinished = z.infer<typeof AgentInteractionFinished>
 
-export const ResponseTextAppeared = z.object({
+export const ResponseTextAppeared = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.agent.ResponseTextAppeared'),
   text: z.string(),
-}).passthrough()
+})
 export type ResponseTextAppeared = z.infer<typeof ResponseTextAppeared>
 
 export const BeforeStepStartedEvent = z.object({
   type: z.literal('BeforeStepStartedEvent'),
   // TODO
-}).passthrough()
-export const StepMetaInfoAppearedEvent = z.object({
+})
+export const StepMetaInfoAppearedEvent = z.looseObject({
   type: z.literal('StepMetaInfoAppearedEvent'),
   stepName: z.string(),
   stepType: z.string(),
-}).passthrough()
-export const StepSummaryCreatedEvent = z.object({
+})
+export const StepSummaryCreatedEvent = z.looseObject({
   type: z.literal('StepSummaryCreatedEvent'),
-}).passthrough()
-export const AfterStepFinishedEvent = z.object({
+})
+export const AfterStepFinishedEvent = z.looseObject({
   type: z.literal('AfterStepFinishedEvent'),
   // TODO
-}).passthrough()
-export const AgentActionExecutionFinished = z.object({
+})
+export const AgentActionExecutionFinished = z.looseObject({
   type: z.literal('AgentActionExecutionFinished'),
   // TODO
-}).passthrough()
-export const AgentSessionUpdatedEvent = z.object({
+})
+export const AgentSessionUpdatedEvent = z.looseObject({
   type: z.literal('AgentSessionUpdatedEvent'),
   // TODO
-}).passthrough()
-export const ActionRequestBuildingStarted = z.object({
+})
+export const ActionRequestBuildingStarted = z.looseObject({
   type: z.literal('ActionRequestBuildingStarted'),
   attemptNumber: z.number(),
-}).passthrough()
-export const ActionRequestBuildingFailed = z.object({
+})
+export const ActionRequestBuildingFailed = z.looseObject({
   type: z.literal('ActionRequestBuildingFailed'),
   attemptNumber: z.number(),
-}).passthrough()
-export const ActionRequestBuildingFinished = z.object({
+})
+export const ActionRequestBuildingFinished = z.looseObject({
   type: z.literal('ActionRequestBuildingFinished'),
   attemptNumber: z.number(),
-  actionRequest: z.object({
+  actionRequest: z.looseObject({
     // TODO
-  }).passthrough(),
-}).passthrough()
-export const TaskResultCreatedEvent = z.object({
+  }),
+})
+export const TaskResultCreatedEvent = z.looseObject({
   type: z.literal('TaskResultCreatedEvent'),
   // TODO
-}).passthrough()
-export const TaskReportCreatedEvent = z.object({
+})
+export const TaskReportCreatedEvent = z.looseObject({
   type: z.literal('TaskReportCreatedEvent'),
   // TODO
-}).passthrough()
-export const SemanticCheckStarted = z.object({
+})
+export const SemanticCheckStarted = z.looseObject({
   type: z.literal('SemanticCheckStarted'),
   // TODO
-}).passthrough()
-export const SemanticCheckFinished = z.object({
+})
+export const SemanticCheckFinished = z.looseObject({
   type: z.literal('SemanticCheckFinished'),
   // TODO
-}).passthrough()
-export const ErrorCheckerStarted = z.object({
+})
+export const ErrorCheckerStarted = z.looseObject({
   type: z.literal('ErrorCheckerStarted'),
   // TODO
-}).passthrough()
-export const ErrorCheckerFinished = z.object({
+})
+export const ErrorCheckerFinished = z.looseObject({
   type: z.literal('ErrorCheckerFinished'),
   // TODO
-}).passthrough()
-export const EditEvent = z.object({
+})
+export const EditEvent = z.looseObject({
   type: z.literal('EditEvent'),
   // TODO
-}).passthrough()
-export const LongDelayDetected = z.object({
+})
+export const LongDelayDetected = z.looseObject({
   type: z.literal('LongDelayDetected'),
-}).passthrough()
-export const LlmRequestFailed = z.object({
+})
+export const LlmRequestFailed = z.looseObject({
   type: z.literal('LlmRequestFailed'),
   // TODO
 })
-export const McpInitStarted = z.object({
+export const McpInitStarted = z.looseObject({
   type: z.literal('McpInitStarted'),
   // TODO
 })
-export const McpInitFinished = z.object({
+export const McpInitFinished = z.looseObject({
   type: z.literal('McpInitFinished'),
   // TODO
 })
-export const UnknownEvent = z.object({
+export const UnknownEvent = z.looseObject({
   type: z.string(),
-}).passthrough()
+})
 export const Event = z.discriminatedUnion('type', [
   BeforeArtifactBuildingStarted,
   AfterArtifactBuildingFinished,
@@ -471,16 +497,16 @@ export const Event = z.discriminatedUnion('type', [
 ])
 export type Event = z.infer<typeof Event>
 
-export const EventRecord = z.object({
+export const EventRecord = z.looseObject({
   event: Event,
   timestampMs: z.coerce.date(),
   parseError: z.any().optional(),
-}).passthrough().transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
+}).transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
 export type EventRecord = z.infer<typeof EventRecord>
 
-export const UnknownEventRecord = z.object({
+export const UnknownEventRecord = z.looseObject({
   event: UnknownEvent,
   timestampMs: z.coerce.date(),
   parseError: z.any().optional(),
-}).passthrough().transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
+}).transform(({ timestampMs, ...rest }) => ({ timestamp: timestampMs, ...rest }))
 export type UnknownEventRecord = z.infer<typeof UnknownEventRecord>

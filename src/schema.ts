@@ -21,7 +21,7 @@ export const SessionHistory = z.object({
   viewedFiles: z.string().array(),
   viewedImports: z.string().array(),
   createdFiles: z.string().array(),
-  shownCode: z.record(z.object({
+  shownCode: z.record(z.string(), z.object({
     first: z.number(),
     second: z.number(),
   }).array()),

@@ -33,7 +33,7 @@
     "poolifier-web-worker": "^0.5.8",
     "semver": "^7.7.2",
     "tailwindcss": "^4.1.11",
-    "zod": "^3.25.63"
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^10.3.1",
