@@ -1,5 +1,6 @@
 import { ThreadWorker } from "poolifier-web-worker"
-import { EventRecord, UnknownEventRecord } from "../eventSchema.js"
+import { EventRecord } from "../schema/eventRecord.js"
+import { UnknownEventRecord } from "../schema/unknownEventRecord.js"
 import { loadEvents } from "./loadEvents.js"
 
 interface LoadEventsInput {

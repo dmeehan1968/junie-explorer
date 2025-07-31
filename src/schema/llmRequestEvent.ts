@@ -1,0 +1,32 @@
+import * as z from "zod"
+import { AssistantChatMessageWithToolUses } from "./assistantChatMessageWithToolUses.js"
+import { ChatMessage } from "./chatMessage.js"
+import { LLM } from "./LLM.js"
+import { MultiPartChatMessage } from "./multiPartChatMessage.js"
+import { Tools } from "./tools.js"
+import { UserChatMessageWithToolResults } from "./userChatMessageWithToolResults.js"
+
+export const LlmRequestEvent = z.looseObject({
+  type: z.literal('LlmRequestEvent'),
+  chat: z.looseObject({
+    system: z.string(),
+    messages: z.discriminatedUnion('type', [
+      ChatMessage,
+      MultiPartChatMessage,
+      AssistantChatMessageWithToolUses,
+      UserChatMessageWithToolResults,
+    ]).array(),
+    tools: Tools,
+  }),
+  modelParameters: z.looseObject({
+    model: LLM,
+    prompt_cache_enabled: z.boolean().default(() => false),
+    temperature: z.number().optional(),
+    n: z.number().optional(),
+    stop: z.record(z.string(), z.string()).optional(),
+    max_tokens: z.number().optional(),
+    user: z.string().optional(),
+  }),
+  attemptNumber: z.number(),
+  id: z.string(),
+})

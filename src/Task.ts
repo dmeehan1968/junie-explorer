@@ -1,7 +1,6 @@
 import fs from "fs-extra"
 import path from "node:path"
 import { AbstractPool, DynamicThreadPool, FixedThreadPool, ThreadPoolOptions } from "poolifier-web-worker"
-import { EventRecord } from "./eventSchema.js"
 import { getMaxConcurrency } from "./getMaxConcurrency.js"
 import {
   AgentState,
@@ -12,6 +11,7 @@ import {
   SessionHistory,
   SummaryMetrics,
 } from "./schema.js"
+import { EventRecord } from "./schema/eventRecord.js"
 import { Step } from "./Step.js"
 import { Trajectory, TrajectoryError } from "./trajectorySchema.js"
 import { loadEvents } from "./workers/loadEvents.js"

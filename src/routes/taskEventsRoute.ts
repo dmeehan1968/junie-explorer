@@ -2,8 +2,8 @@ import express from 'express'
 import fs from 'fs-extra'
 import path from 'node:path'
 import { marked } from 'marked'
-import { EventRecord } from '../eventSchema.js'
 import { JetBrains } from "../jetbrains.js"
+import { EventRecord } from "../schema/eventRecord.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../utils/versionBanner.js'

@@ -1,5 +1,6 @@
 import fs from "fs-extra"
-import { EventRecord, UnknownEventRecord } from "../eventSchema.js"
+import { EventRecord } from "../schema/eventRecord.js"
+import { UnknownEventRecord } from "../schema/unknownEventRecord.js"
 
 export async function loadEvents(eventsFile: string) {
   if (fs.existsSync(eventsFile)) {

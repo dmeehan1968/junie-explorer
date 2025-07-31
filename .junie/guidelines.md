@@ -95,7 +95,6 @@ junie-explorer/
 │   ├── Task.ts              # Task class implementation
 │   ├── chart.d.ts           # Type definitions for chart library
 │   ├── createServer.ts      # Server creation utilities
-│   ├── eventSchema.ts       # Event data schemas
 │   ├── index.ts             # Main application entry point
 │   ├── jetbrains.ts         # Main JetBrains class implementation
 │   ├── schema.ts            # Zod schemas for data validation
@@ -175,7 +174,7 @@ Comprehensive Zod schemas for data validation and type safety (src/schema.ts):
 - **`PreviousTasksInfo`**: Context from previous tasks including agent state and file modifications
 
 ### Additional Schemas
-- **Event Schemas** (src/eventSchema.ts): Event data structures for tracking application events and activities
+- **Event Schemas** (src/schema/*.ts): Event data structures for tracking application events and activities
 - **Trajectory Schemas** (src/trajectorySchema.ts): Trajectory and error schemas for agent interaction tracking
 - **Analysis Types** (src/types.ts): Statistical analysis interfaces including aggregates, step statistics, and task analysis structures
 
