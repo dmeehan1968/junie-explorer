@@ -12,34 +12,6 @@ export const AfterArtifactBuildingFinished = z.object({
     data: z.string(),
   }).passthrough(),
 }).passthrough()
-export const LlmRequestEvent = z.object({
-  type: z.literal('LlmRequestEvent'),
-  chat: z.object({
-    system: z.string(),
-    messages: z.object({
-      type: z.string(),
-      content: z.string().optional(),
-      kind: z.enum(['User', 'Assistant']).optional(),
-      // TODO: toolUses, toolResults
-    }).passthrough().array(),
-    // TODO: tools
-  }).passthrough(),
-  modelParameters: z.object({
-    model: z.object({
-      name: z.string(),
-      provider: z.string(),
-      jbai: z.string().optional(),
-      capabilities: z.object({
-        inputPrice: z.number(),
-        outputPrice: z.number(),
-        cacheInputPrice: z.number(),
-      }).passthrough().default(() => ({ inputPrice: 0, outputPrice: 0, cacheInputPrice: 0 })),
-    }).passthrough(),
-  }).passthrough(),
-  attemptNumber: z.number(),
-  id: z.string(),
-}).passthrough()
-
 export const ContentChoice = z.object({
   content: z.string(),
 })
@@ -181,6 +153,88 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AnthropicSonnet37,
   AnthropicSonnet4,
 ]).parse(data))
+
+export const MatterhornChatMessage = z.object({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage'),
+  content: z.string(),
+  kind: z.enum(['User', 'Assistant']).optional(),
+}).passthrough()
+
+export const MatterhornMultiPartChatMessage = z.object({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage'),
+  parts: z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal('text'),
+      text: z.string(),
+    }),
+    z.object({
+      type: z.literal('image'),
+      contentType: z.string(),
+      base64: z.string(),
+    })
+  ]).array(),
+  kind: z.enum(['User', 'Assistant']).optional(),
+}).passthrough()
+
+export const MatterhornAssistantChatMessageWithToolUses = z.object({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses'),
+  content: z.string(),
+  toolUses: z.object({
+    id: z.string(),
+    name: z.string(),
+    input: z.object({
+      ParameterValue: z.string(),
+      name: z.string(),
+      value: z.any(),
+    }).array()
+  }).passthrough().array(),
+}).passthrough()
+
+export const MatterhornUserChatMessageWithToolResults = z.object({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults'),
+  toolResults: z.object({
+    id: z.string(),
+    content: z.string(),
+    isError: z.boolean(),
+  }).passthrough().array(),
+}).passthrough()
+
+export const Tools = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  params: z.object({
+    MatterhornToolProperty: z.string(),
+    name: z.string(),
+    primitiveType: z.string().optional(),
+    description: z.string().optional(),
+    required: z.boolean(),
+  }).passthrough().array().default(() => ([]))
+}).passthrough().array().default(() => ([]))
+
+export const LlmRequestEvent = z.object({
+  type: z.literal('LlmRequestEvent'),
+  chat: z.object({
+    system: z.string(),
+    messages: z.discriminatedUnion('type', [
+      MatterhornChatMessage,
+      MatterhornMultiPartChatMessage,
+      MatterhornAssistantChatMessageWithToolUses,
+      MatterhornUserChatMessageWithToolResults,
+    ]).array(),
+    tools: Tools
+  }).passthrough(),
+  modelParameters: z.object({
+    model: LLM,
+    prompt_cache_enabled: z.boolean().default(() => false),
+    temperature: z.number().optional(),
+    n: z.number().optional(),
+    stop: z.record(z.string()).optional(),
+    max_tokens: z.number().optional(),
+    user: z.string().optional(),
+  }).passthrough(),
+  attemptNumber: z.number(),
+  id: z.string(),
+}).passthrough()
 
 export const LlmResponseEvent = z.object({
   type: z.literal('LlmResponseEvent'),
