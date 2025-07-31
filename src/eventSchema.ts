@@ -39,25 +39,155 @@ export const LlmRequestEvent = z.object({
   attemptNumber: z.number(),
   id: z.string(),
 }).passthrough()
+
+export const ContentChoice = z.object({
+  content: z.string(),
+})
+export const AIToolUseAnswerChoice = ContentChoice.extend({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'),
+  usages: z.object({
+    toolId: z.string(),
+    toolName: z.string(),
+    toolParams: z.object({
+      ParameterValue: z.string(),
+      name: z.string(),
+      value: z.any(),
+    }).array().default(() => ([])),
+  }).array().default(() => ([])),
+}).passthrough()
+
+export const AIContentAnswerChoice = ContentChoice.extend({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.AIContentAnswerChoice'),
+}).passthrough()
+
+export const BaseCapabilities = z.object({
+  inputPrice: z.number(),
+  outputPrice: z.number(),
+  cacheInputPrice: z.number().default(() => 0),
+  cacheCreateInputPrice: z.number().default(() => 0),
+}).passthrough()
+
+export const LLMBase = z.object({
+  provider: z.string(),
+  name: z.string(),
+  inputPrice: z.number().optional(),              // deprecated
+  outputPrice: z.number().optional(),             // deprecated
+  cacheInputPrice: z.number().optional(),         // deprecated
+  cacheCreateInputPrice: z.number().optional(),   // deprecated
+}).passthrough()
+
+export const OpenAIo3 = LLMBase.extend({
+  jbai: z.literal('openai-o3'),
+  capabilities: BaseCapabilities.optional()
+}).passthrough()
+
+export const OpenAI4oMini = LLMBase.extend({
+  jbai: z.literal('openai-gpt-4o-mini'),
+  capabilities: BaseCapabilities.optional()
+}).passthrough()
+
+export const AnthropicSonnet37 = LLMBase.extend({
+  jbai: z.literal('anthropic-claude-3.7-sonnet'),
+  capabilities: BaseCapabilities.extend({
+    maxOutputTokens: z.number(),
+    vision: z.object({
+      maxDimension: z.number(),
+      maxPixels: z.number(),
+      maxDimensionDivider: z.number(),
+    }).passthrough().optional(),
+    supportsAssistantMessageResuming: z.boolean().default(() => false),
+  }).optional(),
+}).passthrough()
+
+export const AnthropicSonnet4 = AnthropicSonnet37.extend({
+  jbai: z.literal('anthropic-claude-4-sonnet'),
+}).passthrough()
+
+// Need to do manual discrimination because there are multiple data formats and models and not a singular way to
+// discriminate and then transform them.  So this is a two part process, transform them into common formats
+// and then use a discriminated union to parse them so that the output type narrows correctly.
+export const LLMTransformer = z.any().transform(data => {
+  if (!('jbai' in data) && !('capabilities' in data)) {
+    if (/4o-mini/i.test(data.name)) {
+      return OpenAI4oMini.parse({
+        jbai: 'openai-gpt-4o-mini',
+        name: data.name,
+        provider: data.provider,
+        capabilities: {
+          inputPrice: data.inputPrice ?? 0,
+          outputPrice: data.outputPrice ?? 0,
+          cacheInputPrice: data.cacheInputPrice ?? 0,
+        }
+      })
+    }
+    return AnthropicSonnet37.parse({
+      jbai: 'anthropic-claude-3.7-sonnet',
+      name: data.name,
+      provider: data.provider,
+      capabilities: {
+        inputPrice: data.inputPrice ?? 0,
+        outputPrice: data.outputPrice ?? 0,
+        cacheInputPrice: data.cacheInputPrice ?? 0,
+        maxOutputTokens: data.maxOutputTokens ?? 0,
+        vision: data.vision,
+        supportsAssistantMessageResuming: data.supportsAssistantMessageResuming ?? false,
+      }
+    })
+  }
+  if (data.jbai === 'openai-gpt-4o-mini' && !('capabilities' in data)) {
+    return OpenAI4oMini.parse({
+      name: data.name,
+      provider: data.provider,
+      jbai: 'openai-gpt-4o-mini',
+      capabilities: {
+        inputPrice: data.inputPrice ?? 0,
+        outputPrice: data.outputPrice ?? 0,
+        cacheInputPrice: data.cacheInputPrice ?? 0,
+      }
+    })
+  }
+  if (data.jbai === 'openai-o3' && 'capabilities' in data) {
+    return OpenAIo3.parse(data)
+  }
+  if (data.jbai === 'openai-gpt-4o-mini' && 'capabilities' in data) {
+    return OpenAI4oMini.parse(data)
+  }
+  if (data.jbai === 'anthropic-claude-3.7-sonnet' && 'capabilities' in data) {
+    return AnthropicSonnet37.parse(data)
+  }
+  if (data.jbai === 'anthropic-claude-3.7-sonnet' && !('capabilities' in data)) {
+    return AnthropicSonnet37.parse({
+      name: data.name,
+      provider: data.provider,
+      jbai: 'anthropic-claude-3.7-sonnet',
+      capabilities: {
+        inputPrice: data.inputPrice ?? 0,
+        outputPrice: data.outputPrice ?? 0,
+        cacheInputPrice: data.cacheInputPrice ?? 0,
+        maxOutputTokens: data.maxOutputTokens ?? 0,
+        vision: data.vision,
+        supportsAssistantMessageResuming: data.supportsAssistantMessageResuming ?? false,
+      }
+    })
+  }
+  if (data.jbai === 'anthropic-claude-4-sonnet' && 'capabilities' in data) {
+    return AnthropicSonnet4.parse(data)
+  }
+})
+
+export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai', [
+  OpenAIo3,
+  OpenAI4oMini,
+  AnthropicSonnet37,
+  AnthropicSonnet4,
+]).parse(data))
+
 export const LlmResponseEvent = z.object({
   type: z.literal('LlmResponseEvent'),
+  id: z.string(),
   answer: z.object({
-    llm: z.object({
-      name: z.string(),
-      provider: z.string(),
-      jbai: z.string().optional(),
-      capabilities: z.object({
-        inputPrice: z.number(),
-        outputPrice: z.number(),
-        cacheInputPrice: z.number().default(() => 0),
-        cacheCreateInputPrice: z.number().default(() => 0),
-      }).passthrough().default(() => ({ inputPrice: 0, outputPrice: 0, cacheInputPrice: 0, cacheCreateInputPrice: 0 })),
-    }).passthrough(),
-    contentChoices: z.object({
-      type: z.string(),
-      content: z.string(),
-      // TODO: usages
-    }).passthrough().array(),
+    llm: LLM,
+    contentChoices: z.discriminatedUnion('type', [AIContentAnswerChoice, AIToolUseAnswerChoice]).array(),
     inputTokens: z.number().int().default(() => 0),
     outputTokens: z.number().int().default(() => 0),
     cacheInputTokens: z.number().int().default(() => 0),
@@ -67,13 +197,12 @@ export const LlmResponseEvent = z.object({
     const million = 1_000_000
     return {
       ...answer,
-      cost: (answer.inputTokens / million) * answer.llm.capabilities.inputPrice
-        + (answer.outputTokens / million) * answer.llm.capabilities.outputPrice
-        + (answer.cacheInputTokens / million) * answer.llm.capabilities.cacheInputPrice
-        + (answer.cacheCreateInputTokens / million) * answer.llm.capabilities.cacheCreateInputPrice,
+      cost: (answer.inputTokens / million) * (answer.llm?.capabilities?.inputPrice ?? answer.llm?.inputPrice ?? 0)
+        + (answer.outputTokens / million) * (answer.llm?.capabilities?.outputPrice ?? answer.llm?.outputPrice ?? 0)
+        + (answer.cacheInputTokens / million) * (answer.llm?.capabilities?.cacheInputPrice ?? answer.llm?.cacheInputPrice ?? 0)
+        + (answer.cacheCreateInputTokens / million) * (answer.llm?.capabilities?.cacheCreateInputPrice ?? answer.llm?.cacheCreateInputPrice ?? 0),
     }
   }),
-  id: z.string(),
 }).passthrough()
 export const TaskSummaryCreatedEvent = z.object({
   type: z.literal('TaskSummaryCreatedEvent'),
