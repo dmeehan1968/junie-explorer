@@ -33,6 +33,7 @@ export async function loadEvents(eventsFile: string) {
           json,
         }, null, 2))
         return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parse(json)
+
       })
       .filter((event): event is any => !!event)
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
