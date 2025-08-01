@@ -1,7 +1,7 @@
 import express from 'express'
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { ReloadButton } from '../components/reloadButton.js'
-import { TaskDetailRow } from '../components/taskDetailRow.js'
+import { TaskDetailFlexGrid } from '../components/taskDetailFlexGrid.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
 import { JetBrains } from "../jetbrains.js"
@@ -41,7 +41,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/reloadPage.js"></script>
-        <script src="/js/taskEventFilters.js"></script>
+        <script src="/js/taskDetailsFilters.js"></script>
       </head>
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
@@ -90,19 +90,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
                 `).join('')}
               </div>
             </div>
-              <div class="overflow-x-auto">
-                <table class="table table-fixed w-full bg-base-100" data-testid="events-table">
-                  <thead>
-                    <tr class="!bg-base-200 text-base-content">
-                      <th class="text-left whitespace-nowrap w-42">Timestamp</th>
-                      <th class="text-left whitespace-nowrap w-56">Event Type</th>
-                      <th class="text-left whitespace-nowrap">JSON</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  ${(() => {
+              <div class="events-grid">
+                ${(() => {
         return events.map((eventRecord, index) => {
-          return TaskDetailRow({
+          return TaskDetailFlexGrid({
             eventRecord,
             index,
             locale,
@@ -110,8 +101,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
           })
         }).join('')
       })()}
-                  </tbody>
-                </table>
               </div>
             `
       : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'

@@ -2,15 +2,34 @@ import { Event } from '../schema/event.js'
 import { escapeHtml } from './escapeHtml.js'
 
 /**
+ * Represents a single row in the flex grid layout
+ */
+export interface FlexGridRow {
+  timestamp: string
+  eventType: string
+  content: string
+  hasParseError?: boolean
+}
+
+/**
  * Base interface for event formatters
  */
 export interface EventFormatter {
   /**
-   * Formats an event object into HTML string
+   * Formats an event object into HTML string (legacy method for backward compatibility)
    * @param event - The event to format
    * @returns HTML string representation of the event
    */
   format(event: Event): string
+
+  /**
+   * Formats an event object into flex grid rows
+   * @param event - The event to format
+   * @param timestamp - The formatted timestamp string
+   * @param hasParseError - Whether the event has a parse error
+   * @returns Array of flex grid rows
+   */
+  formatFlexGrid?(event: Event, timestamp: string, hasParseError?: boolean): FlexGridRow[]
 }
 
 /**
@@ -20,6 +39,15 @@ export class DefaultEventFormatter implements EventFormatter {
   format(event: Event): string {
     return escapeHtml(JSON.stringify(event, null, 2))
   }
+
+  formatFlexGrid(event: Event, timestamp: string, hasParseError?: boolean): FlexGridRow[] {
+    return [{
+      timestamp,
+      eventType: event.type,
+      content: escapeHtml(JSON.stringify(event, null, 2)),
+      hasParseError
+    }]
+  }
 }
 
 /**
@@ -28,6 +56,15 @@ export class DefaultEventFormatter implements EventFormatter {
 export class LlmRequestFormatter implements EventFormatter {
   format(event: Event): string {
     return escapeHtml(JSON.stringify(event, null, 2))
+  }
+
+  formatFlexGrid(event: Event, timestamp: string, hasParseError?: boolean): FlexGridRow[] {
+    return [{
+      timestamp,
+      eventType: event.type,
+      content: escapeHtml(JSON.stringify(event, null, 2)),
+      hasParseError
+    }]
   }
 }
 
@@ -59,6 +96,27 @@ export class EventFormatterDecorator implements EventFormatter {
   format(event: Event): string {
     const formatter = this.formatters.get(event.type) || this.defaultFormatter
     return formatter.format(event)
+  }
+
+  /**
+   * Format an event using the appropriate formatter for flex grid layout
+   * @param event - The event to format
+   * @param timestamp - The formatted timestamp string
+   * @param hasParseError - Whether the event has a parse error
+   * @returns Array of flex grid rows
+   */
+  formatFlexGrid(event: Event, timestamp: string, hasParseError?: boolean): FlexGridRow[] {
+    const formatter = this.formatters.get(event.type) || this.defaultFormatter
+    if (formatter.formatFlexGrid) {
+      return formatter.formatFlexGrid(event, timestamp, hasParseError)
+    }
+    // Fallback to default behavior if formatFlexGrid is not implemented
+    return [{
+      timestamp,
+      eventType: event.type,
+      content: formatter.format(event),
+      hasParseError
+    }]
   }
 }
 
