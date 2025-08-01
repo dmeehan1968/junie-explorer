@@ -1,4 +1,5 @@
 import { Event } from '../schema/event.js'
+import { LlmRequestEvent } from '../schema/llmRequestEvent.js'
 import { escapeHtml } from './escapeHtml.js'
 
 /**
@@ -54,17 +55,49 @@ export class DefaultEventFormatter implements EventFormatter {
  * LLM Request formatter that uses the same formatting as the default formatter
  */
 export class LlmRequestFormatter implements EventFormatter {
-  format(event: Event): string {
+  format(event: LlmRequestEvent): string {
     return escapeHtml(JSON.stringify(event, null, 2))
   }
 
-  formatFlexGrid(event: Event, timestamp: string, hasParseError?: boolean): FlexGridRow[] {
-    return [{
-      timestamp,
-      eventType: event.type,
-      content: escapeHtml(JSON.stringify(event, null, 2)),
-      hasParseError
-    }]
+  formatFlexGrid(event: LlmRequestEvent, timestamp: string, hasParseError?: boolean): FlexGridRow[] {
+
+    const rows: FlexGridRow[] = []
+
+    // Add row for system message if it exists
+    if (event.chat.system) {
+      rows.push({
+        timestamp,
+        eventType: event.type,
+        content: escapeHtml(event.chat.system),
+        hasParseError
+      })
+    }
+
+    // Add rows for each message if they exist
+    if (event.chat.messages && Array.isArray(event.chat.messages)) {
+      event.chat.messages.forEach(message => {
+        if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
+          rows.push({
+            timestamp,
+            eventType: event.type,
+            content: escapeHtml(message.content),
+            hasParseError
+          })
+        }
+      })
+    }
+
+    // If no chat data found, fall back to default behavior
+    if (rows.length === 0) {
+      return [{
+        timestamp,
+        eventType: event.type,
+        content: escapeHtml(JSON.stringify(event, null, 2)),
+        hasParseError
+      }]
+    }
+
+    return rows
   }
 }
 

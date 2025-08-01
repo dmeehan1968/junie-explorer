@@ -30,3 +30,4 @@ export const LlmRequestEvent = z.looseObject({
   attemptNumber: z.number(),
   id: z.string(),
 })
+export type LlmRequestEvent = z.infer<typeof LlmRequestEvent>

@@ -25,3 +25,4 @@ export const LlmResponseEvent = z.looseObject({
     }
   }),
 })
+export type LlmResponseEvent = z.infer<typeof LlmResponseEvent>
