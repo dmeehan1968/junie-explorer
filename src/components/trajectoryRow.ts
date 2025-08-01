@@ -1,5 +1,5 @@
-import { escapeHtml } from './escapeHtml.js'
-import { ToggleComponent } from './toggleComponent.js'
+import { escapeHtml } from '../utils/escapeHtml.js'
+import { ToggleComponent } from '../utils/toggleComponent.js'
 
 export interface TrajectoryRowOptions {
   timestamp?: Date

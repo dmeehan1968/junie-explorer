@@ -2,14 +2,14 @@ import express from 'express'
 import { Issue } from "../Issue.js"
 import { JetBrains } from "../jetbrains.js"
 import { Project } from "../Project.js"
-import { Breadcrumb } from '../utils/breadcrumb.js'
+import { Breadcrumb } from '../components/breadcrumb.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { ReloadButton } from '../utils/reloadButton.js'
-import { getStatusBadge } from "../utils/statusBadge.js"
+import { ReloadButton } from '../components/reloadButton.js'
+import { getStatusBadge } from "../components/statusBadge.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
-import { ThemeSwitcher } from '../utils/themeSwitcher.js'
-import { VersionBanner } from '../utils/versionBanner.js'
+import { ThemeSwitcher } from '../components/themeSwitcher.js'
+import { VersionBanner } from '../components/versionBanner.js'
 
 const router = express.Router()
 

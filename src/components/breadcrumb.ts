@@ -1,4 +1,4 @@
-import { escapeHtml } from './escapeHtml.js'
+import { escapeHtml } from '../utils/escapeHtml.js'
 
 export interface BreadcrumbItem {
   label: string

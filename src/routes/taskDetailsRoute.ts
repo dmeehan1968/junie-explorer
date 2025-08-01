@@ -1,15 +1,13 @@
 import express from 'express'
-import fs from 'fs-extra'
+import { Breadcrumb } from '../components/breadcrumb.js'
+import { ReloadButton } from '../components/reloadButton.js'
+import { TaskDetailRow } from '../components/taskDetailRow.js'
+import { ThemeSwitcher } from '../components/themeSwitcher.js'
+import { VersionBanner } from '../components/versionBanner.js'
 import { JetBrains } from "../jetbrains.js"
-import { EventRecord } from "../schema/eventRecord.js"
-import { Breadcrumb } from '../utils/breadcrumb.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
-import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { ReloadButton } from '../utils/reloadButton.js'
-import { TaskDetailRow } from '../utils/taskDetailRow.js'
-import { ThemeSwitcher } from '../utils/themeSwitcher.js'
-import { VersionBanner } from '../utils/versionBanner.js'
 import { createEventFormatter } from '../utils/eventFormatters.js'
+import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 
 const router = express.Router()
 
@@ -108,7 +106,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
             eventRecord,
             index,
             locale,
-            eventFormatter
+            eventFormatter,
           })
         }).join('')
       })()}

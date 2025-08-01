@@ -1,6 +1,6 @@
-import { escapeHtml } from './escapeHtml.js'
+import { escapeHtml } from '../utils/escapeHtml.js'
 import { EventRecord } from '../schema/eventRecord.js'
-import { EventFormatter } from './eventFormatters.js'
+import { EventFormatter } from '../utils/eventFormatters.js'
 
 export interface TaskDetailRowOptions {
   eventRecord: EventRecord

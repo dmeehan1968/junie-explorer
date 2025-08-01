@@ -6,10 +6,10 @@ import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { calculateStepSummary } from '../utils/metricsUtils.js'
 import { formatMilliseconds, formatSeconds } from '../utils/timeUtils.js'
-import { VersionBanner } from '../utils/versionBanner.js'
-import { ReloadButton } from '../utils/reloadButton.js'
-import { Breadcrumb } from '../utils/breadcrumb.js'
-import { ThemeSwitcher } from '../utils/themeSwitcher.js'
+import { VersionBanner } from '../components/versionBanner.js'
+import { ReloadButton } from '../components/reloadButton.js'
+import { Breadcrumb } from '../components/breadcrumb.js'
+import { ThemeSwitcher } from '../components/themeSwitcher.js'
 
 const router = express.Router()
 

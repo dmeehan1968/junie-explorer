@@ -2,9 +2,9 @@ import express from 'express'
 import { JetBrains } from "../jetbrains.js"
 import { Project } from '../Project.js'
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
-import { VersionBanner } from '../utils/versionBanner.js'
-import { ReloadButton } from '../utils/reloadButton.js'
-import { ThemeSwitcher } from '../utils/themeSwitcher.js'
+import { VersionBanner } from '../components/versionBanner.js'
+import { ReloadButton } from '../components/reloadButton.js'
+import { ThemeSwitcher } from '../components/themeSwitcher.js'
 
 const router = express.Router()
 
