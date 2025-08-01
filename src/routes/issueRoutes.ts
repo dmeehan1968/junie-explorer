@@ -112,6 +112,7 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
                         </div>
                         <div class="flex flex-wrap gap-2 mt-4">
                           <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="events-button">Events</a>
+                          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/details" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="details-button">Details</a>
                           <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/trajectories" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="trajectories-button">Trajectories</a>
                           <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="steps-button">Steps</a>
                           <button class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
