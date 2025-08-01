@@ -31,14 +31,7 @@ export function TaskDetailFlexGrid(options: TaskDetailFlexGridOptions): string {
   const hasParseError = eventRecord.parseError !== undefined
 
   // Get flex grid rows from formatter
-  const flexGridRows = eventFormatter.formatFlexGrid 
-    ? eventFormatter.formatFlexGrid(eventRecord.event, formattedTimestamp, hasParseError)
-    : [{
-        timestamp: formattedTimestamp,
-        eventType: eventRecord.event.type,
-        content: eventFormatter.format(eventRecord.event),
-        hasParseError
-      }]
+  const flexGridRows = eventFormatter.formatFlexGrid(eventRecord.event, formattedTimestamp, hasParseError)
 
   // Generate HTML for each row
   return flexGridRows.map((row, rowIndex) => {
