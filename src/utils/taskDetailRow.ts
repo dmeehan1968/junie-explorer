@@ -1,11 +1,13 @@
 import { escapeHtml } from './escapeHtml.js'
 import { EventRecord } from '../schema/eventRecord.js'
+import { EventFormatter } from './eventFormatters.js'
 
 export interface TaskDetailRowOptions {
   eventRecord: EventRecord
   index: number
   locale?: string
   testIdPrefix?: string
+  eventFormatter: EventFormatter
 }
 
 /**
@@ -18,7 +20,8 @@ export function TaskDetailRow(options: TaskDetailRowOptions): string {
     eventRecord,
     index,
     locale = 'en-US',
-    testIdPrefix = 'detail-row'
+    testIdPrefix = 'detail-row',
+    eventFormatter
   } = options
 
   // Format timestamp
@@ -39,7 +42,9 @@ export function TaskDetailRow(options: TaskDetailRowOptions): string {
         ${hasParseError ? '(parseError)' : ''}
       </td>
       <td class="text-left pr-0">
-        <div class="max-h-48 overflow-auto bg-base-200 text-base-content rounded font-mono text-xs whitespace-pre break-all">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
+        <div 
+          class="max-h-48 overflow-auto bg-base-200 text-base-content rounded font-mono text-xs whitespace-pre break-all"
+        >${eventFormatter.format(eventRecord.event)}</div>
       </td>
     </tr>
   `

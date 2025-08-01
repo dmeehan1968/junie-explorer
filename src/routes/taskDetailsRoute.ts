@@ -9,6 +9,7 @@ import { ReloadButton } from '../utils/reloadButton.js'
 import { TaskDetailRow } from '../utils/taskDetailRow.js'
 import { ThemeSwitcher } from '../utils/themeSwitcher.js'
 import { VersionBanner } from '../utils/versionBanner.js'
+import { createEventFormatter } from '../utils/eventFormatters.js'
 
 const router = express.Router()
 
@@ -27,6 +28,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
 
     // Load events
     const events = await task.events
+    const locale = getLocaleFromRequest(req)
+    const eventFormatter = createEventFormatter()
 
     // Generate HTML
     const html = `
@@ -99,14 +102,16 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
                     </tr>
                   </thead>
                   <tbody>
-                  ${events.map((eventRecord, index) => {
-        const locale = getLocaleFromRequest(req)
-        return TaskDetailRow({
-          eventRecord,
-          index,
-          locale
-        })
-      }).join('')}
+                  ${(() => {
+        return events.map((eventRecord, index) => {
+          return TaskDetailRow({
+            eventRecord,
+            index,
+            locale,
+            eventFormatter
+          })
+        }).join('')
+      })()}
                   </tbody>
                 </table>
               </div>
