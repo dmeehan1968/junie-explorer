@@ -1,14 +1,13 @@
 import express from 'express'
 import fs from 'fs-extra'
-import path from 'node:path'
 import { JetBrains } from "../jetbrains.js"
 import { EventRecord } from "../schema/eventRecord.js"
+import { Breadcrumb } from '../utils/breadcrumb.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { VersionBanner } from '../utils/versionBanner.js'
 import { ReloadButton } from '../utils/reloadButton.js'
-import { Breadcrumb } from '../utils/breadcrumb.js'
 import { ThemeSwitcher } from '../utils/themeSwitcher.js'
+import { VersionBanner } from '../utils/versionBanner.js'
 
 const router = express.Router()
 
@@ -26,28 +25,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
     }
 
     // Load events
-    const events: EventRecord[] = []
-    if (task.eventsFile && await fs.pathExists(task.eventsFile)) {
-      const eventsContent = await fs.readFile(task.eventsFile, 'utf-8')
-      const lines = eventsContent.trim().split('\n').filter(line => line.trim())
-      
-      for (const line of lines) {
-        try {
-          const eventData = JSON.parse(line)
-          events.push({
-            timestamp: new Date(eventData.timestamp),
-            event: eventData.event,
-            parseError: false
-          })
-        } catch (error) {
-          events.push({
-            timestamp: new Date(),
-            event: { type: 'ParseError', data: line },
-            parseError: true
-          })
-        }
-      }
-    }
+    const events = await task.events
 
     // Generate HTML
     const html = `
@@ -73,13 +51,17 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
           </div>
           ${VersionBanner(jetBrains.version)}
           ${Breadcrumb({
-            items: [
-              { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
-              { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
-              { label: issue.name, href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`, testId: 'breadcrumb-issue-name' },
-              { label: `Task ${taskId} Details`, testId: 'breadcrumb-task-details' }
-            ]
-          })}
+      items: [
+        { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
+        { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
+        {
+          label: issue.name,
+          href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`,
+          testId: 'breadcrumb-issue-name',
+        },
+        { label: `Task ${taskId} Details`, testId: 'breadcrumb-task-details' },
+      ],
+    })}
 
           <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
@@ -92,49 +74,38 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
           </div>
 
           ${events.length > 0
-            ? `
+      ? `
               <div class="overflow-x-auto">
-                <table class="table w-full bg-base-100" data-testid="details-table">
+                <table class="table table-fixed w-full bg-base-100" data-testid="details-table">
                   <thead>
                     <tr class="!bg-base-200 text-base-content">
-                      <th class="text-left whitespace-nowrap w-fit">Timestamp</th>
-                      <th class="text-left whitespace-nowrap w-fit">Event Type</th>
-                      <th class="text-left whitespace-nowrap max-w-2xl">JSON</th>
+                      <th class="text-left whitespace-nowrap w-42">Timestamp</th>
+                      <th class="text-left whitespace-nowrap w-56">Event Type</th>
+                      <th class="text-left whitespace-nowrap">JSON</th>
                     </tr>
                   </thead>
                   <tbody>
                   ${events.map((eventRecord, index) => {
-                    // Calculate timestamp display
-                    let timestampDisplay = '-'
-                    if (index === 0) {
-                      // First record: show time only
-                      timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
-                    } else {
-                      // Subsequent records: show elapsed milliseconds since previous record
-                      const prevRecord = events[index - 1]
-                      const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
-                      timestampDisplay = `+${elapsed}ms`
-                    }
-
-                    return `
+        const locale = getLocaleFromRequest(req)
+        return `
                       <tr data-testid="detail-row-${index}" class="text-base-content">
-                        <td class="text-left whitespace-nowrap w-fit">${timestampDisplay}</td>
-                        <td class="text-left whitespace-nowrap w-fit ${eventRecord.parseError ? 'bg-red-100 text-red-800' : ''}">
+                        <td class="text-left whitespace-nowrap">${eventRecord.timestamp.toLocaleString(locale)}</td>
+                        <td class="text-left whitespace-nowrap ${eventRecord.parseError ? 'bg-red-100 text-red-800' : ''}">
                           ${escapeHtml(eventRecord.event.type)}
                           ${eventRecord.parseError ? '(parseError)' : ''}
                         </td>
-                        <td class="text-left max-w-2xl">
-                          <div class="max-h-48 overflow-auto bg-base-200 text-base-content p-2 rounded font-mono text-xs whitespace-pre break-all">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
+                        <td class="text-left pr-0">
+                          <div class="max-h-48 overflow-auto bg-base-200 text-base-content rounded font-mono text-xs whitespace-pre break-all">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
                         </td>
                       </tr>
                     `
-                  }).join('')}
+      }).join('')}
                   </tbody>
                 </table>
               </div>
             `
-            : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
-          }
+      : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
+    }
         </div>
       </body>
       </html>
