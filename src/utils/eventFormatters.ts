@@ -76,6 +76,7 @@ export class LlmRequestFormatter implements EventFormatter {
     // Add rows for each message if they exist
     if (event.chat.messages && Array.isArray(event.chat.messages)) {
       event.chat.messages.forEach(message => {
+        // Handle ChatMessage
         if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
           rows.push({
             timestamp,
@@ -83,6 +84,54 @@ export class LlmRequestFormatter implements EventFormatter {
             content: escapeHtml(message.content),
             hasParseError
           })
+        }
+        // Handle MultiPartChatMessage
+        else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
+          if (message.parts && Array.isArray(message.parts)) {
+            message.parts.forEach(part => {
+              if (part.type === 'text' && part.text) {
+                rows.push({
+                  timestamp,
+                  eventType: event.type,
+                  content: escapeHtml(part.text),
+                  hasParseError
+                })
+              } else if (part.type === 'image') {
+                rows.push({
+                  timestamp,
+                  eventType: event.type,
+                  content: escapeHtml(`[Image: ${part.contentType || 'unknown type'}]`),
+                  hasParseError
+                })
+              }
+            })
+          }
+        }
+        // Handle AssistantChatMessageWithToolUses
+        else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
+          if (message.content) {
+            rows.push({
+              timestamp,
+              eventType: event.type,
+              content: escapeHtml(message.content),
+              hasParseError
+            })
+          }
+        }
+        // Handle UserChatMessageWithToolResults
+        else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
+          if (message.toolResults && Array.isArray(message.toolResults)) {
+            message.toolResults.forEach(toolResult => {
+              if (toolResult.content) {
+                rows.push({
+                  timestamp,
+                  eventType: event.type,
+                  content: escapeHtml(toolResult.content),
+                  hasParseError
+                })
+              }
+            })
+          }
         }
       })
     }
