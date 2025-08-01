@@ -23,6 +23,15 @@ export class DefaultEventFormatter implements EventFormatter {
 }
 
 /**
+ * LLM Request formatter that uses the same formatting as the default formatter
+ */
+export class LlmRequestFormatter implements EventFormatter {
+  format(event: Event): string {
+    return escapeHtml(JSON.stringify(event, null, 2))
+  }
+}
+
+/**
  * Event formatter decorator that selects appropriate formatter based on event type
  */
 export class EventFormatterDecorator implements EventFormatter {
@@ -60,9 +69,11 @@ export class EventFormatterDecorator implements EventFormatter {
 export function createEventFormatter(): EventFormatterDecorator {
   const decorator = new EventFormatterDecorator()
   
+  // Register custom formatters for specific event types
+  decorator.registerFormatter('LlmRequestEvent', new LlmRequestFormatter())
+  
   // Future custom formatters can be registered here
   // Example:
-  // decorator.registerFormatter('LlmRequestEvent', new LlmRequestFormatter())
   // decorator.registerFormatter('AgentActionExecutionStarted', new AgentActionFormatter())
   
   return decorator
