@@ -110,7 +110,12 @@ export class Task {
       return this._steps
     }
 
-    const steps = fs.readdirSync(path.resolve(this.logPath, '../../..', this.id), { withFileTypes: true })
+    const stepPath = path.resolve(this.logPath, '../../..', this.id)
+    if (!fs.existsSync(stepPath)) {
+      return this._steps
+    }
+
+    const steps = fs.readdirSync(stepPath, { withFileTypes: true })
       .filter(file => file.isFile() && /^step_[0-9]+\.((.*(swe|chat)_next.*)|(junie_single_step_(chat|issue)))$/.test(file.name))
       .sort((a, b) => a.name.localeCompare(b.name))
 
