@@ -6,6 +6,7 @@ import { Breadcrumb } from '../utils/breadcrumb.js'
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { ReloadButton } from '../utils/reloadButton.js'
+import { TaskDetailRow } from '../utils/taskDetailRow.js'
 import { ThemeSwitcher } from '../utils/themeSwitcher.js'
 import { VersionBanner } from '../utils/versionBanner.js'
 
@@ -100,18 +101,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
                   <tbody>
                   ${events.map((eventRecord, index) => {
         const locale = getLocaleFromRequest(req)
-        return `
-                      <tr data-testid="detail-row-${index}" class="text-base-content">
-                        <td class="text-left whitespace-nowrap">${eventRecord.timestamp.toLocaleString(locale)}</td>
-                        <td class="text-left whitespace-nowrap ${eventRecord.parseError ? 'bg-red-100 text-red-800' : ''}">
-                          ${escapeHtml(eventRecord.event.type)}
-                          ${eventRecord.parseError ? '(parseError)' : ''}
-                        </td>
-                        <td class="text-left pr-0">
-                          <div class="max-h-48 overflow-auto bg-base-200 text-base-content rounded font-mono text-xs whitespace-pre break-all">${escapeHtml(JSON.stringify(eventRecord.event, null, 2))}</div>
-                        </td>
-                      </tr>
-                    `
+        return TaskDetailRow({
+          eventRecord,
+          index,
+          locale
+        })
       }).join('')}
                   </tbody>
                 </table>
