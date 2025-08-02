@@ -6,16 +6,19 @@ import { MultiPartChatMessage } from "./multiPartChatMessage.js"
 import { Tools } from "./tools.js"
 import { UserChatMessageWithToolResults } from "./userChatMessageWithToolResults.js"
 
+export const MatterhornMessage = z.discriminatedUnion('type', [
+  ChatMessage,
+  MultiPartChatMessage,
+  AssistantChatMessageWithToolUses,
+  UserChatMessageWithToolResults,
+])
+export type MatterhornMessage = z.infer<typeof MatterhornMessage>
+
 export const LlmRequestEvent = z.looseObject({
   type: z.literal('LlmRequestEvent'),
   chat: z.looseObject({
     system: z.string(),
-    messages: z.discriminatedUnion('type', [
-      ChatMessage,
-      MultiPartChatMessage,
-      AssistantChatMessageWithToolUses,
-      UserChatMessageWithToolResults,
-    ]).array(),
+    messages: MatterhornMessage.array(),
     tools: Tools,
   }),
   modelParameters: z.looseObject({

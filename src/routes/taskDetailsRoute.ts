@@ -1,15 +1,39 @@
 import express from 'express'
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { ReloadButton } from '../components/reloadButton.js'
-import { TaskDetailFlexGrid } from '../components/taskDetailFlexGrid.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
 import { JetBrains } from "../jetbrains.js"
+import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
+import { EventRecord } from "../schema/eventRecord.js"
+import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { createEventFormatter } from '../utils/eventFormatters.js'
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 
 const router = express.Router()
+
+function ToolUseDecorator(klass: string) {
+  return (tool: ToolUse) => {
+    const params = tool.input.map(param => `<span>${escapeHtml(param.name)}:</span><span>${escapeHtml(param.value)}</span>`).join(', ')
+    return `<pre class="${klass}"><code>${escapeHtml(tool.name)}(${params})</code></pre>`
+  }
+}
+
+function ChatMessageDecorator(klass: string) {
+  return (message: MatterhornMessage) => {
+    if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
+      return `<pre class="${klass}">${escapeHtml(message.content)}</pre>`
+    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
+      const toolUses = message.toolUses.map(ToolUseDecorator(klass)).join('')
+      return `<pre class="${klass}">${escapeHtml(message.content)}</pre>${toolUses}`
+    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
+      return `<pre class="${klass}">${message.toolResults.map(res => escapeHtml(res.content)).join('\n')}</pre>`
+    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
+      return `<pre class="${klass}">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</pre>`
+    }
+  }
+}
 
 // Task details page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (req, res) => {
@@ -90,18 +114,21 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
                 `).join('')}
               </div>
             </div>
-              <div class="events-grid">
-                ${(() => {
-        return events.map((eventRecord, index) => {
-          return TaskDetailFlexGrid({
-            eventRecord,
-            index,
-            locale,
-            eventFormatter,
-          })
-        }).join('')
-      })()}
-              </div>
+              ${
+                events
+                  .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
+                    return record.event.type === 'LlmRequestEvent' && record.event.modelParameters.model.provider === 'Anthropic'
+                  })
+                  .slice(-1)
+                  .map((eventRecord) => {
+                    const klass = 'p-4 mt-4 bg-base-content/10'
+                    return `<div class="font-mono text-xs border p-2">${[
+                      `<pre class="${klass}">${escapeHtml(eventRecord.event.chat.system)}</pre>`,
+                      ...eventRecord.event.chat.messages.map(ChatMessageDecorator(klass))
+                    ].join('\n')}</div>`
+                  })
+                  .join('')
+              }
             `
       : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
     }
