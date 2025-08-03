@@ -7,6 +7,7 @@ import { JetBrains } from "../jetbrains.js"
 import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
+import { ContentAnswer, LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { createEventFormatter } from '../utils/eventFormatters.js'
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
@@ -32,6 +33,19 @@ function ChatMessageDecorator(klass: string) {
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
       return `<pre class="${klass}">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</pre>`
     }
+  }
+}
+
+function ChatAnswerDecorator(klass: string) {
+  return (answer: ContentAnswer) => {
+    let toolUses = ''
+    if (answer.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice') {
+      toolUses = answer.usages.map(tool => {
+        const params = tool.toolParams.map(param => `<span>${escapeHtml(param.name)}:</span><span>${escapeHtml(param.value)}</span>`).join(', ')
+        return `<pre class="${klass}"><code>${escapeHtml(tool.toolName)}(${params})</code></pre>`
+      }).join('')
+    }
+    return `<pre class="${klass}"><code>${escapeHtml(answer.content)}</code></pre>${toolUses}`
   }
 }
 
@@ -115,20 +129,26 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
               </div>
             </div>
               ${
-                events
-                  .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
-                    return record.event.type === 'LlmRequestEvent' && record.event.modelParameters.model.provider === 'Anthropic'
-                  })
-                  .slice(-1)
-                  .map((eventRecord) => {
-                    const klass = 'p-4 mt-4 bg-base-content/10'
-                    return `<div class="font-mono text-xs border p-2">${[
-                      `<pre class="${klass}">${escapeHtml(eventRecord.event.chat.system)}</pre>`,
-                      ...eventRecord.event.chat.messages.map(ChatMessageDecorator(klass))
-                    ].join('\n')}</div>`
-                  })
-                  .join('')
-              }
+        events
+          .filter((record: EventRecord): record is { event: LlmRequestEvent | LlmResponseEvent, timestamp: Date } => {
+            return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
+              || (record.event.type === 'LlmResponseEvent' && !record.event.answer.llm.isSummarizer)
+          })
+          // .slice(-1)
+          .map((record, index) => {
+            const klass = 'p-4 mt-4 bg-base-content/10'
+            if (record.event.type === 'LlmRequestEvent') {
+              return `<div class="font-mono text-xs border p-4 mb-4">${[
+                ...(index===0 ? [`<pre class="${klass}">${escapeHtml(record.event.chat.system)}</pre>`] : []),
+                ...record.event.chat.messages.map(ChatMessageDecorator(klass)),
+              ].join('\n')}</div>`
+            } else if (record.event.type === 'LlmResponseEvent') {               
+              return `<div class="font-mono text-xs border p-4 mb-4">${record.event.answer.contentChoices.map(ChatAnswerDecorator(klass)).join('')}</div>`
+            }
+            return ''
+          })
+          .join('')
+      }
             `
       : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
     }

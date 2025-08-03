@@ -3,12 +3,15 @@ import { AIContentAnswerChoice } from "./AIContentAnswerChoice.js"
 import { AIToolUseAnswerChoice } from "./AIToolUseAnswerChoice.js"
 import { LLM } from "./LLM.js"
 
+export const ContentAnswer = z.discriminatedUnion('type', [AIContentAnswerChoice, AIToolUseAnswerChoice])
+export type ContentAnswer = z.infer<typeof ContentAnswer>
+
 export const LlmResponseEvent = z.looseObject({
   type: z.literal('LlmResponseEvent'),
   id: z.string(),
   answer: z.looseObject({
     llm: LLM,
-    contentChoices: z.discriminatedUnion('type', [AIContentAnswerChoice, AIToolUseAnswerChoice]).array(),
+    contentChoices: ContentAnswer.array(),
     inputTokens: z.number().int().default(() => 0),
     outputTokens: z.number().int().default(() => 0),
     cacheInputTokens: z.number().int().default(() => 0),
