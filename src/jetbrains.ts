@@ -82,11 +82,7 @@ export class JetBrains {
   }
 
   async preload() {
-    try {
-      await this.checkForUpdates()
-    } catch (error) {
-      console.error('Unable to check for updates:', error)
-    }
+    await this.checkForUpdates()
 
     this.logger.log('Reading logs, please wait...')
     const start = Date.now()
@@ -266,6 +262,10 @@ export class JetBrains {
   async checkForUpdates() {
 
     const response = await fetch('https://api.github.com/repos/dmeehan1968/junie-explorer/releases/latest')
+    if (!response.ok) {
+      console.error('Unable to check for updates:', response.status, response.statusText)
+      return
+    }
     const latest = await response.json()
     const currentVersion = JSON.parse(publicFiles['version.txt'])
 
