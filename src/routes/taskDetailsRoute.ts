@@ -21,10 +21,10 @@ function ToolUseDecorator(klass: string, index: number) {
   return (tool: ToolUse) => {
     const params = Object.entries(tool.input.rawJsonObject).flatMap(([key, value]) =>
       [
-        `<span class="bg-base-content/10 px-2">${escapeHtml(key)}:</span>`,
+        `<span class="text-base-content/50 px-2 italic">${escapeHtml(key)}:</span>`,
         `<span class="bg-info text-info-content px-2">${escapeHtml(String(value))}</span>`
       ].join('')
-    ).join('')
+    ).join(', ')
     const content = `<span class="bg-secondary text-secondary-content px-2">${escapeHtml(tool.name)}</span>(${params})`
     return `
       <div class="relative">
@@ -44,8 +44,12 @@ function ToolUseDecorator(klass: string, index: number) {
 
 function ToolUseAnswerDecorator(klass: string, index: number) {
   return (tool: ToolUseAnswer) => {
-    const params = Object.entries(tool.toolParams.rawJsonObject).map(([key, value]) => `<span>${escapeHtml(key)}:</span><span>"${escapeHtml(String(value))}"</span>`).join(', ')
-    const content = `${escapeHtml(tool.toolName)}(${params})`
+    const params = Object.entries(tool.toolParams.rawJsonObject).map(([key, value]) => [
+      `<span class="text-base-content/50 px-2 italic">${escapeHtml(key)}:</span>`,
+      `<span class="bg-info text-info-content px-2">${escapeHtml(String(value))}"</span>`
+    ].join('')
+    ).join(', ')
+    const content = `<span class="bg-secondary text-secondary-content px-2">${escapeHtml(tool.toolName)}</span>(${params})`
     return `
       <div class="relative">
         ${ToggleComponent({
@@ -232,11 +236,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
                               testIdPrefix: 'system-message-toggle',
                               index: index + 10000
                             })}
-                            <div class="font-mono text-xs bg-base-content/10 p-4 mb-4 relative">
-                              <h3 class="absolute -top-2 left-2 py-1 px-2 bg-primary text-primary-content">System Message</h3>
-                              <div 
-                                class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out"
-                                >${escapeHtml(record.event.chat.system)}</div>                            
+                            <div class="relative">
+                              <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">System Message</h3>
+                              <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(record.event.chat.system)}</div>        
                             </div>
                           </div>`] : []),
                         ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
