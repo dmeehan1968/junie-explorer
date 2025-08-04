@@ -44,7 +44,6 @@ const router = express.Router()
 
 function ToolUseDecorator(klass: string, index: number) {
   return (tool: ToolUse) => {
-    console.log(tool)
     const params = Object.entries(tool.input.rawJsonObject).map(([key, value]) => `<span>${escapeHtml(key)}:</span><span>"${escapeHtml(String(value))}"</span>`).join(', ')
     const content = `${escapeHtml(tool.name)}(${params})`
     return `
@@ -55,14 +54,15 @@ function ToolUseDecorator(klass: string, index: number) {
           testIdPrefix: 'tool-use-toggle',
           index
         })}
-        <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out"><code>${content}</code></pre>
+        <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+          <pre class="${klass}"><code>${content}</code></pre>
+        </div>
       </div>`
   }
 }
 
 function ToolUseAnswerDecorator(klass: string, index: number) {
   return (tool: ToolUseAnswer) => {
-    console.log(tool)
     const params = Object.entries(tool.toolParams.rawJsonObject).map(([key, value]) => `<span>${escapeHtml(key)}:</span><span>"${escapeHtml(String(value))}"</span>`).join(', ')
     const content = `${escapeHtml(tool.toolName)}(${params})`
     return `
@@ -73,7 +73,9 @@ function ToolUseAnswerDecorator(klass: string, index: number) {
           testIdPrefix: 'tool-use-answer-toggle',
           index
         })}
-        <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out"><code>${content}</code></pre>
+        <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+          <pre class="${klass}"><code>${content}</code></pre>
+        </div>
       </div>`
   }
 }
@@ -89,7 +91,9 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-message-toggle',
             index
           })}
-          <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</pre>
+          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+            <pre class="${klass}">${escapeHtml(message.content)}</pre>
+          </div>
         </div>`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
       const toolUses = message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
@@ -101,7 +105,9 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-assistant-toggle',
             index
           })}
-          <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</pre>
+          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+            <pre class="${klass}">${escapeHtml(message.content)}</pre>
+          </div>
         </div>${toolUses}`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
       return `
@@ -112,7 +118,9 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-user-toggle',
             index
           })}
-          <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${message.toolResults.map(res => escapeHtml(res.content)).join('\n')}</pre>
+          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+            <pre class="${klass}">${message.toolResults.map(res => escapeHtml(res.content)).join('\n')}</pre>
+          </div>
         </div>`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
       return `
@@ -123,7 +131,9 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-multipart-toggle',
             index
           })}
-          <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</pre>
+          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+            <pre class="${klass}">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</pre>
+          </div>
         </div>`
     }
   }
@@ -143,7 +153,9 @@ function ChatAnswerDecorator(klass: string, index: number) {
           testIdPrefix: 'chat-answer-toggle',
           index
         })}
-        <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out"><code>${escapeHtml(answer.content)}</code></pre>
+        <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+          <pre class="${klass}"><code>${escapeHtml(answer.content)}</code></pre>
+        </div>
       </div>${toolUses}`
   }
 }
@@ -247,7 +259,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
                       testIdPrefix: 'system-message-toggle',
                       index: index + 10000
                     })}
-                    <pre class="${klass} font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(record.event.chat.system)}</pre>
+                    <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
+                      <pre class="${klass}">${escapeHtml(record.event.chat.system)}</pre>
+                    </div>
                   </div>`] : []),
                 ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
               ].join('\n')}</div>`
