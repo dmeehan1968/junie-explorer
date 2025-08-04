@@ -218,7 +218,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
         .map((record, index) => {
           const klass = 'p-4 mt-4 bg-base-content/10'
           if (record.event.type === 'LlmRequestEvent') {
-            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 relative">
+            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 mr-48 relative">
                       <h3 class="absolute -top-2 left-2 py-1 px-2 bg-primary text-primary-content">Junie</h3>
                       ${[
               ...(index === 0 ? [`
@@ -238,7 +238,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
             ].join('\n')}
                         </div>`
           } else if (record.event.type === 'LlmResponseEvent') {
-            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 relative">
+            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 ml-48 relative">
                       <h3 class="absolute -top-2 left-2 py-1 px-2 bg-primary text-primary-content">LLM</h3>
                       ${record.event.answer.contentChoices.map((choice, choiceIndex) => ChatAnswerDecorator(klass, index * 100 + choiceIndex + 50)(choice)).join('')}</div>`
           }
