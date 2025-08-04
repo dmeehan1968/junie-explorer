@@ -203,7 +203,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/reloadPage.js"></script>
         <script src="/js/taskDetailsFilters.js"></script>
-        <script src="/js/trajectoryToggle.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
       </head>

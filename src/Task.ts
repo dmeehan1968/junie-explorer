@@ -13,7 +13,6 @@ import {
 } from "./schema.js"
 import { EventRecord } from "./schema/eventRecord.js"
 import { Step } from "./Step.js"
-import { Trajectory, TrajectoryError } from "./trajectorySchema.js"
 import { loadEvents } from "./workers/loadEvents.js"
 
 export class Task {
@@ -30,7 +29,6 @@ export class Task {
   private _patch?: string | null
   private _events: Promise<EventRecord[]> | undefined = undefined
   private _eventTypes: Promise<string[]> | undefined = undefined
-  private _trajectories: (Trajectory | TrajectoryError)[] = []
 
   // Static worker pool for loading events
   private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, {
@@ -210,28 +208,4 @@ export class Task {
     return path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
   }
 
-  get trajectories() {
-    if (this._trajectories.length > 0) {
-      return this._trajectories
-    }
-
-    const root = this.trajectoriesFile
-
-    if (fs.existsSync(root)) {
-      const content = fs.readFileSync(root, 'utf-8')
-      this._trajectories = content
-        .split('\n')
-        .filter(line => line.trim())
-        .map((line, index) => {
-          try {
-            return Trajectory.parse(JSON.parse(line))
-          } catch (error) {
-            console.error(`Trajectory error in ${root}:${index}`, error)
-            return TrajectoryError.parse({ error, line })
-          }
-        })
-    }
-
-    return this._trajectories
-  }
 }
