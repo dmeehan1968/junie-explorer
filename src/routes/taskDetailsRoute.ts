@@ -23,7 +23,7 @@ function ToolUseDecorator(klass: string, index: number) {
     const params = Object.entries(tool.input.rawJsonObject).map(([key, value]) => `<span>${escapeHtml(key)}:</span><span>"${escapeHtml(String(value))}"</span>`).join(', ')
     const content = `${escapeHtml(tool.name)}(${params})`
     return `
-      <div class="content-cell-container relative">
+      <div class="relative">
         ${ToggleComponent({
           expandIcon,
           collapseIcon,
@@ -40,7 +40,7 @@ function ToolUseAnswerDecorator(klass: string, index: number) {
     const params = Object.entries(tool.toolParams.rawJsonObject).map(([key, value]) => `<span>${escapeHtml(key)}:</span><span>"${escapeHtml(String(value))}"</span>`).join(', ')
     const content = `${escapeHtml(tool.toolName)}(${params})`
     return `
-      <div class="content-cell-container relative">
+      <div class="relative">
         ${ToggleComponent({
           expandIcon,
           collapseIcon,
@@ -56,7 +56,7 @@ function ChatMessageDecorator(klass: string, index: number) {
   return (message: MatterhornMessage) => {
     if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
       return `
-        <div class="content-cell-container relative">
+        <div class="relative">
           ${ToggleComponent({
             expandIcon,
             collapseIcon,
@@ -68,7 +68,7 @@ function ChatMessageDecorator(klass: string, index: number) {
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
       const toolUses = message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
       return `
-        <div class="content-cell-container relative">
+        <div class="relative">
           ${ToggleComponent({
             expandIcon,
             collapseIcon,
@@ -79,7 +79,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         </div>${toolUses}`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
       return `
-        <div class="content-cell-container relative">
+        <div class="relative">
           ${ToggleComponent({
             expandIcon,
             collapseIcon,
@@ -90,7 +90,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         </div>`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
       return `
-        <div class="content-cell-container relative">
+        <div class="relative">
           ${ToggleComponent({
             expandIcon,
             collapseIcon,
@@ -110,7 +110,7 @@ function ChatAnswerDecorator(klass: string, index: number) {
       toolUses = answer.usages.map((usage, usageIndex) => ToolUseAnswerDecorator(klass, index + usageIndex + 2000)(usage)).join('')
     }
     return `
-      <div class="content-cell-container relative">
+      <div class="relative">
         ${ToggleComponent({
           expandIcon,
           collapseIcon,
@@ -214,7 +214,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
             if (record.event.type === 'LlmRequestEvent') {
               return `<div class="font-mono text-xs border p-4 mb-4"><h3>Request</h3>${[
                 ...(index===0 ? [`
-                  <div class="content-cell-container relative">
+                  <div class="relative">
                     ${ToggleComponent({
                       expandIcon,
                       collapseIcon,
