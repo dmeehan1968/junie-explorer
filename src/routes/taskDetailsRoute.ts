@@ -1,5 +1,7 @@
 import express from 'express'
 import { Breadcrumb } from '../components/breadcrumb.js'
+import { collapseIcon } from "../components/collapseIcon.js"
+import { expandIcon } from "../components/expandIcon.js"
 import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
@@ -9,36 +11,10 @@ import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { ContentAnswer, LlmResponseEvent } from "../schema/llmResponseEvent.js"
-import { ToolParams } from "../schema/toolParams.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { createEventFormatter } from '../utils/eventFormatters.js'
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { ToggleComponent } from '../utils/toggleComponent.js'
-
-// SVG icons for expand and collapse states
-const expandIcon = `<svg 
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="#000000"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21 21l-6-6m6 6v-4.8m0 4.8h-4.8" />
-  <path d="M3 16.2V21m0 0h4.8M3 21l6-6" />
-  <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6" />
-  <path d="M3 7.8V3m0 0h4.8M3 3l6 6" />
-</svg>`
-
-const collapseIcon = `<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M20 20L15 15M15 15V19M15 15H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M4 20L9 15M9 15V19M9 15H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M20 4L15 9M15 9V5M15 9H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M4 4L9 9M9 9V5M9 9H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`
 
 const router = express.Router()
 
@@ -54,9 +30,7 @@ function ToolUseDecorator(klass: string, index: number) {
           testIdPrefix: 'tool-use-toggle',
           index
         })}
-        <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-          <pre class="${klass}"><code>${content}</code></pre>
-        </div>
+        <div class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>
       </div>`
   }
 }
@@ -73,9 +47,7 @@ function ToolUseAnswerDecorator(klass: string, index: number) {
           testIdPrefix: 'tool-use-answer-toggle',
           index
         })}
-        <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-          <pre class="${klass}"><code>${content}</code></pre>
-        </div>
+        <div class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>
       </div>`
   }
 }
@@ -91,9 +63,7 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-message-toggle',
             index
           })}
-          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-            <pre class="${klass}">${escapeHtml(message.content)}</pre>
-          </div>
+          <div class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</div>
         </div>`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
       const toolUses = message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
@@ -105,9 +75,7 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-assistant-toggle',
             index
           })}
-          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-            <pre class="${klass}">${escapeHtml(message.content)}</pre>
-          </div>
+          <div class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</div>
         </div>${toolUses}`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
       return `
@@ -118,9 +86,7 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-user-toggle',
             index
           })}
-          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-            <pre class="${klass}">${message.toolResults.map(res => escapeHtml(res.content)).join('\n')}</pre>
-          </div>
+          <div class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${message.toolResults.map(res => escapeHtml(res.content)).join('\n')}</div>
         </div>`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
       return `
@@ -131,9 +97,7 @@ function ChatMessageDecorator(klass: string, index: number) {
             testIdPrefix: 'chat-multipart-toggle',
             index
           })}
-          <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-            <pre class="${klass}">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</pre>
-          </div>
+          <div class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</div>
         </div>`
     }
   }
@@ -153,9 +117,7 @@ function ChatAnswerDecorator(klass: string, index: number) {
           testIdPrefix: 'chat-answer-toggle',
           index
         })}
-        <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-          <pre class="${klass}"><code>${escapeHtml(answer.content)}</code></pre>
-        </div>
+        <div class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(answer.content)}</div>
       </div>${toolUses}`
   }
 }
@@ -259,9 +221,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
                       testIdPrefix: 'system-message-toggle',
                       index: index + 10000
                     })}
-                    <div class="content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">
-                      <pre class="${klass}">${escapeHtml(record.event.chat.system)}</pre>
-                    </div>
+                    <div 
+                      class="${klass} content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out"
+                      >${escapeHtml(record.event.chat.system)}</div>
                   </div>`] : []),
                 ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
               ].join('\n')}</div>`

@@ -2,39 +2,16 @@ import express from 'express'
 import fs from 'fs-extra'
 import { marked } from 'marked'
 import path from 'node:path'
+import { Breadcrumb } from '../components/breadcrumb.js'
+import { collapseIcon } from "../components/collapseIcon.js"
+import { expandIcon } from "../components/expandIcon.js"
+import { ReloadButton } from '../components/reloadButton.js'
+import { ThemeSwitcher } from '../components/themeSwitcher.js'
+import { TrajectoryRow } from '../components/trajectoryRow.js'
+import { VersionBanner } from '../components/versionBanner.js'
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { VersionBanner } from '../components/versionBanner.js'
-import { ReloadButton } from '../components/reloadButton.js'
-import { TrajectoryRow } from '../components/trajectoryRow.js'
-import { Breadcrumb } from '../components/breadcrumb.js'
-import { ThemeSwitcher } from '../components/themeSwitcher.js'
-
-// SVG icons for expand and collapse states
-const expandIcon = `<svg 
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="#000000"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21 21l-6-6m6 6v-4.8m0 4.8h-4.8" />
-  <path d="M3 16.2V21m0 0h4.8M3 21l6-6" />
-  <path d="M21 7.8V3m0 0h-4.8M21 3l-6 6" />
-  <path d="M3 7.8V3m0 0h4.8M3 3l6 6" />
-</svg>`
-
-const collapseIcon = `<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M20 20L15 15M15 15V19M15 15H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M4 20L9 15M9 15V19M9 15H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M20 4L15 9M15 9V5M15 9H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M4 4L9 9M9 9V5M9 9H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`
 
 const router = express.Router()
 
