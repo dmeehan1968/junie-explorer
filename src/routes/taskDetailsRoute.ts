@@ -12,7 +12,6 @@ import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { ContentAnswer, LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
-import { createEventFormatter } from '../utils/eventFormatters.js'
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { ToggleComponent } from '../utils/toggleComponent.js'
 
@@ -138,7 +137,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
     // Load events
     const events = await task.events
     const locale = getLocaleFromRequest(req)
-    const eventFormatter = createEventFormatter()
 
     // Generate HTML
     const html = `
