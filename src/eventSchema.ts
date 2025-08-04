@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { literal, z } from "zod"
 
 export const BeforeArtifactBuildingStarted = z.object({
   type: z.literal('BeforeArtifactBuildingStarted'),
@@ -105,18 +105,28 @@ export const PlanUpdatedEvent = z.object({
     status: z.string(),
   }).passthrough().array(),
 }).passthrough()
+
+const ParamsObject = z.record(z.any())
+type ParamsObject = z.infer<typeof ParamsObject>
+const ParamsArray = z.object({
+  ParameterValue: z.string(),
+  name: z.string(),
+  value: z.any(),
+}).passthrough().array().transform(params => {
+  return ParamsObject.parse(params.reduce((acc, { name, value }) => {
+    acc[name] = value
+    return acc
+  }, {} as ParamsObject))
+})
+
 export const AgentActionExecutionStarted = z.object({
   type: z.literal('AgentActionExecutionStarted'),
   actionToExecute: z.object({
     type: z.string(),
     name: z.string(),
     id: z.string().optional(),
-    inputParams: z.object({
-      ParameterValue: z.string(),
-      name: z.string(),
-      value: z.any(),
-    }).passthrough().array().optional(),
-    description: z.string(),
+    inputParams: z.union([ParamsObject, ParamsArray]).optional(),
+    description: z.string().optional(),
   }).passthrough(),
 }).passthrough()
 export const AgentActionExecutionFailed = AgentActionExecutionStarted.extend({
@@ -126,6 +136,37 @@ export const AgentActionExecutionFailed = AgentActionExecutionStarted.extend({
     images: z.any().array(),
   }).passthrough().optional(),
 }).passthrough()
+
+export const AgentInteractionStarted = z.object({
+  type: z.literal('AgentInteractionStarted'),
+  interaction: z.object({
+    interactionId: z.object({
+      id: z.string(),
+    }),
+    runCancelableInteraction: z.object({
+      name: z.string(),
+    }).passthrough().optional(),
+    askInteraction: z.object({
+      question: z.string(),
+    }).passthrough().optional(),
+  }).passthrough(),
+}).passthrough()
+export type AgentInteractionStarted = z.infer<typeof AgentInteractionStarted>
+
+export const AgentInteractionFinished = z.object({
+  type: z.literal('AgentInteractionFinished'),
+  interactionId: z.object({
+    id: z.string(),
+  }).passthrough(),
+}).passthrough()
+export type AgentInteractionFinished = z.infer<typeof AgentInteractionFinished>
+
+export const ResponseTextAppeared = z.object({
+  type: z.literal('com.intellij.ml.llm.matterhorn.agent.ResponseTextAppeared'),
+  text: z.string(),
+}).passthrough()
+export type ResponseTextAppeared = z.infer<typeof ResponseTextAppeared>
+
 export const BeforeStepStartedEvent = z.object({
   type: z.literal('BeforeStepStartedEvent'),
   // TODO
@@ -223,6 +264,9 @@ export const Event = z.discriminatedUnion('type', [
   AgentActionExecutionStarted,
   AgentActionExecutionFinished,
   AgentActionExecutionFailed,
+  AgentInteractionStarted,
+  AgentInteractionFinished,
+  ResponseTextAppeared,
   BeforeStepStartedEvent,
   StepMetaInfoAppearedEvent,
   AfterStepFinishedEvent,
