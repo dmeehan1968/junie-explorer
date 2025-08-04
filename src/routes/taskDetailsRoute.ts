@@ -22,19 +22,19 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
   params: Record<string, any>,
   label: string
 }) {
-  const params = Object.entries(tool.params).flatMap(([key, value]) =>
-    [
-      `<span class="text-base-content/50 px-2 italic">${escapeHtml(key)}:</span>`,
-      `<span class="bg-info text-info-content px-2">${escapeHtml(String(value))}</span>`,
-    ].join(''),
-  ).join(', ')
-  const content = `<span class="bg-secondary text-secondary-content px-2">${escapeHtml(tool.name)}</span>(${params})`
+  const params = Object.entries(tool.params).map(([key, value]) => {
+    return `<div class="flex flex-row">
+      <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">${escapeHtml(key)}:</div>
+      <div class="flex-grow bg-info text-info-content p-2">${escapeHtml(String(value))}</div>
+    </div>`
+  }).join('')
+  const content = `<div class="py-2"><span class="bg-secondary text-secondary-content p-2">${escapeHtml(tool.name)}</span></div>${params}`
   return `
     <div class="relative">
       ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix, index, })}
       <div class="relative">
         <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">${tool.label}</h3>
-        <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
+        <div class="${klass} flex flex-col gap-1 pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
       </div>
     </div>
   `
@@ -161,7 +161,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Task ${taskId} Details - ${escapeHtml(issue.name)}</title>
+        <title>Junie Explorer: ${issueId} Task ${taskId} Trajectory - ${escapeHtml(issue.name)}</title>
         <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="/js/themeSwitcher.js"></script>
@@ -172,7 +172,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
-            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Task ${taskId} Details</h1>
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Issue ${issueId} Task ${taskId} Trajectory</h1>
             <div class="flex items-center gap-3">
               ${ThemeSwitcher()}
               ${ReloadButton()}
@@ -188,7 +188,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
           href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`,
           testId: 'breadcrumb-issue-name',
         },
-        { label: `Task ${taskId} Details`, testId: 'breadcrumb-task-details' },
+        { label: `Issue ${issueId} Task ${taskId} Trajectory`, testId: 'breadcrumb-task-details' },
       ],
     })}
 
