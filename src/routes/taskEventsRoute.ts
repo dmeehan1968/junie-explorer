@@ -132,7 +132,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
 }
 
 // Task event timeline API endpoint
-router.get('/project/:projectName/issue/:issueId/task/:taskId/events/timeline', async (req, res) => {
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/events/timeline', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
@@ -161,7 +161,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events/timeline', 
 })
 
 // Task action events API endpoint
-router.get('/project/:projectName/issue/:issueId/task/:taskId/events/actions', async (req, res) => {
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/events/actions', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
