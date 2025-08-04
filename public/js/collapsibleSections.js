@@ -31,7 +31,31 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Check if this section contains the event timeline chart
         const chartCanvas = section.querySelector('#event-timeline-chart');
-        if (chartCanvas && window.taskEventChart) {
+        if (chartCanvas && !window.taskEvents) {
+          // Fetch event timeline data when the event timeline is expanded
+          const pathParts = window.location.pathname.split('/');
+          const projectName = pathParts[2];
+          const issueId = pathParts[4];
+          const taskId = pathParts[6];
+          
+          fetch(`/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/timeline`)
+            .then(response => response.json())
+            .then(data => {
+              // Convert ISO strings back to Date objects
+              window.taskEvents = data.map(e => ({
+                ...e,
+                timestamp: new Date(e.timestamp)
+              }));
+              
+              // Initialize the event chart if it hasn't been created yet
+              if (!window.taskEventChart) {
+                window.taskEventChart = new TaskEventChart('event-timeline-chart', window.taskEvents);
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching timeline events:', error);
+            });
+        } else if (chartCanvas && window.taskEventChart) {
           // Use setTimeout to ensure the section is fully expanded before resizing
           setTimeout(() => {
             window.taskEventChart.resize();

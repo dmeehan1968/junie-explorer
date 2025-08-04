@@ -131,6 +131,35 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 }
 
+// Task event timeline API endpoint
+router.get('/project/:projectName/issue/:issueId/task/:taskId/events/timeline', async (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = await jetBrains.getProjectByName(projectName)
+    const issue = await project?.getIssueById(issueId)
+    const task = await issue?.getTaskById(taskId)
+
+    if (!project || !issue || !task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    // Get events for the task
+    const events = await task.events
+
+    // Map events for Event Timeline
+    const timelineEvents = events.map(e => ({
+      timestamp: e.timestamp.toISOString(),
+      event: { type: e.event.type },
+    }))
+
+    res.json(timelineEvents)
+  } catch (error) {
+    console.error('Error fetching timeline events:', error)
+    res.status(500).json({ error: 'An error occurred while fetching timeline events' })
+  }
+})
+
 // Task action events API endpoint
 router.get('/project/:projectName/issue/:issueId/task/:taskId/events/actions', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
@@ -338,17 +367,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
                 </div>
               </div>
             </div>
-            <script>
-              window.taskEvents = ${JSON.stringify(events.map(e => ({
-      timestamp: e.timestamp.toISOString(),
-      event: { type: e.event.type },
-    })))};
-              // Convert ISO strings back to Date objects
-              window.taskEvents = window.taskEvents.map(e => ({
-                ...e,
-                timestamp: new Date(e.timestamp)
-              }));
-            </script>
           ` : ''}
 
           ${hasActionEvents ? `
