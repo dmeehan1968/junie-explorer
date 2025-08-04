@@ -1,4 +1,5 @@
 import express from 'express'
+import { marked } from "marked"
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { collapseIcon } from "../components/collapseIcon.js"
 import { expandIcon } from "../components/expandIcon.js"
@@ -48,7 +49,7 @@ function ToolUseDecorator(klass: string, index: number) {
 
 function ToolUseAnswerDecorator(klass: string, index: number) {
   return (tool: ToolUseAnswer) => {
-    return ToolCallDecorator(klass, index, 'tool-use-answer-toggle', { name: tool.toolName, params: tool.toolParams.rawJsonObject, label: 'Tool Answer' })
+    return ToolCallDecorator(klass, index, 'tool-use-answer-toggle', { name: tool.toolName, params: tool.toolParams.rawJsonObject, label: 'Tool Request' })
   }
 }
 
@@ -201,6 +202,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
           <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
             <div class="text-sm text-base-content/70" data-testid="task-date">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
           </div>
+          ${task.context.description ? `
+              <div class="bg-base-200 text-base-content p-4 mb-8 rounded-lg">
+                <h3 class="text-lg font-semibold mb-2 text-primary">Task Description</h3>
+                <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
+              </div>
+            ` : ''}
 
           ${events.length > 0 ? `
               ${events
