@@ -1,5 +1,7 @@
 import express from 'express'
+import fs from 'fs-extra'
 import { marked } from "marked"
+import path from 'node:path'
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { collapseIcon } from "../components/collapseIcon.js"
 import { expandIcon } from "../components/expandIcon.js"
@@ -140,6 +142,34 @@ function ChatAnswerDecorator(klass: string, index: number) {
   }
 }
 
+// Task trajectories download route
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/details/trajectories/download', async (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = await jetBrains.getProjectByName(projectName)
+    const issue = await project?.getIssueById(issueId)
+    const task = await issue?.getTaskById(taskId)
+
+    if (!project || !issue || !task) {
+      return res.status(404).send('Task not found')
+    }
+
+    if (!fs.existsSync(task.trajectoriesFile)) {
+      return res.status(404).send('Trajectories file not found')
+    }
+
+    const filename = path.basename(task.trajectoriesFile)
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    res.setHeader('Content-Type', 'application/jsonl')
+
+    res.sendFile(path.resolve(task.trajectoriesFile))
+  } catch (error) {
+    console.error('Error downloading trajectories file:', error)
+    res.status(500).send('An error occurred while downloading the trajectories file')
+  }
+})
+
 // Task details page route
 router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
@@ -208,6 +238,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
 
           <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
             <div class="text-sm text-base-content/70" data-testid="task-date">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
+            <a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/details/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>
           </div>
           ${task.context.description ? `
               <div class="bg-base-200 text-base-content p-4 mb-8 rounded-lg">
