@@ -178,14 +178,18 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/events/actions
 
     // Filter and flatten action events for Action Timeline
     const actionEvents = events
-      .filter((e): e is { event: AgentActionExecutionStarted, timestamp: Date } =>
-        e.event.type === 'AgentActionExecutionStarted',
+      .filter((e): e is { event: AgentActionExecutionStarted | AgentActionExecutionFinished, timestamp: Date } =>
+        e.event.type === 'AgentActionExecutionStarted' || e.event.type === 'AgentActionExecutionFinished',
       )
       .map(e => ({
         timestamp: e.timestamp.toISOString(),
         eventType: e.event.type,
-        actionName: e.event.actionToExecute.name,
-        inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
+        ...(e.event.type === 'AgentActionExecutionStarted'
+          ? {
+            actionName: e.event.actionToExecute.name,
+            inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
+          }
+          : {})
       }))
 
     res.json(actionEvents)
