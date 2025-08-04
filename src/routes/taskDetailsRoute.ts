@@ -17,52 +17,38 @@ import { ToggleComponent } from '../utils/toggleComponent.js'
 
 const router = express.Router()
 
+function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, tool: {
+  name: string,
+  params: Record<string, any>,
+  label: string
+}) {
+  const params = Object.entries(tool.params).flatMap(([key, value]) =>
+    [
+      `<span class="text-base-content/50 px-2 italic">${escapeHtml(key)}:</span>`,
+      `<span class="bg-info text-info-content px-2">${escapeHtml(String(value))}</span>`,
+    ].join(''),
+  ).join(', ')
+  const content = `<span class="bg-secondary text-secondary-content px-2">${escapeHtml(tool.name)}</span>(${params})`
+  return `
+    <div class="relative">
+      ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix, index, })}
+      <div class="relative">
+        <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">${tool.label}</h3>
+        <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
+      </div>
+    </div>
+  `
+}
+
 function ToolUseDecorator(klass: string, index: number) {
   return (tool: ToolUse) => {
-    const params = Object.entries(tool.input.rawJsonObject).flatMap(([key, value]) =>
-      [
-        `<span class="text-base-content/50 px-2 italic">${escapeHtml(key)}:</span>`,
-        `<span class="bg-info text-info-content px-2">${escapeHtml(String(value))}</span>`
-      ].join('')
-    ).join(', ')
-    const content = `<span class="bg-secondary text-secondary-content px-2">${escapeHtml(tool.name)}</span>(${params})`
-    return `
-      <div class="relative">
-        ${ToggleComponent({
-          expandIcon,
-          collapseIcon,
-          testIdPrefix: 'tool-use-toggle',
-          index
-        })}
-        <div class="relative">
-          <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Tool Call</h3>
-          <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
-        </div>
-      </div>`
+    return ToolCallDecorator(klass, index, 'tool-use-toggle', { name: tool.name, params: tool.input.rawJsonObject, label: 'Tool Call' })
   }
 }
 
 function ToolUseAnswerDecorator(klass: string, index: number) {
   return (tool: ToolUseAnswer) => {
-    const params = Object.entries(tool.toolParams.rawJsonObject).map(([key, value]) => [
-      `<span class="text-base-content/50 px-2 italic">${escapeHtml(key)}:</span>`,
-      `<span class="bg-info text-info-content px-2">${escapeHtml(String(value))}"</span>`
-    ].join('')
-    ).join(', ')
-    const content = `<span class="bg-secondary text-secondary-content px-2">${escapeHtml(tool.toolName)}</span>(${params})`
-    return `
-      <div class="relative">
-        ${ToggleComponent({
-          expandIcon,
-          collapseIcon,
-          testIdPrefix: 'tool-use-answer-toggle',
-          index
-        })}
-        <div class="relative">
-          <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Tool Request</h3>
-          <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>
-        </div>
-      </div>`
+    return ToolCallDecorator(klass, index, 'tool-use-answer-toggle', { name: tool.toolName, params: tool.toolParams.rawJsonObject, label: 'Tool Answer' })
   }
 }
 
@@ -72,11 +58,11 @@ function ChatMessageDecorator(klass: string, index: number) {
       return `
         <div class="relative">
           ${ToggleComponent({
-            expandIcon,
-            collapseIcon,
-            testIdPrefix: 'chat-message-toggle',
-            index
-          })}
+        expandIcon,
+        collapseIcon,
+        testIdPrefix: 'chat-message-toggle',
+        index,
+      })}
           <div class="relative">
             <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Message</h3>
             <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</div>
@@ -87,11 +73,11 @@ function ChatMessageDecorator(klass: string, index: number) {
       return `
         <div class="relative">
           ${ToggleComponent({
-            expandIcon,
-            collapseIcon,
-            testIdPrefix: 'chat-assistant-toggle',
-            index
-          })}
+        expandIcon,
+        collapseIcon,
+        testIdPrefix: 'chat-assistant-toggle',
+        index,
+      })}
           <div class="relative">
             <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Message</h3>
             <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</div>
@@ -101,11 +87,11 @@ function ChatMessageDecorator(klass: string, index: number) {
       return `
         <div class="relative">
           ${ToggleComponent({
-            expandIcon,
-            collapseIcon,
-            testIdPrefix: 'chat-user-toggle',
-            index
-          })}
+        expandIcon,
+        collapseIcon,
+        testIdPrefix: 'chat-user-toggle',
+        index,
+      })}
           <div class="relative">
             <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Tool Result</h3>
             <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${message.toolResults.map(res => escapeHtml(res.content)).join('\n')}</div>
@@ -115,11 +101,11 @@ function ChatMessageDecorator(klass: string, index: number) {
       return `
         <div class="relative">
           ${ToggleComponent({
-            expandIcon,
-            collapseIcon,
-            testIdPrefix: 'chat-multipart-toggle',
-            index
-          })}
+        expandIcon,
+        collapseIcon,
+        testIdPrefix: 'chat-multipart-toggle',
+        index,
+      })}
           <div class="relative">
             <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Multi-Part Message</h3>
             <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</div>
@@ -138,11 +124,11 @@ function ChatAnswerDecorator(klass: string, index: number) {
     return `
       <div class="relative">
         ${ToggleComponent({
-          expandIcon,
-          collapseIcon,
-          testIdPrefix: 'chat-answer-toggle',
-          index
-        })}
+      expandIcon,
+      collapseIcon,
+      testIdPrefix: 'chat-answer-toggle',
+      index,
+    })}
           <div class="relative">
             <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Message</h3>
             <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(answer.content)}</div>
@@ -218,41 +204,41 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
 
           ${events.length > 0 ? `
               ${events
-                .filter((record: EventRecord): record is { event: LlmRequestEvent | LlmResponseEvent, timestamp: Date } => {
-                  return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
-                    || (record.event.type === 'LlmResponseEvent' && !record.event.answer.llm.isSummarizer)
-                })
-                .map((record, index) => {
-                  const klass = 'p-4 mt-4 bg-base-content/10'
-                  if (record.event.type === 'LlmRequestEvent') {
-                    return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 relative">
+        .filter((record: EventRecord): record is { event: LlmRequestEvent | LlmResponseEvent, timestamp: Date } => {
+          return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
+            || (record.event.type === 'LlmResponseEvent' && !record.event.answer.llm.isSummarizer)
+        })
+        .map((record, index) => {
+          const klass = 'p-4 mt-4 bg-base-content/10'
+          if (record.event.type === 'LlmRequestEvent') {
+            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 relative">
                       <h3 class="absolute -top-2 left-2 py-1 px-2 bg-primary text-primary-content">Junie</h3>
                       ${[
-                        ...(index===0 ? [`
+              ...(index === 0 ? [`
                           <div class="relative">
                             ${ToggleComponent({
-                              expandIcon,
-                              collapseIcon,
-                              testIdPrefix: 'system-message-toggle',
-                              index: index + 10000
-                            })}
+                expandIcon,
+                collapseIcon,
+                testIdPrefix: 'system-message-toggle',
+                index: index + 10000,
+              })}
                             <div class="relative">
                               <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">System Message</h3>
                               <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(record.event.chat.system)}</div>        
                             </div>
                           </div>`] : []),
-                        ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
-                        ].join('\n')}
+              ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
+            ].join('\n')}
                         </div>`
-                  } else if (record.event.type === 'LlmResponseEvent') {               
-                    return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 relative">
+          } else if (record.event.type === 'LlmResponseEvent') {
+            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 relative">
                       <h3 class="absolute -top-2 left-2 py-1 px-2 bg-primary text-primary-content">LLM</h3>
                       ${record.event.answer.contentChoices.map((choice, choiceIndex) => ChatAnswerDecorator(klass, index * 100 + choiceIndex + 50)(choice)).join('')}</div>`
-                  }
-                  return ''
-                })
-                .join('')
-            }`
+          }
+          return ''
+        })
+        .join('')
+      }`
       : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
     }
         </div>
