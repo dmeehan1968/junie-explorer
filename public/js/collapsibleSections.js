@@ -37,6 +37,34 @@ document.addEventListener('DOMContentLoaded', function() {
             window.taskEventChart.resize();
           }, 50);
         }
+        
+        // Check if this section contains the action timeline chart
+        const actionChartCanvas = section.querySelector('#action-timeline-chart');
+        if (actionChartCanvas && !window.taskActionEvents) {
+          // Fetch action events data when the action timeline is expanded
+          const pathParts = window.location.pathname.split('/');
+          const projectName = pathParts[2];
+          const issueId = pathParts[4];
+          const taskId = pathParts[6];
+          
+          fetch(`/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/actions`)
+            .then(response => response.json())
+            .then(data => {
+              // Convert ISO strings back to Date objects
+              window.taskActionEvents = data.map(e => ({
+                ...e,
+                timestamp: new Date(e.timestamp)
+              }));
+              
+              // Initialize the action chart if it hasn't been created yet
+              if (!window.taskActionChart) {
+                window.taskActionChart = new TaskActionChart('action-timeline-chart', window.taskActionEvents);
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching action events:', error);
+            });
+        }
       }
     });
   });

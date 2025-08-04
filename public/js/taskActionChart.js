@@ -310,10 +310,4 @@ class TaskActionChart {
   }
 }
 
-// Initialize chart when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  const chartCanvas = document.getElementById('action-timeline-chart');
-  if (chartCanvas && window.taskActionEvents) {
-    window.taskActionChart = new TaskActionChart('action-timeline-chart', window.taskActionEvents);
-  }
-});
+// Chart initialization is now handled by collapsibleSections.js when the action timeline is expanded

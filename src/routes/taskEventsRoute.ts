@@ -131,6 +131,41 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 }
 
+// Task action events API endpoint
+router.get('/project/:projectName/issue/:issueId/task/:taskId/events/actions', async (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = await jetBrains.getProjectByName(projectName)
+    const issue = await project?.getIssueById(issueId)
+    const task = await issue?.getTaskById(taskId)
+
+    if (!project || !issue || !task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    // Get events for the task
+    const events = await task.events
+
+    // Filter and flatten action events for Action Timeline
+    const actionEvents = events
+      .filter((e): e is { event: AgentActionExecutionStarted, timestamp: Date } =>
+        e.event.type === 'AgentActionExecutionStarted',
+      )
+      .map(e => ({
+        timestamp: e.timestamp.toISOString(),
+        eventType: e.event.type,
+        actionName: e.event.actionToExecute.name,
+        inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
+      }))
+
+    res.json(actionEvents)
+  } catch (error) {
+    console.error('Error fetching action events:', error)
+    res.status(500).json({ error: 'An error occurred while fetching action events' })
+  }
+})
+
 // Task events download route
 router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
@@ -180,18 +215,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
     const llmGraphData = prepareLlmEventGraphData(events)
     const hasLlmEvents = llmGraphData.labels.length > 0
 
-    // Filter and flatten action events for Action Timeline
-    const actionEvents = events
-      .filter((e): e is { event: AgentActionExecutionStarted, timestamp: Date } =>
-        e.event.type === 'AgentActionExecutionStarted',
-      )
-      .map(e => ({
-        timestamp: e.timestamp,
-        eventType: e.event.type,
-        actionName: e.event.actionToExecute.name,
-        inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
-      }))
-    const hasActionEvents = actionEvents.length > 0
+    // Check if there are action events for conditional rendering
+    const hasActionEvents = events.some(e => e.event.type === 'AgentActionExecutionStarted')
 
     // Generate HTML
     const html = `
@@ -338,19 +363,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
                 </div>
               </div>
             </div>
-            <script>
-              window.taskActionEvents = ${JSON.stringify(actionEvents.map(e => ({
-      timestamp: e.timestamp.toISOString(),
-      eventType: e.eventType,
-      actionName: e.actionName,
-      inputParamValue: e.inputParamValue,
-    })))};
-              // Convert ISO strings back to Date objects
-              window.taskActionEvents = window.taskActionEvents.map(e => ({
-                ...e,
-                timestamp: new Date(e.timestamp)
-              }));
-            </script>
           ` : ''}
 
           ${events.length > 0 ? `
