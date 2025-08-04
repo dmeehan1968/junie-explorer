@@ -109,8 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const timeUnit = chartData.timeUnit;
       const stepSize = chartData.stepSize;
 
-      console.log('LLM Chart - timeUnit:', timeUnit, 'stepSize:', stepSize);
-      
       // Create chart configuration
       const config = {
         type: 'line',

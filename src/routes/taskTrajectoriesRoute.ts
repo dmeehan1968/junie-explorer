@@ -143,7 +143,7 @@ function ChatAnswerDecorator(klass: string, index: number) {
 }
 
 // Task trajectories download route
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId/details/trajectories/download', async (req, res) => {
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/download', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
@@ -170,8 +170,8 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/details/trajec
   }
 })
 
-// Task details page route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (req, res) => {
+// Task trajectories page route
+router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params
@@ -202,7 +202,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/reloadPage.js"></script>
-        <script src="/js/taskDetailsFilters.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
       </head>
@@ -225,7 +224,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
           href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`,
           testId: 'breadcrumb-issue-name',
         },
-        { label: `Issue ${issueId} Task ${taskId} Trajectory`, testId: 'breadcrumb-task-details' },
+        { label: `Issue ${issueId} Task ${taskId} Trajectory`, testId: 'breadcrumb-task-trajectories' },
       ],
     })}
 
@@ -237,7 +236,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
 
           <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
             <div class="text-sm text-base-content/70" data-testid="task-date">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
-            <a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/details/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>
+            <a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>
           </div>
           ${task.context.description ? `
               <div class="bg-base-200 text-base-content p-4 mb-8 rounded-lg">
@@ -306,13 +305,13 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
 
     res.send(html)
   } catch (error) {
-    console.error('Error generating task details page:', error)
-    res.status(500).send('An error occurred while generating the task details page')
+    console.error('Error generating task trajectories page:', error)
+    res.status(500).send('An error occurred while generating the task trajectories page')
   }
 })
 
 // Task action timeline API endpoint
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId/details/timeline', async (req, res) => {
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/timeline', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   try {
     const { projectName, issueId, taskId } = req.params

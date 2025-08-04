@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const issueId = pathParts[4];
           const taskId = pathParts[6];
           
-          fetch(`/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/details/timeline`)
+          fetch(`/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/timeline`)
             .then(response => response.json())
             .then(data => {
               // Convert ISO strings back to Date objects

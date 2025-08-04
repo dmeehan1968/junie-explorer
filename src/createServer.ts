@@ -10,7 +10,7 @@ import issueRoutes from "./routes/issueRoutes.js"
 import notFoundRoutes from "./routes/notFoundRoutes.js"
 import projectRoutes from "./routes/projectRoutes.js"
 import taskEventsRoute from "./routes/taskEventsRoute.js"
-import taskDetailsRoute from "./routes/taskDetailsRoute.js"
+import taskTrajectoriesRoute from "./routes/taskTrajectoriesRoute.js"
 
 export interface ServerOptions {
   jetBrainsInstance?: JetBrains
@@ -56,7 +56,7 @@ export async function createServer(options: ServerOptions = {}) {
   app.use('/', projectRoutes)
   app.use('/', issueRoutes)
   app.use('/', taskEventsRoute)
-  app.use('/', taskDetailsRoute)
+  app.use('/', taskTrajectoriesRoute)
 
   // Add not found page (must be after routes)
   app.use(notFoundRoutes)
