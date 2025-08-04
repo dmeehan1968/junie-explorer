@@ -4,10 +4,12 @@ import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
 import { JetBrains } from "../jetbrains.js"
+import { ToolUseAnswer } from "../schema/AIToolUseAnswerChoice.js"
 import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { ContentAnswer, LlmResponseEvent } from "../schema/llmResponseEvent.js"
+import { ToolParams } from "../schema/toolParams.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { createEventFormatter } from '../utils/eventFormatters.js'
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
@@ -16,8 +18,17 @@ const router = express.Router()
 
 function ToolUseDecorator(klass: string) {
   return (tool: ToolUse) => {
-    const params = tool.input.map(param => `<span>${escapeHtml(param.name)}:</span><span>${escapeHtml(param.value)}</span>`).join(', ')
+    console.log(tool)
+    const params = Object.entries(tool.input.rawJsonObject).map(([key, value]) => `<span>${escapeHtml(key)}:</span><span>"${escapeHtml(String(value))}"</span>`).join(', ')
     return `<pre class="${klass}"><code>${escapeHtml(tool.name)}(${params})</code></pre>`
+  }
+}
+
+function ToolUseAnswerDecorator(klass: string) {
+  return (tool: ToolUseAnswer) => {
+    console.log(tool)
+    const params = Object.entries(tool.toolParams.rawJsonObject).map(([key, value]) => `<span>${escapeHtml(key)}:</span><span>"${escapeHtml(String(value))}"</span>`).join(', ')
+    return `<pre class="${klass}"><code>${escapeHtml(tool.toolName)}(${params})</code></pre>`
   }
 }
 
@@ -40,10 +51,7 @@ function ChatAnswerDecorator(klass: string) {
   return (answer: ContentAnswer) => {
     let toolUses = ''
     if (answer.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice') {
-      toolUses = answer.usages.map(tool => {
-        const params = tool.toolParams.map(param => `<span>${escapeHtml(param.name)}:</span><span>${escapeHtml(param.value)}</span>`).join(', ')
-        return `<pre class="${klass}"><code>${escapeHtml(tool.toolName)}(${params})</code></pre>`
-      }).join('')
+      toolUses = answer.usages.map(ToolUseAnswerDecorator(klass)).join('')
     }
     return `<pre class="${klass}"><code>${escapeHtml(answer.content)}</code></pre>${toolUses}`
   }
@@ -138,12 +146,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/details', async (r
           .map((record, index) => {
             const klass = 'p-4 mt-4 bg-base-content/10'
             if (record.event.type === 'LlmRequestEvent') {
-              return `<div class="font-mono text-xs border p-4 mb-4">${[
+              return `<div class="font-mono text-xs border p-4 mb-4"><h3>Request</h3>${[
                 ...(index===0 ? [`<pre class="${klass}">${escapeHtml(record.event.chat.system)}</pre>`] : []),
                 ...record.event.chat.messages.map(ChatMessageDecorator(klass)),
               ].join('\n')}</div>`
             } else if (record.event.type === 'LlmResponseEvent') {               
-              return `<div class="font-mono text-xs border p-4 mb-4">${record.event.answer.contentChoices.map(ChatAnswerDecorator(klass)).join('')}</div>`
+              return `<div class="font-mono text-xs border p-4 mb-4"><h3>Response</h3>${record.event.answer.contentChoices.map(ChatAnswerDecorator(klass)).join('')}</div>`
             }
             return ''
           })
