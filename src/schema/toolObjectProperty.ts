@@ -8,3 +8,4 @@ export const ToolObjectProperty = AbstractToolProperty.extend({
     return ToolAnyProperty.array()
   },
 })
+export type ToolObjectProperty = z.infer<typeof ToolObjectProperty>

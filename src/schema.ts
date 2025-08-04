@@ -110,7 +110,7 @@ const StepContent = z.looseObject({
     type: z.string(),
     name: z.string(),
     arguments: z.string().optional(),
-    description: z.string(),
+    description: z.string().optional(),
   }).optional(),
   actionResult: z.looseObject({
     type: z.string(),

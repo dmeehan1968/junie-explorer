@@ -1,15 +1,12 @@
 import * as z from "zod"
 import { ContentChoice } from "./contentChoice.js"
+import { ToolParams } from "./toolParams.js"
 
 export const AIToolUseAnswerChoice = ContentChoice.extend({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'),
   usages: z.object({
     toolId: z.string().nullable(),
     toolName: z.string(),
-    toolParams: z.object({
-      ParameterValue: z.string(),
-      name: z.string(),
-      value: z.any(),
-    }).array().default(() => ([])),
+    toolParams: ToolParams,
   }).array().default(() => ([])),
 })

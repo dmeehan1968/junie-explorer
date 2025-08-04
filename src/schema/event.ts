@@ -7,6 +7,8 @@ import { AfterStepFinishedEvent } from "./afterStepFinishedEvent.js"
 import { AgentActionExecutionFailed } from "./agentActionExecutionFailed.js"
 import { AgentActionExecutionFinished } from "./agentActionExecutionFinished.js"
 import { AgentActionExecutionStarted } from "./agentActionExecutionStarted.js"
+import { AgentInteractionFinished } from "./agentInteractionFinished.js"
+import { AgentInteractionStarted } from "./agentInteractionStarted.js"
 import { AgentSessionUpdatedEvent } from "./agentSessionUpdatedEvent.js"
 import { AgentStateUpdatedEvent } from "./agentStateUpdatedEvent.js"
 import { BeforeArtifactBuildingStarted } from "./beforeArtifactBuildingStarted.js"
@@ -28,6 +30,7 @@ import { StepSummaryCreatedEvent } from "./stepSummaryCreatedEvent.js"
 import { TaskReportCreatedEvent } from "./taskReportCreatedEvent.js"
 import { TaskResultCreatedEvent } from "./taskResultCreatedEvent.js"
 import { TaskSummaryCreatedEvent } from "./taskSummaryCreatedEvent.js"
+import { ResponseTextAppeared } from "./responseTextAppeared.js"
 
 export const Event = z.discriminatedUnion('type', [
   BeforeArtifactBuildingStarted,
@@ -41,6 +44,9 @@ export const Event = z.discriminatedUnion('type', [
   AgentActionExecutionStarted,
   AgentActionExecutionFinished,
   AgentActionExecutionFailed,
+  AgentInteractionStarted,
+  AgentInteractionFinished,
+  ResponseTextAppeared,
   BeforeStepStartedEvent,
   StepMetaInfoAppearedEvent,
   AfterStepFinishedEvent,

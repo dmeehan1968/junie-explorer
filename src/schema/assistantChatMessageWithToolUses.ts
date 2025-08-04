@@ -1,4 +1,5 @@
 import * as z from "zod"
+import { ToolParams } from "./toolParams.js"
 
 export const AssistantChatMessageWithToolUses = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses'),
@@ -6,10 +7,6 @@ export const AssistantChatMessageWithToolUses = z.looseObject({
   toolUses: z.looseObject({
     id: z.string(),
     name: z.string(),
-    input: z.object({
-      ParameterValue: z.string(),
-      name: z.string(),
-      value: z.any(),
-    }).array(),
+    input: ToolParams,
   }).array(),
 })

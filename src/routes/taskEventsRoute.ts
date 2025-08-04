@@ -3,6 +3,8 @@ import fs from 'fs-extra'
 import path from 'node:path'
 import { marked } from 'marked'
 import { JetBrains } from "../jetbrains.js"
+import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
+import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
@@ -180,19 +182,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
 
     // Filter and flatten action events for Action Timeline
     const actionEvents = events
-      .filter(e =>
-        e.event.type === 'AgentActionExecutionStarted' ||
-        e.event.type === 'AgentActionExecutionFinished',
+      .filter((e): e is { event: AgentActionExecutionStarted, timestamp: Date } =>
+        e.event.type === 'AgentActionExecutionStarted',
       )
       .map(e => ({
         timestamp: e.timestamp,
         eventType: e.event.type,
-        actionName: e.event.type === 'AgentActionExecutionStarted'
-          ? (e.event as any).actionToExecute?.name || ''
-          : '',
-        inputParamValue: e.event.type === 'AgentActionExecutionStarted'
-          ? ((e.event as any).actionToExecute?.inputParams?.[0]?.value?.toString() || '')
-          : '',
+        actionName: e.event.actionToExecute.name,
+        inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
       }))
     const hasActionEvents = actionEvents.length > 0
 

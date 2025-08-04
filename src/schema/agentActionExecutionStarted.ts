@@ -1,4 +1,5 @@
-import * as z from "zod"
+import { z } from "zod"
+import { ToolParams } from "./toolParams.js"
 
 export const AgentActionExecutionStarted = z.looseObject({
   type: z.literal('AgentActionExecutionStarted'),
@@ -6,11 +7,12 @@ export const AgentActionExecutionStarted = z.looseObject({
     type: z.string(),
     name: z.string(),
     id: z.string().optional(),
-    inputParams: z.looseObject({
-      ParameterValue: z.string(),
-      name: z.string(),
-      value: z.any(),
-    }).array().optional(),
-    description: z.string(),
-  }),
+    arguments: z.any().optional(),
+    inputParams: ToolParams.optional(),
+    description: z.string().optional(),
+  }).transform(({ arguments: args, inputParams, ...rest }) => ({
+    ...rest,
+    inputParams: args || inputParams || {},
+  })),
 })
+export type AgentActionExecutionStarted = z.infer<typeof AgentActionExecutionStarted>
