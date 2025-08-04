@@ -160,44 +160,6 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/events/timelin
   }
 })
 
-// Task action events API endpoint
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId/events/actions', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
-  try {
-    const { projectName, issueId, taskId } = req.params
-    const project = await jetBrains.getProjectByName(projectName)
-    const issue = await project?.getIssueById(issueId)
-    const task = await issue?.getTaskById(taskId)
-
-    if (!project || !issue || !task) {
-      return res.status(404).json({ error: 'Task not found' })
-    }
-
-    // Get events for the task
-    const events = await task.events
-
-    // Filter and flatten action events for Action Timeline
-    const actionEvents = events
-      .filter((e): e is { event: AgentActionExecutionStarted | AgentActionExecutionFinished, timestamp: Date } =>
-        e.event.type === 'AgentActionExecutionStarted' || e.event.type === 'AgentActionExecutionFinished',
-      )
-      .map(e => ({
-        timestamp: e.timestamp.toISOString(),
-        eventType: e.event.type,
-        ...(e.event.type === 'AgentActionExecutionStarted'
-          ? {
-            actionName: e.event.actionToExecute.name,
-            inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
-          }
-          : {})
-      }))
-
-    res.json(actionEvents)
-  } catch (error) {
-    console.error('Error fetching action events:', error)
-    res.status(500).json({ error: 'An error occurred while fetching action events' })
-  }
-})
 
 // Task events download route
 router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', async (req, res) => {
@@ -248,8 +210,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
     const llmGraphData = prepareLlmEventGraphData(events)
     const hasLlmEvents = llmGraphData.labels.length > 0
 
-    // Check if there are action events for conditional rendering
-    const hasActionEvents = events.some(e => e.event.type === 'AgentActionExecutionStarted')
 
     // Generate HTML
     const html = `
@@ -294,7 +254,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
         <script src="/js/reloadPage.js"></script>
         <script src="/js/taskEventChart.js"></script>
         <script src="/js/taskEventLlmChart.js"></script>
-        <script src="/js/taskActionChart.js"></script>
       </head>
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
@@ -373,19 +332,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             </div>
           ` : ''}
 
-          ${hasActionEvents ? `
-            <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed" data-testid="action-timeline-section">
-              <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-lg hover:bg-base-200 transition-colors duration-200" data-testid="action-timeline-header">
-                <h3 class="text-xl font-bold text-primary m-0">Action Timeline</h3>
-                <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
-              </div>
-              <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
-                <div class="w-full">
-                  <canvas id="action-timeline-chart" class="w-full max-w-full border border-base-300 rounded bg-base-100 shadow-sm"></canvas>
-                </div>
-              </div>
-            </div>
-          ` : ''}
 
           ${events.length > 0 ? `
             <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed" data-testid="event-statistics-section">
