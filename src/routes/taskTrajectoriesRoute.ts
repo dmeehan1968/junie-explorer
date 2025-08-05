@@ -35,7 +35,7 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
   }).join('')
   const content = `<div class="py-2"><span class="bg-secondary text-secondary-content p-2">${escapeHtml(tool.name)}</span></div>${params}`
   return `
-    <div class="relative">
+    <div class="relative ml-48">
       ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix, index, })}
       <div class="relative">
         <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">${tool.label}</h3>
@@ -61,7 +61,7 @@ function ChatMessageDecorator(klass: string, index: number) {
   return (message: MatterhornMessage) => {
     if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
       return `
-        <div class="relative">
+        <div class="relative mr-48">
           ${ToggleComponent({
         expandIcon,
         collapseIcon,
@@ -76,7 +76,7 @@ function ChatMessageDecorator(klass: string, index: number) {
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
       const toolUses = message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
       return `
-        <div class="relative">
+        <div class="relative ml-48">
           ${ToggleComponent({
         expandIcon,
         collapseIcon,
@@ -90,7 +90,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         </div>${toolUses}`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
       return `
-        <div class="relative">
+        <div class="relative mr-48">
           ${ToggleComponent({
         expandIcon,
         collapseIcon,
@@ -104,7 +104,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         </div>`
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
       return `
-        <div class="relative">
+        <div class="relative mr-48">
           ${ToggleComponent({
         expandIcon,
         collapseIcon,
@@ -117,28 +117,6 @@ function ChatMessageDecorator(klass: string, index: number) {
           </div>
         </div>`
     }
-  }
-}
-
-function ChatAnswerDecorator(klass: string, index: number) {
-  return (answer: ContentAnswer) => {
-    let toolUses = ''
-    if (answer.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice') {
-      toolUses = answer.usages.map((usage, usageIndex) => ToolUseAnswerDecorator(klass, index + usageIndex + 2000)(usage)).join('')
-    }
-    return `
-      <div class="relative">
-        ${ToggleComponent({
-      expandIcon,
-      collapseIcon,
-      testIdPrefix: 'chat-answer-toggle',
-      index,
-    })}
-          <div class="relative">
-            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Message</h3>
-            <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(answer.content)}</div>
-          </div>
-      </div>${toolUses}`
   }
 }
 
@@ -261,38 +239,23 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
 
           ${events.length > 0 ? `
               ${events
-        .filter((record: EventRecord): record is { event: LlmRequestEvent | LlmResponseEvent, timestamp: Date } => {
+        .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
           return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
-            || (record.event.type === 'LlmResponseEvent' && !record.event.answer.llm.isSummarizer)
         })
         .map((record, index) => {
           const klass = 'p-4 mt-4 bg-base-content/10'
-          if (record.event.type === 'LlmRequestEvent') {
-            return `<div class="font-mono text-xs bg-base-content/10 p-4 mb-4 mr-48 relative">
-                      <h3 class="absolute -top-2 left-2 py-1 px-2 bg-neutral text-neutral-content">Junie</h3>
-                      ${[
-              ...(index === 0 ? [`
+          const messages = [
+            ...(index === 0 ? [`
+                        <div class="relative mr-48">
+                          ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix: 'system-message-toggle', index: index + 10000 })}
                           <div class="relative">
-                            ${ToggleComponent({
-                expandIcon,
-                collapseIcon,
-                testIdPrefix: 'system-message-toggle',
-                index: index + 10000,
-              })}
-                            <div class="relative">
-                              <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">System Message</h3>
-                              <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(record.event.chat.system)}</div>        
-                            </div>
-                          </div>`] : []),
-              ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
-            ].join('\n')}
-                        </div>`
-          } else if (record.event.type === 'LlmResponseEvent') {
-            return `<div class="font-mono text-xs bg-base-content/10 p-4 mb-4 ml-48 relative">
-                      <h3 class="absolute -top-2 left-2 py-1 px-2 bg-neutral text-neutral-content">LLM</h3>
-                      ${record.event.answer.contentChoices.map((choice, choiceIndex) => ChatAnswerDecorator(klass, index * 100 + choiceIndex + 50)(choice)).join('')}</div>`
-          }
-          return ''
+                            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">System Message</h3>
+                            <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(record.event.chat.system)}</div>        
+                          </div>
+                        </div>`] : []),
+            ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
+          ].join('\n')
+          return `<div class="font-mono text-xs">${messages}</div>`
         })
         .join('')
       }`
