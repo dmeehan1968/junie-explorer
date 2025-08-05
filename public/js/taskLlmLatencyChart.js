@@ -11,7 +11,7 @@ class LlmLatencyChart {
     this.tooltip = null;
     
     // Chart dimensions and styling
-    this.margin = { top: 20, right: 30, bottom: 60, left: 200 };
+    this.margin = { top: 20, right: 30, bottom: 60, left: 100 };
     this.colors = [
       '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
       '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#6366f1'
@@ -256,7 +256,7 @@ class LlmLatencyChart {
       const y = this.margin.top + this.chartHeight - (i / latencyTicks) * this.chartHeight;
       
       this.ctx.fillText(
-        `${Math.round(latency / 1000)}s`,
+        Math.round(latency / 1000).toString(),
         this.margin.left - 10,
         y
       );

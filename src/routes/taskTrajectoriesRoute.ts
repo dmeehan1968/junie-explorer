@@ -9,13 +9,12 @@ import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
 import { JetBrains } from "../jetbrains.js"
-import { ToolUseAnswer } from "../schema/AIToolUseAnswerChoice.js"
+import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
+import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
 import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
-import { ContentAnswer, LlmResponseEvent } from "../schema/llmResponseEvent.js"
-import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
-import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
+import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { ToggleComponent } from '../utils/toggleComponent.js'
@@ -36,7 +35,7 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
   const content = `<div class="py-2"><span class="bg-secondary text-secondary-content p-2 rounded shadow">${escapeHtml(tool.name)}</span></div>${params}`
   return `
     <div class="relative ml-48 mb-8">
-      ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix, index, })}
+      ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix, index })}
       <div class="relative">
         <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow">${tool.label}</h3>
         <div class="${klass} rounded shadow flex flex-col gap-1 pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
@@ -47,11 +46,22 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
 
 function ToolUseDecorator(klass: string, index: number) {
   return (tool: ToolUse) => {
-    return ToolCallDecorator(klass, index, 'tool-use-toggle', { name: tool.name, params: tool.input.rawJsonObject, label: 'Tool Request' })
+    return ToolCallDecorator(klass, index, 'tool-use-toggle', {
+      name: tool.name,
+      params: tool.input.rawJsonObject,
+      label: 'Tool Request',
+    })
   }
 }
 
-function MessageDecorator(props: { klass: string, index: number, testIdPrefix: string, left: boolean, label: string, content: string }) {
+function MessageDecorator(props: {
+  klass: string,
+  index: number,
+  testIdPrefix: string,
+  left: boolean,
+  label: string,
+  content: string
+}) {
   return `
         <div class="relative mb-8 ${props.left ? 'mr-48' : 'ml-48'}">
           ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix: props.testIdPrefix, index: props.index })}
@@ -247,26 +257,36 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               </div>
             </div>
           </div>
+          
+          <div class="bg-base-200 text-base-content rounded-lg p-4 border border-base-300">
+            <h3 class="text-xl font-bold text-primary mb-8">Message Trajectories</h3>
 
-          ${events.length > 0 ? `
-              ${events
-        .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
-          return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
-        })
-        .map((record, index) => {
-          const klass = 'p-4 mt-4 bg-base-content/10'
-          const messages = [
-            ...(index === 0 ? [
-              MessageDecorator({ klass, index: index + 10000, testIdPrefix: 'system-request-toggle', left: true, label: 'System Message', content: record.event.chat.system }),
-            ] : []),
-            ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
-          ].join('\n')
-          return `<div class="font-mono text-xs">${messages}</div>`
-        })
-        .join('')
-      }`
-      : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
-    }
+            ${events.length > 0 ?
+              events
+                .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
+                  return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
+                })
+                .map((record, index) => {
+                  const klass = 'p-4 mt-4 bg-base-content/10'
+                  const messages = [
+                    ...(index === 0 ? [
+                      MessageDecorator({
+                        klass,
+                        index: index + 10000,
+                        testIdPrefix: 'system-request-toggle',
+                        left: true,
+                        label: 'System Message',
+                        content: record.event.chat.system,
+                      }),
+                    ] : []),
+                    ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
+                  ].join('\n')
+                  return `<div class="font-mono text-xs">${messages}</div>`
+                })
+                .join('')
+              : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
+          }
+        </div>
         </div>
       </body>
       </html>
@@ -308,7 +328,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/t
             actionName: e.event.actionToExecute.name,
             inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
           }
-          : {})
+          : {}),
       }))
 
     res.json(actionEvents)
@@ -345,9 +365,9 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
       latency: number
     }> = []
 
-    for (let i = 1; i < sortedEvents.length; i++) {
+    for (let i = 1 ; i < sortedEvents.length ; i++) {
       const currentEvent = sortedEvents[i]
-      
+
       // Only process LLM response events
       if (currentEvent.event.type === 'LlmResponseEvent') {
         const previousEvent = sortedEvents[i - 1]
@@ -361,7 +381,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
           timestamp: currentEvent.timestamp.toISOString(),
           provider,
           model,
-          latency
+          latency,
         })
       }
     }
@@ -382,7 +402,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
     res.json({
       latencyData,
       providerGroups,
-      providers
+      providers,
     })
   } catch (error) {
     console.error('Error fetching LLM latency data:', error)
