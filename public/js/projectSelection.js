@@ -9,6 +9,11 @@ function initializeProjectSelection() {
   const storedDisplayOption = localStorage.getItem('junie-explorer-displayOption');
   const graphContainer = document.getElementById('projects-graph-container');
 
+  if (document.getElementById('project-chart-options') === null) {
+    // bail early if there are no radio buttons (no metrics)
+    return;
+  }
+
   // Initialize display option from local storage or default to 'both'
   if (storedDisplayOption) {
     displayOption = storedDisplayOption;

@@ -12,19 +12,29 @@ export const LlmResponseEvent = z.looseObject({
   answer: z.looseObject({
     llm: LLM,
     contentChoices: ContentAnswer.array(),
-    inputTokens: z.number().int().default(() => 0),
-    outputTokens: z.number().int().default(() => 0),
-    cacheInputTokens: z.number().int().default(() => 0),
-    cacheCreateInputTokens: z.number().int().default(() => 0),
+    inputTokens: z.number().int().optional(),
+    outputTokens: z.number().int().optional(),
+    cacheInputTokens: z.number().int().optional(),
+    cacheCreateInputTokens: z.number().int().optional(),
     time: z.number().optional(),
   }).transform(answer => {
     const million = 1_000_000
     return {
       ...answer,
-      cost: (answer.inputTokens / million) * (answer.llm?.capabilities?.inputPrice ?? answer.llm?.inputPrice ?? 0)
-        + (answer.outputTokens / million) * (answer.llm?.capabilities?.outputPrice ?? answer.llm?.outputPrice ?? 0)
-        + (answer.cacheInputTokens / million) * (answer.llm?.capabilities?.cacheInputPrice ?? answer.llm?.cacheInputPrice ?? 0)
-        + (answer.cacheCreateInputTokens / million) * (answer.llm?.capabilities?.cacheCreateInputPrice ?? answer.llm?.cacheCreateInputPrice ?? 0),
+      cost: (answer.inputTokens ?? 0 / million) * (answer.llm?.capabilities?.inputPrice ?? answer.llm?.inputPrice ?? 0)
+        + (answer.outputTokens ?? 0 / million) * (answer.llm?.capabilities?.outputPrice ?? answer.llm?.outputPrice ?? 0)
+        + (answer.cacheInputTokens ?? 0 / million) * (answer.llm?.capabilities?.cacheInputPrice ?? answer.llm?.cacheInputPrice ?? 0)
+        + (answer.cacheCreateInputTokens ?? 0 / million) * (answer.llm?.capabilities?.cacheCreateInputPrice ?? answer.llm?.cacheCreateInputPrice ?? 0),
+      inputTokens: answer.inputTokens ?? 0,
+      outputTokens: answer.outputTokens ?? 0,
+      cacheInputTokens: answer.cacheInputTokens ?? 0,
+      cacheCreateInputTokens: answer.cacheCreateInputTokens ?? 0,
+      time: answer.time ?? 0,
+      metricCount:
+        (answer.inputTokens !== undefined ? 1 : 0) +
+        (answer.outputTokens !== undefined ? 1 : 0) +
+        (answer.cacheInputTokens !== undefined ? 1 : 0) +
+        (answer.cacheCreateInputTokens !== undefined ? 1 : 0),
     }
   }),
 })

@@ -202,13 +202,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
       return res.status(404).send('Task not found')
     }
 
+    const hasMetrics = (await task.metrics).metricCount > 0
+
     // Get events for the task
     const events = await task.events
     let cost = 0
 
     // Prepare LLM event graph data
     const llmGraphData = prepareLlmEventGraphData(events)
-    const hasLlmEvents = llmGraphData.labels.length > 0
 
 
     // Generate HTML
@@ -223,25 +224,26 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-        ${hasLlmEvents
+        ${hasMetrics
       ? `<script>
               // Define the LLM chart data as a global variable
               window.llmChartData = ${JSON.stringify(llmGraphData)};
               // Define the LLM events data for filtering
               window.llmEvents = ${JSON.stringify(events.filter(e => e.event.type === 'LlmResponseEvent').map(e => ({
-        timestamp: e.timestamp.toISOString(),
-        event: {
-          type: e.event.type,
-          answer: {
-            llm: { provider: (e.event as any).answer.llm.provider },
-            cost: (e.event as any).answer.cost,
-            inputTokens: (e.event as any).answer.inputTokens,
-            outputTokens: (e.event as any).answer.outputTokens,
-            cacheInputTokens: (e.event as any).answer.cacheInputTokens,
-            cacheCreateInputTokens: (e.event as any).answer.cacheCreateInputTokens,
-          },
-        },
-      })))};
+                  timestamp: e.timestamp.toISOString(),
+                  event: {
+                    type: e.event.type,
+                    answer: {
+                      llm: { provider: (e.event as any).answer.llm.provider },
+                      cost: (e.event as any).answer.cost,
+                      inputTokens: (e.event as any).answer.inputTokens,
+                      outputTokens: (e.event as any).answer.outputTokens,
+                      cacheInputTokens: (e.event as any).answer.cacheInputTokens,
+                      cacheCreateInputTokens: (e.event as any).answer.cacheCreateInputTokens,
+                    },
+                  },
+                }))
+              )};
               // Convert ISO strings back to Date objects
               window.llmEvents = window.llmEvents.map(e => ({
                 ...e,
@@ -295,7 +297,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             ` : ''}
           </div>
 
-          ${hasLlmEvents ? `
+          ${hasMetrics ? `
             <div class="collapsible-section mb-5 bg-base-100 rounded-lg border border-base-300" data-testid="event-metrics-section">
               <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-t-lg hover:bg-base-200 transition-colors duration-200" data-testid="event-metrics-header">
                 <h3 class="text-xl font-bold text-primary m-0">Event Metrics</h3>

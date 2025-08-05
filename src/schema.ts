@@ -181,4 +181,5 @@ export interface SummaryMetrics {
   cacheTokens: number;
   cost: number;
   time: number;
+  metricCount: number;
 }

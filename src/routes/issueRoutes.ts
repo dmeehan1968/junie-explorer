@@ -20,10 +20,15 @@ const generateStepTotalsTable = (summaryData: SummaryMetrics): string => {
     <table class="table w-full bg-base-300">
       <tbody>
         <tr>
-          <td class="text-sm text-center"><span class="font-semibold">Input Tokens:</span> ${summaryData.inputTokens}</td>
-          <td class="text-sm text-center"><span class="font-semibold">Output Tokens:</span> ${summaryData.outputTokens}</td>
-          <td class="text-sm text-center"><span class="font-semibold">Cache Tokens:</span> ${summaryData.cacheTokens}</td>
-          <td class="text-sm text-center"><span class="font-semibold">Cost:</span> ${summaryData.cost.toFixed(4)}</td>
+          ${summaryData.metricCount > 0
+            ? `
+                <td class="text-sm text-center"><span class="font-semibold">Input Tokens:</span> ${summaryData.inputTokens}</td>
+                <td class="text-sm text-center"><span class="font-semibold">Output Tokens:</span> ${summaryData.outputTokens}</td>
+                <td class="text-sm text-center"><span class="font-semibold">Cache Tokens:</span> ${summaryData.cacheTokens}</td>
+                <td class="text-sm text-center"><span class="font-semibold">Cost:</span> ${summaryData.cost.toFixed(4)}</td>
+              `
+            : ``
+          }
           <td class="text-sm text-center"><span class="font-semibold">Total Time:</span> ${formatSeconds(summaryData.time / 1000)}</td>
         </tr>
       </tbody>

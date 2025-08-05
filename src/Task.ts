@@ -74,7 +74,7 @@ export class Task {
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
 
-      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 }
+      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0 }
 
       // metrics needs to load events, but not retain them
       // but if metrics are already loaded (retained), then just use them
@@ -89,6 +89,7 @@ export class Task {
           metrics.outputTokens += event.event.answer.outputTokens
           metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
           metrics.time += event.event.answer.time ?? 0
+          metrics.metricCount += event.event.answer.metricCount
         }
       }
 

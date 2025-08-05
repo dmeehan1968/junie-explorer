@@ -140,8 +140,9 @@ export class JetBrains {
           cacheTokens: acc.cacheTokens + cur.cacheTokens,
           cost: acc.cost + cur.cost,
           time: acc.time + cur.time,
+          metricCount: acc.metricCount + cur.metricCount,
         }
-      }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0 } satisfies SummaryMetrics)
+      }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0 } satisfies SummaryMetrics)
 
       return resolve(metrics)
     })

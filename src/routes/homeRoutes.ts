@@ -199,9 +199,42 @@ async function prepareProjectsGraphData(projects: Project[]): Promise<{
   }
 }
 
+function ProjectMetricsChart() {
+  return `
+    <div id="projects-graph-container" class="h-96 mb-5 p-4 bg-base-100 rounded-lg border border-base-300 hidden">
+      <canvas id="projectsMetricsChart"></canvas>
+    </div>`
+}
+
+function ProjectChartOptions() {
+  return `
+    <div id="project-chart-options" class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()" class="checkbox checkbox-primary checkbox-sm">
+        <label for="select-all-projects" class="font-medium cursor-pointer">Select All</label>
+      </div>
+      <div class="flex gap-4">
+        <div class="flex items-center gap-2">
+          <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
+          <label for="display-both" class="cursor-pointer">Both</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
+          <label for="display-cost" class="cursor-pointer">Cost</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
+          <label for="display-tokens" class="cursor-pointer">Tokens</label>
+        </div>
+      </div>
+    </div>
+  `
+}
 // Homepage route (now shows projects instead of IDEs)
 router.get('/', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
+  const hasMetrics = (await jetBrains.metrics).metricCount > 0
+
   try {
 
     const projects: Project[] = Array.from((await jetBrains.projects).values())
@@ -260,41 +293,23 @@ router.get('/', async (req, res) => {
             </div>
           </div>
 
-          <div id="projects-graph-container" class="h-96 mb-5 p-4 bg-base-100 rounded-lg border border-base-300 hidden">
-            <canvas id="projectsMetricsChart"></canvas>
-          </div>
-
-          <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
-            <div class="flex items-center gap-2">
-              <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()" class="checkbox checkbox-primary checkbox-sm">
-              <label for="select-all-projects" class="font-medium cursor-pointer">Select All</label>
-            </div>
-            <div class="flex gap-4">
-              <div class="flex items-center gap-2">
-                <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
-                <label for="display-both" class="cursor-pointer">Both</label>
-              </div>
-              <div class="flex items-center gap-2">
-                <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
-                <label for="display-cost" class="cursor-pointer">Cost</label>
-              </div>
-              <div class="flex items-center gap-2">
-                <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
-                <label for="display-tokens" class="cursor-pointer">Tokens</label>
-              </div>
-            </div>
-          </div>
+          ${hasMetrics ? ProjectMetricsChart() : ''}
+          ${hasMetrics ? ProjectChartOptions() : ''}
 
           <ul class="space-y-3" id="project-list" data-testid="projects-list">
             ${projects.length > 0
               ? (await Promise.all(projects.map(async project => `
                   <li class="project-item flex items-center p-4 bg-base-200 border-l-4 border-primary rounded transition-all duration-300 hover:bg-base-300 hover:translate-x-1" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
-                    <div class="mr-4">
-                      <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
+                  ${hasMetrics 
+                    ? `<div class="mr-4">
+                        <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
                              class="project-checkbox checkbox checkbox-primary checkbox-sm" 
                              data-project-name="${project.name}" 
                              onchange="handleProjectSelection(this)">
-                    </div>
+                      </div>` 
+                    : ''
+                  }
+                    
                     <a href="/project/${encodeURIComponent(project.name)}" class="flex-1 flex items-center justify-between text-decoration-none hover:text-primary transition-colors" data-testid="project-link-${project.name}">
                       <div class="flex items-center justify-between flex-1">
                         <div class="project-name font-bold text-lg text-primary" data-testid="project-name">${project.name}</div>

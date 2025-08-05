@@ -162,10 +162,11 @@ router.get('/project/:projectName', async (req, res) => {
   try {
     const { projectName } = req.params
     const project = await jetBrains.getProjectByName(projectName)
-
     if (!project) {
       return res.status(404).send('Project not found')
     }
+
+    const hasMetrics = (await project?.metrics).metricCount > 0
 
     // Prepare graph data
     const graphData = await prepareGraphData([...(await project.issues).values()])
@@ -216,7 +217,7 @@ router.get('/project/:projectName', async (req, res) => {
             `).join('')}
           </div>
 
-          ${(await project.issues).size > 0
+          ${hasMetrics
       ? `<div class="h-96 mb-5 p-4 bg-base-200 rounded-lg border border-base-300" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>`
