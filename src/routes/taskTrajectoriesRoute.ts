@@ -372,7 +372,6 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
       if (currentEvent.event.type === 'LlmResponseEvent') {
         const previousEvent = sortedEvents[i - 1]
 
-        console.log(previousEvent.event.type)
         const latency = currentEvent.timestamp.getTime() - previousEvent.timestamp.getTime()
         const provider = (currentEvent.event as LlmResponseEvent).answer.llm.provider
         const model = (currentEvent.event as LlmResponseEvent).answer.llm.name
@@ -398,7 +397,6 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
     // Get unique providers
     const providers = Object.keys(providerGroups).sort()
 
-    console.log(latencyData)
     res.json({
       latencyData,
       providerGroups,
