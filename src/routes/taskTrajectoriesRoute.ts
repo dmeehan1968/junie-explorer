@@ -328,7 +328,11 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/t
         ...(e.event.type === 'AgentActionExecutionStarted'
           ? {
             actionName: e.event.actionToExecute.name,
-            inputParamValue: JSON.stringify(Object.values(e.event.actionToExecute.inputParams ?? {})[0]),
+            inputParamValue: JSON.stringify(
+              (typeof e.event.actionToExecute.inputParams === 'object' && 'rawJsonObject' in e.event.actionToExecute.inputParams)
+                ? e.event.actionToExecute.inputParams.rawJsonObject
+                : e.event.actionToExecute.inputParams
+            ),
           }
           : {}),
       }))
