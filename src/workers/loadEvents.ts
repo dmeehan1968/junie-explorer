@@ -15,10 +15,9 @@ export async function loadEvents(eventsFile: string) {
           json = JSON.parse(line)
         } catch (error) {
           return {
-            type: 'jsonError',
             timestamp: new Date(),
             event: {
-              type: 'unparsed',
+              type: 'jsonError',
               data: line,
             },
           }
