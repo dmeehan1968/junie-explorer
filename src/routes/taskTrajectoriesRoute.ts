@@ -30,16 +30,16 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
   const params = Object.entries(tool.params).map(([key, value]) => {
     return `<div class="flex flex-row">
       <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">${escapeHtml(key)}:</div>
-      <div class="flex-grow bg-info text-info-content p-2">${escapeHtml(String(value))}</div>
+      <div class="flex-grow bg-info text-info-content p-2 rounded">${escapeHtml(String(value))}</div>
     </div>`
   }).join('')
-  const content = `<div class="py-2"><span class="bg-secondary text-secondary-content p-2">${escapeHtml(tool.name)}</span></div>${params}`
+  const content = `<div class="py-2"><span class="bg-secondary text-secondary-content p-2 rounded shadow">${escapeHtml(tool.name)}</span></div>${params}`
   return `
-    <div class="relative ml-48">
+    <div class="relative ml-48 mb-8">
       ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix, index, })}
       <div class="relative">
-        <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">${tool.label}</h3>
-        <div class="${klass} flex flex-col gap-1 pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
+        <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow">${tool.label}</h3>
+        <div class="${klass} rounded shadow flex flex-col gap-1 pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
       </div>
     </div>
   `
@@ -53,11 +53,11 @@ function ToolUseDecorator(klass: string, index: number) {
 
 function MessageDecorator(props: { klass: string, index: number, testIdPrefix: string, left: boolean, label: string, content: string }) {
   return `
-        <div class="relative ${props.left ? 'mr-48' : 'ml-48'}">
+        <div class="relative mb-8 ${props.left ? 'mr-48' : 'ml-48'}">
           ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix: props.testIdPrefix, index: props.index })}
           <div class="relative">
-            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">${props.label}</h3>
-            <div class="${props.klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(props.content)}</div>
+            <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow">${props.label}</h3>
+            <div class="${props.klass} rounded shadow pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(props.content)}</div>
           </div>
         </div>`
 }
@@ -256,14 +256,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         .map((record, index) => {
           const klass = 'p-4 mt-4 bg-base-content/10'
           const messages = [
-            ...(index === 0 ? [`
-                        <div class="relative mr-48">
-                          ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix: 'system-message-toggle', index: index + 10000 })}
-                          <div class="relative">
-                            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">System Message</h3>
-                            <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(record.event.chat.system)}</div>        
-                          </div>
-                        </div>`] : []),
+            ...(index === 0 ? [
+              MessageDecorator({ klass, index: index + 10000, testIdPrefix: 'system-request-toggle', left: true, label: 'System Message', content: record.event.chat.system }),
+            ] : []),
             ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
           ].join('\n')
           return `<div class="font-mono text-xs">${messages}</div>`
