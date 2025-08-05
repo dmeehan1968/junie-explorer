@@ -29,7 +29,7 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
   const params = Object.entries(tool.params).map(([key, value]) => {
     return `<div class="flex flex-row">
       <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">${escapeHtml(key)}:</div>
-      <div class="flex-grow bg-info text-info-content p-2 rounded">${escapeHtml(String(value))}</div>
+      <div class="flex-grow bg-info text-info-content p-2 rounded">${escapeHtml(typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value))}</div>
     </div>`
   }).join('')
   const content = `<div class="py-2"><span class="bg-secondary text-secondary-content p-2 rounded shadow">${escapeHtml(tool.name)}</span></div>${params}`
