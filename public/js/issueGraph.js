@@ -9,6 +9,10 @@ window._locale = {
   localize: {
     month: (n) => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][n],
     day: (n) => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][n],
+    dayPeriod: (n, options) => {
+      const periods = options?.width === 'wide' ? ['AM', 'PM'] : ['AM', 'PM'];
+      return periods[n] || '';
+    },
     ordinalNumber: (n) => n
   },
   formatRelative: () => '',

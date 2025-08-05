@@ -1,25 +1,41 @@
-// LLM Request Latency Chart
+// Define a minimal locale object to satisfy the adapter requirements
+window._locale = {
+  code: 'en-US',
+  formatLong: {
+    date: (options) => {
+      return options.width === 'short' ? 'MM/dd/yyyy' : 'MMMM d, yyyy';
+    }
+  },
+  localize: {
+    month: (n) => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][n],
+    day: (n) => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][n],
+    dayPeriod: (n, options) => {
+      const periods = options?.width === 'wide' ? ['AM', 'PM'] : ['AM', 'PM'];
+      return periods[n] || '';
+    },
+    ordinalNumber: (n) => n
+  },
+  formatRelative: () => '',
+  match: {},
+  options: { weekStartsOn: 0 }
+};
+
+// LLM Request Latency Chart using Chart.js
 class LlmLatencyChart {
   constructor(canvasId, apiUrl) {
     this.canvas = document.getElementById(canvasId);
-    this.ctx = this.canvas.getContext('2d');
     this.apiUrl = apiUrl;
     this.data = null;
     this.providers = [];
     this.visibleProviders = new Set();
-    this.dataPoints = []; // Store data points with their screen coordinates
-    this.tooltip = null;
+    this.chart = null;
     
-    // Chart dimensions and styling
-    this.margin = { top: 20, right: 30, bottom: 60, left: 100 };
+    // Chart colors
     this.colors = [
       '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
       '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#6366f1'
     ];
     
-    this.setupCanvas();
-    this.setupTooltip();
-    this.setupMouseEvents();
     this.loadData();
   }
   
@@ -36,7 +52,7 @@ class LlmLatencyChart {
       this.visibleProviders = new Set(this.providers);
       
       this.createProviderFilters();
-      this.render();
+      this.createChart();
     } catch (error) {
       console.error('Error loading LLM latency data:', error);
       this.showError('Failed to load LLM latency data');
@@ -65,7 +81,7 @@ class LlmLatencyChart {
         } else {
           this.visibleProviders.delete(provider);
         }
-        this.render();
+        this.updateChart();
       });
       
       const colorBox = document.createElement('div');
@@ -83,313 +99,140 @@ class LlmLatencyChart {
     });
   }
   
-  setupCanvas() {
-    // Get the container width
-    let containerWidth = 0;
-    
-    const llmLatencySection = this.canvas.closest('.collapsible-section');
-    const collapsibleContent = this.canvas.closest('.collapsible-content');
-    
-    if (collapsibleContent && collapsibleContent.offsetWidth > 0) {
-      containerWidth = collapsibleContent.offsetWidth - 40; // Account for padding
-    } else if (llmLatencySection && llmLatencySection.offsetWidth > 0) {
-      containerWidth = llmLatencySection.offsetWidth - 40;
-    } else if (this.canvas.offsetWidth > 0) {
-      containerWidth = this.canvas.offsetWidth;
-    } else {
-      containerWidth = 800; // Fallback
-    }
-    
-    this.canvas.width = containerWidth;
-    this.canvas.height = 400; // Fixed height for latency chart
-    
-    // Set up high DPI rendering
-    const dpr = window.devicePixelRatio || 1;
-    const rect = this.canvas.getBoundingClientRect();
-    const actualWidth = rect.width || containerWidth;
-    this.canvas.width = actualWidth * dpr;
-    this.canvas.height = 400 * dpr;
-    this.ctx.scale(dpr, dpr);
-    this.canvas.style.width = actualWidth + 'px';
-    this.canvas.style.height = '400px';
-    
-    this.chartWidth = actualWidth - this.margin.left - this.margin.right;
-    this.chartHeight = 400 - this.margin.top - this.margin.bottom;
-  }
-  
-  setupTooltip() {
-    // Create tooltip element
-    this.tooltip = document.createElement('div');
-    this.tooltip.className = 'absolute bg-base-100 border border-base-300 rounded-lg p-2 text-sm shadow-lg pointer-events-none z-10 hidden';
-    this.tooltip.style.position = 'absolute';
-    this.tooltip.style.zIndex = '1000';
-    document.body.appendChild(this.tooltip);
-  }
-  
-  setupMouseEvents() {
-    this.canvas.addEventListener('mousemove', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const hoveredPoint = this.findDataPointAt(x, y);
-      if (hoveredPoint) {
-        this.showTooltip(e, hoveredPoint);
-      } else {
-        this.hideTooltip();
-      }
-    });
-    
-    this.canvas.addEventListener('mouseleave', () => {
-      this.hideTooltip();
-    });
-  }
-  
-  findDataPointAt(mouseX, mouseY) {
-    const tolerance = 8; // Pixels around the point to consider as hit
-    
-    for (const point of this.dataPoints) {
-      const distance = Math.sqrt(
-        Math.pow(mouseX - point.x, 2) + Math.pow(mouseY - point.y, 2)
-      );
-      
-      if (distance <= tolerance) {
-        return point;
-      }
-    }
-    
-    return null;
-  }
-  
-  showTooltip(mouseEvent, dataPoint) {
-    const date = new Date(dataPoint.data.timestamp);
-    const latencySeconds = (dataPoint.data.latency / 1000).toFixed(2);
-    
-    this.tooltip.innerHTML = `
-      <div class="font-semibold text-primary">${dataPoint.data.provider}</div>
-      <div class="text-xs text-base-content/70">${dataPoint.data.model}</div>
-      <div class="mt-1">
-        <div>Latency: ${latencySeconds}s</div>
-        <div class="text-xs text-base-content/70">${date.toLocaleString()}</div>
-      </div>
-    `;
-    
-    this.tooltip.classList.remove('hidden');
-    this.tooltip.style.left = (mouseEvent.pageX + 10) + 'px';
-    this.tooltip.style.top = (mouseEvent.pageY - 10) + 'px';
-  }
-  
-  hideTooltip() {
-    this.tooltip.classList.add('hidden');
-  }
-  
-  render() {
+  createChart() {
     if (!this.data || !this.data.latencyData) {
       this.showError('No latency data available');
       return;
     }
+
+    const ctx = this.canvas.getContext('2d');
     
-    // Clear canvas
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    // Filter data by visible providers
-    const filteredData = this.data.latencyData.filter(item => 
-      this.visibleProviders.has(item.provider)
-    );
-    
-    if (filteredData.length === 0) {
-      this.showError('No data to display with current filters');
-      return;
-    }
-    
-    // Calculate scales
-    const timestamps = filteredData.map(d => new Date(d.timestamp).getTime());
-    const latencies = filteredData.map(d => d.latency);
-    
-    const timeRange = {
-      min: Math.min(...timestamps),
-      max: Math.max(...timestamps)
-    };
-    
-    const latencyRange = {
-      min: 0, // Start from 0 for latency
-      max: Math.max(...latencies)
-    };
-    
-    // Add some padding to the max latency
-    latencyRange.max *= 1.1;
-    
-    // Draw axes
-    this.drawAxes(timeRange, latencyRange);
-    
-    // Draw data points grouped by provider
-    this.drawDataPoints(filteredData, timeRange, latencyRange);
-    
-    // Draw legend
-    this.drawLegend();
-  }
-  
-  drawAxes(timeRange, latencyRange) {
-    this.ctx.strokeStyle = '#374151';
-    this.ctx.lineWidth = 1;
-    this.ctx.font = '12px sans-serif';
-    this.ctx.fillStyle = '#374151';
-    
-    // Y-axis (latency)
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.margin.left, this.margin.top);
-    this.ctx.lineTo(this.margin.left, this.margin.top + this.chartHeight);
-    this.ctx.stroke();
-    
-    // X-axis (time)
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.margin.left, this.margin.top + this.chartHeight);
-    this.ctx.lineTo(this.margin.left + this.chartWidth, this.margin.top + this.chartHeight);
-    this.ctx.stroke();
-    
-    // Y-axis labels (latency in seconds)
-    this.ctx.textAlign = 'right';
-    this.ctx.textBaseline = 'middle';
-    const latencyTicks = 5;
-    for (let i = 0; i <= latencyTicks; i++) {
-      const latency = (latencyRange.max / latencyTicks) * i;
-      const y = this.margin.top + this.chartHeight - (i / latencyTicks) * this.chartHeight;
-      
-      this.ctx.fillText(
-        Math.round(latency / 1000).toString(),
-        this.margin.left - 10,
-        y
-      );
-      
-      // Grid lines
-      if (i > 0) {
-        this.ctx.strokeStyle = '#e5e7eb';
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.margin.left, y);
-        this.ctx.lineTo(this.margin.left + this.chartWidth, y);
-        this.ctx.stroke();
-        this.ctx.strokeStyle = '#374151';
-      }
-    }
-    
-    // X-axis labels (time)
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'top';
-    const timeTicks = 5;
-    for (let i = 0; i <= timeTicks; i++) {
-      const time = timeRange.min + ((timeRange.max - timeRange.min) / timeTicks) * i;
-      const x = this.margin.left + (i / timeTicks) * this.chartWidth;
-      
-      const date = new Date(time);
-      const timeStr = date.toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        second: '2-digit'
-      });
-      
-      this.ctx.fillText(timeStr, x, this.margin.top + this.chartHeight + 10);
-    }
-    
-    // Axis labels
-    this.ctx.font = '14px sans-serif';
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    
-    // Y-axis label (rotated)
-    this.ctx.save();
-    this.ctx.translate(15, this.margin.top + this.chartHeight / 2);
-    this.ctx.rotate(-Math.PI / 2);
-    this.ctx.fillText('Latency (s)', 0, 0);
-    this.ctx.restore();
-    
-    // X-axis label
-    this.ctx.fillText('Time', this.margin.left + this.chartWidth / 2, this.margin.top + this.chartHeight + 50);
-    
-    // Reset text alignment
-    this.ctx.textAlign = 'left';
-    this.ctx.textBaseline = 'alphabetic';
-  }
-  
-  drawDataPoints(data, timeRange, latencyRange) {
-    // Clear previous data points for hit detection
-    this.dataPoints = [];
-    
-    // Group data by provider
-    const providerData = {};
-    data.forEach(item => {
-      if (!providerData[item.provider]) {
-        providerData[item.provider] = [];
-      }
-      providerData[item.provider].push(item);
+    // Prepare datasets for each provider
+    const datasets = this.providers.map((provider, index) => {
+      const color = this.colors[index % this.colors.length];
+      const providerData = this.data.latencyData
+        .filter(item => item.provider === provider)
+        .map(item => ({
+          x: new Date(item.timestamp),
+          y: item.latency / 1000, // Convert to seconds
+          provider: item.provider,
+          model: item.model,
+          latency: item.latency
+        }));
+
+      return {
+        label: provider,
+        data: providerData,
+        borderColor: color,
+        backgroundColor: color + '20',
+        fill: false,
+        tension: 0.1,
+        borderWidth: 2,
+        hidden: !this.visibleProviders.has(provider)
+      };
     });
-    
-    // Draw each provider's data
-    Object.entries(providerData).forEach(([provider, items], providerIndex) => {
-      if (!this.visibleProviders.has(provider)) return;
-      
-      const color = this.colors[this.providers.indexOf(provider) % this.colors.length];
-      this.ctx.fillStyle = color;
-      this.ctx.strokeStyle = color;
-      
-      // Sort items by timestamp for line drawing
-      items.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-      
-      // Draw line connecting points
-      if (items.length > 1) {
-        this.ctx.beginPath();
-        items.forEach((item, index) => {
-          const x = this.margin.left + 
-            ((new Date(item.timestamp).getTime() - timeRange.min) / (timeRange.max - timeRange.min)) * this.chartWidth;
-          const y = this.margin.top + this.chartHeight - 
-            (item.latency / latencyRange.max) * this.chartHeight;
-          
-          if (index === 0) {
-            this.ctx.moveTo(x, y);
-          } else {
-            this.ctx.lineTo(x, y);
+
+    const config = {
+      type: 'line',
+      data: {
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          point: {
+            radius: 4,
+            hitRadius: 10,
+            hoverRadius: 6
+          },
+          line: {
+            tension: 0.1
           }
-        });
-        this.ctx.lineWidth = 2;
-        this.ctx.stroke();
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              displayFormats: {
+                hour: 'HH:mm',
+                minute: 'HH:mm:ss',
+                second: 'HH:mm:ss'
+              },
+              tooltipFormat: 'MMM d, yyyy HH:mm:ss'
+            },
+            title: {
+              display: true,
+              text: 'Time'
+            },
+            adapters: {
+              date: {
+                locale: window._locale
+              }
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Latency (s)'
+            },
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'LLM Request Latency Over Time',
+            font: {
+              size: 16
+            }
+          },
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          tooltip: {
+            callbacks: {
+              title: function(context) {
+                return new Date(context[0].parsed.x).toLocaleString();
+              },
+              label: function(context) {
+                const dataPoint = context.raw;
+                return [
+                  `${context.dataset.label}`,
+                  `Model: ${dataPoint.model}`,
+                  `Latency: ${context.parsed.y.toFixed(2)}s`
+                ];
+              }
+            }
+          }
+        }
       }
-      
-      // Draw points and store coordinates for hit detection
-      items.forEach(item => {
-        const x = this.margin.left + 
-          ((new Date(item.timestamp).getTime() - timeRange.min) / (timeRange.max - timeRange.min)) * this.chartWidth;
-        const y = this.margin.top + this.chartHeight - 
-          (item.latency / latencyRange.max) * this.chartHeight;
-        
-        // Store data point for hit detection
-        this.dataPoints.push({
-          x: x,
-          y: y,
-          data: item
-        });
-        
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, 4, 0, 2 * Math.PI);
-        this.ctx.fill();
-      });
-    });
+    };
+
+    this.chart = new Chart(ctx, config);
   }
-  
-  drawLegend() {
-    // Legend is handled by the checkboxes, so this is optional
-    // Could add additional legend information here if needed
+
+  updateChart() {
+    if (!this.chart) return;
+
+    // Update dataset visibility
+    this.chart.data.datasets.forEach((dataset, index) => {
+      const provider = this.providers[index];
+      dataset.hidden = !this.visibleProviders.has(provider);
+    });
+
+    this.chart.update();
   }
   
   showError(message) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.font = '16px sans-serif';
-    this.ctx.fillStyle = '#ef4444';
-    this.ctx.textAlign = 'center';
-    this.ctx.fillText(
-      message,
-      this.canvas.width / 2,
-      this.canvas.height / 2
-    );
-    this.ctx.textAlign = 'left';
+    const ctx = this.canvas.getContext('2d');
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.font = '16px sans-serif';
+    ctx.fillStyle = '#ef4444';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(message, this.canvas.width / 2, this.canvas.height / 2);
   }
 }
 
@@ -417,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         new LlmLatencyChart('llm-latency-chart', apiUrl);
         chartInitialized = true;
-      }, 100); // Small delay to ensure DOM is ready
+      }, 100);
     }
   });
 });
