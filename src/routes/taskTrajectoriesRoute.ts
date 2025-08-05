@@ -47,7 +47,7 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
 
 function ToolUseDecorator(klass: string, index: number) {
   return (tool: ToolUse) => {
-    return ToolCallDecorator(klass, index, 'tool-use-toggle', { name: tool.name, params: tool.input.rawJsonObject, label: 'Tool Call' })
+    return ToolCallDecorator(klass, index, 'tool-use-toggle', { name: tool.name, params: tool.input.rawJsonObject, label: 'Tool Request' })
   }
 }
 
@@ -57,65 +57,63 @@ function ToolUseAnswerDecorator(klass: string, index: number) {
   }
 }
 
+function MessageDecorator(props: { klass: string, index: number, testIdPrefix: string, left: boolean, label: string, content: string }) {
+  return `
+        <div class="relative ${props.left ? 'mr-48' : 'ml-48'}">
+          ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix: props.testIdPrefix, index: props.index })}
+          <div class="relative">
+            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">${props.label}</h3>
+            <div class="${props.klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(props.content)}</div>
+          </div>
+        </div>`
+}
+
 function ChatMessageDecorator(klass: string, index: number) {
   return (message: MatterhornMessage) => {
     if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
-      return `
-        <div class="relative mr-48">
-          ${ToggleComponent({
-        expandIcon,
-        collapseIcon,
+
+      return MessageDecorator({
+        klass,
+        index,
         testIdPrefix: 'chat-message-toggle',
-        index,
-      })}
-          <div class="relative">
-            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Message</h3>
-            <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</div>
-          </div>
-        </div>`
+        left: true,
+        label: 'Message',
+        content: message.content,
+      })
+
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
-      const toolUses = message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
-      return `
-        <div class="relative ml-48">
-          ${ToggleComponent({
-        expandIcon,
-        collapseIcon,
+
+      return MessageDecorator({
+        klass,
+        index,
         testIdPrefix: 'chat-assistant-toggle',
-        index,
-      })}
-          <div class="relative">
-            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Message</h3>
-            <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.content)}</div>
-          </div>
-        </div>${toolUses}`
+        left: false,
+        label: 'Model Response',
+        content: message.content,
+      }) + message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
+
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
-      return `
-        <div class="relative mr-48">
-          ${ToggleComponent({
-        expandIcon,
-        collapseIcon,
+
+      return MessageDecorator({
+        klass,
+        index,
         testIdPrefix: 'chat-user-toggle',
-        index,
-      })}
-          <div class="relative">
-            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Tool Result</h3>
-            <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${message.toolResults.map(res => escapeHtml(res.content)).join('\n')}</div>
-          </div>
-        </div>`
+        left: true,
+        label: 'Tool Result',
+        content: message.toolResults.map(res => res.content).join('\n'),
+      })
+
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
-      return `
-        <div class="relative mr-48">
-          ${ToggleComponent({
-        expandIcon,
-        collapseIcon,
-        testIdPrefix: 'chat-multipart-toggle',
+
+      return MessageDecorator({
+        klass,
         index,
-      })}
-          <div class="relative">
-            <h3 class="absolute -top-2 left-2 bg-primary text-primary-content px-2 py-1">Multi-Part Message</h3>
-            <div class="${klass} pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(message.parts.map(part => part.contentType).join(''))}</div>
-          </div>
-        </div>`
+        testIdPrefix: 'chat-multipart-toggle',
+        left: true,
+        label: 'Multi-part Message',
+        content: message.parts.map(part => part.contentType).join(''),
+      })
+
     }
   }
 }
