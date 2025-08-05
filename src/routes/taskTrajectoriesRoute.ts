@@ -174,6 +174,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         <script src="/js/reloadPage.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
+        <script src="/js/taskLlmLatencyChart.js"></script>
         <script src="/js/trajectoryToggle.js"></script>
       </head>
       <body class="bg-base-200 p-5">
@@ -229,6 +230,23 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               </div>
             </div>
           ` : ''}
+
+          <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed" data-testid="llm-latency-section">
+            <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-lg hover:bg-base-200 transition-colors duration-200" data-testid="llm-latency-header">
+              <h3 class="text-xl font-bold text-primary m-0">LLM Request Latency</h3>
+              <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
+            </div>
+            <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
+              <div class="mb-4">
+                <div id="llm-latency-provider-filters" class="flex flex-wrap gap-2 mb-4">
+                  <!-- Provider checkboxes will be populated by JavaScript -->
+                </div>
+              </div>
+              <div class="w-full">
+                <canvas id="llm-latency-chart" class="w-full max-w-full border border-base-300 rounded bg-base-100 shadow-sm"></canvas>
+              </div>
+            </div>
+          </div>
 
           ${events.length > 0 ? `
               ${events
@@ -302,6 +320,76 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/t
   } catch (error) {
     console.error('Error fetching action timeline events:', error)
     res.status(500).json({ error: 'An error occurred while fetching action timeline events' })
+  }
+})
+
+// LLM request latency API endpoint
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/llm-latency', async (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = await jetBrains.getProjectByName(projectName)
+    const issue = await project?.getIssueById(issueId)
+    const task = await issue?.getTaskById(taskId)
+
+    if (!project || !issue || !task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    // Get events for the task
+    const events = await task.events
+
+    // Filter LLM request events and sort by timestamp
+    const llmRequestEvents = events
+      .filter((e): e is { event: LlmRequestEvent, timestamp: Date } =>
+        e.event.type === 'LlmRequestEvent'
+      )
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+
+    // Calculate latencies by measuring time since previous event
+    const latencyData: Array<{
+      timestamp: string
+      provider: string
+      model: string
+      latency: number
+    }> = []
+
+    for (let i = 1; i < llmRequestEvents.length; i++) {
+      const currentEvent = llmRequestEvents[i]
+      const previousEvent = llmRequestEvents[i - 1]
+      
+      const latency = currentEvent.timestamp.getTime() - previousEvent.timestamp.getTime()
+      const provider = currentEvent.event.modelParameters.model.provider
+      const model = currentEvent.event.modelParameters.model.name
+
+      latencyData.push({
+        timestamp: currentEvent.timestamp.toISOString(),
+        provider,
+        model,
+        latency
+      })
+    }
+
+    // Group by provider
+    const providerGroups = latencyData.reduce((acc, item) => {
+      if (!acc[item.provider]) {
+        acc[item.provider] = []
+      }
+      acc[item.provider].push(item)
+      return acc
+    }, {} as Record<string, typeof latencyData>)
+
+    // Get unique providers
+    const providers = Object.keys(providerGroups).sort()
+
+    res.json({
+      latencyData,
+      providerGroups,
+      providers
+    })
+  } catch (error) {
+    console.error('Error fetching LLM latency data:', error)
+    res.status(500).json({ error: 'An error occurred while fetching LLM latency data' })
   }
 })
 
