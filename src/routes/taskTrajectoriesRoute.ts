@@ -235,7 +235,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                 <h3 class="text-xl font-bold text-primary m-0">Action Timeline</h3>
                 <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
               </div>
-              <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
+              <div class="collapsible-content p-4 hidden transition-all duration-300">
                 <div class="w-full">
                   <canvas id="action-timeline-chart" class="w-full max-w-full border border-base-300 rounded bg-base-100 shadow-sm"></canvas>
                 </div>
@@ -248,7 +248,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               <h3 class="text-xl font-bold text-primary m-0">Model Latency</h3>
               <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
             </div>
-            <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">
+            <div class="collapsible-content p-4 hidden transition-all duration-300">
               <div class="mb-4">
                 <div id="llm-latency-provider-filters" class="flex flex-wrap gap-2 mb-4">
                   <!-- Provider checkboxes will be populated by JavaScript -->
