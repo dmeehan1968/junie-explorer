@@ -233,7 +233,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
 
           <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed" data-testid="llm-latency-section">
             <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-100 rounded-lg hover:bg-base-200 transition-colors duration-200" data-testid="llm-latency-header">
-              <h3 class="text-xl font-bold text-primary m-0">LLM Request Latency</h3>
+              <h3 class="text-xl font-bold text-primary m-0">Model Latency</h3>
               <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
             </div>
             <div class="collapsible-content px-4 pb-4 hidden transition-all duration-300">

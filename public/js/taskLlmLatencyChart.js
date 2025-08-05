@@ -177,16 +177,18 @@ class LlmLatencyChart {
     this.ctx.lineTo(this.margin.left + this.chartWidth, this.margin.top + this.chartHeight);
     this.ctx.stroke();
     
-    // Y-axis labels (latency in ms)
+    // Y-axis labels (latency in seconds)
+    this.ctx.textAlign = 'right';
+    this.ctx.textBaseline = 'middle';
     const latencyTicks = 5;
     for (let i = 0; i <= latencyTicks; i++) {
       const latency = (latencyRange.max / latencyTicks) * i;
       const y = this.margin.top + this.chartHeight - (i / latencyTicks) * this.chartHeight;
       
       this.ctx.fillText(
-        `${Math.round(latency)}ms`,
+        `${Math.round(latency / 1000)}s`,
         this.margin.left - 10,
-        y + 4
+        y
       );
       
       // Grid lines
@@ -201,6 +203,8 @@ class LlmLatencyChart {
     }
     
     // X-axis labels (time)
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'top';
     const timeTicks = 5;
     for (let i = 0; i <= timeTicks; i++) {
       const time = timeRange.min + ((timeRange.max - timeRange.min) / timeTicks) * i;
@@ -213,17 +217,27 @@ class LlmLatencyChart {
         second: '2-digit'
       });
       
-      this.ctx.save();
-      this.ctx.translate(x, this.margin.top + this.chartHeight + 15);
-      this.ctx.rotate(-Math.PI / 4);
-      this.ctx.fillText(timeStr, 0, 0);
-      this.ctx.restore();
+      this.ctx.fillText(timeStr, x, this.margin.top + this.chartHeight + 10);
     }
     
     // Axis labels
     this.ctx.font = '14px sans-serif';
-    this.ctx.fillText('Latency (ms)', 10, this.margin.top + this.chartHeight / 2);
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    
+    // Y-axis label (rotated)
+    this.ctx.save();
+    this.ctx.translate(15, this.margin.top + this.chartHeight / 2);
+    this.ctx.rotate(-Math.PI / 2);
+    this.ctx.fillText('Latency (s)', 0, 0);
+    this.ctx.restore();
+    
+    // X-axis label
     this.ctx.fillText('Time', this.margin.left + this.chartWidth / 2, this.margin.top + this.chartHeight + 50);
+    
+    // Reset text alignment
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'alphabetic';
   }
   
   drawDataPoints(data, timeRange, latencyRange) {
