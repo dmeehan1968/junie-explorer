@@ -239,7 +239,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             <a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>
           </div>
           ${task.context.description ? `
-              <div class="bg-base-200 text-base-content p-4 mb-8 rounded-lg">
+              <div class="bg-base-200 text-base-content p-4 mb-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2 text-primary">Task Description</h3>
                 <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
               </div>
@@ -268,8 +268,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         .map((record, index) => {
           const klass = 'p-4 mt-4 bg-base-content/10'
           if (record.event.type === 'LlmRequestEvent') {
-            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 mr-48 relative">
-                      <h3 class="absolute -top-2 left-2 py-1 px-2 bg-primary text-primary-content">Junie</h3>
+            return `<div class="font-mono text-xs bg-base-content/10 p-4 mb-4 mr-48 relative">
+                      <h3 class="absolute -top-2 left-2 py-1 px-2 bg-neutral text-neutral-content">Junie</h3>
                       ${[
               ...(index === 0 ? [`
                           <div class="relative">
@@ -288,8 +288,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             ].join('\n')}
                         </div>`
           } else if (record.event.type === 'LlmResponseEvent') {
-            return `<div class="font-mono text-xs bg-base-content/10 p-4 pt-8 mb-4 ml-48 relative">
-                      <h3 class="absolute -top-2 left-2 py-1 px-2 bg-primary text-primary-content">LLM</h3>
+            return `<div class="font-mono text-xs bg-base-content/10 p-4 mb-4 ml-48 relative">
+                      <h3 class="absolute -top-2 left-2 py-1 px-2 bg-neutral text-neutral-content">LLM</h3>
                       ${record.event.answer.contentChoices.map((choice, choiceIndex) => ChatAnswerDecorator(klass, index * 100 + choiceIndex + 50)(choice)).join('')}</div>`
           }
           return ''
