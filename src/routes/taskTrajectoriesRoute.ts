@@ -182,6 +182,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         <script src="/js/reloadPage.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
+        <script src="/js/trajectoryToggle.js"></script>
       </head>
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
