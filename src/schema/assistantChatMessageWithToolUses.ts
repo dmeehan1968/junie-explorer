@@ -12,4 +12,10 @@ export const AssistantChatMessageWithToolUses = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses'),
   content: z.string(),
   toolUses: ToolUse.array(),
+  answerChoiceId: z.string().optional(),
+  reasoning: z.looseObject({
+    type: z.string(),
+    id: z.string(),
+    encryptedContent: z.string(),
+  }).array().optional(),
 })

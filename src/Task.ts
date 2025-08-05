@@ -186,7 +186,9 @@ export class Task {
     } catch (error) {
       console.error('Error loading events with worker pool:', error)
       // Fallback to original implementation if worker fails
-      events = (await loadEvents(this.eventsFile)).events
+      if (Task.workerPool) {
+        events = (await loadEvents(this.eventsFile)).events
+      }
     }
 
     return events

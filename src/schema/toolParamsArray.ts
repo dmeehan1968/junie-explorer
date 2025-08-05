@@ -6,9 +6,9 @@ export const ToolParamsArray = z.looseObject({
   name: z.string(),
   value: z.any(),
 }).array().transform(params => {
-  return ToolParamsObject.parse(params.reduce((acc, { name, value }) => {
+  return params.reduce((acc, { name, value }) => {
     acc[name] = value
     return acc
-  }, {} as ToolParamsObject))
+  }, {} as ToolParamsObject)
 })
 export type ToolParamsArray = z.infer<typeof ToolParamsArray>

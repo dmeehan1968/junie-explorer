@@ -4,6 +4,7 @@
 import * as z from "zod"
 import { AnthropicSonnet37 } from "./anthropicSonnet37.js"
 import { AnthropicSonnet4 } from "./anthropicSonnet4.js"
+import { AutoSelectedLlm } from "./AutoSelectedLlm.js"
 import { OpenAI4oMini } from "./openAI4oMini.js"
 import { OpenAIo3 } from "./openAIo3.js"
 
@@ -74,4 +75,18 @@ export const LLMTransformer = z.any().transform(data => {
   if (data.jbai === 'anthropic-claude-4-sonnet' && 'capabilities' in data) {
     return AnthropicSonnet4.parse(data)
   }
+  if (data.jbai === '<UNKNOWN>' && 'capabilities' in data) {
+    return AutoSelectedLlm.parse({
+      name: data.name,
+      provider: data.provider,
+      jbai: '<UNKNOWN>',
+      capabilities: {
+        inputPrice: data.capabilities.inputPrice ?? 0,
+        outputPrice: data.capabilities.outputPrice ?? 0,
+        cacheInputPrice: data.capabilities.cacheInputPrice ?? 0,
+      }
+    })
+  }
+  console.error(data)
+  return {}
 })
