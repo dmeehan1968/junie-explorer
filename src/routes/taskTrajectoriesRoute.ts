@@ -255,7 +255,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                 </div>
               </div>
               <div class="w-full">
-                <canvas id="llm-latency-chart" class="w-full max-w-full border border-base-300 rounded bg-base-100 shadow-sm"></canvas>
+                <canvas id="llm-latency-chart" class="w-full max-w-full h-96 border border-base-300 rounded bg-base-100 shadow-sm"></canvas>
               </div>
             </div>
           </div>
