@@ -51,12 +51,6 @@ function ToolUseDecorator(klass: string, index: number) {
   }
 }
 
-function ToolUseAnswerDecorator(klass: string, index: number) {
-  return (tool: ToolUseAnswer) => {
-    return ToolCallDecorator(klass, index, 'tool-use-answer-toggle', { name: tool.toolName, params: tool.toolParams.rawJsonObject, label: 'Tool Request' })
-  }
-}
-
 function MessageDecorator(props: { klass: string, index: number, testIdPrefix: string, left: boolean, label: string, content: string }) {
   return `
         <div class="relative ${props.left ? 'mr-48' : 'ml-48'}">
