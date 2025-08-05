@@ -88,7 +88,7 @@ export class Task {
           metrics.inputTokens += event.event.answer.inputTokens
           metrics.outputTokens += event.event.answer.outputTokens
           metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
-          metrics.time += event.event.answer.time ?? 0
+          metrics.time += event.event.answer.time
           metrics.metricCount += event.event.answer.metricCount
         }
       }
