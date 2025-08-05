@@ -7,6 +7,8 @@ class LlmLatencyChart {
     this.data = null;
     this.providers = [];
     this.visibleProviders = new Set();
+    this.dataPoints = []; // Store data points with their screen coordinates
+    this.tooltip = null;
     
     // Chart dimensions and styling
     this.margin = { top: 20, right: 30, bottom: 60, left: 200 };
@@ -16,6 +18,8 @@ class LlmLatencyChart {
     ];
     
     this.setupCanvas();
+    this.setupTooltip();
+    this.setupMouseEvents();
     this.loadData();
   }
   
@@ -111,6 +115,72 @@ class LlmLatencyChart {
     
     this.chartWidth = actualWidth - this.margin.left - this.margin.right;
     this.chartHeight = 400 - this.margin.top - this.margin.bottom;
+  }
+  
+  setupTooltip() {
+    // Create tooltip element
+    this.tooltip = document.createElement('div');
+    this.tooltip.className = 'absolute bg-base-100 border border-base-300 rounded-lg p-2 text-sm shadow-lg pointer-events-none z-10 hidden';
+    this.tooltip.style.position = 'absolute';
+    this.tooltip.style.zIndex = '1000';
+    document.body.appendChild(this.tooltip);
+  }
+  
+  setupMouseEvents() {
+    this.canvas.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const hoveredPoint = this.findDataPointAt(x, y);
+      if (hoveredPoint) {
+        this.showTooltip(e, hoveredPoint);
+      } else {
+        this.hideTooltip();
+      }
+    });
+    
+    this.canvas.addEventListener('mouseleave', () => {
+      this.hideTooltip();
+    });
+  }
+  
+  findDataPointAt(mouseX, mouseY) {
+    const tolerance = 8; // Pixels around the point to consider as hit
+    
+    for (const point of this.dataPoints) {
+      const distance = Math.sqrt(
+        Math.pow(mouseX - point.x, 2) + Math.pow(mouseY - point.y, 2)
+      );
+      
+      if (distance <= tolerance) {
+        return point;
+      }
+    }
+    
+    return null;
+  }
+  
+  showTooltip(mouseEvent, dataPoint) {
+    const date = new Date(dataPoint.data.timestamp);
+    const latencySeconds = (dataPoint.data.latency / 1000).toFixed(2);
+    
+    this.tooltip.innerHTML = `
+      <div class="font-semibold text-primary">${dataPoint.data.provider}</div>
+      <div class="text-xs text-base-content/70">${dataPoint.data.model}</div>
+      <div class="mt-1">
+        <div>Latency: ${latencySeconds}s</div>
+        <div class="text-xs text-base-content/70">${date.toLocaleString()}</div>
+      </div>
+    `;
+    
+    this.tooltip.classList.remove('hidden');
+    this.tooltip.style.left = (mouseEvent.pageX + 10) + 'px';
+    this.tooltip.style.top = (mouseEvent.pageY - 10) + 'px';
+  }
+  
+  hideTooltip() {
+    this.tooltip.classList.add('hidden');
   }
   
   render() {
@@ -241,6 +311,9 @@ class LlmLatencyChart {
   }
   
   drawDataPoints(data, timeRange, latencyRange) {
+    // Clear previous data points for hit detection
+    this.dataPoints = [];
+    
     // Group data by provider
     const providerData = {};
     data.forEach(item => {
@@ -280,12 +353,19 @@ class LlmLatencyChart {
         this.ctx.stroke();
       }
       
-      // Draw points
+      // Draw points and store coordinates for hit detection
       items.forEach(item => {
         const x = this.margin.left + 
           ((new Date(item.timestamp).getTime() - timeRange.min) / (timeRange.max - timeRange.min)) * this.chartWidth;
         const y = this.margin.top + this.chartHeight - 
           (item.latency / latencyRange.max) * this.chartHeight;
+        
+        // Store data point for hit detection
+        this.dataPoints.push({
+          x: x,
+          y: y,
+          data: item
+        });
         
         this.ctx.beginPath();
         this.ctx.arc(x, y, 4, 0, 2 * Math.PI);
@@ -325,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const content = llmLatencySection.querySelector('.collapsible-content');
     const isExpanded = !content.classList.contains('hidden');
     
-    if (!isExpanded && !chartInitialized) {
+    if (isExpanded && !chartInitialized) {
       // Initialize chart when first expanded
       setTimeout(() => {
         const pathParts = window.location.pathname.split('/');
