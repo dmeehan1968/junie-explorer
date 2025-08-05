@@ -339,14 +339,10 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
     // Get events for the task
     const events = await task.events
 
-    // Filter LLM request events and sort by timestamp
-    const llmRequestEvents = events
-      .filter((e): e is { event: LlmRequestEvent, timestamp: Date } =>
-        e.event.type === 'LlmRequestEvent'
-      )
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+    // Sort all events by timestamp first
+    const sortedEvents = events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
 
-    // Calculate latencies by measuring time since previous event
+    // Calculate latencies by measuring time since previous event of any type
     const latencyData: Array<{
       timestamp: string
       provider: string
@@ -354,20 +350,25 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
       latency: number
     }> = []
 
-    for (let i = 1; i < llmRequestEvents.length; i++) {
-      const currentEvent = llmRequestEvents[i]
-      const previousEvent = llmRequestEvents[i - 1]
+    for (let i = 1; i < sortedEvents.length; i++) {
+      const currentEvent = sortedEvents[i]
       
-      const latency = currentEvent.timestamp.getTime() - previousEvent.timestamp.getTime()
-      const provider = currentEvent.event.modelParameters.model.provider
-      const model = currentEvent.event.modelParameters.model.name
+      // Only process LLM response events
+      if (currentEvent.event.type === 'LlmResponseEvent') {
+        const previousEvent = sortedEvents[i - 1]
 
-      latencyData.push({
-        timestamp: currentEvent.timestamp.toISOString(),
-        provider,
-        model,
-        latency
-      })
+        console.log(previousEvent.event.type)
+        const latency = currentEvent.timestamp.getTime() - previousEvent.timestamp.getTime()
+        const provider = (currentEvent.event as LlmResponseEvent).answer.llm.provider
+        const model = (currentEvent.event as LlmResponseEvent).answer.llm.name
+
+        latencyData.push({
+          timestamp: currentEvent.timestamp.toISOString(),
+          provider,
+          model,
+          latency
+        })
+      }
     }
 
     // Group by provider
@@ -382,6 +383,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
     // Get unique providers
     const providers = Object.keys(providerGroups).sort()
 
+    console.log(latencyData)
     res.json({
       latencyData,
       providerGroups,
