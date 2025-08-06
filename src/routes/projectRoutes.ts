@@ -16,6 +16,8 @@ const router = express.Router()
 // Function to generate HTML for combined issues table with project summary footer
 const generateIssuesTable = async (project: Project, locale: string | undefined): Promise<string> => {
   const issuesCount = (await project.issues).size
+  const hasMetrics = (await project.metrics).metricCount > 0
+
   if (issuesCount === 0) {
     return '<p class="p-4 text-center text-base-content/70" data-testid="no-issues-message">No issues found for this project</p>'
   }
@@ -33,25 +35,42 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
       <span class="font-bold text-base-content" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
     </div>
     <div class="overflow-x-auto">
+      ${!hasMetrics 
+        ? `
+          <div class="bg-base-content/10 p-4 rounded mb-4">
+            This project does not contain token or cost metrics, which means that it is most likely created by the 
+            Junie General Availability (GA) plugin which does not collect metrics.
+          </div>
+        `
+        : ``
+      }
       <table class="table table-zebra w-full bg-base-100" data-testid="issues-table">
         <thead>
           <tr class="!bg-base-200">
             <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
             <th class="text-left whitespace-nowrap">Timestamp</th>
-            <th class="text-right whitespace-nowrap">Input Tokens</th>
-            <th class="text-right whitespace-nowrap">Output Tokens</th>
-            <th class="text-right whitespace-nowrap">Cache Tokens</th>
-            <th class="text-right whitespace-nowrap">Cost</th>
+            ${hasMetrics 
+              ? `<th class="text-right whitespace-nowrap">Input Tokens</th>
+                <th class="text-right whitespace-nowrap">Output Tokens</th>
+                <th class="text-right whitespace-nowrap">Cache Tokens</th>
+                <th class="text-right whitespace-nowrap">Cost</th>
+               ` 
+              : ''}
             <th class="text-right whitespace-nowrap">Time</th>
             <th class="text-right whitespace-nowrap">Status</th>
           </tr>
           <tr class="!bg-base-200 font-bold text-base-content">
             <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
-            <td class="text-right whitespace-nowrap" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="header-summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="header-summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="header-summary-cost">${metrics.cost.toFixed(2)}</td>
+            ${hasMetrics
+              ? `
+                <td class="text-right whitespace-nowrap" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="header-summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="header-summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="header-summary-cost">${metrics.cost.toFixed(2)}</td>
+              `
+              : ``
+            }
             <td class="text-right whitespace-nowrap" data-testid="header-summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
             <td class="text-right whitespace-nowrap"></td>
           </tr>
@@ -63,10 +82,15 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
               ${escapeHtml(issue.name)}
             </td>
             <td class="text-left whitespace-nowrap" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString(locale)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens">${formatNumber((await issue.metrics).inputTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens">${formatNumber((await issue.metrics).outputTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens">${formatNumber((await issue.metrics).cacheTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="issue-cost">${(await issue.metrics).cost.toFixed(4)}</td>
+            ${hasMetrics 
+              ? `
+                <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens">${formatNumber((await issue.metrics).inputTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens">${formatNumber((await issue.metrics).outputTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens">${formatNumber((await issue.metrics).cacheTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="issue-cost">${(await issue.metrics).cost.toFixed(4)}</td>
+              ` 
+              : ``
+            }
             <td class="text-right whitespace-nowrap" data-testid="issue-total-time">${formatSeconds((await issue.metrics).time / 1000)}</td>
             <td class="text-right whitespace-nowrap" data-testid="issue-status">
               ${getStatusBadge(issue.state)}
@@ -78,10 +102,15 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           <tr class="!bg-base-200 font-bold text-base-content">
             <td class="text-left whitespace-nowrap" data-testid="summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
-            <td class="text-right whitespace-nowrap" data-testid="summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
-            <td class="text-right whitespace-nowrap" data-testid="summary-cost">${metrics.cost.toFixed(2)}</td>
+            ${hasMetrics 
+              ? `
+                <td class="text-right whitespace-nowrap" data-testid="summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="summary-cache-tokens">${formatNumber(metrics.cacheTokens)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="summary-cost">${metrics.cost.toFixed(2)}</td>
+              `
+              : ``
+            }
             <td class="text-right whitespace-nowrap" data-testid="summary-total-time">${formatSeconds(metrics.time / 1000)}</td>
             <td class="text-right whitespace-nowrap"></td>
           </tr>

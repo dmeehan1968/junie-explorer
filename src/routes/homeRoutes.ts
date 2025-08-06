@@ -281,6 +281,16 @@ router.get('/', async (req, res) => {
           ${VersionBanner(jetBrains.version)}
           <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
 
+          ${!hasMetrics
+            ? `
+                <div class="bg-base-content/10 p-4 rounded mb-4">
+                  The Junie logs do not contain token or cost metrics, which means that the projects were most
+                  likely created by the Junie General Availability (GA) plugin which does not collect metrics.
+                </div>
+              `
+            : ``
+          }
+
           <div class="flex flex-wrap gap-3 mb-5 p-3 bg-base-200 rounded" data-testid="ide-filter-toolbar">
             <div class="font-medium text-base-content flex items-center">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
