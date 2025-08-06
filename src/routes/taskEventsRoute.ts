@@ -6,6 +6,7 @@ import { JetBrains } from "../jetbrains.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
 import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
 import { EventRecord } from "../schema/eventRecord.js"
+import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { VersionBanner } from '../components/versionBanner.js'
@@ -24,7 +25,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   providers: string[]
 } {
   // Filter for LlmResponseEvent events only
-  const llmEvents = events.filter(event => event.event.type === 'LlmResponseEvent')
+  const llmEvents = events.filter((event): event is { event: LlmResponseEvent, timestamp: Date } => event.event.type === 'LlmResponseEvent')
 
   if (llmEvents.length === 0) {
     return {
@@ -37,7 +38,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 
   // Extract unique providers
-  const providers = [...new Set(llmEvents.map(event => (event.event as any).answer.llm.provider))].sort()
+  const providers = [...new Set(llmEvents.map(event => `${event.event.answer.llm.provider} (${event.event.answer.llm.name})`))].sort()
 
   // Use the actual timestamps from the event data
   const eventTimes = llmEvents.map(event => event.timestamp)
@@ -229,17 +230,17 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               // Define the LLM chart data as a global variable
               window.llmChartData = ${JSON.stringify(llmGraphData)};
               // Define the LLM events data for filtering
-              window.llmEvents = ${JSON.stringify(events.filter(e => e.event.type === 'LlmResponseEvent').map(e => ({
+              window.llmEvents = ${JSON.stringify(events.filter((e): e is { event: LlmResponseEvent, timestamp: Date } => e.event.type === 'LlmResponseEvent').map(e => ({
                   timestamp: e.timestamp.toISOString(),
                   event: {
                     type: e.event.type,
                     answer: {
-                      llm: { provider: (e.event as any).answer.llm.provider },
-                      cost: (e.event as any).answer.cost,
-                      inputTokens: (e.event as any).answer.inputTokens,
-                      outputTokens: (e.event as any).answer.outputTokens,
-                      cacheInputTokens: (e.event as any).answer.cacheInputTokens,
-                      cacheCreateInputTokens: (e.event as any).answer.cacheCreateInputTokens,
+                      llm: { provider: `${e.event.answer.llm.provider} (${e.event.answer.llm.name})` },
+                      cost: e.event.answer.cost,
+                      inputTokens: e.event.answer.inputTokens,
+                      outputTokens: e.event.answer.outputTokens,
+                      cacheInputTokens: e.event.answer.cacheInputTokens,
+                      cacheCreateInputTokens: e.event.answer.cacheCreateInputTokens,
                     },
                   },
                 }))
