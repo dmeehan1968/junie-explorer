@@ -8,3 +8,4 @@ export const ToolAnyProperty = z.union([
   ToolArrayProperty,
   ToolObjectProperty,
 ])
+export type ToolAnyProperty = z.infer<typeof ToolAnyProperty>

@@ -12,6 +12,36 @@ const McpToolParameters = z.looseObject({
 })
 export type McpToolParameters = z.infer<typeof McpToolParameters>
 
+type Param = { name: string, type: string, description?: string, properties?: object, itemType?: string }
+
+function parameterReducer(acc: Record<string, Param>, param: ToolAnyProperty ) {
+  if (param.MatterhornToolProperty === 'MatterhornToolPrimitiveProperty') {
+    acc[param.name] = {
+      name: param.name,
+      type: param.primitiveType?.toLowerCase() ?? 'string',
+      description: param.description
+    }
+  } else if (param.MatterhornToolProperty === 'MatterhornToolObjectProperty') {
+    acc[param.name] = {
+      name: param.name,
+      type: 'object',
+      description: param.description,
+      properties: param.properties,
+    }
+  } else if (param.MatterhornToolProperty === 'MatterhornToolArrayProperty') {
+    acc[param.name] = {
+      name: param.name,
+      type: 'array',
+      description: param.description,
+      itemType: param.itemType.MatterhornToolProperty === 'MatterhornToolPrimitiveProperty'
+        ? param.itemType.primitiveType?.toLowerCase() ?? 'string'
+        : param.itemType.MatterhornToolProperty === 'MatterhornToolObjectProperty'
+          ? 'object'
+          : 'array',
+    }
+  }
+  return acc
+}
 export const Tool = z.looseObject({
   name: z.string(),
   description: z.string().optional(),
@@ -22,34 +52,7 @@ export const Tool = z.looseObject({
     ToolAnyProperty.array().default(() => ([])).transform(params => {
       return {
         type: 'com.intellij.ml.llm.matterhorn.llm.ToolParametersSchema.McpToolParametersSchema',
-        parameters: params.reduce((acc, param) => {
-          if (param.MatterhornToolProperty === 'MatterhornToolPrimitiveProperty') {
-            acc[param.name] = {
-              name: param.name,
-              type: param.primitiveType?.toLowerCase() ?? 'string',
-              description: param.description
-            }
-          } else if (param.MatterhornToolProperty === 'MatterhornToolObjectProperty') {
-            acc[param.name] = {
-              name: param.name,
-              type: 'object',
-              description: param.description,
-              properties: param.properties,
-            }
-          } else if (param.MatterhornToolProperty === 'MatterhornToolArrayProperty') {
-            acc[param.name] = {
-              name: param.name,
-              type: 'array',
-              description: param.description,
-              itemType: param.itemType.MatterhornToolProperty === 'MatterhornToolPrimitiveProperty'
-                ? param.itemType.primitiveType?.toLowerCase() ?? 'string'
-                : param.itemType.MatterhornToolProperty === 'MatterhornToolObjectProperty'
-                  ? 'object'
-                  : 'array',
-            }
-          }
-          return acc
-        }, {} as Record<string, { name: string, type: string, description?: string, properties?: object, itemType?: string }>),
+        parameters: params.reduce(parameterReducer, {} as Record<string, Param>),
         required: params.filter(param => param.required).map(param => param.name),
       }
     }).transform(({ parameters, ...params }) => {
@@ -66,34 +69,7 @@ export const Tool = z.looseObject({
     }).transform(({ parameters }) => {
       return {
         type: 'com.intellij.ml.llm.matterhorn.llm.ToolParametersSchema.McpToolParametersSchema',
-        rawJsonObject: parameters.reduce((acc, param) => {
-          if (param.MatterhornToolProperty === 'MatterhornToolPrimitiveProperty') {
-            acc[param.name] = {
-              name: param.name,
-              type: param.primitiveType?.toLowerCase() ?? 'string',
-              description: param.description
-            }
-          } else if (param.MatterhornToolProperty === 'MatterhornToolObjectProperty') {
-            acc[param.name] = {
-              name: param.name,
-              type: 'object',
-              description: param.description,
-              properties: param.properties,
-            }
-          } else if (param.MatterhornToolProperty === 'MatterhornToolArrayProperty') {
-            acc[param.name] = {
-              name: param.name,
-              type: 'array',
-              description: param.description,
-              itemType: param.itemType.MatterhornToolProperty === 'MatterhornToolPrimitiveProperty'
-                ? param.itemType.primitiveType?.toLowerCase() ?? 'string'
-                : param.itemType.MatterhornToolProperty === 'MatterhornToolObjectProperty'
-                  ? 'object'
-                  : 'array',
-            }
-          }
-          return acc
-        }, {} as Record<string, { name: string, type: string, description?: string, properties?: object, itemType?: string }>),
+        rawJsonObject: parameters.reduce(parameterReducer, {} as Record<string, Param>),
         required: parameters.filter(param => param.required).map(param => param.name),
       } satisfies McpToolParameters
     }),
