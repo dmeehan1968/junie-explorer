@@ -95,9 +95,13 @@ export class JetBrains {
     this.memoryReport()
   }
 
-  private memoryReport() {
+  isMemoryReportEnabled() {
+    return /1|true|yes/i.test(process.env.MEMORY_REPORT ?? 'false')
+  }
+
+  memoryReport() {
     this.memory[new Date().toISOString()] = process.memoryUsage()
-    if (/1|true|yes/i.test(process.env.MEMORY_REPORT ?? 'false')) {
+    if (this.isMemoryReportEnabled()) {
       console.log('Memory usage (MB):')
       const table = Object.fromEntries(Object.entries(this.memory)
         .map(([timestamp, memoryUsage], index, memory) => {
@@ -274,13 +278,13 @@ export class JetBrains {
       this._version = {
         currentVersion,
         newVersion: latest.tag_name,
-        releaseUrl: latest.html_url
+        releaseUrl: latest.html_url,
       }
 
       const width = 80
       console.log('┌' + '─'.repeat(width) + '┐')
       console.log('│' + ` New version available: ${latest.tag_name} `.padEnd(width) + '│')
-      console.log('│' + ` ${latest.html_url.padEnd(width-1)}` + '│')
+      console.log('│' + ` ${latest.html_url.padEnd(width - 1)}` + '│')
       console.log('└' + '─'.repeat(width) + '┘')
     }
   }

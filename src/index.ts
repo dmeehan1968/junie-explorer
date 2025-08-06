@@ -1,6 +1,6 @@
 import { createServer } from "./createServer.js"
 
-const { app, port } = await createServer()
+const { app, port, jetBrainsInstance } = await createServer()
 const server = app.listen(port, () => {
   const address = server.address()
   if (address === null || typeof address === 'string') {
@@ -10,4 +10,8 @@ const server = app.listen(port, () => {
   console.log(
       `Server is running on http://localhost:${address.port}`
   )
+
+  // if (jetBrainsInstance.isMemoryReportEnabled()) {
+  //   setInterval(() => jetBrainsInstance.memoryReport(), 5_000)
+  // }
 })
