@@ -280,6 +280,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         label: 'System Message',
                         content: record.event.chat.system,
                       }),
+                      MessageDecorator({
+                        klass,
+                        index: index + 10001,
+                        testIdPrefix: 'user-tools-toggle',
+                        left: true,
+                        label: 'Tools',
+                        content: JSON.stringify(record.event.chat.tools, null, 2),
+                      }),
                     ] : []),
                     ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
                   ].join('\n')
