@@ -208,7 +208,7 @@ export class JetBrains {
           names.add(ideName)
         }
       }
-      return [...names]
+      return resolve([...names])
     })
   }
 
