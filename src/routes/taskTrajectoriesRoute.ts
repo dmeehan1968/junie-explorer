@@ -14,7 +14,6 @@ import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStart
 import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
-import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { Tool } from "../schema/tools.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
@@ -104,7 +103,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         klass,
         index,
         testIdPrefix: 'chat-message-toggle',
-        left: true,
+        left: message.kind === 'User',
         label: 'Message',
         content: escapeHtml(message.content),
       })
@@ -115,7 +114,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         klass,
         index,
         testIdPrefix: 'chat-assistant-toggle',
-        left: false,
+        left: message.kind === 'User',
         label: 'Model Response',
         content: escapeHtml(message.content),
       }) + message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
@@ -137,7 +136,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         klass,
         index,
         testIdPrefix: 'chat-multipart-toggle',
-        left: true,
+        left: message.kind === 'User',
         label: 'Multi-part Message',
         content: escapeHtml(message.parts.map(part => part.contentType).join('')),
       })
