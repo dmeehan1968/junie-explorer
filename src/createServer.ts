@@ -58,6 +58,8 @@ export async function createServer(options: ServerOptions = {}) {
       const issueId = parts[4]
       const taskId = parts[6]
 
+      console.log('Reloading', JSON.stringify({ projectId, issueId, taskId }))
+
       let project: Project | undefined
       let issue: Issue | undefined
       let task: Task | undefined
