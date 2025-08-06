@@ -17,7 +17,7 @@ Replace the previously stated 'workflow' with the following:
 1. Thoroughly review `<issue_description>`. 
 2. Create a plan that outlines the implementation steps necessary to resolve `<issue_description>`
 3. Do NOT include testing
-4. Place your plan inside the XML tag `<THOUGHT>` within the sub-tag `<PLAN>`.
+4. Place your plan inside the XML tag `<OUTPUT>` within the sub-tag `<PLAN>`.
 5. Review the project’s codebase, examining not only its structure but also the specific implementation details,
    to identify all segments that may contribute to or help resolve the issue described in `<issue_description>`.
 6. Edit the source code in the repo to resolve `<issue_description>`, ensuring that edge cases are properly handled.
