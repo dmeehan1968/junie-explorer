@@ -71,6 +71,17 @@ export class Task {
     this.plan = task.plan
   }
 
+  reload() {
+    this._metrics = undefined
+    this._previousTasksInfo = undefined
+    this._finalAgentState = undefined
+    this._sessionHistory = undefined
+    this._patch = undefined
+    this._events = undefined
+    this._eventTypes = undefined
+    this._steps.clear()
+  }
+
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
 

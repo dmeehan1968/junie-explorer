@@ -26,6 +26,11 @@ export class Issue {
 
   }
 
+  reload() {
+    this._tasks = undefined
+    this._metrics = undefined
+  }
+
   get tasks(): Promise<Map<string, Task>> {
     this._tasks ??= new Promise(async (resolve) => {
 

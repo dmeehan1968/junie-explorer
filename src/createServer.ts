@@ -4,13 +4,16 @@ import path from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
 import publicFiles from "./bun/public.js"
+import { Issue } from "./Issue.js"
 import { JetBrains } from "./jetbrains.js"
+import { Project } from "./Project.js"
 import homeRoutes from "./routes/homeRoutes.js"
 import issueRoutes from "./routes/issueRoutes.js"
 import notFoundRoutes from "./routes/notFoundRoutes.js"
 import projectRoutes from "./routes/projectRoutes.js"
 import taskEventsRoute from "./routes/taskEventsRoute.js"
 import taskTrajectoriesRoute from "./routes/taskTrajectoriesRoute.js"
+import { Task } from "./Task.js"
 
 export interface ServerOptions {
   jetBrainsInstance?: JetBrains
@@ -47,7 +50,41 @@ export async function createServer(options: ServerOptions = {}) {
   })
   // Add refresh endpoint
   app.get('/refresh', async (req, res) => {
-    await jetBrainsInstance.reload()
+    console.log('Referer', req.headers.referer)
+    const referer = req.headers.referer
+    if (referer) {
+      const url = new URL(referer)
+      const parts = url.pathname.split('/')
+      const projectId = parts[2]
+      const issueId = parts[4]
+      const taskId = parts[6]
+
+      let project: Project | undefined
+      let issue: Issue | undefined
+      let task: Task | undefined
+
+      if (projectId) {
+        project = await jetBrainsInstance.getProjectByName(projectId)
+      }
+      if (issueId) {
+        issue = await project?.getIssueById(issueId)
+      }
+      if (taskId) {
+        task = await issue?.getTaskById(taskId)
+      }
+
+      if (task) {
+        task.reload()
+      } else if (issue) {
+        issue.reload()
+      } else if (project) {
+        project.reload()
+      } else {
+        await jetBrainsInstance.reload()
+      }
+    }
+    await jetBrainsInstance.metrics // causes the metrics to be recalculated which will load other needed data
+
     res.redirect(req.headers.referer || '/')
   })
 

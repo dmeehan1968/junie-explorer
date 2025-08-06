@@ -44,6 +44,11 @@ export class Project {
     return (await this.issues).get(id)
   }
 
+  reload() {
+    this._issues = undefined
+    this._metrics = undefined
+  }
+
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0 }
