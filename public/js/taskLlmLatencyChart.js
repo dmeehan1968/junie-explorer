@@ -89,7 +89,12 @@ class LlmLatencyChart {
       colorBox.style.backgroundColor = color;
       
       const text = document.createElement('span');
-      text.textContent = provider;
+      text.textContent = provider
+        .replace(/</.g, '&lt;')
+        .replace(/>/.g, '&gt;')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
       text.className = 'text-sm';
       
       label.appendChild(checkbox);

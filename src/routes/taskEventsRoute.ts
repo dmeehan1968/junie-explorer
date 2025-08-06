@@ -38,7 +38,8 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 
   // Extract unique providers
-  const providers = [...new Set(llmEvents.map(event => `${event.event.answer.llm.provider} (${event.event.answer.llm.name})`))].sort()
+  console.log(llmEvents.map(event => event.event.answer.llm))
+  const providers = [...new Set(llmEvents.map(event => event.event.answer.llm.groupName))].sort()
 
   // Use the actual timestamps from the event data
   const eventTimes = llmEvents.map(event => event.timestamp)
@@ -235,7 +236,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
                   event: {
                     type: e.event.type,
                     answer: {
-                      llm: { provider: `${e.event.answer.llm.provider} (${e.event.answer.llm.name})` },
+                      llm: { provider: e.event.answer.llm.groupName },
                       cost: e.event.answer.cost,
                       inputTokens: e.event.answer.inputTokens,
                       outputTokens: e.event.answer.outputTokens,
@@ -310,7 +311,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
                     <label class="flex items-center gap-1"><input type="checkbox" id="all-providers" checked class="checkbox checkbox-sm"> All</label>
                     <label class="flex items-center gap-1"><input type="checkbox" id="none-providers" class="checkbox checkbox-sm"> None</label>
                     ${llmGraphData.providers.map(provider => `
-                      <label class="flex items-center gap-1"><input type="checkbox" class="provider-checkbox checkbox checkbox-sm" data-provider="${provider}" checked> ${provider}</label>
+                      <label class="flex items-center gap-1"><input type="checkbox" class="provider-checkbox checkbox checkbox-sm" data-provider="${provider}" checked> ${escapeHtml(provider)}</label>
                     `).join('')}
                   </div>
                 </div>

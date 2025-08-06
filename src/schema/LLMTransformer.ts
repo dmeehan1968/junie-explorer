@@ -4,7 +4,7 @@
 import * as z from "zod"
 import { AnthropicSonnet37 } from "./anthropicSonnet37.js"
 import { AnthropicSonnet4 } from "./anthropicSonnet4.js"
-import { AutoSelectedLlm, GrazieModel1 } from "./AutoSelectedLlm.js"
+import { AutoSelectedLlm } from "./AutoSelectedLlm.js"
 import { OpenAI4oMini } from "./openAI4oMini.js"
 import { OpenAIo3 } from "./openAIo3.js"
 
@@ -36,7 +36,7 @@ export const LLMTransformer = z.any().transform(data => {
       },
     })
   }
-  if (data.jbai === 'openai-gpt-4o-mini' && !('capabilities' in data)) {
+  if (OpenAI4oMini.shape.jbai.value === data.jbai && !('capabilities' in data)) {
     return OpenAI4oMini.parse({
       name: data.name,
       provider: data.provider,
@@ -48,16 +48,16 @@ export const LLMTransformer = z.any().transform(data => {
       },
     })
   }
-  if (data.jbai === 'openai-o3' && 'capabilities' in data) {
+  if (OpenAIo3.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return OpenAIo3.parse(data)
   }
-  if (data.jbai === 'openai-gpt-4o-mini' && 'capabilities' in data) {
+  if (OpenAI4oMini.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return OpenAI4oMini.parse(data)
   }
-  if (data.jbai === 'anthropic-claude-3.7-sonnet' && 'capabilities' in data) {
+  if (AnthropicSonnet37.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return AnthropicSonnet37.parse(data)
   }
-  if (data.jbai === 'anthropic-claude-3.7-sonnet' && !('capabilities' in data)) {
+  if (AnthropicSonnet37.shape.jbai.value === data.jbai && !('capabilities' in data)) {
     return AnthropicSonnet37.parse({
       name: data.name,
       provider: data.provider,
@@ -72,23 +72,11 @@ export const LLMTransformer = z.any().transform(data => {
       },
     })
   }
-  if (data.jbai === 'anthropic-claude-4-sonnet' && 'capabilities' in data) {
+  if (AnthropicSonnet4.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return AnthropicSonnet4.parse(data)
   }
-  if (data.jbai === '<UNKNOWN>' && 'capabilities' in data) {
+  if (AutoSelectedLlm.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
     return AutoSelectedLlm.parse({
-      name: data.name,
-      provider: data.provider,
-      jbai: data.jbai,
-      capabilities: {
-        inputPrice: data.capabilities.inputPrice ?? 0,
-        outputPrice: data.capabilities.outputPrice ?? 0,
-        cacheInputPrice: data.capabilities.cacheInputPrice ?? 0,
-      }
-    })
-  }
-  if (data.jbai === 'Grazie_model_1' && 'capabilities' in data) {
-    return GrazieModel1.parse({
       name: data.name,
       provider: data.provider,
       jbai: data.jbai,
