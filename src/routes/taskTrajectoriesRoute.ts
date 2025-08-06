@@ -310,7 +310,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         testIdPrefix: 'user-tools-toggle',
                         left: true,
                         label: 'Tools',
-                        content: record.event.chat.tools.map(ToolDecorator()).join(''),
+                        content: record.event.chat.tools.length 
+                          ? record.event.chat.tools.map(ToolDecorator()).join('')
+                          : 'No tools listed',
                       }),
                     ] : []),
                     ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
