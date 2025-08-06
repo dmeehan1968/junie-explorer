@@ -23,7 +23,6 @@ function initializeProjectSelection() {
 
   // Set initial state of graph container
   graphContainer.classList.add('hidden');
-  graphContainer.style.display = 'block'; // Keep in DOM for animation
 
   if (storedSelection) {
     selectedProjects = JSON.parse(storedSelection);
@@ -127,9 +126,10 @@ async function loadProjectsGraph() {
 
   // Hide graph if no projects are selected
   if (selectedProjectNames.length === 0) {
-    // Add hidden class and remove visible class for animation
+    // Add hidden class and remove visible class for animation, then fully hide the container
     graphContainer.classList.add('hidden');
     graphContainer.classList.remove('visible');
+    graphContainer.style.display = 'none';
 
     // Wait for animation to complete before destroying chart
     setTimeout(() => {
