@@ -413,8 +413,8 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
         const previousEvent = sortedEvents[i - 1]
 
         const latency = currentEvent.timestamp.getTime() - previousEvent.timestamp.getTime()
-        const provider = (currentEvent.event as LlmResponseEvent).answer.llm.provider
-        const model = (currentEvent.event as LlmResponseEvent).answer.llm.name
+        const provider = currentEvent.event.answer.llm.provider + ' (' + currentEvent.event.answer.llm.name + ')'
+        const model = currentEvent.event.answer.llm.name
 
         latencyData.push({
           timestamp: currentEvent.timestamp.toISOString(),
