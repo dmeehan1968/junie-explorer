@@ -1,0 +1,12 @@
+{
+  "mcpServers":
+  {
+    "filesystem-extended": {
+      "command": "bun",
+      "args": [
+        "/Users/dmeehan/Documents/Dropbox/Projects/mcp/mcp-filesystem-extended/index.ts",
+        "/Users/dmeehan/Library/CloudStorage/Dropbox/Projects/JetBrains/junie-explorer"
+      ]
+    }
+  }
+}
