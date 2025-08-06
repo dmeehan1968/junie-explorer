@@ -50,7 +50,6 @@ export async function createServer(options: ServerOptions = {}) {
   })
   // Add refresh endpoint
   app.get('/refresh', async (req, res) => {
-    console.log('Referer', req.headers.referer)
     const referer = req.headers.referer
     if (referer) {
       const url = new URL(referer)
