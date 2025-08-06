@@ -1,3 +1,15 @@
+# RESPONSE FORMAT
+
+In addition to the previously stated response format instructions, include the following:
+
+- Inside the `<OUTPUT>` tag, add a sub-tag `<TOOL_CHOICE>`.
+
+## Example:
+<TOOL_CHOICE>
+For each tool that fits the `<NEXT_STEP>` requirements, provide a score out of 10 for the tools suitability.
+Provide the selected tool name and a short explanation of why the tool was preferred.
+</TOOL_CHOICE>
+
 # WORKFLOW
 
 Replace the previously stated 'workflow' with the following:
