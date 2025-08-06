@@ -15,11 +15,35 @@ import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
+import { Tool } from "../schema/tools.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { ToggleComponent } from '../utils/toggleComponent.js'
 
 const router = express.Router()
+
+function ToolDecorator() {
+  return (tool: Tool) => {
+    const params = Object.entries(tool.parameters).map(([name, { description, type, ...param }]) => {
+      return `<div class="flex flex-row">
+          <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">${escapeHtml(name)}</div>
+          <div class="flex flex-row flex-grow gap-2">
+            <div class="flex-grow bg-base-content/10 p-2 rounded">${escapeHtml(description ? description : JSON.stringify(param, null, 2))}</div>        
+            <div class="flex-shrink-0 bg-base-content/10 text-base-content/50 p-2 rounded">${escapeHtml(type)}</div>
+          </div>
+        </div>`
+    }).join('')
+    return `<div class="flex flex-col gap-2 p-4 bg-base-content/10 rounded mb-2">
+        <div class="py-2"><span class="bg-secondary text-secondary-content p-2 rounded shadow">${escapeHtml(tool.name)}</span></div>
+        <div class="flex flex-row">
+          <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">Description</div>
+          <div class="flex-grow p-2 bg-base-content/10 rounded">${escapeHtml(tool.description?.trim() ?? '')}</div>            
+        </div>
+        ${params ? '<div class="w-32 pr-2 text-base-content/50 italic text-right">Parameters</div>' : '' }
+        ${params}
+      </div>`
+  }
+}
 
 function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, tool: {
   name: string,
@@ -67,7 +91,7 @@ function MessageDecorator(props: {
           ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix: props.testIdPrefix, index: props.index })}
           <div class="relative">
             <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow">${props.label}</h3>
-            <div class="${props.klass} rounded shadow pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${escapeHtml(props.content)}</div>
+            <div class="${props.klass} rounded shadow pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${props.content}</div>
           </div>
         </div>`
 }
@@ -82,7 +106,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         testIdPrefix: 'chat-message-toggle',
         left: true,
         label: 'Message',
-        content: message.content,
+        content: escapeHtml(message.content),
       })
 
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
@@ -93,7 +117,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         testIdPrefix: 'chat-assistant-toggle',
         left: false,
         label: 'Model Response',
-        content: message.content,
+        content: escapeHtml(message.content),
       }) + message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
 
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
@@ -104,7 +128,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         testIdPrefix: 'chat-user-toggle',
         left: true,
         label: 'Tool Result',
-        content: message.toolResults.map(res => res.content).join('\n'),
+        content: escapeHtml(message.toolResults.map(res => res.content).join('\n')),
       })
 
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
@@ -115,7 +139,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         testIdPrefix: 'chat-multipart-toggle',
         left: true,
         label: 'Multi-part Message',
-        content: message.parts.map(part => part.contentType).join(''),
+        content: escapeHtml(message.parts.map(part => part.contentType).join('')),
       })
 
     }
@@ -278,7 +302,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         testIdPrefix: 'system-request-toggle',
                         left: true,
                         label: 'System Message',
-                        content: record.event.chat.system,
+                        content: escapeHtml(record.event.chat.system),
                       }),
                       MessageDecorator({
                         klass,
@@ -286,7 +310,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                         testIdPrefix: 'user-tools-toggle',
                         left: true,
                         label: 'Tools',
-                        content: JSON.stringify(record.event.chat.tools, null, 2),
+                        content: record.event.chat.tools.map(ToolDecorator()).join(''),
                       }),
                     ] : []),
                     ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
