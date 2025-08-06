@@ -1,4 +1,4 @@
-# Junie Explorer - Project Guidelines
+# Junie Explorer
 
 ## Project Overview
 Junie Explorer is a full-stack web application built with [Bun](https://bun.com) and
