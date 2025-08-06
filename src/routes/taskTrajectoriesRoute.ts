@@ -32,9 +32,9 @@ function ToolDecorator() {
           </div>
         </div>`
     }).join('')
-    return `<div class="flex flex-col gap-2 p-4 bg-base-content/10 rounded mb-2">
-        <div class="py-2"><span class="bg-secondary text-secondary-content p-2 rounded shadow">${escapeHtml(tool.name)}</span></div>
-        <div class="flex flex-row">
+    return `<div class="flex flex-col gap-2 p-4 bg-base-content/10 rounded mt-4 mb-8 relative">
+        <div class="absolute -top-4 left-4 py-2"><span class="bg-secondary text-secondary-content p-2 rounded shadow">${escapeHtml(tool.name)}</span></div>
+        <div class="flex flex-row pt-2">
           <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">Description</div>
           <div class="flex-grow p-2 bg-base-content/10 rounded">${escapeHtml(tool.description?.trim() ?? '')}</div>            
         </div>
@@ -82,7 +82,7 @@ function MessageDecorator(props: {
   index: number,
   testIdPrefix: string,
   left: boolean,
-  label: string,
+  label?: string,
   content: string
 }) {
   return `
