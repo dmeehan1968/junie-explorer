@@ -54,6 +54,10 @@ export class Task {
         this._workerPool = isDynamic
           ? new DynamicThreadPool(1, concurrency, workerPath, options)
           : new FixedThreadPool(concurrency, workerPath, options)
+
+        // Task stealing causes problems on reload (slow or fails to complete) and barely makes a difference
+        // to performance as its only helpful as workers become idle
+        this._workerPool.enableTasksQueue(true, { taskStealing: false, tasksStealingOnBackPressure: false })
       } else {
         this._workerPool = null
         console.warn(`Concurrency disabled. Set environment CONCURRENCY > 0 to enable`)
@@ -85,7 +89,14 @@ export class Task {
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
 
-      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0 }
+      const metrics: SummaryMetrics = {
+        inputTokens: 0,
+        outputTokens: 0,
+        cacheTokens: 0,
+        cost: 0,
+        time: 0,
+        metricCount: 0,
+      }
 
       // metrics needs to load events, but not retain them
       // but if metrics are already loaded (retained), then just use them
