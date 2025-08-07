@@ -16,11 +16,11 @@ import { Step } from "./Step.js"
 import { loadEvents } from "./workers/loadEvents.js"
 
 export class Task {
-  readonly id: string
-  readonly created: Date
-  readonly context: JunieTaskContext
-  readonly isDeclined: boolean
-  readonly plan: JuniePlan[]
+  public id: string = ''
+  public created: Date = new Date()
+  public context: JunieTaskContext = { description: '' }
+  public isDeclined: boolean = false
+  public plan: JuniePlan[] = []
   readonly _steps: Map<number, Step> = new Map()
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
   private _previousTasksInfo?: PreviousTasksInfo | null
@@ -67,6 +67,10 @@ export class Task {
   }
 
   constructor(public readonly logPath: string) {
+    this.init()
+  }
+
+  private init() {
     const task = this.load()
     this.id = task.id
     this.created = task.created
@@ -84,6 +88,7 @@ export class Task {
     this._events = undefined
     this._eventTypes = undefined
     this._steps.clear()
+    this.init()
   }
 
   get metrics(): Promise<SummaryMetrics> {

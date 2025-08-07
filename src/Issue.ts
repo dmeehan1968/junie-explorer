@@ -5,30 +5,35 @@ import { JunieChainSchema, SummaryMetrics } from "./schema.js"
 import { Task } from "./Task.js"
 
 export class Issue {
-  readonly id: string
-  readonly name: string
-  readonly created: Date
-  readonly state: string
-  readonly error?: any
+  public id: string = ''
+  public name: string = ''
+  public created: Date = new Date()
+  public state: string = ''
+  public error?: any
   private _tasks: Promise<Map<string, Task>> | undefined = undefined
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
 
   constructor(public readonly logPath: string) {
-    const issue = JunieChainSchema.safeParse(fs.readJsonSync(logPath))
+    this.init()
+
+  }
+
+  private init() {
+    const issue = JunieChainSchema.safeParse(fs.readJsonSync(this.logPath))
     if (!issue.success) {
-      throw new Error(`Error parsing JunieChain at ${logPath}: ${issue.error.message}`)
+      throw new Error(`Error parsing JunieChain at ${this.logPath}: ${issue.error.message}`)
     }
     this.id = issue.data.id.id
     this.name = issue.data.name ?? '-No Name-'
     this.created = issue.data.created
     this.state = issue.data.state
     this.error = issue.data.error
-
   }
 
   reload() {
     this._tasks = undefined
     this._metrics = undefined
+    this.init()
   }
 
   get tasks(): Promise<Map<string, Task>> {
