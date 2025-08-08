@@ -53,6 +53,7 @@
           localStorage.setItem(storageKey, JSON.stringify(selectedIds));
         }
       } catch (e) { /* ignore storage errors */ }
+      setActiveMetric('time');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       renderChart();
