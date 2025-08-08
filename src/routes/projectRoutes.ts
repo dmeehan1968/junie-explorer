@@ -169,13 +169,13 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           <button id="closeCompareModal" class="btn btn-sm btn-circle absolute right-3 top-3" aria-label="Close">✕</button>
           <div class="mb-3 flex items-center gap-4">
             <span class="font-semibold">Metric:</span>
-            <div class="btn-group" role="group" aria-label="Metric selection">
+            <div class="join" role="group" aria-label="Metric selection">
               ${hasMetrics ? `
-                <button type="button" class="btn btn-sm metric-btn btn-active" data-metric="input" aria-pressed="true">Input Tokens</button>
-                <button type="button" class="btn btn-sm metric-btn" data-metric="output" aria-pressed="false">Output Tokens</button>
-                <button type="button" class="btn btn-sm metric-btn" data-metric="cache" aria-pressed="false">Cache Tokens</button>
+                <button type="button" class="btn btn-sm join-item metric-btn" data-metric="input" aria-pressed="false">Input Tokens</button>
+                <button type="button" class="btn btn-sm join-item metric-btn" data-metric="output" aria-pressed="false">Output Tokens</button>
+                <button type="button" class="btn btn-sm join-item metric-btn" data-metric="cache" aria-pressed="false">Cache Tokens</button>
               ` : ''}
-              <button type="button" class="btn btn-sm metric-btn ${hasMetrics ? '' : 'btn-active'}" data-metric="time" aria-pressed="${hasMetrics ? 'false' : 'true'}">Time</button>
+              <button type="button" class="btn btn-sm join-item metric-btn" data-metric="time" aria-pressed="${hasMetrics ? 'false' : 'true'}">Time</button>
             </div>
           </div>
           <div class="h-[80%]"><canvas id="compareChart" class="w-full h-full"></canvas></div>

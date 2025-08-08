@@ -74,7 +74,7 @@
     function setActiveMetric(metric){
       metricButtons.forEach(btn => {
         const isActive = btn.dataset.metric === metric;
-        btn.classList.toggle('btn-active', isActive);
+        btn.classList.toggle('btn-primary', isActive);
         btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });
       renderChart();
@@ -95,7 +95,7 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const selected = getSelected();
-      const activeBtn = document.querySelector('.metric-btn.btn-active');
+      const activeBtn = document.querySelector('.metric-btn[aria-pressed="true"]');
       const metric = (activeBtn && activeBtn.dataset && activeBtn.dataset.metric) || 'time';
       const labels = selected.map(s => s.label);
       const rawData = selected.map(s => s[metric]);
