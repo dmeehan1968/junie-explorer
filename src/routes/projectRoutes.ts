@@ -44,14 +44,17 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         `
         : ``
       }
-      <div class="flex items-center justify-between mb-3">
+      ${hasMetrics 
+        ? `<div class="flex items-center justify-between mb-3">
         <div class="text-sm opacity-70">Select at least two issues to enable compare</div>
         <button id="compareBtn" class="btn btn-primary btn-sm" disabled data-testid="compare-button">Compare</button>
-      </div>
+      </div>`
+        : ``
+      }
       <table class="table table-zebra w-full bg-base-100" data-testid="issues-table">
         <thead>
           <tr class="!bg-base-200">
-            <th class="w-10 text-center align-middle"><input type="checkbox" id="selectAllIssues" class="checkbox checkbox-sm" aria-label="Select all issues" /></th>
+            ${hasMetrics ? `<th class="w-10 text-center align-middle"><input type="checkbox" id="selectAllIssues" class="checkbox checkbox-sm" aria-label="Select all issues" /></th>` : ''}
             <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
             <th class="text-left whitespace-nowrap">Timestamp</th>
             ${hasMetrics 
@@ -65,7 +68,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             <th class="text-right whitespace-nowrap">Status</th>
           </tr>
           <tr class="!bg-base-200 font-bold text-base-content">
-            <td></td>
+            ${hasMetrics ? '<td></td>' : ''}
             <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
             ${hasMetrics
@@ -84,6 +87,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         <tbody>
           ${(await Promise.all(sortedIssues.map(async issue => `
           <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
+            ${hasMetrics ? `
             <td class="text-center align-top py-3 px-2">
               <input type="checkbox" class="checkbox checkbox-sm issue-select" aria-label="Select issue for comparison" 
                 data-issue-id="${escapeHtml(issue.id)}"
@@ -96,6 +100,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
                 onclick="event.stopPropagation()"
               />
             </td>
+            ` : ``}
             <td class="text-left font-bold whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
               <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block text-primary hover:text-primary-focus">
                 ${escapeHtml(issue.name)}
@@ -146,7 +151,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         </tbody>
         <tfoot>
           <tr class="!bg-base-200 font-bold text-base-content">
-            <td></td>
+            ${hasMetrics ? '<td></td>' : ''}
             <td class="text-left whitespace-nowrap" data-testid="summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
             ${hasMetrics 
