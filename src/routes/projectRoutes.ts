@@ -83,7 +83,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         </thead>
         <tbody>
           ${(await Promise.all(sortedIssues.map(async issue => `
-          <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md" onclick="window.location.href='/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}'">
+          <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
             <td class="text-center align-top py-3 px-2">
               <input type="checkbox" class="checkbox checkbox-sm issue-select" aria-label="Select issue for comparison" 
                 data-issue-id="${escapeHtml(issue.id)}"
@@ -95,22 +95,50 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
                 onclick="event.stopPropagation()"
               />
             </td>
-            <td class="text-left font-bold text-primary hover:text-primary-focus whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
-              ${escapeHtml(issue.name)}
+            <td class="text-left font-bold whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
+              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block text-primary hover:text-primary-focus">
+                ${escapeHtml(issue.name)}
+              </a>
             </td>
-            <td class="text-left whitespace-nowrap" data-testid="issue-timestamp">${new Date(issue.created).toLocaleString(locale)}</td>
+            <td class="text-left whitespace-nowrap" data-testid="issue-timestamp">
+              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                ${new Date(issue.created).toLocaleString(locale)}
+              </a>
+            </td>
             ${hasMetrics 
               ? `
-                <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens">${formatNumber((await issue.metrics).inputTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens">${formatNumber((await issue.metrics).outputTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens">${formatNumber((await issue.metrics).cacheTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="issue-cost">${(await issue.metrics).cost.toFixed(4)}</td>
+                <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens">
+                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                    ${formatNumber((await issue.metrics).inputTokens)}
+                  </a>
+                </td>
+                <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens">
+                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                    ${formatNumber((await issue.metrics).outputTokens)}
+                  </a>
+                </td>
+                <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens">
+                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                    ${formatNumber((await issue.metrics).cacheTokens)}
+                  </a>
+                </td>
+                <td class="text-right whitespace-nowrap" data-testid="issue-cost">
+                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                    ${(await issue.metrics).cost.toFixed(4)}
+                  </a>
+                </td>
               ` 
               : ``
             }
-            <td class="text-right whitespace-nowrap" data-testid="issue-total-time">${formatSeconds((await issue.metrics).time / 1000)}</td>
+            <td class="text-right whitespace-nowrap" data-testid="issue-total-time">
+              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                ${formatSeconds((await issue.metrics).time / 1000)}
+              </a>
+            </td>
             <td class="text-right whitespace-nowrap" data-testid="issue-status">
-              ${getStatusBadge(issue.state)}
+              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="inline-block">
+                ${getStatusBadge(issue.state)}
+              </a>
             </td>
           </tr>
           `))).join('')}
