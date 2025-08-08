@@ -44,9 +44,14 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         `
         : ``
       }
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-sm opacity-70">Select at least two issues to enable compare</div>
+        <button id="compareBtn" class="btn btn-primary btn-sm" disabled data-testid="compare-button">Compare</button>
+      </div>
       <table class="table table-zebra w-full bg-base-100" data-testid="issues-table">
         <thead>
           <tr class="!bg-base-200">
+            <th class="w-10 text-center align-middle"><input type="checkbox" id="selectAllIssues" class="checkbox checkbox-sm" aria-label="Select all issues" /></th>
             <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
             <th class="text-left whitespace-nowrap">Timestamp</th>
             ${hasMetrics 
@@ -60,6 +65,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             <th class="text-right whitespace-nowrap">Status</th>
           </tr>
           <tr class="!bg-base-200 font-bold text-base-content">
+            <td></td>
             <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
             ${hasMetrics
@@ -78,6 +84,17 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         <tbody>
           ${(await Promise.all(sortedIssues.map(async issue => `
           <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md" onclick="window.location.href='/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}'">
+            <td class="text-center align-top py-3 px-2">
+              <input type="checkbox" class="checkbox checkbox-sm issue-select" aria-label="Select issue for comparison" 
+                data-issue-id="${escapeHtml(issue.id)}"
+                data-issue-name="${escapeHtml(issue.name)}"
+                data-input-tokens="${(await issue.metrics).inputTokens}"
+                data-output-tokens="${(await issue.metrics).outputTokens}"
+                data-cache-tokens="${(await issue.metrics).cacheTokens}"
+                data-time-ms="${(await issue.metrics).time}"
+                onclick="event.stopPropagation()"
+              />
+            </td>
             <td class="text-left font-bold text-primary hover:text-primary-focus whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
               ${escapeHtml(issue.name)}
             </td>
@@ -100,6 +117,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         </tbody>
         <tfoot>
           <tr class="!bg-base-200 font-bold text-base-content">
+            <td></td>
             <td class="text-left whitespace-nowrap" data-testid="summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
             ${hasMetrics 
@@ -116,6 +134,123 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           </tr>
         </tfoot>
       </table>
+
+      <!-- Compare Modal -->
+      <div id="compareModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-base-100 w-[95vw] h-[90vh] rounded-lg shadow-lg relative p-4" role="dialog" aria-modal="true">
+          <button id="closeCompareModal" class="btn btn-sm btn-circle absolute right-3 top-3" aria-label="Close">✕</button>
+          <div class="mb-3 flex items-center gap-4">
+            <span class="font-semibold">Metric:</span>
+            ${hasMetrics ? `
+            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="input" class="radio radio-sm" checked><span>Input Tokens</span></label>
+            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="output" class="radio radio-sm"><span>Output Tokens</span></label>
+            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="cache" class="radio radio-sm"><span>Cache Tokens</span></label>
+            `: ''}
+            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="time" class="radio radio-sm" ${hasMetrics ? '' : 'checked'}><span>Time</span></label>
+          </div>
+          <div class="h-[80%]"><canvas id="compareChart" class="w-full h-full"></canvas></div>
+        </div>
+      </div>
+
+      <script>
+        (function(){
+          const selectAll = document.getElementById('selectAllIssues');
+          const compareBtn = document.getElementById('compareBtn');
+          const modal = document.getElementById('compareModal');
+          const closeBtn = document.getElementById('closeCompareModal');
+
+          function getSelected(){
+            return Array.from(document.querySelectorAll('.issue-select:checked')).map(cb => ({
+              id: cb.dataset.issueId,
+              label: cb.dataset.issueName,
+              input: Number(cb.dataset.inputTokens||0),
+              output: Number(cb.dataset.outputTokens||0),
+              cache: Number(cb.dataset.cacheTokens||0),
+              time: Number(cb.dataset.timeMs||0)
+            }));
+          }
+
+          function updateButton(){
+            const count = getSelected().length;
+            compareBtn.disabled = count < 2;
+          }
+
+          if (selectAll){
+            selectAll.addEventListener('change', () => {
+              document.querySelectorAll('.issue-select').forEach(cb => {
+                cb.checked = selectAll.checked;
+              });
+              updateButton();
+            });
+          }
+
+          document.addEventListener('change', (e) => {
+            if (e.target && e.target.classList && e.target.classList.contains('issue-select')){
+              updateButton();
+            }
+          });
+
+          function openModal(){
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderChart();
+          }
+          function closeModal(){
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+          }
+
+          compareBtn.addEventListener('click', openModal);
+          closeBtn.addEventListener('click', closeModal);
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+          });
+
+          document.addEventListener('change', (e) => {
+            if (e.target && e.target.name === 'metricChoice'){
+              renderChart();
+            }
+          });
+
+          let chartInstance;
+          function renderChart(){
+            const ctx = document.getElementById('compareChart').getContext('2d');
+            const selected = getSelected();
+            const metric = (document.querySelector('input[name="metricChoice"]:checked')||{value:'time'}).value;
+            const labels = selected.map(s => s.label);
+            const data = selected.map(s => s[metric]);
+
+            const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : 'Time (ms)';
+
+            if (chartInstance){ chartInstance.destroy(); }
+            if (window.Chart){
+              chartInstance = new window.Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels,
+                  datasets: [{
+                    label: dsLabel,
+                    data,
+                    backgroundColor: labels.map((_, i) => 'hsl(' + ((i*137)%360) + ',70%,60%)')
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { display: true } },
+                  scales: { y: { beginAtZero: true } }
+                }
+              });
+            } else {
+              // Fallback: simple text
+              ctx.canvas.parentElement.innerHTML = '<div class="p-4">Chart library not available.</div>';
+            }
+          }
+
+          // Initialize button state
+          updateButton();
+        })();
+      </script>
     </div>
   </div>
 `
