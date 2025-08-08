@@ -42,7 +42,17 @@
       }
     });
 
+    const projectId = (document.body && document.body.dataset && document.body.dataset.projectId) || '';
+    const storageKey = projectId ? `junie-explorer-${projectId}-selectedIssues` : '';
+
     function openModal(){
+      // Save selections to localStorage only when Compare is pressed
+      try {
+        if (storageKey) {
+          const selectedIds = getSelected().map(s => s.id);
+          localStorage.setItem(storageKey, JSON.stringify(selectedIds));
+        }
+      } catch (e) { /* ignore storage errors */ }
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       renderChart();
@@ -58,12 +68,25 @@
       if (e.target === modal) closeModal();
     });
 
-    document.addEventListener('change', (e) => {
-      const t = e.target;
-      if (t && t.name === 'metricChoice'){
-        renderChart();
-      }
-    });
+    // Metric button group handling
+    const metricButtons = Array.from(document.querySelectorAll('.metric-btn'));
+    function setActiveMetric(metric){
+      metricButtons.forEach(btn => {
+        const isActive = btn.dataset.metric === metric;
+        btn.classList.toggle('btn-active', isActive);
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+      renderChart();
+    }
+    if (metricButtons.length){
+      metricButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const metric = btn.dataset.metric;
+          if (metric) setActiveMetric(metric);
+        });
+      });
+    }
 
     let chartInstance;
     function renderChart(){
@@ -71,8 +94,8 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const selected = getSelected();
-      const metricRadio = document.querySelector('input[name="metricChoice"]:checked');
-      const metric = (metricRadio && metricRadio.value) || 'time';
+      const activeBtn = document.querySelector('.metric-btn.btn-active');
+      const metric = (activeBtn && activeBtn.dataset && activeBtn.dataset.metric) || 'time';
       const labels = selected.map(s => s.label);
       const rawData = selected.map(s => s[metric]);
       const data = metric === 'time' ? rawData.map(v => v / 1000) : rawData; // seconds for time
@@ -103,6 +126,28 @@
         // Fallback: simple text
         ctx.canvas.parentElement.innerHTML = '<div class="p-4">Chart library not available.</div>';
       }
+    }
+
+    // Restore selection from localStorage on load (if any)
+    try {
+      if (storageKey) {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          const ids = JSON.parse(saved);
+          if (Array.isArray(ids)) {
+            document.querySelectorAll('.issue-select').forEach(cb => {
+              if (ids.includes(cb.dataset.issueId)) cb.checked = true;
+            });
+          }
+        }
+      }
+    } catch (e) { /* ignore storage errors */ }
+
+    // Sync select-all checkbox state after restore
+    if (selectAll){
+      const all = Array.from(document.querySelectorAll('.issue-select'));
+      const checked = all.filter(cb => cb.checked).length;
+      selectAll.checked = (all.length > 0 && checked === all.length);
     }
 
     // Initialize button state

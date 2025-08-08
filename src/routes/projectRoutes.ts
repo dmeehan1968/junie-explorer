@@ -141,12 +141,14 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           <button id="closeCompareModal" class="btn btn-sm btn-circle absolute right-3 top-3" aria-label="Close">✕</button>
           <div class="mb-3 flex items-center gap-4">
             <span class="font-semibold">Metric:</span>
-            ${hasMetrics ? `
-            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="input" class="radio radio-sm" checked><span>Input Tokens</span></label>
-            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="output" class="radio radio-sm"><span>Output Tokens</span></label>
-            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="cache" class="radio radio-sm"><span>Cache Tokens</span></label>
-            `: ''}
-            <label class="label cursor-pointer gap-2"><input type="radio" name="metricChoice" value="time" class="radio radio-sm" ${hasMetrics ? '' : 'checked'}><span>Time</span></label>
+            <div class="btn-group" role="group" aria-label="Metric selection">
+              ${hasMetrics ? `
+                <button type="button" class="btn btn-sm metric-btn btn-active" data-metric="input" aria-pressed="true">Input Tokens</button>
+                <button type="button" class="btn btn-sm metric-btn" data-metric="output" aria-pressed="false">Output Tokens</button>
+                <button type="button" class="btn btn-sm metric-btn" data-metric="cache" aria-pressed="false">Cache Tokens</button>
+              ` : ''}
+              <button type="button" class="btn btn-sm metric-btn ${hasMetrics ? '' : 'btn-active'}" data-metric="time" aria-pressed="${hasMetrics ? 'false' : 'true'}">Time</button>
+            </div>
           </div>
           <div class="h-[80%]"><canvas id="compareChart" class="w-full h-full"></canvas></div>
         </div>
@@ -259,7 +261,7 @@ router.get('/project/:projectName', async (req, res) => {
         <script src="/js/reloadPage.js"></script>
         <script src="/js/compareModal.js"></script>
       </head>
-      <body class="bg-base-200 p-5">
+      <body class="bg-base-200 p-5" data-project-id="${escapeHtml(project.name)}">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${project.name}</h1>
