@@ -100,8 +100,17 @@
       const rawData = selected.map(s => s[metric]);
       const data = metric === 'time' ? rawData.map(v => v / 1000) : rawData; // seconds for time
 
-      const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : 'Time (s)';
-      const yAxisLabel = (metric === 'input' || metric === 'output' || metric === 'cache') ? 'Tokens' : 'Time (s)';
+      function fmtMinSec(totalSeconds){
+        if (!isFinite(totalSeconds)) return '0:00';
+        const sign = totalSeconds < 0 ? '-' : '';
+        const s = Math.max(0, Math.floor(Math.abs(totalSeconds)));
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return sign + m + ':' + (sec < 10 ? '0' + sec : sec);
+      }
+
+      const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : 'Time (mm:ss)';
+      const yAxisLabel = (metric === 'input' || metric === 'output' || metric === 'cache') ? 'Tokens' : 'Time (mm:ss)';
 
       if (chartInstance){ chartInstance.destroy(); }
       if (window.Chart){
@@ -118,8 +127,27 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true, title: { display: true, text: yAxisLabel } } }
+            plugins: {
+              legend: { display: true },
+              tooltip: {
+                callbacks: {
+                  label: function(context){
+                    const v = context.parsed && typeof context.parsed.y !== 'undefined' ? context.parsed.y : context.parsed;
+                    if (metric === 'time') return (context.dataset.label ? context.dataset.label + ': ' : '') + fmtMinSec(v);
+                    return (context.dataset.label ? context.dataset.label + ': ' : '') + v;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: yAxisLabel },
+                ticks: metric === 'time' ? {
+                  callback: function(value){ return fmtMinSec(Number(value)); }
+                } : {}
+              }
+            }
           }
         });
       } else {
