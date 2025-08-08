@@ -28,6 +28,7 @@ class LlmLatencyChart {
     this.data = null;
     this.providers = [];
     this.visibleProviders = new Set();
+    this.metricMode = 'both'; // 'both' | 'latency' | 'tps'
     this.chart = null;
     
     // Chart colors
@@ -52,6 +53,7 @@ class LlmLatencyChart {
       this.visibleProviders = new Set(this.providers);
       
       this.createProviderFilters();
+      this.setupMetricToggle();
       this.createChart();
     } catch (error) {
       console.error('Error loading LLM latency data:', error);
@@ -59,6 +61,25 @@ class LlmLatencyChart {
     }
   }
   
+  setupMetricToggle() {
+    const toggleContainer = document.getElementById('llm-latency-metric-toggle');
+    if (!toggleContainer) return;
+
+    const buttons = Array.from(toggleContainer.querySelectorAll('button[data-metric]'));
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // update pressed states
+        buttons.forEach(b => {
+          const isActive = b === btn;
+          b.classList.toggle('btn-primary', isActive);
+          b.setAttribute('aria-pressed', String(isActive));
+        });
+        this.metricMode = btn.getAttribute('data-metric');
+        this.updateChart();
+      });
+    });
+  }
+
   createProviderFilters() {
     const filtersContainer = document.getElementById('llm-latency-provider-filters');
     if (!filtersContainer) return;
@@ -112,29 +133,48 @@ class LlmLatencyChart {
 
     const ctx = this.canvas.getContext('2d');
     
-    // Prepare datasets for each provider
-    const datasets = this.providers.map((provider, index) => {
+    // Prepare datasets for each provider - two datasets per provider (latency and tokens/s)
+    const datasets = [];
+    this.providers.forEach((provider, index) => {
       const color = this.colors[index % this.colors.length];
       const providerData = this.data.latencyData
         .filter(item => item.provider === provider)
         .map(item => ({
           x: new Date(item.timestamp),
-          y: item.latency / 1000, // Convert to seconds
+          latencySeconds: (item.latency ?? 0) / 1000,
+          tokensPerSecond: item.tokensPerSecond ?? 0,
           provider: item.provider,
           model: item.model,
-          latency: item.latency
         }));
 
-      return {
-        label: provider,
-        data: providerData,
+      datasets.push({
+        label: provider + ' • latency',
+        data: providerData.map(p => ({ x: p.x, y: p.latencySeconds, provider: p.provider, model: p.model })),
         borderColor: color,
         backgroundColor: color + '20',
         fill: false,
         tension: 0.1,
         borderWidth: 2,
-        hidden: !this.visibleProviders.has(provider)
-      };
+        yAxisID: 'yLatency',
+        hidden: !this.visibleProviders.has(provider),
+        _provider: provider,
+        _metric: 'latency'
+      });
+
+      datasets.push({
+        label: provider + ' • tokens/s',
+        data: providerData.map(p => ({ x: p.x, y: p.tokensPerSecond, provider: p.provider, model: p.model })),
+        borderColor: color,
+        borderDash: [6, 4],
+        backgroundColor: color + '20',
+        fill: false,
+        tension: 0.1,
+        borderWidth: 2,
+        yAxisID: 'yTokens',
+        hidden: !this.visibleProviders.has(provider),
+        _provider: provider,
+        _metric: 'tps'
+      });
     });
 
     const config = {
@@ -176,18 +216,29 @@ class LlmLatencyChart {
               }
             }
           },
-          y: {
+          yLatency: {
             title: {
               display: true,
               text: 'Latency (s)'
             },
             beginAtZero: true
+          },
+          yTokens: {
+            title: {
+              display: true,
+              text: 'Tokens / s'
+            },
+            beginAtZero: true,
+            position: 'right',
+            grid: {
+              drawOnChartArea: false
+            }
           }
         },
         plugins: {
           title: {
             display: true,
-            text: 'LLM Request Latency Over Time',
+            text: 'Model Latency and Tokens/s Over Time',
             font: {
               size: 16
             }
@@ -203,11 +254,18 @@ class LlmLatencyChart {
               },
               label: function(context) {
                 const dataPoint = context.raw;
-                return [
-                  `${context.dataset.label}`,
+                const isLatency = context.dataset._metric === 'latency';
+                const value = context.parsed.y;
+                const lines = [
+                  `${context.dataset._provider}`,
                   `Model: ${dataPoint.model}`,
-                  `Latency: ${context.parsed.y.toFixed(2)}s`
                 ];
+                if (isLatency) {
+                  lines.push(`Latency: ${value.toFixed(2)}s`);
+                } else {
+                  lines.push(`Tokens/s: ${value.toFixed(2)}`);
+                }
+                return lines;
               }
             }
           }
@@ -221,10 +279,11 @@ class LlmLatencyChart {
   updateChart() {
     if (!this.chart) return;
 
-    // Update dataset visibility
-    this.chart.data.datasets.forEach((dataset, index) => {
-      const provider = this.providers[index];
-      dataset.hidden = !this.visibleProviders.has(provider);
+    // Update dataset visibility based on provider and metric mode
+    this.chart.data.datasets.forEach((dataset) => {
+      const providerVisible = this.visibleProviders.has(dataset._provider);
+      const metricVisible = (this.metricMode === 'both') || (dataset._metric === this.metricMode);
+      dataset.hidden = !(providerVisible && metricVisible);
     });
 
     this.chart.update();

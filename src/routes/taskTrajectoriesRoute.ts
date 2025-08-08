@@ -273,8 +273,20 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             </div>
             <div class="collapsible-content p-4 hidden transition-all duration-300">
               <div class="mb-4">
-                <div id="llm-latency-provider-filters" class="flex flex-wrap gap-2 mb-4">
-                  <!-- Provider checkboxes will be populated by JavaScript -->
+                <div class="flex flex-col gap-3">
+                  <div class="flex items-center gap-3 flex-wrap justify-between">
+                    <div id="llm-latency-provider-filters" class="flex flex-wrap gap-2">
+                      <!-- Provider checkboxes will be populated by JavaScript -->
+                    </div>
+                    <div class="flex items-center gap-3 ml-auto">
+                      <span class="text-sm text-base-content/70">Show metrics:</span>
+                      <div id="llm-latency-metric-toggle" class="join">
+                        <button class="btn btn-xs join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
+                        <button class="btn btn-xs join-item" data-metric="latency" aria-pressed="false">Latency</button>
+                        <button class="btn btn-xs join-item" data-metric="tps" aria-pressed="false">Tokens/s</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="w-full">
@@ -396,30 +408,33 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
     // Sort all events by timestamp first
     const sortedEvents = events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
 
-    // Calculate latencies by measuring time since previous event of any type
+    // Build latency and token rate data from LLM response events
     const latencyData: Array<{
       timestamp: string
       provider: string
       model: string
-      latency: number
+      latency: number // milliseconds
+      outputTokens: number
+      tokensPerSecond: number
     }> = []
 
-    for (let i = 1 ; i < sortedEvents.length ; i++) {
+    for (let i = 0 ; i < sortedEvents.length ; i++) {
       const currentEvent = sortedEvents[i]
 
-      // Only process LLM response events
       if (currentEvent.event.type === 'LlmResponseEvent') {
-        const previousEvent = sortedEvents[i - 1]
-
-        const latency = currentEvent.timestamp.getTime() - previousEvent.timestamp.getTime()
         const provider = currentEvent.event.answer.llm.groupName
         const model = currentEvent.event.answer.llm.name
+        const latencyMs = currentEvent.event.answer.time ?? 0
+        const outputTokens = currentEvent.event.answer.outputTokens ?? 0
+        const tokensPerSecond = latencyMs > 0 ? (outputTokens / (latencyMs / 1000)) : 0
 
         latencyData.push({
           timestamp: currentEvent.timestamp.toISOString(),
           provider,
           model,
-          latency,
+          latency: latencyMs,
+          outputTokens,
+          tokensPerSecond,
         })
       }
     }
