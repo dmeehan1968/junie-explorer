@@ -19,6 +19,8 @@ window._locale = {
 // Global variables for chart management
 let llmChart = null;
 let originalChartData = null;
+let selectedProvidersSet = new Set();
+let selectedProvider = 'all';
 
 // Function to filter chart data based on selected providers
 function filterChartData(selectedProviders) {
@@ -74,12 +76,15 @@ function filterChartData(selectedProviders) {
 // Function to update chart with filtered data
 function updateChart() {
   if (!llmChart) return;
-  
-  const selectedProviders = [];
-  document.querySelectorAll('.provider-checkbox:checked').forEach(checkbox => {
-    selectedProviders.push(checkbox.dataset.provider);
-  });
 
+  let selectedProviders = [];
+  if (selectedProvider === 'all') {
+    selectedProviders = (originalChartData && Array.isArray(originalChartData.providers)) ? originalChartData.providers : [];
+  } else if (selectedProvider) {
+    selectedProviders = [selectedProvider];
+  }
+
+  selectedProvidersSet = new Set(selectedProviders);
   llmChart.data = filterChartData(selectedProviders);
   llmChart.update();
 }
@@ -215,54 +220,64 @@ document.addEventListener('DOMContentLoaded', function() {
       // Create the chart
       llmChart = new Chart(ctx, config);
       
-      // Set up checkbox event listeners
-      const allCheckbox = document.getElementById('all-providers');
-      const noneCheckbox = document.getElementById('none-providers');
-      const providerCheckboxes = document.querySelectorAll('.provider-checkbox');
-      
-      // All checkbox functionality
-      if (allCheckbox) {
-        allCheckbox.addEventListener('change', function() {
-          if (this.checked) {
-            noneCheckbox.checked = false;
-            providerCheckboxes.forEach(cb => cb.checked = true);
-            updateChart();
-          }
-        });
-      }
-      
-      // None checkbox functionality
-      if (noneCheckbox) {
-        noneCheckbox.addEventListener('change', function() {
-          if (this.checked) {
-            allCheckbox.checked = false;
-            providerCheckboxes.forEach(cb => cb.checked = false);
-            updateChart();
-          }
-        });
-      }
-      
-      // Individual provider checkbox functionality
-      providerCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          // Update all/none checkboxes based on provider selection
-          const checkedProviders = document.querySelectorAll('.provider-checkbox:checked');
-          const totalProviders = document.querySelectorAll('.provider-checkbox');
-          
-          if (checkedProviders.length === totalProviders.length) {
-            allCheckbox.checked = true;
-            noneCheckbox.checked = false;
-          } else if (checkedProviders.length === 0) {
-            allCheckbox.checked = false;
-            noneCheckbox.checked = true;
+      // Build provider filter button group (exclusive: All or one provider)
+      const providerFiltersContainer = document.getElementById('llm-provider-filters');
+      if (providerFiltersContainer && originalChartData && Array.isArray(originalChartData.providers)) {
+        providerFiltersContainer.innerHTML = '';
+        const providers = originalChartData.providers;
+
+        // Initialize selection to 'all'
+        selectedProvider = 'all';
+        selectedProvidersSet = new Set(providers);
+
+        const buttons = [];
+
+        const makeBtn = (label, value) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn btn-sm join-item';
+          btn.setAttribute('data-value', value);
+          btn.setAttribute('aria-pressed', 'false');
+          btn.textContent = label;
+          return btn;
+        };
+
+        const refreshButtons = () => {
+          buttons.forEach(btn => {
+            const value = btn.getAttribute('data-value');
+            const active = value === selectedProvider;
+            btn.classList.toggle('btn-primary', active);
+            btn.setAttribute('aria-pressed', String(active));
+          });
+        };
+
+        const setSelection = (value) => {
+          selectedProvider = value;
+          if (value === 'all') {
+            selectedProvidersSet = new Set(providers);
           } else {
-            allCheckbox.checked = false;
-            noneCheckbox.checked = false;
+            selectedProvidersSet = new Set([value]);
           }
-          
+          refreshButtons();
           updateChart();
+        };
+
+        const allBtn = makeBtn('All', 'all');
+        allBtn.addEventListener('click', () => setSelection('all'));
+        providerFiltersContainer.appendChild(allBtn);
+        buttons.push(allBtn);
+
+        providers.forEach(provider => {
+          const pBtn = makeBtn(provider, provider);
+          pBtn.addEventListener('click', () => setSelection(provider));
+          providerFiltersContainer.appendChild(pBtn);
+          buttons.push(pBtn);
         });
-      });
+
+        // Initialize UI state and chart
+        refreshButtons();
+        updateChart();
+      }
       
     } catch (error) {
       console.error('Error creating LLM chart:', error);

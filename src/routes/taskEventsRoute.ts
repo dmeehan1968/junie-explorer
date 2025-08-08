@@ -306,12 +306,12 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               </div>
               <div class="collapsible-content px-4 pb-4 block transition-all duration-300">
                 <div class="mb-4">
-                  <div class="flex flex-wrap gap-2 items-center">
-                    <label class="flex items-center gap-1"><input type="checkbox" id="all-providers" checked class="checkbox checkbox-sm"> All</label>
-                    <label class="flex items-center gap-1"><input type="checkbox" id="none-providers" class="checkbox checkbox-sm"> None</label>
-                    ${llmGraphData.providers.map(provider => `
-                      <label class="flex items-center gap-1"><input type="checkbox" class="provider-checkbox checkbox checkbox-sm" data-provider="${provider}" checked> ${escapeHtml(provider)}</label>
-                    `).join('')}
+                  <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-3 flex-wrap justify-between">
+                      <div id="llm-provider-filters" class="join flex flex-wrap" data-testid="llm-provider-filters">
+                        <!-- Provider buttons will be populated by JavaScript -->
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="w-full h-96">
