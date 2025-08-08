@@ -91,6 +91,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
                 data-input-tokens="${(await issue.metrics).inputTokens}"
                 data-output-tokens="${(await issue.metrics).outputTokens}"
                 data-cache-tokens="${(await issue.metrics).cacheTokens}"
+                data-cost="${(await issue.metrics).cost}"
                 data-time-ms="${(await issue.metrics).time}"
                 onclick="event.stopPropagation()"
               />
@@ -174,6 +175,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
                 <button type="button" class="btn btn-sm join-item metric-btn" data-metric="input" aria-pressed="false">Input Tokens</button>
                 <button type="button" class="btn btn-sm join-item metric-btn" data-metric="output" aria-pressed="false">Output Tokens</button>
                 <button type="button" class="btn btn-sm join-item metric-btn" data-metric="cache" aria-pressed="false">Cache Tokens</button>
+                <button type="button" class="btn btn-sm join-item metric-btn" data-metric="cost" aria-pressed="false">Cost</button>
               ` : ''}
               <button type="button" class="btn btn-sm join-item metric-btn" data-metric="time" aria-pressed="${hasMetrics ? 'false' : 'true'}">Time</button>
             </div>

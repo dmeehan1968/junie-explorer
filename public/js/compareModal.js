@@ -17,6 +17,7 @@
         input: Number(cb.dataset.inputTokens||0),
         output: Number(cb.dataset.outputTokens||0),
         cache: Number(cb.dataset.cacheTokens||0),
+        cost: Number(cb.dataset.cost||0),
         time: Number(cb.dataset.timeMs||0)
       }));
     }
@@ -110,8 +111,8 @@
         return sign + m + ':' + (sec < 10 ? '0' + sec : sec);
       }
 
-      const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : 'Time (mm:ss)';
-      const yAxisLabel = (metric === 'input' || metric === 'output' || metric === 'cache') ? 'Tokens' : 'Time (mm:ss)';
+      const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : metric === 'cost' ? 'Cost (USD)' : 'Time (mm:ss)';
+      const yAxisLabel = (metric === 'input' || metric === 'output' || metric === 'cache') ? 'Tokens' : metric === 'cost' ? 'USD' : 'Time (mm:ss)';
 
       if (chartInstance){ chartInstance.destroy(); }
       if (window.Chart){
@@ -135,6 +136,7 @@
                   label: function(context){
                     const v = context.parsed && typeof context.parsed.y !== 'undefined' ? context.parsed.y : context.parsed;
                     if (metric === 'time') return (context.dataset.label ? context.dataset.label + ': ' : '') + fmtMinSec(v);
+                    if (metric === 'cost') return (context.dataset.label ? context.dataset.label + ': ' : '') + '$' + Number(v).toFixed(4);
                     return (context.dataset.label ? context.dataset.label + ': ' : '') + v;
                   }
                 }
@@ -146,7 +148,9 @@
                 title: { display: true, text: yAxisLabel },
                 ticks: metric === 'time' ? {
                   callback: function(value){ return fmtMinSec(Number(value)); }
-                } : {}
+                } : (metric === 'cost' ? {
+                  callback: function(value){ return '$' + Number(value).toFixed(2); }
+                } : {})
               }
             }
           }
