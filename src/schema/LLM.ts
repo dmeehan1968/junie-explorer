@@ -14,5 +14,5 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AutoSelectedLlm,
 ]).parse(data)).transform((data => ({
   ...data,
-  groupName: `${ data.provider } (${ data.jbai })`
+  groupName: `${ data.isSummarizer ? 'Summarizer' : 'Assistant' } (${ data.jbai })`
 })))
