@@ -275,15 +275,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               <div class="mb-4">
                 <div class="flex flex-col gap-3">
                   <div class="flex items-center gap-3 flex-wrap justify-between">
-                    <div id="llm-latency-provider-filters" class="flex flex-wrap gap-2">
-                      <!-- Provider checkboxes will be populated by JavaScript -->
+                    <div id="llm-latency-provider-filters" class="join flex flex-wrap">
+                      <!-- Provider buttons will be populated by JavaScript -->
                     </div>
                     <div class="flex items-center gap-3 ml-auto">
-                      <span class="text-sm text-base-content/70">Show metrics:</span>
                       <div id="llm-latency-metric-toggle" class="join">
-                        <button class="btn btn-xs join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
-                        <button class="btn btn-xs join-item" data-metric="latency" aria-pressed="false">Latency</button>
-                        <button class="btn btn-xs join-item" data-metric="tps" aria-pressed="false">Tokens/s</button>
+                        <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
+                        <button class="btn btn-sm join-item" data-metric="latency" aria-pressed="false">Latency</button>
+                        <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/s</button>
                       </div>
                     </div>
                   </div>

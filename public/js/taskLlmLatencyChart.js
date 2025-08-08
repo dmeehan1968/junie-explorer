@@ -81,47 +81,62 @@ class LlmLatencyChart {
   }
 
   createProviderFilters() {
-    const filtersContainer = document.getElementById('llm-latency-provider-filters');
-    if (!filtersContainer) return;
+    const container = document.getElementById('llm-latency-provider-filters');
+    if (!container) return;
     
-    filtersContainer.innerHTML = '';
+    container.innerHTML = '';
     
-    this.providers.forEach((provider, index) => {
-      const color = this.colors[index % this.colors.length];
-      
-      const label = document.createElement('label');
-      label.className = 'flex items-center gap-2 cursor-pointer';
-      
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = true;
-      checkbox.className = 'checkbox checkbox-sm';
-      checkbox.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          this.visibleProviders.add(provider);
-        } else {
+    // "Both" button selects all providers
+    const bothBtn = document.createElement('button');
+    bothBtn.type = 'button';
+    bothBtn.className = 'btn btn-sm join-item btn-primary';
+    bothBtn.setAttribute('aria-pressed', 'true');
+    bothBtn.textContent = 'Both';
+    bothBtn.addEventListener('click', () => {
+      // Select all providers
+      this.visibleProviders = new Set(this.providers);
+      // Activate all provider buttons
+      container.querySelectorAll('button[data-provider]').forEach(b => {
+        b.classList.add('btn-primary');
+        b.setAttribute('aria-pressed', 'true');
+      });
+      // Activate "Both"
+      bothBtn.classList.add('btn-primary');
+      bothBtn.setAttribute('aria-pressed', 'true');
+      this.updateChart();
+    });
+    container.appendChild(bothBtn);
+    
+    // Individual provider toggle buttons
+    this.providers.forEach((provider) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm join-item btn-primary';
+      btn.setAttribute('aria-pressed', 'true');
+      btn.setAttribute('data-provider', provider);
+      btn.textContent = provider;
+      btn.addEventListener('click', () => {
+        const isActive = this.visibleProviders.has(provider);
+        if (isActive) {
           this.visibleProviders.delete(provider);
+          btn.classList.remove('btn-primary');
+          btn.setAttribute('aria-pressed', 'false');
+        } else {
+          this.visibleProviders.add(provider);
+          btn.classList.add('btn-primary');
+          btn.setAttribute('aria-pressed', 'true');
+        }
+        // Update "Both" button state
+        if (this.visibleProviders.size === this.providers.length) {
+          bothBtn.classList.add('btn-primary');
+          bothBtn.setAttribute('aria-pressed', 'true');
+        } else {
+          bothBtn.classList.remove('btn-primary');
+          bothBtn.setAttribute('aria-pressed', 'false');
         }
         this.updateChart();
       });
-      
-      const colorBox = document.createElement('div');
-      colorBox.className = 'w-4 h-4 rounded';
-      colorBox.style.backgroundColor = color;
-      
-      const text = document.createElement('span');
-      text.textContent = provider
-        .replace(/</.g, '&lt;')
-        .replace(/>/.g, '&gt;')
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-      text.className = 'text-sm';
-      
-      label.appendChild(checkbox);
-      label.appendChild(colorBox);
-      label.appendChild(text);
-      filtersContainer.appendChild(label);
+      container.appendChild(btn);
     });
   }
   
