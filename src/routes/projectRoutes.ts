@@ -218,9 +218,11 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             const selected = getSelected();
             const metric = (document.querySelector('input[name="metricChoice"]:checked')||{value:'time'}).value;
             const labels = selected.map(s => s.label);
-            const data = selected.map(s => s[metric]);
+            const rawData = selected.map(s => s[metric]);
+            const data = metric === 'time' ? rawData.map(v => v / 1000) : rawData;
 
-            const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : 'Time (ms)';
+            const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : 'Time (s)';
+            const yAxisLabel = (metric === 'input' || metric === 'output' || metric === 'cache') ? 'Tokens' : 'Time (s)';
 
             if (chartInstance){ chartInstance.destroy(); }
             if (window.Chart){
@@ -238,7 +240,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: { legend: { display: true } },
-                  scales: { y: { beginAtZero: true } }
+                  scales: { y: { beginAtZero: true, title: { display: true, text: yAxisLabel } } }
                 }
               });
             } else {
