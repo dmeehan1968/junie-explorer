@@ -29,6 +29,7 @@ class LlmLatencyChart {
     this.providers = [];
     this.visibleProviders = new Set();
     this.metricMode = 'both'; // 'both' | 'latency' | 'tps'
+    this.selectedProvider = 'both'; // 'both' or provider name
     this.chart = null;
     
     // Chart colors
@@ -86,58 +87,46 @@ class LlmLatencyChart {
     
     container.innerHTML = '';
     
-    // "Both" button selects all providers
-    const bothBtn = document.createElement('button');
-    bothBtn.type = 'button';
-    bothBtn.className = 'btn btn-sm join-item btn-primary';
-    bothBtn.setAttribute('aria-pressed', 'true');
-    bothBtn.textContent = 'Both';
-    bothBtn.addEventListener('click', () => {
-      // Select all providers
-      this.visibleProviders = new Set(this.providers);
-      // Activate all provider buttons
-      container.querySelectorAll('button[data-provider]').forEach(b => {
-        b.classList.add('btn-primary');
-        b.setAttribute('aria-pressed', 'true');
-      });
-      // Activate "Both"
-      bothBtn.classList.add('btn-primary');
-      bothBtn.setAttribute('aria-pressed', 'true');
-      this.updateChart();
-    });
-    container.appendChild(bothBtn);
+    const buttons = [];
     
-    // Individual provider toggle buttons
-    this.providers.forEach((provider) => {
+    const setSelection = (value) => {
+      this.selectedProvider = value;
+      if (value === 'both') {
+        this.visibleProviders = new Set(this.providers);
+      } else {
+        this.visibleProviders = new Set([value]);
+      }
+      buttons.forEach(b => {
+        const active = b.getAttribute('data-value') === value;
+        b.classList.toggle('btn-primary', active);
+        b.setAttribute('aria-pressed', String(active));
+      });
+      this.updateChart();
+    };
+    
+    const makeButton = (label, value) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'btn btn-sm join-item btn-primary';
-      btn.setAttribute('aria-pressed', 'true');
-      btn.setAttribute('data-provider', provider);
-      btn.textContent = provider;
-      btn.addEventListener('click', () => {
-        const isActive = this.visibleProviders.has(provider);
-        if (isActive) {
-          this.visibleProviders.delete(provider);
-          btn.classList.remove('btn-primary');
-          btn.setAttribute('aria-pressed', 'false');
-        } else {
-          this.visibleProviders.add(provider);
-          btn.classList.add('btn-primary');
-          btn.setAttribute('aria-pressed', 'true');
-        }
-        // Update "Both" button state
-        if (this.visibleProviders.size === this.providers.length) {
-          bothBtn.classList.add('btn-primary');
-          bothBtn.setAttribute('aria-pressed', 'true');
-        } else {
-          bothBtn.classList.remove('btn-primary');
-          bothBtn.setAttribute('aria-pressed', 'false');
-        }
-        this.updateChart();
-      });
+      btn.className = 'btn btn-sm join-item';
+      btn.setAttribute('data-value', value);
+      btn.setAttribute('aria-pressed', 'false');
+      btn.textContent = label;
+      btn.addEventListener('click', () => setSelection(value));
+      return btn;
+    };
+    
+    const bothBtn = makeButton('Both', 'both');
+    container.appendChild(bothBtn);
+    buttons.push(bothBtn);
+    
+    this.providers.forEach((provider) => {
+      const btn = makeButton(provider, provider);
       container.appendChild(btn);
+      buttons.push(btn);
     });
+    
+    // Initialize selection
+    setSelection(this.selectedProvider || 'both');
   }
   
   createChart() {
