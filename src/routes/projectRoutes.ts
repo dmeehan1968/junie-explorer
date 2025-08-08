@@ -151,108 +151,6 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           <div class="h-[80%]"><canvas id="compareChart" class="w-full h-full"></canvas></div>
         </div>
       </div>
-
-      <script>
-        (function(){
-          const selectAll = document.getElementById('selectAllIssues');
-          const compareBtn = document.getElementById('compareBtn');
-          const modal = document.getElementById('compareModal');
-          const closeBtn = document.getElementById('closeCompareModal');
-
-          function getSelected(){
-            return Array.from(document.querySelectorAll('.issue-select:checked')).map(cb => ({
-              id: cb.dataset.issueId,
-              label: cb.dataset.issueName,
-              input: Number(cb.dataset.inputTokens||0),
-              output: Number(cb.dataset.outputTokens||0),
-              cache: Number(cb.dataset.cacheTokens||0),
-              time: Number(cb.dataset.timeMs||0)
-            }));
-          }
-
-          function updateButton(){
-            const count = getSelected().length;
-            compareBtn.disabled = count < 2;
-          }
-
-          if (selectAll){
-            selectAll.addEventListener('change', () => {
-              document.querySelectorAll('.issue-select').forEach(cb => {
-                cb.checked = selectAll.checked;
-              });
-              updateButton();
-            });
-          }
-
-          document.addEventListener('change', (e) => {
-            if (e.target && e.target.classList && e.target.classList.contains('issue-select')){
-              updateButton();
-            }
-          });
-
-          function openModal(){
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            renderChart();
-          }
-          function closeModal(){
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-          }
-
-          compareBtn.addEventListener('click', openModal);
-          closeBtn.addEventListener('click', closeModal);
-          modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-          });
-
-          document.addEventListener('change', (e) => {
-            if (e.target && e.target.name === 'metricChoice'){
-              renderChart();
-            }
-          });
-
-          let chartInstance;
-          function renderChart(){
-            const ctx = document.getElementById('compareChart').getContext('2d');
-            const selected = getSelected();
-            const metric = (document.querySelector('input[name="metricChoice"]:checked')||{value:'time'}).value;
-            const labels = selected.map(s => s.label);
-            const rawData = selected.map(s => s[metric]);
-            const data = metric === 'time' ? rawData.map(v => v / 1000) : rawData;
-
-            const dsLabel = metric === 'input' ? 'Input Tokens' : metric === 'output' ? 'Output Tokens' : metric === 'cache' ? 'Cache Tokens' : 'Time (s)';
-            const yAxisLabel = (metric === 'input' || metric === 'output' || metric === 'cache') ? 'Tokens' : 'Time (s)';
-
-            if (chartInstance){ chartInstance.destroy(); }
-            if (window.Chart){
-              chartInstance = new window.Chart(ctx, {
-                type: 'bar',
-                data: {
-                  labels,
-                  datasets: [{
-                    label: dsLabel,
-                    data,
-                    backgroundColor: labels.map((_, i) => 'hsl(' + ((i*137)%360) + ',70%,60%)')
-                  }]
-                },
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: true } },
-                  scales: { y: { beginAtZero: true, title: { display: true, text: yAxisLabel } } }
-                }
-              });
-            } else {
-              // Fallback: simple text
-              ctx.canvas.parentElement.innerHTML = '<div class="p-4">Chart library not available.</div>';
-            }
-          }
-
-          // Initialize button state
-          updateButton();
-        })();
-      </script>
     </div>
   </div>
 `
@@ -359,6 +257,7 @@ router.get('/project/:projectName', async (req, res) => {
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/issueGraph.js"></script>
         <script src="/js/reloadPage.js"></script>
+        <script src="/js/compareModal.js"></script>
       </head>
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
