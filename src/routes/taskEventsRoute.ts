@@ -13,6 +13,7 @@ import { ReloadButton } from '../components/reloadButton.js'
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { TaskCard } from '../components/taskCard.js'
+import { themeAttributeForHtml } from '../utils/themeCookie.js'
 
 const router = express.Router()
 
@@ -216,7 +217,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" ${themeAttributeForHtml(req.headers.cookie)}>
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">

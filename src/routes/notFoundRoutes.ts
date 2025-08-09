@@ -1,4 +1,5 @@
 import express from 'express';
+import { themeAttributeForHtml } from '../utils/themeCookie.js'
 
 const router = express.Router();
 
@@ -6,7 +7,7 @@ const router = express.Router();
 router.use((req, res, next) => {
   res.status(404).send(`
     <!DOCTYPE html>
-    <html lang="en" data-theme="light">
+    <html lang="en" ${themeAttributeForHtml(req.headers.cookie)}>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">

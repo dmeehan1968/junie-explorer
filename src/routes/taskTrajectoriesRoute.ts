@@ -8,6 +8,7 @@ import { expandIcon } from "../components/expandIcon.js"
 import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
+import { themeAttributeForHtml } from '../utils/themeCookie.js'
 import { TaskCard } from '../components/taskCard.js'
 import { JetBrains } from "../jetbrains.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
@@ -197,7 +198,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
     // Generate HTML
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" ${themeAttributeForHtml(req.headers.cookie)}>
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">

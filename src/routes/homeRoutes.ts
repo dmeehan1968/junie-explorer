@@ -5,6 +5,7 @@ import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { VersionBanner } from '../components/versionBanner.js'
 import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
+import { themeAttributeForHtml } from '../utils/themeCookie.js'
 
 const router = express.Router()
 
@@ -251,7 +252,7 @@ router.get('/', async (req, res) => {
     // Generate HTML
     const html: string = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" ${themeAttributeForHtml(req.headers.cookie)}>
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">

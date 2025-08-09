@@ -5,8 +5,16 @@
   // Timeout tracking for delayed preview
   let previewTimeout = null;
 
-  // Get the current theme from localStorage or default to 'auto'
+  // Get the current theme from cookie (preferred) or localStorage or default to 'auto'
   function getCurrentTheme() {
+    // Try cookie first
+    const cookie = document.cookie || '';
+    const match = cookie.split(';').map(p => p.trim()).find(p => p.startsWith('junie-explorer-theme='));
+    if (match) {
+      const val = decodeURIComponent(match.split('=')[1] || '').trim();
+      if (val) return val;
+    }
+    // Fallback to localStorage (legacy)
     return localStorage.getItem('junie-explorer-theme') || 'auto';
   }
 
@@ -23,15 +31,33 @@
     }
   }
 
-  // Set theme and save to localStorage
+  // Set theme and save to cookie (and localStorage for backward compatibility)
   function setTheme(theme) {
-    localStorage.setItem('junie-explorer-theme', theme);
+    try {
+      document.cookie = `junie-explorer-theme=${encodeURIComponent(theme)}; Max-Age=31536000; Path=/; SameSite=Lax`;
+    } catch (e) {
+      // ignore cookie errors
+    }
+    try {
+      localStorage.setItem('junie-explorer-theme', theme);
+    } catch (e) {
+      // ignore storage errors
+    }
     applyTheme(theme);
   }
 
   // Initialize theme on page load
   function initTheme() {
     const currentTheme = getCurrentTheme();
+    // Keep localStorage in sync with cookie if needed
+    try {
+      const ls = localStorage.getItem('junie-explorer-theme');
+      if (ls !== currentTheme) {
+        localStorage.setItem('junie-explorer-theme', currentTheme);
+      }
+    } catch (e) {
+      // ignore
+    }
     applyTheme(currentTheme);
     
     // Listen for system theme changes when in auto mode
