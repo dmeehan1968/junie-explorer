@@ -276,7 +276,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
               { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
               { label: issue?.name || '', testId: 'breadcrumb-issue-name' },
-              { label: `Task ${task.id} Events`, testId: 'breadcrumb-task-events' }
             ]
           })}
 
