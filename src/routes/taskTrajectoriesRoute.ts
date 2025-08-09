@@ -145,15 +145,16 @@ function ChatMessageDecorator(klass: string, index: number) {
 
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
 
-      return MessageDecorator({
-        klass,
-        index,
-        testIdPrefix: 'chat-multipart-toggle',
-        left: message.kind === 'User',
-        label: 'Multi-part Message',
-        content: message.parts.map(MultiPartMessage).join(''),
-      })
-
+      return message.parts.map(part => {
+        return MessageDecorator({
+          klass,
+          index,
+          testIdPrefix: 'chat-multipart-toggle',
+          left: message.kind === 'User',
+          label: part.type === 'image' ? 'Image' : 'Message',
+          content: MultiPartMessage(part),
+        })
+      }).join('')
     }
   }
 }
