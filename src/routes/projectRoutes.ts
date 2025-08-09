@@ -108,51 +108,37 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
               />
             </td>
             ` : ``}
-            <td class="text-left whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
-              <a href="${href}" class="font-bold text-primary hover:text-primary-focus">
+            <td class="text-left whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+              <span class="font-bold text-primary">
                 ${escapeHtml(issue.name)}
-              </a>
+              </span>
               <span class="text-neutral/50">${tasks.size > 1 ? `(${tasks.size})` : ''}</span>
             </td>
-            <td class="text-left whitespace-nowrap" data-testid="issue-timestamp">
-              <a href="${href}" class="block">
-                ${new Date(issue.created).toLocaleString(locale)}
-              </a>
+            <td class="text-left whitespace-nowrap" data-testid="issue-timestamp" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+              ${new Date(issue.created).toLocaleString(locale)}
             </td>
             ${hasMetrics 
               ? `
-                <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens">
-                  <a href="${href}" class="block">
-                    ${formatNumber((await issue.metrics).inputTokens)}
-                  </a>
+                <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+                  ${formatNumber((await issue.metrics).inputTokens)}
                 </td>
-                <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens">
-                  <a href="${href}" class="block">
-                    ${formatNumber((await issue.metrics).outputTokens)}
-                  </a>
+                <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+                  ${formatNumber((await issue.metrics).outputTokens)}
                 </td>
-                <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens">
-                  <a href="${href}" class="block">
-                    ${formatNumber((await issue.metrics).cacheTokens)}
-                  </a>
+                <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+                  ${formatNumber((await issue.metrics).cacheTokens)}
                 </td>
-                <td class="text-right whitespace-nowrap" data-testid="issue-cost">
-                  <a href="${href}" class="block">
-                    ${(await issue.metrics).cost.toFixed(4)}
-                  </a>
+                <td class="text-right whitespace-nowrap" data-testid="issue-cost" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+                  ${(await issue.metrics).cost.toFixed(4)}
                 </td>
               ` 
               : ``
             }
-            <td class="text-right whitespace-nowrap" data-testid="issue-total-time">
-              <a href="${href}" class="block">
-                ${formatSeconds((await issue.metrics).time / 1000)}
-              </a>
+            <td class="text-right whitespace-nowrap" data-testid="issue-total-time" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+              ${formatSeconds((await issue.metrics).time / 1000)}
             </td>
-            <td class="text-right whitespace-nowrap" data-testid="issue-status">
-              <a href="${href}" class="inline-block">
-                ${getStatusBadge(issue.state)}
-              </a>
+            <td class="text-right whitespace-nowrap" data-testid="issue-status" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
+              ${getStatusBadge(issue.state)}
             </td>
           </tr>
           `
