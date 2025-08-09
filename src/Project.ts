@@ -24,9 +24,14 @@ export class Project {
       const issues = new Map()
 
       for (const logPath of this._logPaths) {
-        const root = path.join(logPath, 'issues', 'chain-*.json')
+        const root = path.join(logPath, 'issues')
 
-        fs.globSync(root)
+        if (!fs.existsSync(root)) {
+          console.error(root, 'does not exist, ignoring')
+          continue
+        }
+
+        fs.globSync(path.join(root, 'chain-*.json'))
           .map(path => new Issue(path))
           .sort((a, b) => a.name.localeCompare(b.name))
           .forEach(issue => issues.set(issue.id, issue))

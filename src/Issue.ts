@@ -44,8 +44,7 @@ export class Issue {
       const taskPath = path.join(this.logPath, '..', path.parse(this.logPath).name)
 
       if (fs.existsSync(taskPath)) {
-        const root = path.join(taskPath, 'task-*.json')
-        fs.globSync(root)
+        fs.globSync(path.join(taskPath, 'task-*.json'))
           .map(path => new Task(path))
           .sort((a, b) => a.created.getTime() - b.created.getTime())
           .forEach(task => tasks.set(task.id, task))
