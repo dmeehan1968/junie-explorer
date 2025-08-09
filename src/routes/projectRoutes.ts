@@ -287,7 +287,7 @@ router.get('/project/:projectName', async (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${project.name} Issues</title>
+        <title>Junie Explorer: ${project.name} Issues</title>
         <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>

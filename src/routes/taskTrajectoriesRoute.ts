@@ -214,7 +214,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Junie Explorer: ${issueId} Task ${taskId} Trajectory - ${escapeHtml(issue.name)}</title>
+        <title>Junie Explorer: ${project.name} ${issue.name} ${task.id} Trajectories</title>
         <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
@@ -234,7 +234,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
-            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: Issue ${issueId} Task ${taskId} Trajectory</h1>
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${project.name}</h1>
             <div class="flex items-center gap-3">
               ${ThemeSwitcher()}
               ${ReloadButton()}
