@@ -19,6 +19,7 @@ export interface TaskCardProps {
   title?: string // defaults to Initial Request / Follow up N in routes that want it
   showLinks?: boolean // defaults to true
   showJsonToggle?: boolean // defaults to true
+  actionsHtml?: string // optional actions to render next to the created date
 }
 
 function generateStepTotalsTable(summaryData: SummaryMetrics): string {
@@ -43,7 +44,7 @@ function generateStepTotalsTable(summaryData: SummaryMetrics): string {
   </div>
 `}
 
-export function TaskCard({ projectName, issueId, taskIndex, task, metrics, locale, title, showLinks = true, showJsonToggle = true }: TaskCardProps): string {
+export function TaskCard({ projectName, issueId, taskIndex, task, metrics, locale, title, showLinks = true, showJsonToggle = true, actionsHtml }: TaskCardProps): string {
   const computedTitle = title ?? (Number(taskIndex) === 0 ? 'Initial Request' : `Follow up ${taskIndex}`)
   const created = new Date(task.created)
 
@@ -52,8 +53,9 @@ export function TaskCard({ projectName, issueId, taskIndex, task, metrics, local
     <div class="card-body">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold text-primary">${escapeHtml(computedTitle)}</h3>
-        <div class="text-sm text-base-content/70">
-          Created: ${created.toLocaleString(locale)}
+        <div class="flex items-center gap-2">
+          <div class="text-sm text-base-content/70">Created: ${created.toLocaleString(locale)}</div>
+          ${actionsHtml ? `<div class="ml-2">${actionsHtml}</div>` : ''}
         </div>
       </div>
       ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-base-300 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
