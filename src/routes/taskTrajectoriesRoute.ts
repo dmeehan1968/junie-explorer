@@ -233,7 +233,6 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
         {
           label: issue.name,
-          href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`,
           testId: 'breadcrumb-issue-name',
         },
         { label: `Issue ${issueId} Task ${taskId} Trajectory`, testId: 'breadcrumb-task-trajectories' },

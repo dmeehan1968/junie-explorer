@@ -88,8 +88,9 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           ${(await Promise.all(sortedIssues.map(async issue => {
             const tasks = await issue.tasks
             const hasTasks = tasks.size > 0
-            const issueBase = `/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}`
-            const href = hasTasks ? `${issueBase}/task/0/trajectories` : issueBase
+            const href = hasTasks
+              ? `/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/0/trajectories`
+              : `/project/${encodeURIComponent(project.name)}`
             return `
           <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
             ${hasMetrics ? `

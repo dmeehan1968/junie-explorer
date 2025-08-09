@@ -8,7 +8,6 @@ import { Issue } from "./Issue.js"
 import { JetBrains } from "./jetbrains.js"
 import { Project } from "./Project.js"
 import homeRoutes from "./routes/homeRoutes.js"
-import issueRoutes from "./routes/issueRoutes.js"
 import notFoundRoutes from "./routes/notFoundRoutes.js"
 import projectRoutes from "./routes/projectRoutes.js"
 import taskEventsRoute from "./routes/taskEventsRoute.js"
@@ -92,7 +91,6 @@ export async function createServer(options: ServerOptions = {}) {
   // Register routes
   app.use('/', homeRoutes)
   app.use('/', projectRoutes)
-  app.use('/', issueRoutes)
   app.use('/', taskEventsRoute)
   app.use('/', taskTrajectoriesRoute)
 

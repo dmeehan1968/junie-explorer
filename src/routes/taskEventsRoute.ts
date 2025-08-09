@@ -276,7 +276,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             items: [
               { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
               { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
-              { label: issue?.name || '', href: `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}`, testId: 'breadcrumb-issue-name' },
+              { label: issue?.name || '', testId: 'breadcrumb-issue-name' },
               { label: `Task ${task.id} Events`, testId: 'breadcrumb-task-events' }
             ]
           })}
@@ -495,6 +495,42 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
   } catch (error) {
     console.error('Error generating task events page:', error)
     res.status(500).send('An error occurred while generating the task events page')
+  }
+})
+
+// API endpoint to get task data for a specific issue (migrated from issueRoutes)
+router.get('/api/project/:projectName/issue/:issueId/task/:taskId', async (req, res) => {
+  const jetBrains = req.app.locals.jetBrains as JetBrains
+  try {
+    const { projectName, issueId, taskId } = req.params
+    const project = await jetBrains.getProjectByName(projectName)
+    const issue = await project?.getIssueById(issueId)
+    const task = await issue?.getTaskById(taskId)
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    res.json({
+      logPath: task.logPath,
+      id: task.id,
+      created: task.created,
+      context: task.context,
+      isDeclined: task.isDeclined,
+      plan: task.plan,
+      eventsFile: task.eventsFile,
+      events: await task.events,
+      trajectoriesFile: task.trajectoriesFile,
+      steps: task.steps,
+      metrics: await task.metrics,
+      previousTasksInfo: task.previousTasksInfo,
+      finalAgentState: task.finalAgentState,
+      sessionHistory: task.sessionHistory,
+      patch: task.patch,
+    })
+  } catch (error) {
+    console.error('Error fetching task data:', error)
+    res.status(500).json({ error: 'An error occurred while fetching task data' })
   }
 })
 
