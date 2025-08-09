@@ -206,6 +206,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
 
     // Check if there are action events for conditional rendering
     const hasActionEvents = events.some(e => e.event.type === 'AgentActionExecutionStarted')
+    const hasMetrics = (await project.metrics).metricCount > 0
 
     // Generate HTML
     const html = `
@@ -284,7 +285,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             </div>
           ` : ''}
 
-          <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="model-performance-section">
+          <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="model-performance-section" data-has-metrics="${hasMetrics}">
             <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-200 rounded-lg hover:bg-base-100 transition-colors duration-200" data-testid="llm-latency-header">
               <h3 class="text-xl font-bold text-primary m-0">Model Performance</h3>
               <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
@@ -297,10 +298,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                       <!-- Provider buttons will be populated by JavaScript -->
                     </div>
                     <div class="flex items-center gap-3 ml-auto">
-                      <div id="llm-latency-metric-toggle" class="join">
+                      <div id="llm-latency-metric-toggle" class="join" data-has-metrics="${hasMetrics}">
+                        ${hasMetrics ? `
                         <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
                         <button class="btn btn-sm join-item" data-metric="latency" aria-pressed="false">Latency</button>
                         <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/sec</button>
+                        ` : `
+                        <button class="btn btn-sm join-item btn-primary" data-metric="latency" aria-pressed="true">Latency</button>
+                        `}
                       </div>
                     </div>
                   </div>
