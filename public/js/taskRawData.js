@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', function() {
       if (container.classList.contains('hidden')) {
         container.classList.toggle('hidden')
 
+        // Toggle button style to outline when active
+        this.classList.add('btn-outline')
+        this.classList.remove('btn-primary')
+        this.classList.remove('btn-active')
+        this.textContent = 'Hide Raw JSON'
+
         // Initialize JSON viewer if not already done
         if (!container.getAttribute('data-initialized')) {
           const jsonRenderer = document.getElementById(`json-renderer-${taskId}`);
@@ -50,6 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       } else {
         container.classList.toggle('hidden')
+
+        // Restore button style when viewer is hidden
+        this.classList.remove('btn-outline')
+        this.classList.add('btn-primary')
+        this.textContent = 'Show Raw JSON'
       }
     });
   });

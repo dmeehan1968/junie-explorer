@@ -76,10 +76,12 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
           ${Array.from({ length: tasksCount }, (_, i) => {
             const isCurrent = Number(taskIndex) === i
             const href = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(i))}/${encodeURIComponent(currentTab ?? 'events')}`
-            const classes = `btn btn-sm join-item ${isCurrent ? 'btn-primary btn-active' : 'btn-outline'} w-full`
+            const inactiveClasses = `btn btn-sm join-item btn-outline w-full`
             const desc = tasksDescriptions && tasksDescriptions[i] ? tasksDescriptions[i] : undefined
             const label = desc ? firstNWords(desc, 5) : (i === 0 ? 'Initial' : `Follow ${i}`)
-            return `<a href="${href}" class="${classes}" aria-pressed="${isCurrent}" ${isCurrent ? 'aria-current="page"' : ''}>${escapeHtml(label)}</a>`
+            return isCurrent
+              ? `<span class="btn btn-sm join-item btn-primary btn-active w-full" aria-current="page" aria-pressed="true">${escapeHtml(label)}</span>`
+              : `<a href="${href}" class="${inactiveClasses}" aria-pressed="false">${escapeHtml(label)}</a>`
           }).join('')}
         </div>
       </div>
@@ -90,9 +92,11 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
       </div>
       ${showLinks ? `
       <div class="flex flex-wrap gap-2 mt-4">
-        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/trajectories" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="trajectories-button">Trajectories</a>
-        <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/events" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="events-button">Events</a>
-        ${showJsonToggle ? `<button class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" data-task="${encodeURIComponent(String(taskIndex))}" data-testid="json-button">Raw JSON</button>` : ''}
+        <div class="join flex-1 min-w-0" data-testid="task-tab-group">
+          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/trajectories" class="btn btn-sm join-item ${currentTab === 'trajectories' ? 'btn-primary btn-active' : 'btn-outline'} w-1/2" data-testid="trajectories-button">Trajectories</a>
+          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/events" class="btn btn-sm join-item ${(currentTab === 'events' || !currentTab) ? 'btn-primary btn-active' : 'btn-outline'} w-1/2" data-testid="events-button">Events</a>
+        </div>
+        ${showJsonToggle ? `<button class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" style="max-width:25%" data-task="${encodeURIComponent(String(taskIndex))}" data-testid="json-button">Show Raw JSON</button>` : ''}
       </div>` : ''}
       ${showJsonToggle ? `
       <div id="raw-data-${encodeURIComponent(String(taskIndex))}" class="mt-4 p-4 bg-base-300 rounded-lg font-mono border border-base-300 hidden" data-testid="json-viewer">
