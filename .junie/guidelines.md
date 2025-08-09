@@ -84,20 +84,12 @@ junie-explorer/
 │   │   ├── notFoundRoutes.ts # Not found page route handler
 │   │   ├── projectRoutes.ts # Project page route handler
 │   │   ├── taskEventsRoute.ts # Task events route handler
-│   │   ├── taskStepDataRoute.ts # Task step data route handler
-│   │   ├── taskStepRepresentationsRoute.ts # Task step representations route handler
-│   │   ├── taskStepsRoute.ts # Task steps route handler
 │   │   └── taskTrajectoriesRoute.ts # Task trajectories route handler
-│   ├── services/            # Service layer
-│   │   └── representationService.ts # Representation data service
 │   ├── utils/               # Utility functions
 │   │   ├── escapeHtml.ts    # HTML escaping utilities
 │   │   ├── getLocaleFromRequest.ts # Locale detection utilities
 │   │   ├── jetBrainsPath.ts # JetBrains path utilities
 │   │   ├── metricsUtils.ts  # Metrics calculation utilities
-│   │   ├── representationFileService.ts # Representation file handling
-│   │   ├── representationParser.ts # Representation data parsing
-│   │   ├── representationRenderer.ts # Representation rendering utilities
 │   │   ├── timeUtils.ts     # Time and date utilities
 │   │   └── versionBanner.ts # Version banner utilities
 │   ├── components/          # Reusable UI components
