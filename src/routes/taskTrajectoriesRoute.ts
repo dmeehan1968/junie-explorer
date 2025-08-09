@@ -102,7 +102,8 @@ function MultiPartMessage(part: ChatMessagePart) {
   if (part.type == 'text') {
     return escapeHtml(part.text)
   } else if (part.type == 'image') {
-    return `<img src="data:${escapeHtml(part.contentType)};base64,${escapeHtml(part.base64)}" alt="Thumbnail" class="max-w-64 max-h-64 rounded shadow" />`
+    const src = `data:${escapeHtml(part.contentType)};base64,${escapeHtml(part.base64)}`
+    return `<img src="${src}" data-fullsrc="${src}" alt="Image" class="chat-image-thumb max-w-64 max-h-64 rounded shadow cursor-zoom-in" />`
   }
   return ''
 }
@@ -227,6 +228,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         <script src="/js/taskLlmLatencyChart.js"></script>
         <script src="/js/trajectoryToggle.js"></script>
         <script src="/js/taskRawData.js"></script>
+        <script src="/js/imageModal.js"></script>
       </head>
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
@@ -352,6 +354,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
           }
         </div>
+        </div>
+        
+        <!-- Image Modal -->
+        <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+          <div class="relative w-[95vw] h-[95vh] max-w-6xl">
+            <button id="closeImageModal" class="absolute -top-3 -right-3 bg-base-100 text-base-content rounded-full w-10 h-10 flex items-center justify-center shadow" aria-label="Close image viewer">&times;</button>
+            <img id="imageModalImg" src="" alt="Full Image" class="w-full h-full object-contain rounded" />
+          </div>
         </div>
       </body>
       </html>
