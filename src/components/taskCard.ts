@@ -63,11 +63,11 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
       </div>
       ${typeof tasksCount === 'number' && tasksCount > 0 ? `
       <div class="mb-4" data-testid="task-switcher">
-        <div class="grid gap-2 w-full" style="grid-template-columns: repeat(${tasksCount}, minmax(0, 1fr));">
+        <div class="join w-full grid" style="grid-template-columns: repeat(${tasksCount}, minmax(0, 1fr));">
           ${Array.from({ length: tasksCount }, (_, i) => {
             const isCurrent = Number(taskIndex) === i
             const href = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(i))}/${encodeURIComponent(currentTab ?? 'events')}`
-            const classes = `btn btn-sm ${isCurrent ? 'btn-primary btn-active' : 'btn-outline'}`
+            const classes = `btn btn-sm join-item ${isCurrent ? 'btn-primary btn-active' : 'btn-outline'} w-full`
             const label = i === 0 ? 'Initial' : `Follow ${i}`
             return `<a href="${href}" class="${classes}" aria-pressed="${isCurrent}" ${isCurrent ? 'aria-current="page"' : ''}>${label}</a>`
           }).join('')}
