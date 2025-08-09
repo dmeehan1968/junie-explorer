@@ -16,12 +16,14 @@ export interface TaskCardProps {
   }
   locale: string | undefined
   // Optional presentation options
-  title?: string // defaults to Initial Request / Follow up N in routes that want it
+  title?: string // explicit title override if provided
+  issueTitle?: string // if provided, used as default title instead of generic labels
   showLinks?: boolean // defaults to true
   showJsonToggle?: boolean // defaults to true
   actionsHtml?: string // optional actions to render next to the created date
   // New optional props for task navigation buttons
   tasksCount?: number // total number of tasks in the issue
+  tasksDescriptions?: string[] // ordered list of task descriptions to label buttons
   currentTab?: 'events' | 'trajectories' // which per-task page to navigate to
 }
 
@@ -47,8 +49,15 @@ function generateStepTotalsTable(summaryData: SummaryMetrics): string {
   </div>
 `}
 
-export async function TaskCard({ projectName, issueId, taskIndex, task, locale, title, showLinks = true, showJsonToggle = true, actionsHtml, tasksCount, currentTab }: TaskCardProps): Promise<string> {
-  const computedTitle = title ?? (Number(taskIndex) === 0 ? 'Initial Request' : `Follow up ${taskIndex}`)
+function firstNWords(text: string, n: number): string {
+  if (!text) return ''
+  const words = text.trim().split(/\s+/)
+  const slice = words.slice(0, n).join(' ')
+  return words.length > n ? `${slice}…` : slice
+}
+
+export async function TaskCard({ projectName, issueId, taskIndex, task, locale, title, issueTitle, showLinks = true, showJsonToggle = true, actionsHtml, tasksCount, tasksDescriptions, currentTab }: TaskCardProps): Promise<string> {
+  const computedTitle = title ?? issueTitle ?? (Number(taskIndex) === 0 ? 'Initial Request' : `Follow up ${taskIndex}`)
   const created = new Date(task.created)
 
   return `
@@ -68,8 +77,9 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
             const isCurrent = Number(taskIndex) === i
             const href = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(i))}/${encodeURIComponent(currentTab ?? 'events')}`
             const classes = `btn btn-sm join-item ${isCurrent ? 'btn-primary btn-active' : 'btn-outline'} w-full`
-            const label = i === 0 ? 'Initial' : `Follow ${i}`
-            return `<a href="${href}" class="${classes}" aria-pressed="${isCurrent}" ${isCurrent ? 'aria-current="page"' : ''}>${label}</a>`
+            const desc = tasksDescriptions && tasksDescriptions[i] ? tasksDescriptions[i] : undefined
+            const label = desc ? firstNWords(desc, 5) : (i === 0 ? 'Initial' : `Follow ${i}`)
+            return `<a href="${href}" class="${classes}" aria-pressed="${isCurrent}" ${isCurrent ? 'aria-current="page"' : ''}>${escapeHtml(label)}</a>`
           }).join('')}
         </div>
       </div>

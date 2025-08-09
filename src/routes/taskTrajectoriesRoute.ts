@@ -253,8 +253,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               taskIndex: taskId,
               task,
               locale: getLocaleFromRequest(req),
+              issueTitle: issue.name,
               actionsHtml: `<a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class=\"btn btn-primary btn-sm\">Download Trajectories as JSONL</a>`,
               tasksCount: (await issue.tasks).size,
+              tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
               currentTab: 'trajectories',
             })}
           </div>

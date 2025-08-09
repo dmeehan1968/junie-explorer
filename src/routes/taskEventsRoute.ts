@@ -294,8 +294,10 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               taskIndex: taskId,
               task,
               locale: getLocaleFromRequest(req),
+              issueTitle: issue.name,
               actionsHtml: `<a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class=\"btn btn-primary btn-sm\">Download Events as JSONL</a>`,
               tasksCount: (await issue.tasks).size,
+              tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
               currentTab: 'events',
             })}
           </div>

@@ -79,7 +79,9 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
           taskIndex: index,
           task,
           locale: getLocaleFromRequest(req),
+          issueTitle: issue.name,
           tasksCount: tasks?.size ?? 0,
+          tasksDescriptions: [...(tasks?.values() ?? [])].map(t => t?.context?.description ?? ''),
           currentTab: 'events',
         })
       }))).join('')
