@@ -1,41 +1,15 @@
 import express from 'express'
-import { marked } from "marked"
 import { JetBrains } from "../jetbrains.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { getStatusBadge } from "../components/statusBadge.js"
-import { formatSeconds } from '../utils/timeUtils.js'
-import { SummaryMetrics } from "../schema.js"
 import { VersionBanner } from '../components/versionBanner.js'
 import { ReloadButton } from '../components/reloadButton.js'
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
+import { TaskCard } from '../components/taskCard.js'
 
 const router = express.Router()
-
-// Function to generate HTML for step totals table
-const generateStepTotalsTable = (summaryData: SummaryMetrics): string => {
-  return `
-  <div class="overflow-x-auto mb-4" data-testid="task-metrics">
-    <table class="table w-full bg-base-300">
-      <tbody>
-        <tr>
-          ${summaryData.metricCount > 0
-            ? `
-                <td class="text-sm text-center"><span class="font-semibold">Input Tokens:</span> ${summaryData.inputTokens}</td>
-                <td class="text-sm text-center"><span class="font-semibold">Output Tokens:</span> ${summaryData.outputTokens}</td>
-                <td class="text-sm text-center"><span class="font-semibold">Cache Tokens:</span> ${summaryData.cacheTokens}</td>
-                <td class="text-sm text-center"><span class="font-semibold">Cost:</span> ${summaryData.cost.toFixed(4)}</td>
-              `
-            : ``
-          }
-          <td class="text-sm text-center"><span class="font-semibold">Total Time:</span> ${formatSeconds(summaryData.time / 1000)}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-`
-}
 
 // Issue tasks page route
 router.get('/project/:projectName/issue/:issueId', async (req, res) => {
@@ -102,30 +76,14 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
         // Use aggregated metrics from task
         const stepTotals = await task.metrics
 
-        return `
-                    <div class="card bg-base-200 shadow-md border border-base-300 hover:shadow-lg transition-all duration-300" data-testid="task-item">
-                      <div class="card-body">
-                        <div class="flex justify-between items-center mb-4">
-                          <h3 class="text-xl font-bold text-primary">${index === 0 ? 'Initial Request' : `Follow up ${index}`}</h3>
-                          <div class="text-sm text-base-content/70">
-                            Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}
-                          </div>
-                        </div>
-                        ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-base-300 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
-                        <div data-testid="task-details">
-                          ${generateStepTotalsTable(stepTotals)}
-                        </div>
-                        <div class="flex flex-wrap gap-2 mt-4">
-                          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/events" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="events-button">Events</a>
-                          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${index}/trajectories" class="btn btn-primary btn-sm flex-1 min-w-0" data-testid="trajectories-button">Trajectories</a>
-                          <button class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" data-task="${index}" data-testid="json-button">Raw JSON</button>
-                        </div>
-                        <div id="raw-data-${index}" class="mt-4 p-4 bg-base-300 rounded-lg font-mono border border-base-300 hidden" data-testid="json-viewer">
-                          <div id="json-renderer-${index}" class="text-sm"></div>
-                        </div>
-                      </div>
-                    </div>
-                  `
+        return TaskCard({
+          projectName,
+          issueId,
+          taskIndex: index,
+          task,
+          metrics: stepTotals,
+          locale: getLocaleFromRequest(req),
+        })
       }))).join('')
       : '<div class="p-4 text-center text-base-content/70" data-testid="no-tasks-message">No tasks found for this issue</div>'
     }

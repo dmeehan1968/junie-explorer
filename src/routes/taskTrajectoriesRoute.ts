@@ -8,6 +8,7 @@ import { expandIcon } from "../components/expandIcon.js"
 import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
+import { TaskCard } from '../components/taskCard.js'
 import { JetBrains } from "../jetbrains.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
 import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
@@ -205,12 +206,16 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/reloadPage.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
         <script src="/js/taskLlmLatencyChart.js"></script>
         <script src="/js/trajectoryToggle.js"></script>
+        <script src="/js/taskRawData.js"></script>
       </head>
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
@@ -241,16 +246,16 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             `).join('')}
           </div>
 
-          <div class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
-            <div class="text-sm text-base-content/70" data-testid="task-date">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
-            <a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>
+          <div class="mb-5">
+            ${TaskCard({
+              projectName,
+              issueId,
+              taskIndex: taskId,
+              task,
+              metrics: await task.metrics,
+              locale: getLocaleFromRequest(req),
+            })}
           </div>
-          ${task.context.description ? `
-              <div class="bg-base-200 text-base-content p-4 mb-4 rounded-lg">
-                <h3 class="text-lg font-semibold mb-2 text-primary">Task Description</h3>
-                <div class="prose prose-sm max-w-none">${marked(escapeHtml(task.context.description))}</div>
-              </div>
-            ` : ''}
 
           ${hasActionEvents ? `
             <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="action-timeline-section">

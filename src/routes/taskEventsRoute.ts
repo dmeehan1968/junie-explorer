@@ -1,7 +1,6 @@
 import express from 'express'
 import fs from 'fs-extra'
 import path from 'node:path'
-import { marked } from 'marked'
 import { JetBrains } from "../jetbrains.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
 import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
@@ -13,6 +12,7 @@ import { VersionBanner } from '../components/versionBanner.js'
 import { ReloadButton } from '../components/reloadButton.js'
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
+import { TaskCard } from '../components/taskCard.js'
 
 const router = express.Router()
 
@@ -253,10 +253,14 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             </script>`
       : ''
     }
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"></script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/reloadPage.js"></script>
         <script src="/js/taskEventChart.js"></script>
         <script src="/js/taskEventLlmChart.js"></script>
+        <script src="/js/taskRawData.js"></script>
       </head>
       <body class="bg-base-200 p-5">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
@@ -283,19 +287,15 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
             `).join('')}
           </div>
 
-          <div class="mb-5 bg-base-100 rounded shadow-sm p-4">
-            <div class="flex justify-between items-center mb-4">
-              <div class="text-base-content">Created: ${new Date(task.created).toLocaleString(getLocaleFromRequest(req))}</div>
-              <div>
-                <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class="btn btn-primary btn-sm">Download Events as JSONL</a>
-              </div>
-            </div>
-            ${task.context.description ? `
-              <div class="mt-4 bg-base-300 p-4">
-                <h3 class="text-xl font-bold text-primary mb-2">Task Description</h3>
-                <div class="prose max-w-none">${marked(escapeHtml(task.context.description))}</div>
-              </div>
-            ` : ''}
+          <div class="mb-5">
+            ${TaskCard({
+              projectName,
+              issueId,
+              taskIndex: taskId,
+              task,
+              metrics: await task.metrics,
+              locale: getLocaleFromRequest(req),
+            })}
           </div>
 
           ${hasMetrics ? `
