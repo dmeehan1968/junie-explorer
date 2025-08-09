@@ -20,15 +20,15 @@ window._locale = {
   options: { weekStartsOn: 0 }
 };
 
-// LLM Request Latency Chart using Chart.js
-class LlmLatencyChart {
+// Model Performance Chart using Chart.js
+class ModelPerformanceChart {
   constructor(canvasId, apiUrl) {
     this.canvas = document.getElementById(canvasId);
     this.apiUrl = apiUrl;
     this.data = null;
     this.providers = [];
     this.visibleProviders = new Set();
-    this.metricMode = 'both'; // 'both' | 'latency' | 'tps'
+    this.metricMode = 'both'; // 'both' | 'model-time' | 'tps'
     this.selectedProvider = 'both'; // 'both' or provider name
     this.chart = null;
     
@@ -57,8 +57,8 @@ class LlmLatencyChart {
       this.setupMetricToggle();
       this.createChart();
     } catch (error) {
-      console.error('Error loading LLM latency data:', error);
-      this.showError('Failed to load LLM latency data');
+      console.error('Error loading Model Performance data:', error);
+      this.showError('Failed to load Model Performance data');
     }
   }
   
@@ -130,43 +130,43 @@ class LlmLatencyChart {
   }
   
   createChart() {
-    if (!this.data || !this.data.latencyData) {
-      this.showError('No latency data available');
+    if (!this.data || !this.data.performanceData) {
+      this.showError('No performance data available');
       return;
     }
 
     const ctx = this.canvas.getContext('2d');
     
-    // Prepare datasets for each provider - two datasets per provider (latency and tokens/s)
+    // Prepare datasets for each provider - two datasets per provider (model time and tokens/sec)
     const datasets = [];
     this.providers.forEach((provider, index) => {
       const color = this.colors[index % this.colors.length];
-      const providerData = this.data.latencyData
+      const providerData = this.data.performanceData
         .filter(item => item.provider === provider)
         .map(item => ({
           x: new Date(item.timestamp),
-          latencySeconds: (item.latency ?? 0) / 1000,
+          modelTimeSeconds: (item.modelTime ?? 0) / 1000,
           tokensPerSecond: item.tokensPerSecond ?? 0,
           provider: item.provider,
           model: item.model,
         }));
 
       datasets.push({
-        label: provider + ' • latency',
-        data: providerData.map(p => ({ x: p.x, y: p.latencySeconds, provider: p.provider, model: p.model })),
+        label: provider + ' • Model Time',
+        data: providerData.map(p => ({ x: p.x, y: p.modelTimeSeconds, provider: p.provider, model: p.model })),
         borderColor: color,
         backgroundColor: color + '20',
         fill: false,
         tension: 0.1,
         borderWidth: 2,
-        yAxisID: 'yLatency',
+        yAxisID: 'yModelTime',
         hidden: !this.visibleProviders.has(provider),
         _provider: provider,
-        _metric: 'latency'
+        _metric: 'model-time'
       });
 
       datasets.push({
-        label: provider + ' • tokens/s',
+        label: provider + ' • tokens/sec',
         data: providerData.map(p => ({ x: p.x, y: p.tokensPerSecond, provider: p.provider, model: p.model })),
         borderColor: color,
         borderDash: [6, 4],
@@ -220,17 +220,17 @@ class LlmLatencyChart {
               }
             }
           },
-          yLatency: {
+          yModelTime: {
             title: {
               display: true,
-              text: 'Latency (s)'
+              text: 'Model Time (secs)'
             },
             beginAtZero: true
           },
           yTokens: {
             title: {
               display: true,
-              text: 'Tokens / s'
+              text: 'Tokens/sec'
             },
             beginAtZero: true,
             position: 'right',
@@ -242,7 +242,7 @@ class LlmLatencyChart {
         plugins: {
           title: {
             display: true,
-            text: 'Model Latency and Tokens/s Over Time',
+            text: 'Model Time and Tokens/sec Over Time',
             font: {
               size: 16
             }
@@ -258,16 +258,16 @@ class LlmLatencyChart {
               },
               label: function(context) {
                 const dataPoint = context.raw;
-                const isLatency = context.dataset._metric === 'latency';
+                const isModelTime = context.dataset._metric === 'model-time';
                 const value = context.parsed.y;
                 const lines = [
                   `${context.dataset._provider}`,
                   `Model: ${dataPoint.model}`,
                 ];
-                if (isLatency) {
-                  lines.push(`Latency: ${value.toFixed(2)}s`);
+                if (isModelTime) {
+                  lines.push(`Model Time: ${value.toFixed(2)}s`);
                 } else {
-                  lines.push(`Tokens/s: ${value.toFixed(2)}`);
+                  lines.push(`Tokens/sec: ${value.toFixed(2)}`);
                 }
                 return lines;
               }
@@ -306,14 +306,14 @@ class LlmLatencyChart {
 
 // Initialize chart when section is expanded
 document.addEventListener('DOMContentLoaded', function() {
-  const llmLatencySection = document.querySelector('[data-testid="llm-latency-section"]');
-  if (!llmLatencySection) return;
+  const modelPerformanceSection = document.querySelector('[data-testid="model-performance-section"]');
+  if (!modelPerformanceSection) return;
   
-  const header = llmLatencySection.querySelector('.collapsible-header');
+  const header = modelPerformanceSection.querySelector('.collapsible-header');
   let chartInitialized = false;
   
   header.addEventListener('click', function() {
-    const content = llmLatencySection.querySelector('.collapsible-content');
+    const content = modelPerformanceSection.querySelector('.collapsible-content');
     const isExpanded = !content.classList.contains('hidden');
     
     if (isExpanded && !chartInitialized) {
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const apiUrl = `/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/llm-latency`;
         
-        new LlmLatencyChart('llm-latency-chart', apiUrl);
+        new ModelPerformanceChart('llm-latency-chart', apiUrl);
         chartInitialized = true;
       }, 100);
     }

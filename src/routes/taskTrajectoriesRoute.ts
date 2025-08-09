@@ -226,7 +226,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
         <script src="/js/reloadPage.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
-        <script src="/js/taskLlmLatencyChart.js"></script>
+        <script src="/js/taskModelPerformanceChart.js"></script>
         <script src="/js/trajectoryToggle.js"></script>
         <script src="/js/taskRawData.js"></script>
         <script src="/js/imageModal.js"></script>
@@ -257,17 +257,17 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
 
           <div class="mb-5">
             ${await TaskCard({
-              projectName,
-              issueId,
-              taskIndex: taskId,
-              task,
-              locale: getLocaleFromRequest(req),
-              issueTitle: issue.name,
-              actionsHtml: `<a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class=\"btn btn-primary btn-sm\">Download Trajectories as JSONL</a>`,
-              tasksCount: (await issue.tasks).size,
-              tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
-              currentTab: 'trajectories',
-            })}
+      projectName,
+      issueId,
+      taskIndex: taskId,
+      task,
+      locale: getLocaleFromRequest(req),
+      issueTitle: issue.name,
+      actionsHtml: `<a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class=\"btn btn-primary btn-sm\">Download Trajectories as JSONL</a>`,
+      tasksCount: (await issue.tasks).size,
+      tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
+      currentTab: 'trajectories',
+    })}
           </div>
 
           ${hasActionEvents ? `
@@ -284,9 +284,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             </div>
           ` : ''}
 
-          <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="llm-latency-section">
+          <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="model-performance-section">
             <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-200 rounded-lg hover:bg-base-100 transition-colors duration-200" data-testid="llm-latency-header">
-              <h3 class="text-xl font-bold text-primary m-0">Model Latency</h3>
+              <h3 class="text-xl font-bold text-primary m-0">Model Performance</h3>
               <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
             </div>
             <div class="collapsible-content p-4 hidden transition-all duration-300">
@@ -299,8 +299,8 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                     <div class="flex items-center gap-3 ml-auto">
                       <div id="llm-latency-metric-toggle" class="join">
                         <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
-                        <button class="btn btn-sm join-item" data-metric="latency" aria-pressed="false">Latency</button>
-                        <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/s</button>
+                        <button class="btn btn-sm join-item" data-metric="model-time" aria-pressed="false">Model Time</button>
+                        <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/sec</button>
                       </div>
                     </div>
                   </div>
@@ -316,40 +316,40 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
             <h3 class="text-xl font-bold text-primary mb-8">Message Trajectories</h3>
 
             ${events.length > 0 ?
-              events
-                .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
-                  return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
-                })
-                .map((record, index) => {
-                  const klass = 'p-4 mt-4 bg-base-content/10'
-                  const messages = [
-                    ...(index === 0 ? [
-                      MessageDecorator({
-                        klass,
-                        index: index + 10000,
-                        testIdPrefix: 'system-request-toggle',
-                        left: true,
-                        label: 'System Message',
-                        content: escapeHtml(record.event.chat.system),
-                      }),
-                      MessageDecorator({
-                        klass,
-                        index: index + 10001,
-                        testIdPrefix: 'user-tools-toggle',
-                        left: true,
-                        label: 'Tools',
-                        content: record.event.chat.tools.length 
-                          ? record.event.chat.tools.map(ToolDecorator()).join('')
-                          : 'No tools listed',
-                      }),
-                    ] : []),
-                    ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
-                  ].join('\n')
-                  return `<div class="font-mono text-xs">${messages}</div>`
-                })
-                .join('')
-              : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
-          }
+      events
+        .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
+          return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
+        })
+        .map((record, index) => {
+          const klass = 'p-4 mt-4 bg-base-content/10'
+          const messages = [
+            ...(index === 0 ? [
+              MessageDecorator({
+                klass,
+                index: index + 10000,
+                testIdPrefix: 'system-request-toggle',
+                left: true,
+                label: 'System Message',
+                content: escapeHtml(record.event.chat.system),
+              }),
+              MessageDecorator({
+                klass,
+                index: index + 10001,
+                testIdPrefix: 'user-tools-toggle',
+                left: true,
+                label: 'Tools',
+                content: record.event.chat.tools.length
+                  ? record.event.chat.tools.map(ToolDecorator()).join('')
+                  : 'No tools listed',
+              }),
+            ] : []),
+            ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
+          ].join('\n')
+          return `<div class="font-mono text-xs">${messages}</div>`
+        })
+        .join('')
+      : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
+    }
         </div>
         </div>
         
@@ -433,12 +433,12 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
     // Sort all events by timestamp first
     const sortedEvents = events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
 
-    // Build latency and token rate data from LLM response events
-    const latencyData: Array<{
+    // Build performance data from LLM response events
+    const performanceData: Array<{
       timestamp: string
       provider: string
       model: string
-      latency: number // milliseconds
+      modelTime: number // milliseconds
       outputTokens: number
       tokensPerSecond: number
     }> = []
@@ -449,15 +449,15 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
       if (currentEvent.event.type === 'LlmResponseEvent') {
         const provider = currentEvent.event.answer.llm.groupName
         const model = currentEvent.event.answer.llm.name
-        const latencyMs = currentEvent.event.answer.time ?? 0
+        const modelTime = currentEvent.event.answer.time ?? 0
         const outputTokens = currentEvent.event.answer.outputTokens ?? 0
-        const tokensPerSecond = latencyMs > 0 ? (outputTokens / (latencyMs / 1000)) : 0
+        const tokensPerSecond = modelTime > 0 ? (outputTokens / (modelTime / 1000)) : 0
 
-        latencyData.push({
+        performanceData.push({
           timestamp: currentEvent.timestamp.toISOString(),
           provider,
           model,
-          latency: latencyMs,
+          modelTime,
           outputTokens,
           tokensPerSecond,
         })
@@ -465,19 +465,19 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
     }
 
     // Group by provider
-    const providerGroups = latencyData.reduce((acc, item) => {
+    const providerGroups = performanceData.reduce((acc, item) => {
       if (!acc[item.provider]) {
         acc[item.provider] = []
       }
       acc[item.provider].push(item)
       return acc
-    }, {} as Record<string, typeof latencyData>)
+    }, {} as Record<string, typeof performanceData>)
 
     // Get unique providers
     const providers = Object.keys(providerGroups).sort()
 
     res.json({
-      latencyData,
+      performanceData,
       providerGroups,
       providers,
     })
