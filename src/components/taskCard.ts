@@ -93,8 +93,8 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
       ${showLinks ? `
       <div class="flex flex-wrap gap-2 mt-4">
         <div class="join flex-1 min-w-0" data-testid="task-tab-group">
-          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/trajectories" class="btn btn-sm join-item ${currentTab === 'trajectories' ? 'btn-primary btn-active' : 'btn-outline'} w-1/2" data-testid="trajectories-button">Trajectories</a>
-          <a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/events" class="btn btn-sm join-item ${(currentTab === 'events' || !currentTab) ? 'btn-primary btn-active' : 'btn-outline'} w-1/2" data-testid="events-button">Events</a>
+          <input class="btn btn-sm join-item w-1/2" name="view" type="radio" ${currentTab === 'trajectories' ? 'checked' : ''} aria-label="Trajectories" onclick="window.location.href = '/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/trajectories'">
+          <input class="btn btn-sm join-item w-1/2" name="view" type="radio" ${currentTab === 'events' || !currentTab ? 'checked' : ''} aria-label="Events" onclick="window.location.href = '/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/events'">
         </div>
         ${showJsonToggle ? `<button class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" style="max-width:25%" data-task="${encodeURIComponent(String(taskIndex))}" data-testid="json-button">Show Raw JSON</button>` : ''}
       </div>` : ''}
