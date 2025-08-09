@@ -85,7 +85,12 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           </tr>
         </thead>
         <tbody>
-          ${(await Promise.all(sortedIssues.map(async issue => `
+          ${(await Promise.all(sortedIssues.map(async issue => {
+            const tasks = await issue.tasks
+            const hasTasks = tasks.size > 0
+            const issueBase = `/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}`
+            const href = hasTasks ? `${issueBase}/task/0/trajectories` : issueBase
+            return `
           <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
             ${hasMetrics ? `
             <td class="text-center align-top py-3 px-2">
@@ -102,34 +107,34 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             </td>
             ` : ``}
             <td class="text-left font-bold whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
-              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block text-primary hover:text-primary-focus">
+              <a href="${href}" class="block text-primary hover:text-primary-focus">
                 ${escapeHtml(issue.name)}
               </a>
             </td>
             <td class="text-left whitespace-nowrap" data-testid="issue-timestamp">
-              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+              <a href="${href}" class="block">
                 ${new Date(issue.created).toLocaleString(locale)}
               </a>
             </td>
             ${hasMetrics 
               ? `
                 <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens">
-                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                  <a href="${href}" class="block">
                     ${formatNumber((await issue.metrics).inputTokens)}
                   </a>
                 </td>
                 <td class="text-right whitespace-nowrap" data-testid="issue-output-tokens">
-                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                  <a href="${href}" class="block">
                     ${formatNumber((await issue.metrics).outputTokens)}
                   </a>
                 </td>
                 <td class="text-right whitespace-nowrap" data-testid="issue-cache-tokens">
-                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                  <a href="${href}" class="block">
                     ${formatNumber((await issue.metrics).cacheTokens)}
                   </a>
                 </td>
                 <td class="text-right whitespace-nowrap" data-testid="issue-cost">
-                  <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+                  <a href="${href}" class="block">
                     ${(await issue.metrics).cost.toFixed(4)}
                   </a>
                 </td>
@@ -137,17 +142,18 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
               : ``
             }
             <td class="text-right whitespace-nowrap" data-testid="issue-total-time">
-              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="block">
+              <a href="${href}" class="block">
                 ${formatSeconds((await issue.metrics).time / 1000)}
               </a>
             </td>
             <td class="text-right whitespace-nowrap" data-testid="issue-status">
-              <a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}" class="inline-block">
+              <a href="${href}" class="inline-block">
                 ${getStatusBadge(issue.state)}
               </a>
             </td>
           </tr>
-          `))).join('')}
+          `
+          }))).join('')}
         </tbody>
         <tfoot>
           <tr class="!bg-base-200 font-bold text-base-content">
