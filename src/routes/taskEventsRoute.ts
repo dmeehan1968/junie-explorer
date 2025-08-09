@@ -288,12 +288,11 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
           </div>
 
           <div class="mb-5">
-            ${TaskCard({
+            ${await TaskCard({
               projectName,
               issueId,
               taskIndex: taskId,
               task,
-              metrics: await task.metrics,
               locale: getLocaleFromRequest(req),
               actionsHtml: `<a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class=\"btn btn-primary btn-sm\">Download Events as JSONL</a>`,
             })}

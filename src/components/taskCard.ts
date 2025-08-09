@@ -12,8 +12,8 @@ export interface TaskCardProps {
     id: string | number
     created: Date | string | number
     context: { description?: string }
+    metrics: Promise<SummaryMetrics>
   }
-  metrics: SummaryMetrics
   locale: string | undefined
   // Optional presentation options
   title?: string // defaults to Initial Request / Follow up N in routes that want it
@@ -44,7 +44,7 @@ function generateStepTotalsTable(summaryData: SummaryMetrics): string {
   </div>
 `}
 
-export function TaskCard({ projectName, issueId, taskIndex, task, metrics, locale, title, showLinks = true, showJsonToggle = true, actionsHtml }: TaskCardProps): string {
+export async function TaskCard({ projectName, issueId, taskIndex, task, locale, title, showLinks = true, showJsonToggle = true, actionsHtml }: TaskCardProps): Promise<string> {
   const computedTitle = title ?? (Number(taskIndex) === 0 ? 'Initial Request' : `Follow up ${taskIndex}`)
   const created = new Date(task.created)
 
@@ -60,7 +60,7 @@ export function TaskCard({ projectName, issueId, taskIndex, task, metrics, local
       </div>
       ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-base-300 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
       <div data-testid="task-details">
-        ${generateStepTotalsTable(metrics)}
+        ${generateStepTotalsTable(await task.metrics)}
       </div>
       ${showLinks ? `
       <div class="flex flex-wrap gap-2 mt-4">

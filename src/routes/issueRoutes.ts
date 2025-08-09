@@ -73,15 +73,11 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
           <div class="space-y-4" data-testid="tasks-list">
             ${tasks?.size ?? 0 > 0
       ? (await Promise.all([...tasks?.values() ?? []].map(async (task, index) => {
-        // Use aggregated metrics from task
-        const stepTotals = await task.metrics
-
-        return TaskCard({
+        return await TaskCard({
           projectName,
           issueId,
           taskIndex: index,
           task,
-          metrics: stepTotals,
           locale: getLocaleFromRequest(req),
         })
       }))).join('')
