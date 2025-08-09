@@ -214,18 +214,12 @@ function ProjectChartOptions() {
         <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()" class="checkbox checkbox-primary checkbox-sm">
         <label for="select-all-projects" class="font-medium cursor-pointer">Select All</label>
       </div>
-      <div class="flex gap-4">
-        <div class="flex items-center gap-2">
-          <input type="radio" id="display-both" name="display-option" value="both" checked onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
-          <label for="display-both" class="cursor-pointer">Both</label>
-        </div>
-        <div class="flex items-center gap-2">
-          <input type="radio" id="display-cost" name="display-option" value="cost" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
-          <label for="display-cost" class="cursor-pointer">Cost</label>
-        </div>
-        <div class="flex items-center gap-2">
-          <input type="radio" id="display-tokens" name="display-option" value="tokens" onchange="handleDisplayOptionChange(this)" class="radio radio-primary radio-sm">
-          <label for="display-tokens" class="cursor-pointer">Tokens</label>
+      <div class="flex gap-2 items-center">
+        <div class="">Show: </div>
+        <div class="join">
+          <input class="join-item btn btn-sm" type="radio" id="display-both" value="both" name="display-option" aria-label="Both" onchange="handleDisplayOptionChange(this)">      
+          <input class="join-item btn btn-sm" type="radio" id="display-cost" value="cost" name="display-option" aria-label="Cost" onchange="handleDisplayOptionChange(this)">      
+          <input class="join-item btn btn-sm" type="radio" id="display-tokens" value="tokens" name="display-option" aria-label="Tokens" onchange="handleDisplayOptionChange(this)">      
         </div>
       </div>
     </div>
