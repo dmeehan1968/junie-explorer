@@ -8,6 +8,7 @@ import { expandIcon } from "../components/expandIcon.js"
 import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
+import { ChatMessagePart } from "../schema/multiPartChatMessage.js"
 import { themeAttributeForHtml } from '../utils/themeCookie.js'
 import { TaskCard } from '../components/taskCard.js'
 import { JetBrains } from "../jetbrains.js"
@@ -97,6 +98,15 @@ function MessageDecorator(props: {
         </div>`
 }
 
+function MultiPartMessage(part: ChatMessagePart) {
+  if (part.type == 'text') {
+    return escapeHtml(part.text)
+  } else if (part.type == 'image') {
+    return `<img src="data:${escapeHtml(part.contentType)};base64,${escapeHtml(part.base64)}" alt="Thumbnail" class="max-w-64 max-h-64 rounded shadow" />`
+  }
+  return ''
+}
+
 function ChatMessageDecorator(klass: string, index: number) {
   return (message: MatterhornMessage) => {
     if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
@@ -140,7 +150,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         testIdPrefix: 'chat-multipart-toggle',
         left: message.kind === 'User',
         label: 'Multi-part Message',
-        content: escapeHtml(message.parts.map(part => part.contentType).join('')),
+        content: message.parts.map(MultiPartMessage).join(''),
       })
 
     }
