@@ -73,16 +73,16 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
       ${typeof tasksCount === 'number' && tasksCount > 0 ? `
       <div class="mb-4" data-testid="task-switcher">
         <div class="join w-full grid" style="grid-template-columns: repeat(${tasksCount}, minmax(0, 1fr));">
-          ${Array.from({ length: tasksCount }, (_, i) => {
-            const isCurrent = Number(taskIndex) === i
-            const href = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(i))}/${encodeURIComponent(currentTab ?? 'events')}`
-            const inactiveClasses = `btn btn-sm join-item btn-outline w-full`
-            const desc = tasksDescriptions && tasksDescriptions[i] ? tasksDescriptions[i] : undefined
-            const label = desc ? firstNWords(desc, 5) : (i === 0 ? 'Initial' : `Follow ${i}`)
-            return isCurrent
-              ? `<span class="btn btn-sm join-item btn-primary btn-active w-full" aria-current="page" aria-pressed="true">${escapeHtml(label)}</span>`
-              : `<a href="${href}" class="${inactiveClasses}" aria-pressed="false">${escapeHtml(label)}</a>`
-          }).join('')}
+          ${(() => {
+            const groupName = `task-switch-${encodeURIComponent(String(task.id))}`
+            return Array.from({ length: tasksCount }, (_, i) => {
+              const isCurrent = Number(taskIndex) === i
+              const href = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(i))}/${encodeURIComponent(currentTab ?? 'events')}`
+              const desc = tasksDescriptions && tasksDescriptions[i] ? tasksDescriptions[i] : undefined
+              const label = desc ? firstNWords(desc, 5) : (i === 0 ? 'Initial' : `Follow ${i}`)
+              return `<input class="btn btn-sm join-item w-full" name="${groupName}" type="radio" ${isCurrent ? 'checked' : ''} aria-label="${escapeHtml(label)}" title="${escapeHtml(desc ?? label)}" onclick="window.location.href = '${href}'">`
+            }).join('')
+          })()}
         </div>
       </div>
       ` : ''}
