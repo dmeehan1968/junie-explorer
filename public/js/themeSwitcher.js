@@ -14,8 +14,7 @@
       const val = decodeURIComponent(match.split('=')[1] || '').trim();
       if (val) return val;
     }
-    // Fallback to localStorage (legacy)
-    return localStorage.getItem('junie-explorer-theme') || 'auto';
+    return 'auto';
   }
 
   // Set theme on the html element
@@ -31,17 +30,12 @@
     }
   }
 
-  // Set theme and save to cookie (and localStorage for backward compatibility)
+  // Set theme and save to cookie
   function setTheme(theme) {
     try {
       document.cookie = `junie-explorer-theme=${encodeURIComponent(theme)}; Max-Age=31536000; Path=/; SameSite=Lax`;
     } catch (e) {
       // ignore cookie errors
-    }
-    try {
-      localStorage.setItem('junie-explorer-theme', theme);
-    } catch (e) {
-      // ignore storage errors
     }
     applyTheme(theme);
   }
@@ -49,15 +43,6 @@
   // Initialize theme on page load
   function initTheme() {
     const currentTheme = getCurrentTheme();
-    // Keep localStorage in sync with cookie if needed
-    try {
-      const ls = localStorage.getItem('junie-explorer-theme');
-      if (ls !== currentTheme) {
-        localStorage.setItem('junie-explorer-theme', currentTheme);
-      }
-    } catch (e) {
-      // ignore
-    }
     applyTheme(currentTheme);
     
     // Listen for system theme changes when in auto mode

@@ -2,8 +2,6 @@ import express from 'express'
 import fs from 'fs-extra'
 import path from 'node:path'
 import { JetBrains } from "../jetbrains.js"
-import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
-import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
