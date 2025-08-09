@@ -108,10 +108,11 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
               />
             </td>
             ` : ``}
-            <td class="text-left font-bold whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
-              <a href="${href}" class="block text-primary hover:text-primary-focus">
+            <td class="text-left whitespace-normal break-words w-2/5 align-top py-3 px-2" data-testid="issue-description">
+              <a href="${href}" class="font-bold text-primary hover:text-primary-focus">
                 ${escapeHtml(issue.name)}
               </a>
+              <span class="text-neutral/50">${tasks.size > 1 ? `(${tasks.size})` : ''}</span>
             </td>
             <td class="text-left whitespace-nowrap" data-testid="issue-timestamp">
               <a href="${href}" class="block">
