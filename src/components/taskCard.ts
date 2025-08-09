@@ -20,6 +20,9 @@ export interface TaskCardProps {
   showLinks?: boolean // defaults to true
   showJsonToggle?: boolean // defaults to true
   actionsHtml?: string // optional actions to render next to the created date
+  // New optional props for task navigation buttons
+  tasksCount?: number // total number of tasks in the issue
+  currentTab?: 'events' | 'trajectories' // which per-task page to navigate to
 }
 
 function generateStepTotalsTable(summaryData: SummaryMetrics): string {
@@ -44,7 +47,7 @@ function generateStepTotalsTable(summaryData: SummaryMetrics): string {
   </div>
 `}
 
-export async function TaskCard({ projectName, issueId, taskIndex, task, locale, title, showLinks = true, showJsonToggle = true, actionsHtml }: TaskCardProps): Promise<string> {
+export async function TaskCard({ projectName, issueId, taskIndex, task, locale, title, showLinks = true, showJsonToggle = true, actionsHtml, tasksCount, currentTab }: TaskCardProps): Promise<string> {
   const computedTitle = title ?? (Number(taskIndex) === 0 ? 'Initial Request' : `Follow up ${taskIndex}`)
   const created = new Date(task.created)
 
@@ -58,6 +61,19 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
           ${actionsHtml ? `<div class="ml-2">${actionsHtml}</div>` : ''}
         </div>
       </div>
+      ${typeof tasksCount === 'number' && tasksCount > 0 ? `
+      <div class="mb-4" data-testid="task-switcher">
+        <div class="grid gap-2 w-full" style="grid-template-columns: repeat(${tasksCount}, minmax(0, 1fr));">
+          ${Array.from({ length: tasksCount }, (_, i) => {
+            const isCurrent = Number(taskIndex) === i
+            const href = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(i))}/${encodeURIComponent(currentTab ?? 'events')}`
+            const classes = `btn btn-sm ${isCurrent ? 'btn-primary btn-active' : 'btn-outline'}`
+            const label = i === 0 ? 'Initial' : `Follow ${i}`
+            return `<a href="${href}" class="${classes}" aria-pressed="${isCurrent}" ${isCurrent ? 'aria-current="page"' : ''}>${label}</a>`
+          }).join('')}
+        </div>
+      </div>
+      ` : ''}
       ${task.context.description ? `<div class="prose prose-sm max-w-none mb-4 p-4 bg-base-300 rounded-lg" data-testid="task-description">${marked(escapeHtml(task.context.description))}</div>` : ''}
       <div data-testid="task-details">
         ${generateStepTotalsTable(await task.metrics)}

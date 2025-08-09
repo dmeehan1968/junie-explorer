@@ -79,6 +79,8 @@ router.get('/project/:projectName/issue/:issueId', async (req, res) => {
           taskIndex: index,
           task,
           locale: getLocaleFromRequest(req),
+          tasksCount: tasks?.size ?? 0,
+          currentTab: 'events',
         })
       }))).join('')
       : '<div class="p-4 text-center text-base-content/70" data-testid="no-tasks-message">No tasks found for this issue</div>'
