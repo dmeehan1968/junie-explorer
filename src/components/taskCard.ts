@@ -80,7 +80,7 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
               const href = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(i))}/${encodeURIComponent(currentTab ?? 'events')}`
               const desc = tasksDescriptions && tasksDescriptions[i] ? tasksDescriptions[i] : undefined
               const label = desc ? firstNWords(desc, 5) : (i === 0 ? 'Initial' : `Follow ${i}`)
-              return `<input class="btn btn-sm join-item w-full" name="${groupName}" type="radio" ${isCurrent ? 'checked' : ''} aria-label="${escapeHtml(label)}" title="${escapeHtml(desc ?? label)}" onclick="window.location.href = '${href}'">`
+              return `<input class="btn btn-sm join-item w-full p-2 h-auto min-h-0 whitespace-normal break-words" name="${groupName}" type="radio" ${isCurrent ? 'checked' : ''} aria-label="${escapeHtml(label)}" title="${escapeHtml(desc ?? label)}" onclick="window.location.href = '${href}'">`
             }).join('')
           })()}
         </div>
