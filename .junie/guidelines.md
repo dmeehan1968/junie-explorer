@@ -25,7 +25,7 @@ Replace the previously stated 'workflow' with the following:
 8. Use the `submit` command to provide the complete response back to the user.
 
 ## Project Overview
-Junie Explorer is a full-stack web application built with Node.js and TypeScript that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
+Junie Explorer is a full-stack web application built with Bun and TypeScript (Express.js) that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
 
 ## Directory Structure
 ```
@@ -53,30 +53,31 @@ junie-explorer/
 ├── package.json             # Project dependencies and scripts
 ├── public/                  # Static assets
 │   ├── css/                 # CSS stylesheets
-│   │   └── style.css        # Main stylesheet
+│   │   └── app.css          # Main stylesheet (build artefact; do not edit)
 │   ├── icons/               # Icon assets
 │   │   └── favicon.png      # Site favicon
 │   ├── js/                  # JavaScript files
-│   │   ├── collapsibleSections.js # Client-side script for collapsible sections
-│   │   ├── ideFilters.js    # Client-side script for IDE filtering
-│   │   ├── issueGraph.js    # Client-side script for issue graph visualization
-│   │   ├── projectSelection.js # Client-side script for project selection
-│   │   ├── reloadPage.js    # Client-side script for page reloading
-│   │   ├── taskActionChart.js # Client-side script for task action charts
-│   │   ├── taskEventChart.js # Client-side script for task event charts
-│   │   ├── taskEventFilters.js # Client-side script for task event filtering
-│   │   ├── taskEventLlmChart.js # Client-side script for task event LLM charts
-│   │   ├── taskRawData.js   # Client-side script for task raw data handling
-│   │   ├── taskStepGraph.js # Client-side script for task step graph visualization
-│   │   ├── taskStepRawData.js # Client-side script for task step raw data handling
-│   │   ├── taskStepRepData.js # Client-side script for task step representation data
-│   │   └── trajectoryToggle.js # Client-side script for trajectory toggling
-│   └── version.txt          # Version information file
+│   │   ├── collapsibleSections.js       # Collapsible sections UI
+│   │   ├── ideFilters.js                # IDE filtering
+│   │   ├── issueGraph.js                # Issue graph visualization
+│   │   ├── projectSelection.js          # Project selection UI
+│   │   ├── reloadPage.js                # Page reload helper
+│   │   ├── taskActionChart.js           # Task action charts
+│   │   ├── taskEventChart.js            # Task event charts
+│   │   ├── taskEventFilters.js          # Task event filtering
+│   │   ├── taskEventLlmChart.js         # Task event LLM charts
+│   │   ├── taskModelPerformanceChart.js # Task model performance chart
+│   │   ├── taskRawData.js               # Task raw data handling
+│   │   ├── trajectoryToggle.js          # Trajectory toggling
+│   │   ├── compareModal.js              # Compare modal UI
+│   │   ├── imageModal.js                # Image modal UI
+│   │   └── themeSwitcher.js             # Theme toggling
+│   └── version.txt          # Version information file (build artefact; do not edit)
 ├── reports/                 # Test and analysis reports
-│   └── cucumber-report.html # Cucumber test report
+│   └── cucumber-report.html # Generated test report (build artefact; do not edit)
 ├── src/                     # Source code
 │   ├── bun/                 # Bun-specific utilities
-│   │   └── public.ts        # Public asset handling for Bun
+│   │   └── public.ts        # Public asset handling for Bun (build artefact; do not edit)
 │   ├── routes/              # Route handlers
 │   │   ├── homeRoutes.ts    # Homepage route handler
 │   │   ├── issueRoutes.ts   # Issue page route handler
@@ -99,6 +100,15 @@ junie-explorer/
 │   │   ├── representationRenderer.ts # Representation rendering utilities
 │   │   ├── timeUtils.ts     # Time and date utilities
 │   │   └── versionBanner.ts # Version banner utilities
+│   ├── components/          # Reusable UI components
+│   │   ├── breadcrumb.ts    # Breadcrumb navigation component
+│   │   ├── collapseIcon.ts  # Collapse icon SVG component
+│   │   ├── expandIcon.ts    # Expand icon SVG component
+│   │   ├── reloadButton.ts  # Reload button component
+│   │   ├── statusBadge.ts   # Status badge component
+│   │   ├── taskCard.ts      # Task summary card component
+│   │   ├── themeSwitcher.ts # Theme switcher component
+│   │   └── versionBanner.ts # Version banner component
 │   ├── workers/             # Background workers
 │   │   └── loadEventsWorker.ts # Event loading worker
 │   ├── Issue.ts             # Issue class implementation
@@ -113,9 +123,10 @@ junie-explorer/
 │   ├── trajectorySchema.ts  # Trajectory data schemas
 │   └── types.ts             # Type definitions
 ├── tsconfig.json            # TypeScript configuration
-├── dist/                    # Compiled JavaScript (generated)
-└── node_modules/            # Dependencies (generated)
+├── dist/                    # Compiled JavaScript (build artefact; do not edit)
+└── node_modules/            # Dependencies (installed; do not edit)
 ```
+
 
 ## Tech Stack
 - **Runtime**: Bun (>=1.2.18) with Express.js web framework
@@ -126,6 +137,8 @@ junie-explorer/
   - TypeScript compiler for type checking
 - **Core Dependencies**:
   - express: Web server framework
+  - Tailwind CSS: Utility-first CSS framework
+  - DaisyUI: Tailwind CSS component library
   - fs-extra: Enhanced file system operations
   - zod: Runtime type validation and schema parsing
   - marked: Markdown parsing and rendering
