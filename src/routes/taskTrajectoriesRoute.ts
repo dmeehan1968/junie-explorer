@@ -299,7 +299,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
                     <div class="flex items-center gap-3 ml-auto">
                       <div id="llm-latency-metric-toggle" class="join">
                         <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
-                        <button class="btn btn-sm join-item" data-metric="model-time" aria-pressed="false">Model Time</button>
+                        <button class="btn btn-sm join-item" data-metric="latency" aria-pressed="false">Latency</button>
                         <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/sec</button>
                       </div>
                     </div>
@@ -438,7 +438,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
       timestamp: string
       provider: string
       model: string
-      modelTime: number // milliseconds
+      latency: number // milliseconds
       outputTokens: number
       tokensPerSecond: number
     }> = []
@@ -449,15 +449,15 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/l
       if (currentEvent.event.type === 'LlmResponseEvent') {
         const provider = currentEvent.event.answer.llm.groupName
         const model = currentEvent.event.answer.llm.name
-        const modelTime = currentEvent.event.answer.time ?? 0
+        const latency = currentEvent.event.answer.time ?? 0
         const outputTokens = currentEvent.event.answer.outputTokens ?? 0
-        const tokensPerSecond = modelTime > 0 ? (outputTokens / (modelTime / 1000)) : 0
+        const tokensPerSecond = latency > 0 ? (outputTokens / (latency / 1000)) : 0
 
         performanceData.push({
           timestamp: currentEvent.timestamp.toISOString(),
           provider,
           model,
-          modelTime,
+          latency,
           outputTokens,
           tokensPerSecond,
         })

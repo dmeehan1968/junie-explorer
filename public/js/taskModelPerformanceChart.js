@@ -28,7 +28,7 @@ class ModelPerformanceChart {
     this.data = null;
     this.providers = [];
     this.visibleProviders = new Set();
-    this.metricMode = 'both'; // 'both' | 'model-time' | 'tps'
+    this.metricMode = 'both'; // 'both' | 'latency' | 'tps'
     this.selectedProvider = 'both'; // 'both' or provider name
     this.chart = null;
     
@@ -137,7 +137,7 @@ class ModelPerformanceChart {
 
     const ctx = this.canvas.getContext('2d');
     
-    // Prepare datasets for each provider - two datasets per provider (model time and tokens/sec)
+    // Prepare datasets for each provider - two datasets per provider (latency and tokens/sec)
     const datasets = [];
     this.providers.forEach((provider, index) => {
       const color = this.colors[index % this.colors.length];
@@ -145,24 +145,24 @@ class ModelPerformanceChart {
         .filter(item => item.provider === provider)
         .map(item => ({
           x: new Date(item.timestamp),
-          modelTimeSeconds: (item.modelTime ?? 0) / 1000,
+          latencySeconds: (item.latency ?? 0) / 1000,
           tokensPerSecond: item.tokensPerSecond ?? 0,
           provider: item.provider,
           model: item.model,
         }));
 
       datasets.push({
-        label: provider + ' • Model Time',
-        data: providerData.map(p => ({ x: p.x, y: p.modelTimeSeconds, provider: p.provider, model: p.model })),
+        label: provider + ' • Latency',
+        data: providerData.map(p => ({ x: p.x, y: p.latencySeconds, provider: p.provider, model: p.model })),
         borderColor: color,
         backgroundColor: color + '20',
         fill: false,
         tension: 0.1,
         borderWidth: 2,
-        yAxisID: 'yModelTime',
+        yAxisID: 'yLatency',
         hidden: !this.visibleProviders.has(provider),
         _provider: provider,
-        _metric: 'model-time'
+        _metric: 'latency'
       });
 
       datasets.push({
@@ -220,10 +220,10 @@ class ModelPerformanceChart {
               }
             }
           },
-          yModelTime: {
+          yLatency: {
             title: {
               display: true,
-              text: 'Model Time (secs)'
+              text: 'Latency (secs)'
             },
             beginAtZero: true
           },
@@ -242,7 +242,7 @@ class ModelPerformanceChart {
         plugins: {
           title: {
             display: true,
-            text: 'Model Time and Tokens/sec Over Time',
+            text: 'Latency and Tokens/sec Over Time',
             font: {
               size: 16
             }
@@ -258,14 +258,14 @@ class ModelPerformanceChart {
               },
               label: function(context) {
                 const dataPoint = context.raw;
-                const isModelTime = context.dataset._metric === 'model-time';
+                const isLatency = context.dataset._metric === 'latency';
                 const value = context.parsed.y;
                 const lines = [
                   `${context.dataset._provider}`,
                   `Model: ${dataPoint.model}`,
                 ];
-                if (isModelTime) {
-                  lines.push(`Model Time: ${value.toFixed(2)}s`);
+                if (isLatency) {
+                  lines.push(`Latency: ${value.toFixed(2)}s`);
                 } else {
                   lines.push(`Tokens/sec: ${value.toFixed(2)}`);
                 }
