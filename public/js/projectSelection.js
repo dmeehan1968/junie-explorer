@@ -323,7 +323,11 @@ function applyNameSort() {
   // Update sort button indicator if present
   const btn = document.getElementById('sort-name-btn');
   if (btn) {
-    btn.textContent = sortOrder === 'asc' ? '↑' : '↓';
+    const ascSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="6" height="4" rx="1" fill="currentColor"/><rect x="3" y="10" width="10" height="4" rx="1" fill="currentColor"/><rect x="3" y="15" width="14" height="4" rx="1" fill="currentColor"/><rect x="20" y="10" width="2" height="8" rx="1" fill="currentColor"/><polygon points="21,5 23,10 19,10" fill="currentColor"/></svg>';
+    const descSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="14" height="4" rx="1" fill="currentColor"/><rect x="3" y="10" width="10" height="4" rx="1" fill="currentColor"/><rect x="3" y="15" width="6" height="4" rx="1" fill="currentColor"/><rect x="20" y="6" width="2" height="8" rx="1" fill="currentColor"/><polygon points="19,14 23,14 21,19" fill="currentColor"/></svg>';
+    btn.innerHTML = sortOrder === 'asc' ? ascSvg : descSvg;
+    btn.title = sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending';
+    btn.setAttribute('aria-label', btn.title);
   }
 }
 
