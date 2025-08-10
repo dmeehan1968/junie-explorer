@@ -126,4 +126,32 @@ function applyFilters(ideFilters, searchTerm = '') {
   }
 }
 
+// Toggle visibility of the search clear button
+function toggleSearchClearBtn() {
+  const input = document.getElementById('project-search-input');
+  const btn = document.getElementById('project-search-clear');
+  if (!input || !btn) return;
+  const hasText = (input.value || '').trim().length > 0;
+  if (hasText) {
+    btn.classList.remove('hidden');
+  } else {
+    btn.classList.add('hidden');
+  }
+}
+
+// Clear the project search input and reapply filters
+function clearProjectSearch() {
+  const input = document.getElementById('project-search-input');
+  if (!input) return;
+  input.value = '';
+  filterByProjectName('');
+  toggleSearchClearBtn();
+  input.focus();
+}
+
+// Initialize clear button state on load
+window.addEventListener('load', function() {
+  toggleSearchClearBtn();
+});
+
 

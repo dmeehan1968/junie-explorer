@@ -316,8 +316,13 @@ router.get('/', async (req, res) => {
                       <button class="btn btn-ghost btn-xs" id="sort-name-btn" onclick="toggleNameSort()" title="Toggle sort" aria-label="Toggle sort">
                         ${SortIcon('asc')}
                       </button>
-                      <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered input-sm w-64 ml-2">
-                    </div>
+                      <label class="input input-sm relative">
+                        <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value);toggleSearchClearBtn()" class="grow w-64 pr-8">
+                        <button id="project-search-clear" class="btn btn-ghost btn-xs absolute right-1 top-1/2 -translate-y-1/2 hidden" title="Clear search" aria-label="Clear search" onclick="clearProjectSearch()">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7A1 1 0 0 0 5.7 7.1L10.6 12l-4.9 4.9a1 1 0 1 0 1.4 1.4L12 13.4l4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z"/></svg>
+                        </button>
+                      </div>
+                    </label>
                   </th>
                   <th class="text-right whitespace-nowrap w-0">
                     <div class="flex items-center gap-2 justify-end">
