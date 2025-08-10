@@ -314,8 +314,8 @@ router.get('/', async (req, res) => {
                       <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered input-sm w-64 ml-2">
                     </div>
                   </th>
-                  <th class="text-right">Issues</th>
-                  <th class="text-right">IDEs</th>
+                  <th class="text-right whitespace-nowrap w-0">Issues</th>
+                  <th class="text-right whitespace-nowrap w-0">IDEs</th>
                 </tr>
               </thead>
               <tbody id="project-list" data-testid="projects-list">
@@ -325,16 +325,16 @@ router.get('/', async (req, res) => {
                       <td class="text-center">
                         ${hasMetrics ? `<input type=\"checkbox\" id=\"project-${encodeURIComponent(project.name)}\" class=\"project-checkbox checkbox checkbox-primary checkbox-sm\" data-project-name=\"${project.name}\" onchange=\"handleProjectSelection(this)\">` : ''}
                       </td>
-                      <td>
+                      <td class="w-full">
                         <a href="/project/${encodeURIComponent(project.name)}" class="project-name link link-primary font-bold" data-testid="project-link-${project.name}">
                           ${project.name}
                         </a>
                       </td>
-                      <td class="text-right">
+                      <td class="text-right whitespace-nowrap w-0">
                         <span class="text-sm text-base-content/70">${(await project.issues).size}</span>
                       </td>
-                      <td>
-                        <div class="flex gap-1" data-testid="ide-icons">
+                      <td class="text-right whitespace-nowrap w-0">
+                        <div class="flex gap-1 justify-end" data-testid="ide-icons">
                           ${project.ideNames.map(ide => `
                             <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
                           `).join('')}
