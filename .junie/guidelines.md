@@ -1,5 +1,7 @@
 # RESPONSE FORMAT
 
+If you are in read-only mode, ignore this section.
+
 In addition to the previously stated response format instructions, include the following:
 
 - Inside the `<UPDATE>` tag, add a sub-tag `<TOOL_CHOICE>`.
@@ -11,6 +13,8 @@ Provide the selected tool name and a short explanation of why the tool was prefe
 </TOOL_CHOICE>
 
 # WORKFLOW
+
+If you are in read-only mode, ignore this section.
 
 Replace the previously stated 'workflow' with the following:
 
