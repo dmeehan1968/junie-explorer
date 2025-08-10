@@ -7,6 +7,7 @@ import { VersionBanner } from '../components/versionBanner.js'
 import { ReloadButton } from '../components/reloadButton.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { themeAttributeForHtml } from '../utils/themeCookie.js'
+import { SortIcon } from '../components/sortIcon.js'
 
 const router = express.Router()
 
@@ -313,7 +314,7 @@ router.get('/', async (req, res) => {
                     <div class="flex items-center gap-2">
                       <span>Name</span>
                       <button class="btn btn-ghost btn-xs" id="sort-name-btn" onclick="toggleNameSort()" title="Toggle sort" aria-label="Toggle sort">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="6" height="4" rx="1" fill="currentColor"/><rect x="3" y="10" width="10" height="4" rx="1" fill="currentColor"/><rect x="3" y="15" width="14" height="4" rx="1" fill="currentColor"/><rect x="20" y="10" width="2" height="8" rx="1" fill="currentColor"/><polygon points="21,5 23,10 19,10" fill="currentColor"/></svg>
+                        ${SortIcon('asc')}
                       </button>
                       <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered input-sm w-64 ml-2">
                     </div>
@@ -322,7 +323,7 @@ router.get('/', async (req, res) => {
                     <div class="flex items-center gap-2 justify-end">
                       <span>Last Updated</span>
                       <button class="btn btn-ghost btn-xs" id="sort-updated-btn" onclick="toggleUpdatedSort()" title="Toggle sort" aria-label="Toggle sort">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 8l4 4H8l4-4z" fill="currentColor"/></svg>
+                        ${SortIcon('desc')}
                       </button>
                     </div>
                   </th>

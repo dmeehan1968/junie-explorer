@@ -364,8 +364,9 @@ function applyUpdatedSort() {
   // Update sort button indicators
   const updatedBtn = document.getElementById('sort-updated-btn');
   if (updatedBtn) {
-    const ascSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 16l-4-4h8l-4 4z" fill="currentColor"/></svg>';
-    const descSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 8l4 4H8l4-4z" fill="currentColor"/></svg>';
+    // Use the same icon style as the Name sort
+    const ascSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="6" height="4" rx="1" fill="currentColor"/><rect x="3" y="10" width="10" height="4" rx="1" fill="currentColor"/><rect x="3" y="15" width="14" height="4" rx="1" fill="currentColor"/><rect x="20" y="10" width="2" height="8" rx="1" fill="currentColor"/><polygon points="21,5 23,10 19,10" fill="currentColor"/></svg>';
+    const descSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="14" height="4" rx="1" fill="currentColor"/><rect x="3" y="10" width="10" height="4" rx="1" fill="currentColor"/><rect x="3" y="15" width="6" height="4" rx="1" fill="currentColor"/><rect x="20" y="6" width="2" height="8" rx="1" fill="currentColor"/><polygon points="19,14 23,14 21,19" fill="currentColor"/></svg>';
     updatedBtn.innerHTML = sortOrder === 'asc' ? ascSvg : descSvg;
     updatedBtn.title = sortOrder === 'asc' ? 'Oldest first' : 'Newest first';
     updatedBtn.setAttribute('aria-label', updatedBtn.title);
