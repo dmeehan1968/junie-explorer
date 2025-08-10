@@ -118,7 +118,7 @@ function ChatMessageDecorator(klass: string, index: number) {
         index,
         testIdPrefix: 'chat-message-toggle',
         left: message.kind === 'User',
-        label: 'Message',
+        label: message.kind === 'User' ? 'Message' : 'Model Response',
         content: escapeHtml(message.content),
       })
 
