@@ -405,8 +405,13 @@ function processEvents(events: EventRecord[] = []) {
           testIdPrefix: 'chat-user-toggle',
           left: true,
           label: 'Tool Result',
-          content: escapeHtml(record.event.result.text),    // TODO: handle images as well
+          content: escapeHtml(record.event.result.text),
         }))
+
+        if (record.event.result.images) {
+          // TODO: handle images as well (when we know what the shape is)
+          console.log('Unhandled tool result image', record.event.result.images)
+        }
 
       } else if (record.event.type === 'ActionRequestBuildingFailed') {
         messages.push(MessageDecorator({
