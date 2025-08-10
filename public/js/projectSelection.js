@@ -9,20 +9,17 @@ function initializeProjectSelection() {
   const storedDisplayOption = localStorage.getItem('junie-explorer-displayOption');
   const graphContainer = document.getElementById('projects-graph-container');
 
-  if (document.getElementById('project-chart-options') === null) {
-    // bail early if there are no radio buttons (no metrics)
-    return;
-  }
-
   // Initialize display option from local storage or default to 'both'
   if (storedDisplayOption) {
     displayOption = storedDisplayOption;
-    // Update radio buttons based on stored display option
-    document.querySelector(`input[name="display-option"][value="${displayOption}"]`).checked = true;
+    const radio = document.querySelector(`input[name="display-option"][value="${displayOption}"]`);
+    if (radio) radio.checked = true;
   }
 
-  // Set initial state of graph container
-  graphContainer.classList.add('hidden');
+  // Set initial state of graph container if present
+  if (graphContainer) {
+    graphContainer.classList.add('hidden');
+  }
 
   if (storedSelection) {
     selectedProjects = JSON.parse(storedSelection);
@@ -73,6 +70,7 @@ function handleProjectSelection(checkbox) {
 // Toggle select/deselect all projects
 function toggleSelectAllProjects() {
   const selectAllCheckbox = document.getElementById('select-all-projects');
+  if (!selectAllCheckbox) return;
   const isChecked = selectAllCheckbox.checked;
 
   // Update all project checkboxes
@@ -92,6 +90,7 @@ function toggleSelectAllProjects() {
 // Update the "Select All" checkbox based on individual selections
 function updateSelectAllCheckbox() {
   const selectAllCheckbox = document.getElementById('select-all-projects');
+  if (!selectAllCheckbox) return;
   const checkboxes = document.querySelectorAll('.project-checkbox');
   const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
 
@@ -122,6 +121,7 @@ function handleDisplayOptionChange(radio) {
 // Load and display the graph for selected projects
 async function loadProjectsGraph() {
   const graphContainer = document.getElementById('projects-graph-container');
+  if (!graphContainer) return;
   const selectedProjectNames = Object.keys(selectedProjects).filter(name => selectedProjects[name]);
 
   // Hide graph if no projects are selected
@@ -300,4 +300,36 @@ window.addEventListener('load', function() {
   if (typeof initializeFilters === 'function') {
     window.ideFilters = initializeFilters();
   }
+
+  // Apply name sort from localStorage
+  applyNameSort();
 });
+
+
+// Sorting by project name with persistence
+function applyNameSort() {
+  const tableBody = document.getElementById('project-list');
+  if (!tableBody) return;
+  const sortOrder = localStorage.getItem('junie-explorer-nameSort') || 'asc';
+  const rows = Array.from(tableBody.querySelectorAll('tr.project-row'));
+  rows.sort((a, b) => {
+    const nameA = (a.querySelector('.project-name')?.textContent || '').toLowerCase();
+    const nameB = (b.querySelector('.project-name')?.textContent || '').toLowerCase();
+    if (nameA < nameB) return sortOrder === 'asc' ? -1 : 1;
+    if (nameA > nameB) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(r => tableBody.appendChild(r));
+  // Update sort button indicator if present
+  const btn = document.getElementById('sort-name-btn');
+  if (btn) {
+    btn.textContent = sortOrder === 'asc' ? '↑' : '↓';
+  }
+}
+
+function toggleNameSort() {
+  const current = localStorage.getItem('junie-explorer-nameSort') || 'asc';
+  const next = current === 'asc' ? 'desc' : 'asc';
+  localStorage.setItem('junie-explorer-nameSort', next);
+  applyNameSort();
+}

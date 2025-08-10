@@ -72,12 +72,16 @@ function filterByProjectName(searchTerm) {
 
 // Apply filters to the project list
 function applyFilters(ideFilters, searchTerm = '') {
-  const projectItems = document.querySelectorAll('.project-item');
+  const projectList = document.getElementById('project-list');
+  const tableRows = projectList ? projectList.querySelectorAll('tr.project-row') : [];
+  const listItems = document.querySelectorAll('.project-item');
+  const items = (tableRows && tableRows.length > 0) ? tableRows : listItems;
   let visibleCount = 0;
 
-  projectItems.forEach(item => {
+  items.forEach(item => {
     const projectIdes = JSON.parse(item.getAttribute('data-ides') || '[]');
-    const projectName = item.querySelector('.project-name').textContent.toLowerCase();
+    const nameEl = item.querySelector('.project-name');
+    const projectName = (nameEl ? nameEl.textContent : '').toLowerCase();
 
     // Check if project matches both IDE filter and search term
     const matchesIdeFilter = projectIdes.some(ide => ideFilters[ide]);
@@ -93,26 +97,33 @@ function applyFilters(ideFilters, searchTerm = '') {
   });
 
   // Show or hide the "no matching projects" message
-  const projectList = document.getElementById('project-list');
+  const projectListEl = document.getElementById('project-list');
   let noMatchMessage = document.getElementById('no-match-message');
 
   if (visibleCount === 0) {
-    if (!noMatchMessage) {
-      noMatchMessage = document.createElement('li');
-      noMatchMessage.id = 'no-match-message';
-      noMatchMessage.setAttribute('data-testid', 'no-matching-projects');
-      noMatchMessage.textContent = 'No matching projects';
-      noMatchMessage.style.padding = '10px 15px';
-      projectList.appendChild(noMatchMessage);
+    if (!noMatchMessage && projectListEl) {
+      if (projectListEl.tagName.toLowerCase() === 'tbody') {
+        noMatchMessage = document.createElement('tr');
+        noMatchMessage.id = 'no-match-message';
+        const td = document.createElement('td');
+        td.colSpan = 4;
+        td.setAttribute('data-testid', 'no-matching-projects');
+        td.textContent = 'No matching projects';
+        td.style.padding = '10px 15px';
+        noMatchMessage.appendChild(td);
+      } else {
+        noMatchMessage = document.createElement('li');
+        noMatchMessage.id = 'no-match-message';
+        noMatchMessage.setAttribute('data-testid', 'no-matching-projects');
+        noMatchMessage.textContent = 'No matching projects';
+        noMatchMessage.style.padding = '10px 15px';
+      }
+      projectListEl.appendChild(noMatchMessage);
     }
-    noMatchMessage.style.display = '';
+    if (noMatchMessage) noMatchMessage.style.display = '';
   } else if (noMatchMessage) {
     noMatchMessage.style.display = 'none';
   }
 }
 
 
-// Initialize filters when the page loads
-window.onload = function() {
-  window.ideFilters = initializeFilters();
-};

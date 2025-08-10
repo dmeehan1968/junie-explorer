@@ -206,6 +206,7 @@ function ProjectMetricsChart() {
       <div class="card-body p-4">
         <div class="flex items-center justify-between mb-3">
           <h2 class="card-title">Project Metrics</h2>
+          ${ProjectMetricsChartOptions()}
         </div>
         <div id="projects-graph-container" class="h-96 p-2 bg-base-200 rounded-lg hidden">
           <canvas id="projectsMetricsChart"></canvas>
@@ -214,24 +215,19 @@ function ProjectMetricsChart() {
     </div>`
 }
 
-function ProjectChartOptions() {
+function ProjectMetricsChartOptions() {
   return `
-    <div id="project-chart-options" class="flex justify-between items-center mb-5 p-4 bg-base-200 rounded-lg">
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()" class="checkbox checkbox-primary checkbox-sm">
-        <label for="select-all-projects" class="font-medium cursor-pointer">Select All</label>
-      </div>
-      <div class="flex gap-2 items-center">
-        <div class="">Show: </div>
-        <div class="join">
-          <input class="join-item btn btn-sm" type="radio" id="display-both" value="both" name="display-option" aria-label="Both" onchange="handleDisplayOptionChange(this)">      
-          <input class="join-item btn btn-sm" type="radio" id="display-cost" value="cost" name="display-option" aria-label="Cost" onchange="handleDisplayOptionChange(this)">      
-          <input class="join-item btn btn-sm" type="radio" id="display-tokens" value="tokens" name="display-option" aria-label="Tokens" onchange="handleDisplayOptionChange(this)">      
-        </div>
+    <div class="flex gap-2 items-center" id="project-chart-display">
+      <div class="">Show: </div>
+      <div class="join">
+        <input class="join-item btn btn-sm" type="radio" id="display-both" value="both" name="display-option" aria-label="Both" onchange="handleDisplayOptionChange(this)">
+        <input class="join-item btn btn-sm" type="radio" id="display-cost" value="cost" name="display-option" aria-label="Cost" onchange="handleDisplayOptionChange(this)">
+        <input class="join-item btn btn-sm" type="radio" id="display-tokens" value="tokens" name="display-option" aria-label="Tokens" onchange="handleDisplayOptionChange(this)">
       </div>
     </div>
   `
 }
+
 // Homepage route (now shows projects instead of IDEs)
 router.get('/', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
@@ -300,44 +296,57 @@ router.get('/', async (req, res) => {
                 <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
               </div>
             `).join('')}
-            <div class="ml-auto">
-              <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered w-64">
-            </div>
           </div>
 
           ${hasMetrics ? ProjectMetricsChart() : ''}
-          ${hasMetrics ? ProjectChartOptions() : ''}
 
-          <ul class="space-y-3" id="project-list" data-testid="projects-list">
-            ${projects.length > 0
-              ? (await Promise.all(projects.map(async project => `
-                  <li class="project-item flex items-center p-4 bg-base-200 border-l-4 border-primary rounded transition-all duration-300 hover:bg-base-300 hover:translate-x-1" data-testid="project-item" data-ides='${JSON.stringify(project.ideNames)}'>
-                  ${hasMetrics 
-                    ? `<div class="mr-4">
-                        <input type="checkbox" id="project-${encodeURIComponent(project.name)}" 
-                             class="project-checkbox checkbox checkbox-primary checkbox-sm" 
-                             data-project-name="${project.name}" 
-                             onchange="handleProjectSelection(this)">
-                      </div>` 
-                    : ''
-                  }
-                    
-                    <a href="/project/${encodeURIComponent(project.name)}" class="flex-1 flex items-center justify-between text-decoration-none hover:text-primary transition-colors" data-testid="project-link-${project.name}">
-                      <div class="flex items-center justify-between flex-1">
-                        <div class="project-name font-bold text-lg text-primary" data-testid="project-name">${project.name}</div>
-                        <div class="text-sm text-base-content/70 mr-4">${(await project.issues).size} issues</div>
-                      </div>
-                      <div class="flex gap-1" data-testid="ide-icons">
-                        ${project.ideNames.map(ide => `
-                          <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
-                        `).join('')}
-                      </div>
-                    </a>
-                  </li>
-                `))).join('')
-              : '<li class="p-4 text-center text-base-content/70" data-testid="empty-projects-message">No JetBrains projects found</li>'
-    }
-          </ul>
+          <div class="overflow-x-auto">
+            <table class="table w-full" id="projects-table">
+              <thead>
+                <tr>
+                  <th class="w-12 text-center">
+                    ${hasMetrics ? `<input type=\"checkbox\" id=\"select-all-projects\" onchange=\"toggleSelectAllProjects()\" class=\"checkbox checkbox-primary checkbox-sm\" title=\"Select All\">` : ''}
+                  </th>
+                  <th>
+                    <div class="flex items-center gap-2">
+                      <span>Name</span>
+                      <button class="btn btn-ghost btn-xs" id="sort-name-btn" onclick="toggleNameSort()" title="Toggle sort">⇅</button>
+                      <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered input-sm w-64 ml-2">
+                    </div>
+                  </th>
+                  <th class="text-right">Issues</th>
+                  <th class="text-right">IDEs</th>
+                </tr>
+              </thead>
+              <tbody id="project-list" data-testid="projects-list">
+                ${projects.length > 0
+                  ? (await Promise.all(projects.map(async project => `
+                    <tr class="project-row" data-ides='${JSON.stringify(project.ideNames)}'>
+                      <td class="text-center">
+                        ${hasMetrics ? `<input type=\"checkbox\" id=\"project-${encodeURIComponent(project.name)}\" class=\"project-checkbox checkbox checkbox-primary checkbox-sm\" data-project-name=\"${project.name}\" onchange=\"handleProjectSelection(this)\">` : ''}
+                      </td>
+                      <td>
+                        <a href="/project/${encodeURIComponent(project.name)}" class="project-name link link-primary font-bold" data-testid="project-link-${project.name}">
+                          ${project.name}
+                        </a>
+                      </td>
+                      <td class="text-right">
+                        <span class="text-sm text-base-content/70">${(await project.issues).size}</span>
+                      </td>
+                      <td>
+                        <div class="flex gap-1" data-testid="ide-icons">
+                          ${project.ideNames.map(ide => `
+                            <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
+                          `).join('')}
+                        </div>
+                      </td>
+                    </tr>
+                  `))).join('')
+                  : '<tr><td colspan="4" class="p-4 text-center text-base-content/70" data-testid="empty-projects-message">No JetBrains projects found</td></tr>'
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
       </body>
       </html>
