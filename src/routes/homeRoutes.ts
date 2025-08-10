@@ -307,9 +307,11 @@ router.get('/', async (req, res) => {
             <table class="table w-full" id="projects-table">
               <thead>
                 <tr>
-                  <th class="w-12 text-center">
-                    ${hasMetrics ? `<input type=\"checkbox\" id=\"select-all-projects\" onchange=\"toggleSelectAllProjects()\" class=\"checkbox checkbox-primary checkbox-sm\" title=\"Select All\">` : ''}
-                  </th>
+                  ${hasMetrics ? `
+                    <th class="w-12 text-center">
+                      <input type=\"checkbox\" id=\"select-all-projects\" onchange=\"toggleSelectAllProjects()\" class=\"checkbox checkbox-primary checkbox-sm\" title=\"Select All\">
+                    </th>
+                  ` : ''}
                   <th>
                     <div class="flex items-center gap-2">
                       <span>Name</span>
@@ -340,9 +342,11 @@ router.get('/', async (req, res) => {
                 ${projects.length > 0
                   ? (await Promise.all(projects.map(async project => `
                     <tr class="project-row" data-ides='${JSON.stringify(project.ideNames)}'>
-                      <td class="text-center">
-                        ${hasMetrics ? `<input type=\"checkbox\" id=\"project-${encodeURIComponent(project.name)}\" class=\"project-checkbox checkbox checkbox-primary checkbox-sm\" data-project-name=\"${project.name}\" onchange=\"handleProjectSelection(this)\">` : ''}
-                      </td>
+                      ${hasMetrics ? `
+                        <td class="text-center">
+                          <input type=\"checkbox\" id=\"project-${encodeURIComponent(project.name)}\" class=\"project-checkbox checkbox checkbox-primary checkbox-sm\" data-project-name=\"${project.name}\" onchange=\"handleProjectSelection(this)\">
+                        </td>
+                      ` : ''}
                       <td class="w-full">
                         <a href="/project/${encodeURIComponent(project.name)}" class="project-name text-primary font-bold" data-testid="project-link-${project.name}">
                           ${project.name}
