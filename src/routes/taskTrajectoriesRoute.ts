@@ -408,7 +408,7 @@ function processEvents(events: EventRecord[] = []) {
           content: escapeHtml(record.event.result.text),
         }))
 
-        if (record.event.result.images) {
+        if (record.event.result.images && record.event.result.images.length) {
           // TODO: handle images as well (when we know what the shape is)
           console.log('Unhandled tool result image', record.event.result.images)
         }
