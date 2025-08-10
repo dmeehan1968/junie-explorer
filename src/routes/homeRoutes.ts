@@ -339,7 +339,7 @@ router.get('/', async (req, res) => {
                         ${hasMetrics ? `<input type=\"checkbox\" id=\"project-${encodeURIComponent(project.name)}\" class=\"project-checkbox checkbox checkbox-primary checkbox-sm\" data-project-name=\"${project.name}\" onchange=\"handleProjectSelection(this)\">` : ''}
                       </td>
                       <td class="w-full">
-                        <a href="/project/${encodeURIComponent(project.name)}" class="project-name font-bold" data-testid="project-link-${project.name}">
+                        <a href="/project/${encodeURIComponent(project.name)}" class="project-name text-primary font-bold" data-testid="project-link-${project.name}">
                           ${project.name}
                         </a>
                       </td>
