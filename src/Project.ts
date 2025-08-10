@@ -10,6 +10,7 @@ export class Project {
   private _metrics: Promise<SummaryMetrics> | undefined
   private _ideNames: Set<string> = new Set()
   private readonly logger: Logger
+  public lastUpdated?: Date
 
   constructor(public readonly name: string, logPath: string, ideName: string, logger?: Logger ) {
     this._logPaths.push(logPath)
@@ -21,7 +22,7 @@ export class Project {
   get issues(): Promise<Map<string, Issue>> {
     this._issues ??= new Promise(async (resolve) => {
 
-      const issues = new Map()
+      const issues = new Map<string, Issue>()
 
       for (const logPath of this._logPaths) {
         const root = path.join(logPath, 'issues')
@@ -37,9 +38,13 @@ export class Project {
           .forEach(issue => issues.set(issue.id, issue))
       }
 
-      return resolve(new Map([...issues.entries()].sort((a, b) =>
+      const sortedIssues = [...issues.entries()].sort((a, b) =>
         b[1].created.getTime() - a[1].created.getTime(),
-      )))
+      )
+
+      this.lastUpdated = sortedIssues[0]?.[1]?.created
+
+      return resolve(new Map(sortedIssues))
     })
 
     return this._issues
