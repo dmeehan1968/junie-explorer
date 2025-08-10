@@ -301,10 +301,19 @@ window.addEventListener('load', function() {
     window.ideFilters = initializeFilters();
   }
 
-  // Apply name sort from localStorage
-  applyNameSort();
+  // Apply current sort (field + direction) from localStorage
+  applySort();
 });
 
+// Apply current sort field
+function applySort() {
+  const field = localStorage.getItem('junie-explorer-sortField') || 'name';
+  if (field === 'updated') {
+    applyUpdatedSort();
+  } else {
+    applyNameSort();
+  }
+}
 
 // Sorting by project name with persistence
 function applyNameSort() {
@@ -320,20 +329,76 @@ function applyNameSort() {
     return 0;
   });
   rows.forEach(r => tableBody.appendChild(r));
-  // Update sort button indicator if present
-  const btn = document.getElementById('sort-name-btn');
-  if (btn) {
+  // Update sort button indicators
+  const nameBtn = document.getElementById('sort-name-btn');
+  if (nameBtn) {
     const ascSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="6" height="4" rx="1" fill="currentColor"/><rect x="3" y="10" width="10" height="4" rx="1" fill="currentColor"/><rect x="3" y="15" width="14" height="4" rx="1" fill="currentColor"/><rect x="20" y="10" width="2" height="8" rx="1" fill="currentColor"/><polygon points="21,5 23,10 19,10" fill="currentColor"/></svg>';
     const descSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="14" height="4" rx="1" fill="currentColor"/><rect x="3" y="10" width="10" height="4" rx="1" fill="currentColor"/><rect x="3" y="15" width="6" height="4" rx="1" fill="currentColor"/><rect x="20" y="6" width="2" height="8" rx="1" fill="currentColor"/><polygon points="19,14 23,14 21,19" fill="currentColor"/></svg>';
-    btn.innerHTML = sortOrder === 'asc' ? ascSvg : descSvg;
-    btn.title = sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending';
-    btn.setAttribute('aria-label', btn.title);
+    nameBtn.innerHTML = sortOrder === 'asc' ? ascSvg : descSvg;
+    nameBtn.title = sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending';
+    nameBtn.setAttribute('aria-label', nameBtn.title);
   }
+  const updatedBtn = document.getElementById('sort-updated-btn');
+  if (updatedBtn) {
+    // Dim the other sort button to indicate inactive field
+    updatedBtn.classList.add('opacity-50');
+  }
+  const field = 'name';
+  localStorage.setItem('junie-explorer-sortField', field);
+}
+
+// Sorting by last updated with persistence
+function applyUpdatedSort() {
+  const tableBody = document.getElementById('project-list');
+  if (!tableBody) return;
+  const sortOrder = localStorage.getItem('junie-explorer-updatedSort') || 'desc';
+  const rows = Array.from(tableBody.querySelectorAll('tr.project-row'));
+  rows.sort((a, b) => {
+    const aTs = Number((a.querySelector('[data-updated-ts]')?.getAttribute('data-updated-ts')) || '0');
+    const bTs = Number((b.querySelector('[data-updated-ts]')?.getAttribute('data-updated-ts')) || '0');
+    if (aTs < bTs) return sortOrder === 'asc' ? -1 : 1;
+    if (aTs > bTs) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(r => tableBody.appendChild(r));
+  // Update sort button indicators
+  const updatedBtn = document.getElementById('sort-updated-btn');
+  if (updatedBtn) {
+    const ascSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 16l-4-4h8l-4 4z" fill="currentColor"/></svg>';
+    const descSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 8l4 4H8l4-4z" fill="currentColor"/></svg>';
+    updatedBtn.innerHTML = sortOrder === 'asc' ? ascSvg : descSvg;
+    updatedBtn.title = sortOrder === 'asc' ? 'Oldest first' : 'Newest first';
+    updatedBtn.setAttribute('aria-label', updatedBtn.title);
+    updatedBtn.classList.remove('opacity-50');
+  }
+  const nameBtn = document.getElementById('sort-name-btn');
+  if (nameBtn) {
+    nameBtn.classList.add('opacity-50');
+  }
+  const field = 'updated';
+  localStorage.setItem('junie-explorer-sortField', field);
 }
 
 function toggleNameSort() {
-  const current = localStorage.getItem('junie-explorer-nameSort') || 'asc';
-  const next = current === 'asc' ? 'desc' : 'asc';
-  localStorage.setItem('junie-explorer-nameSort', next);
-  applyNameSort();
+  const currentField = localStorage.getItem('junie-explorer-sortField') || 'name';
+  if (currentField !== 'name') {
+    localStorage.setItem('junie-explorer-sortField', 'name');
+  } else {
+    const current = localStorage.getItem('junie-explorer-nameSort') || 'asc';
+    const next = current === 'asc' ? 'desc' : 'asc';
+    localStorage.setItem('junie-explorer-nameSort', next);
+  }
+  applySort();
+}
+
+function toggleUpdatedSort() {
+  const currentField = localStorage.getItem('junie-explorer-sortField') || 'name';
+  if (currentField !== 'updated') {
+    localStorage.setItem('junie-explorer-sortField', 'updated');
+  } else {
+    const current = localStorage.getItem('junie-explorer-updatedSort') || 'desc';
+    const next = current === 'asc' ? 'desc' : 'asc';
+    localStorage.setItem('junie-explorer-updatedSort', next);
+  }
+  applySort();
 }

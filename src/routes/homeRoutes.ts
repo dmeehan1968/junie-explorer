@@ -1,6 +1,7 @@
 import express from 'express'
 import { JetBrains } from "../jetbrains.js"
 import { Project } from '../Project.js'
+import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { jetBrainsPath } from '../utils/jetBrainsPath.js'
 import { VersionBanner } from '../components/versionBanner.js'
 import { ReloadButton } from '../components/reloadButton.js'
@@ -232,7 +233,8 @@ function ProjectMetricsChartOptions() {
 router.get('/', async (req, res) => {
   const jetBrains = req.app.locals.jetBrains as JetBrains
   const hasMetrics = (await jetBrains.metrics).metricCount > 0
-
+  const locale = getLocaleFromRequest(req)
+  
   try {
 
     const projects: Project[] = Array.from((await jetBrains.projects).values())
@@ -316,6 +318,14 @@ router.get('/', async (req, res) => {
                       <input type="text" id="project-search-input" data-testid="project-search" placeholder="Search projects..." oninput="filterByProjectName(this.value)" class="input input-bordered input-sm w-64 ml-2">
                     </div>
                   </th>
+                  <th class="text-right whitespace-nowrap w-0">
+                    <div class="flex items-center gap-2 justify-end">
+                      <span>Last Updated</span>
+                      <button class="btn btn-ghost btn-xs" id="sort-updated-btn" onclick="toggleUpdatedSort()" title="Toggle sort" aria-label="Toggle sort">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 8l4 4H8l4-4z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                  </th>
                   <th class="text-right whitespace-nowrap w-0">Issues</th>
                   <th class="text-right whitespace-nowrap w-0">IDEs</th>
                 </tr>
@@ -332,6 +342,9 @@ router.get('/', async (req, res) => {
                           ${project.name}
                         </a>
                       </td>
+                      <td class="text-right whitespace-nowrap w-0" data-updated-ts="${project.lastUpdated ? project.lastUpdated.getTime() : 0}">
+                        <span class="text-sm text-base-content/70">${project.lastUpdated ? project.lastUpdated.toLocaleString(locale) : '-'}</span>
+                      </td>
                       <td class="text-right whitespace-nowrap w-0">
                         <span class="text-sm text-base-content/70">${(await project.issues).size}</span>
                       </td>
@@ -344,7 +357,7 @@ router.get('/', async (req, res) => {
                       </td>
                     </tr>
                   `))).join('')
-                  : '<tr><td colspan="4" class="p-4 text-center text-base-content/70" data-testid="empty-projects-message">No JetBrains projects found</td></tr>'
+                  : '<tr><td colspan="5" class="p-4 text-center text-base-content/70" data-testid="empty-projects-message">No JetBrains projects found</td></tr>'
                 }
               </tbody>
             </table>
