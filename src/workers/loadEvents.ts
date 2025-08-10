@@ -4,7 +4,6 @@ import { UnknownEventRecord } from "../schema/unknownEventRecord.js"
 
 export async function loadEvents(eventsFile: string) {
   if (fs.existsSync(eventsFile)) {
-    let lastMessageCount = 0
     const content = fs.readFileSync(eventsFile, 'utf-8')
     const events = content
       .split('\n')
@@ -38,16 +37,6 @@ export async function loadEvents(eventsFile: string) {
       })
       .filter((event): event is EventRecord => !!event)
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-      .map((record, index) => {
-        // for request events for non-summarizer models, the messages contain history of all previous steps, so
-        // this removes the repetition
-        if (index && record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer) {
-          const count = record.event.chat.messages.length
-          record.event.chat.messages.splice(0, lastMessageCount)
-          lastMessageCount = count
-        }
-        return record
-      })
 
     return { events }
   }

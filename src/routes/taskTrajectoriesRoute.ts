@@ -1,25 +1,26 @@
 import express from 'express'
 import fs from 'fs-extra'
-import { marked } from "marked"
 import path from 'node:path'
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { collapseIcon } from "../components/collapseIcon.js"
 import { expandIcon } from "../components/expandIcon.js"
 import { ReloadButton } from '../components/reloadButton.js'
+import { TaskCard } from '../components/taskCard.js'
 import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
-import { ChatMessagePart } from "../schema/multiPartChatMessage.js"
-import { themeAttributeForHtml } from '../utils/themeCookie.js'
-import { TaskCard } from '../components/taskCard.js'
 import { JetBrains } from "../jetbrains.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
 import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
-import { ToolUse } from "../schema/assistantChatMessageWithToolUses.js"
+import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed.js"
+import { ToolUseAnswer } from "../schema/AIToolUseAnswerChoice.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
+import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
+import { ChatMessagePart } from "../schema/multiPartChatMessage.js"
 import { Tool } from "../schema/tools.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
+import { themeAttributeForHtml } from '../utils/themeCookie.js'
 import { ToggleComponent } from '../utils/toggleComponent.js'
 
 const router = express.Router()
@@ -41,7 +42,7 @@ function ToolDecorator() {
           <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">Description</div>
           <div class="flex-grow p-2 bg-base-content/10 rounded">${escapeHtml(tool.description?.trim() ?? '')}</div>            
         </div>
-        ${params ? '<div class="w-32 pr-2 text-base-content/50 italic text-right">Parameters</div>' : '' }
+        ${params ? '<div class="w-32 pr-2 text-base-content/50 italic text-right">Parameters</div>' : ''}
         ${params}
       </div>`
   }
@@ -71,10 +72,10 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
 }
 
 function ToolUseDecorator(klass: string, index: number) {
-  return (tool: ToolUse) => {
+  return (tool: ToolUseAnswer) => {
     return ToolCallDecorator(klass, index, 'tool-use-toggle', {
-      name: tool.name,
-      params: tool.input.rawJsonObject,
+      name: tool.toolName,
+      params: tool.toolParams.rawJsonObject,
       label: 'Tool Request',
     })
   }
@@ -121,28 +122,6 @@ function ChatMessageDecorator(klass: string, index: number) {
         content: escapeHtml(message.content),
       })
 
-    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
-
-      return MessageDecorator({
-        klass,
-        index,
-        testIdPrefix: 'chat-assistant-toggle',
-        left: message.kind === 'User',
-        label: 'Model Response',
-        content: escapeHtml(message.content),
-      }) + message.toolUses.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
-
-    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
-
-      return MessageDecorator({
-        klass,
-        index,
-        testIdPrefix: 'chat-user-toggle',
-        left: true,
-        label: 'Tool Result',
-        content: escapeHtml(message.toolResults.map(res => res.content).join('\n')),
-      })
-
     } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
 
       return message.parts.map(part => {
@@ -157,6 +136,9 @@ function ChatMessageDecorator(klass: string, index: number) {
       }).join('')
     }
   }
+  // we don't process these, as they are covered by the response and action events
+  // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
+  // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
 }
 
 // Task trajectories download route
@@ -257,18 +239,20 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
           </div>
 
           <div class="mb-5">
-            ${await TaskCard({
-      projectName,
-      issueId,
-      taskIndex: taskId,
-      task,
-      locale: getLocaleFromRequest(req),
-      issueTitle: issue.name,
-      actionsHtml: `<a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class=\"btn btn-primary btn-sm\">Download Trajectories as JSONL</a>`,
-      tasksCount: (await issue.tasks).size,
-      tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
-      currentTab: 'trajectories',
-    })}
+            ${
+              await TaskCard({
+                projectName,
+                issueId,
+                taskIndex: taskId,
+                task,
+                locale: getLocaleFromRequest(req),
+                issueTitle: issue.name,
+                actionsHtml: `<a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class=\"btn btn-primary btn-sm\">Download Trajectories as JSONL</a>`,
+                tasksCount: (await issue.tasks).size,
+                tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
+                currentTab: 'trajectories',
+              })
+            }
           </div>
 
           ${hasActionEvents ? `
@@ -320,41 +304,7 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
           <div class="bg-base-200 text-base-content rounded-lg p-4 border border-base-300">
             <h3 class="text-xl font-bold text-primary mb-8">Message Trajectories</h3>
 
-            ${events.length > 0 ?
-      events
-        .filter((record: EventRecord): record is { event: LlmRequestEvent, timestamp: Date } => {
-          return (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
-        })
-        .map((record, index) => {
-          const klass = 'p-4 mt-4 bg-base-content/10'
-          const messages = [
-            ...(index === 0 ? [
-              MessageDecorator({
-                klass,
-                index: index + 10000,
-                testIdPrefix: 'system-request-toggle',
-                left: true,
-                label: 'System Message',
-                content: escapeHtml(record.event.chat.system),
-              }),
-              MessageDecorator({
-                klass,
-                index: index + 10001,
-                testIdPrefix: 'user-tools-toggle',
-                left: true,
-                label: 'Tools',
-                content: record.event.chat.tools.length
-                  ? record.event.chat.tools.map(ToolDecorator()).join('')
-                  : 'No tools listed',
-              }),
-            ] : []),
-            ...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message)),
-          ].join('\n')
-          return `<div class="font-mono text-xs">${messages}</div>`
-        })
-        .join('')
-      : '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
-    }
+            ${processEvents(events)}
         </div>
         </div>
         
@@ -375,6 +325,107 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
     res.status(500).send('An error occurred while generating the task trajectories page')
   }
 })
+
+function processEvents(events: EventRecord[] = []) {
+  if (events.length === 0) {
+    return '<div class="p-4 text-center text-base-content/70" data-testid="no-events-message">No events found for this task</div>'
+  }
+
+  let didOutputInitialContext = false
+
+  return events
+    .filter((record: EventRecord): record is { event: LlmRequestEvent | LlmResponseEvent | ActionRequestBuildingFailed | AgentActionExecutionFinished, timestamp: Date } => {
+      return (
+        (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
+        || (record.event.type === 'LlmResponseEvent' && !record.event.answer.llm.isSummarizer)
+        || record.event.type === 'AgentActionExecutionFinished'
+        || record.event.type === 'ActionRequestBuildingFailed'
+      )
+    })
+    .map((record, index) => {
+      const klass = 'p-4 mt-4 bg-base-content/10'
+      const messages: string[] = []
+
+      if (record.event.type === 'LlmRequestEvent') {
+        if (!didOutputInitialContext) {
+          messages.push(
+            MessageDecorator({
+              klass,
+              index: index + 10000,
+              testIdPrefix: 'system-request-toggle',
+              left: true,
+              label: 'System Message',
+              content: escapeHtml(record.event.chat.system),
+            }),
+          )
+
+          messages.push(MessageDecorator({
+            klass,
+            index: index + 10001,
+            testIdPrefix: 'user-tools-toggle',
+            left: true,
+            label: 'Tools',
+            content: record.event.chat.tools.length
+              ? record.event.chat.tools.map(ToolDecorator()).join('')
+              : 'No tools listed',
+          }))
+
+          messages.push(...record.event.chat.messages.map((message, msgIndex) => ChatMessageDecorator(klass, index * 100 + msgIndex)(message) ?? ''))
+
+          didOutputInitialContext = true
+
+        }
+
+      } else if (record.event.type === 'LlmResponseEvent') {
+
+        messages.push(
+          ...record.event.answer.contentChoices.map(choice => {
+
+            const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
+              ? choice.usages.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
+              : ''
+
+            return MessageDecorator({
+              klass: klass + (!!choice.content ? '' : ' bg-warning text-warning-content'),
+              index,
+              testIdPrefix: 'chat-assistant-toggle',
+              left: false,
+              label: 'Model Response',
+              content: escapeHtml(choice.content || '<unexpectedly_empty>'),
+            }) + toolUses
+
+          }).join('')
+
+        )
+
+      } else if (record.event.type === 'AgentActionExecutionFinished') {
+        messages.push(MessageDecorator({
+          klass,
+          index: index + 10002,
+          testIdPrefix: 'chat-user-toggle',
+          left: true,
+          label: 'Tool Result',
+          content: escapeHtml(record.event.result.text),    // TODO: handle images as well
+        }))
+
+      } else if (record.event.type === 'ActionRequestBuildingFailed') {
+        messages.push(MessageDecorator({
+          klass: klass + ' bg-error text-error-content',
+          index: index + 10002,
+          testIdPrefix: 'chat-user-toggle',
+          left: true,
+          label: 'Tool Error',
+          content: escapeHtml(record.event.serializableThrowable?.message ?? 'Unspecified error'),
+        }))
+
+      }
+
+      return `<div class="font-mono text-xs">
+        ${messages.join('')}
+      </div>`
+    })
+    .join('')
+}
 
 // Task action timeline API endpoint
 router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/timeline', async (req, res) => {
@@ -406,7 +457,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/t
             inputParamValue: JSON.stringify(
               (typeof e.event.actionToExecute.inputParams === 'object' && 'rawJsonObject' in e.event.actionToExecute.inputParams)
                 ? e.event.actionToExecute.inputParams.rawJsonObject
-                : e.event.actionToExecute.inputParams
+                : e.event.actionToExecute.inputParams,
             ),
           }
           : {}),
