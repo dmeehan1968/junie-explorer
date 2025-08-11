@@ -1,11 +1,12 @@
 import express, { Express, NextFunction, Router } from "express"
 import { Server } from "http"
 import { JetBrains } from "../jetbrains.js"
-import homeRoutes, { homeRouteHandler } from "../app/web/homeRoutes.js"
+import homeRoutes from "../app/web/homeRoutes.js"
 import projectRoutes from "../routes/projectRoutes.js"
 import taskEventsRoute from "../routes/taskEventsRoute.js"
 import taskTrajectoriesRoute from "../routes/taskTrajectoriesRoute.js"
 import apiProjects from "./api/projects.js"
+import apiTrajectories from "./api/trajectories/index.js"
 import { entityLookupMiddleware } from "./middleware/entityLookupMiddleware.js"
 import { errorHandler } from "./middleware/errorHandler.js"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware.js"
@@ -37,6 +38,7 @@ export class JunieExplorer {
     this.app.use('/', taskTrajectoriesRoute)
 
     this.app.use('/', apiProjects)
+    this.app.use('/', apiTrajectories)
 
     // error handling
     this.app.use(notFoundRouteHandler)
