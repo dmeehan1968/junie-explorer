@@ -1,29 +1,25 @@
 import express from 'express'
-import fs from 'fs-extra'
-import path from 'node:path'
-import { entityLookupMiddleware } from "../app/middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../app/types.js"
-import { Breadcrumb } from '../components/breadcrumb.js'
-import { collapseIcon } from "../components/collapseIcon.js"
-import { expandIcon } from "../components/expandIcon.js"
-import { ReloadButton } from '../components/reloadButton.js'
-import { TaskCard } from '../components/taskCard.js'
-import { ThemeSwitcher } from '../components/themeSwitcher.js'
-import { VersionBanner } from '../components/versionBanner.js'
-import { JetBrains } from "../jetbrains.js"
-import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
-import { AgentActionExecutionStarted } from "../schema/agentActionExecutionStarted.js"
-import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed.js"
-import { ToolUseAnswer } from "../schema/AIToolUseAnswerChoice.js"
-import { EventRecord } from "../schema/eventRecord.js"
-import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
-import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
-import { ChatMessagePart } from "../schema/multiPartChatMessage.js"
-import { Tool } from "../schema/tools.js"
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { themeAttributeForHtml } from '../utils/themeCookie.js'
-import { ToggleComponent } from '../utils/toggleComponent.js'
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../types.js"
+import { Breadcrumb } from '../../components/breadcrumb.js'
+import { collapseIcon } from "../../components/collapseIcon.js"
+import { expandIcon } from "../../components/expandIcon.js"
+import { ReloadButton } from '../../components/reloadButton.js'
+import { TaskCard } from '../../components/taskCard.js'
+import { ThemeSwitcher } from '../../components/themeSwitcher.js'
+import { VersionBanner } from '../../components/versionBanner.js'
+import { AgentActionExecutionFinished } from "../../schema/agentActionExecutionFinished.js"
+import { ActionRequestBuildingFailed } from "../../schema/actionRequestBuildingFailed.js"
+import { ToolUseAnswer } from "../../schema/AIToolUseAnswerChoice.js"
+import { EventRecord } from "../../schema/eventRecord.js"
+import { LlmRequestEvent, MatterhornMessage } from "../../schema/llmRequestEvent.js"
+import { LlmResponseEvent } from "../../schema/llmResponseEvent.js"
+import { ChatMessagePart } from "../../schema/multiPartChatMessage.js"
+import { Tool } from "../../schema/tools.js"
+import { escapeHtml } from "../../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
+import { themeAttributeForHtml } from '../../utils/themeCookie.js'
+import { ToggleComponent } from '../../utils/toggleComponent.js'
 
 const router = express.Router({ mergeParams: true })
 

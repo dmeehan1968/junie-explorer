@@ -1,18 +1,17 @@
 import express from 'express'
-import { entityLookupMiddleware } from "../app/middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../app/types.js"
-import { Issue } from "../Issue.js"
-import { JetBrains } from "../jetbrains.js"
-import { Project } from "../Project.js"
-import { Breadcrumb } from '../components/breadcrumb.js'
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { ReloadButton } from '../components/reloadButton.js'
-import { getStatusBadge } from "../components/statusBadge.js"
-import { formatElapsedTime, formatNumber, formatSeconds } from '../utils/timeUtils.js'
-import { ThemeSwitcher } from '../components/themeSwitcher.js'
-import { VersionBanner } from '../components/versionBanner.js'
-import { themeAttributeForHtml } from '../utils/themeCookie.js'
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../types.js"
+import { Issue } from "../../Issue.js"
+import { Project } from "../../Project.js"
+import { Breadcrumb } from '../../components/breadcrumb.js'
+import { escapeHtml } from "../../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
+import { ReloadButton } from '../../components/reloadButton.js'
+import { getStatusBadge } from "../../components/statusBadge.js"
+import { formatElapsedTime, formatNumber, formatSeconds } from '../../utils/timeUtils.js'
+import { ThemeSwitcher } from '../../components/themeSwitcher.js'
+import { VersionBanner } from '../../components/versionBanner.js'
+import { themeAttributeForHtml } from '../../utils/themeCookie.js'
 
 const router = express.Router({ mergeParams: true })
 

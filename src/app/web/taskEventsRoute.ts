@@ -1,19 +1,16 @@
 import express from 'express'
-import fs from 'fs-extra'
-import path from 'node:path'
-import { entityLookupMiddleware } from "../app/middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../app/types.js"
-import { JetBrains } from "../jetbrains.js"
-import { EventRecord } from "../schema/eventRecord.js"
-import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { VersionBanner } from '../components/versionBanner.js'
-import { ReloadButton } from '../components/reloadButton.js'
-import { Breadcrumb } from '../components/breadcrumb.js'
-import { ThemeSwitcher } from '../components/themeSwitcher.js'
-import { TaskCard } from '../components/taskCard.js'
-import { themeAttributeForHtml } from '../utils/themeCookie.js'
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../types.js"
+import { EventRecord } from "../../schema/eventRecord.js"
+import { LlmResponseEvent } from "../../schema/llmResponseEvent.js"
+import { escapeHtml } from "../../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
+import { VersionBanner } from '../../components/versionBanner.js'
+import { ReloadButton } from '../../components/reloadButton.js'
+import { Breadcrumb } from '../../components/breadcrumb.js'
+import { ThemeSwitcher } from '../../components/themeSwitcher.js'
+import { TaskCard } from '../../components/taskCard.js'
+import { themeAttributeForHtml } from '../../utils/themeCookie.js'
 
 const router = express.Router({ mergeParams: true })
 
