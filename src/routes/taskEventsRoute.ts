@@ -135,56 +135,6 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 }
 
-// Task event timeline API endpoint
-router.get('/api/project/:projectId/issue/:issueId/task/:taskId/events/timeline', async (req: AppRequest, res: AppResponse) => {
-  try {
-    const { task } = req
-
-    // Get events for the task
-    const events = task ? await task.events : []
-
-    // Map events for Event Timeline
-    const timelineEvents = events.map(e => ({
-      timestamp: e.timestamp.toISOString(),
-      event: { type: e.event.type },
-    }))
-
-    res.json(timelineEvents)
-  } catch (error) {
-    console.error('Error fetching timeline events:', error)
-    res.status(500).json({ error: 'An error occurred while fetching timeline events' })
-  }
-})
-
-
-// Task events download route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
-  try {
-    const { projectName, issueId, taskId } = req.params
-    const project = await jetBrains.getProjectByName(projectName)
-    const issue = await project?.getIssueById(issueId)
-    const task = await issue?.getTaskById(taskId)
-
-    if (!project || !issue || !task) {
-      return res.status(404).send('Task not found')
-    }
-
-    if (!fs.existsSync(task.eventsFile)) {
-      return res.status(404).send('Events file not found')
-    }
-
-    const filename = path.basename(task.eventsFile)
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
-    res.setHeader('Content-Type', 'application/jsonl')
-    
-    res.sendFile(path.resolve(task.eventsFile))
-  } catch (error) {
-    console.error('Error downloading events file:', error)
-    res.status(500).send('An error occurred while downloading the events file')
-  }
-})
-
 // Task events page route
 router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req: AppRequest, res: AppResponse) => {
   try {
@@ -285,7 +235,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
               task,
               locale: getLocaleFromRequest(req),
               issueTitle: issue.name,
-              actionsHtml: `<a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/${encodeURIComponent(task.index)}/events/download" class=\"btn btn-primary btn-sm\">Download Events as JSONL</a>`,
+              actionsHtml: `<a href="/api/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/${encodeURIComponent(task.index)}/events/download" class=\"btn btn-primary btn-sm\">Download Events as JSONL</a>`,
               tasksCount: (await issue.tasks).size,
               tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
               currentTab: 'events',
@@ -485,42 +435,6 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
   } catch (error) {
     console.error('Error generating task events page:', error)
     res.status(500).send('An error occurred while generating the task events page')
-  }
-})
-
-// API endpoint to get task data for a specific issue (migrated from issueRoutes)
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
-  try {
-    const { projectName, issueId, taskId } = req.params
-    const project = await jetBrains.getProjectByName(projectName)
-    const issue = await project?.getIssueById(issueId)
-    const task = await issue?.getTaskById(taskId)
-
-    if (!task) {
-      return res.status(404).json({ error: 'Task not found' })
-    }
-
-    res.json({
-      logPath: task.logPath,
-      id: task.id,
-      created: task.created,
-      context: task.context,
-      isDeclined: task.isDeclined,
-      plan: task.plan,
-      eventsFile: task.eventsFile,
-      events: await task.events,
-      trajectoriesFile: task.trajectoriesFile,
-      steps: task.steps,
-      metrics: await task.metrics,
-      previousTasksInfo: task.previousTasksInfo,
-      finalAgentState: task.finalAgentState,
-      sessionHistory: task.sessionHistory,
-      patch: task.patch,
-    })
-  } catch (error) {
-    console.error('Error fetching task data:', error)
-    res.status(500).json({ error: 'An error occurred while fetching task data' })
   }
 })
 

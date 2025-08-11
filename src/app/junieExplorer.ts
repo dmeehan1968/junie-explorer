@@ -7,7 +7,7 @@ import taskEventsRoute from "../routes/taskEventsRoute.js"
 import taskTrajectoriesRoute from "../routes/taskTrajectoriesRoute.js"
 import apiProjects from "./api/projects.js"
 import apiTrajectories from "./api/trajectories/index.js"
-import { entityLookupMiddleware } from "./middleware/entityLookupMiddleware.js"
+import apiEvents from "./api/events/index.js"
 import { errorHandler } from "./middleware/errorHandler.js"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware.js"
 import { AppRequest, AppResponse } from "./types.js"
@@ -39,6 +39,7 @@ export class JunieExplorer {
 
     this.app.use('/', apiProjects)
     this.app.use('/', apiTrajectories)
+    this.app.use('/', apiEvents)
 
     // error handling
     this.app.use(notFoundRouteHandler)
