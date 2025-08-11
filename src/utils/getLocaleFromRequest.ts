@@ -1,5 +1,6 @@
 import express from "express"
+import { AppRequest } from "../app/types.js"
 
-export function getLocaleFromRequest(req: express.Request): string | undefined {
+export function getLocaleFromRequest(req: AppRequest): string | undefined {
   return req.headers['accept-language']?.split(',').map(lang => lang.split(';')[0])[0]
 }

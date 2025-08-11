@@ -1,4 +1,6 @@
 import express from 'express'
+import { entityLookupMiddleware } from "../app/middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../app/types.js"
 import { Issue } from "../Issue.js"
 import { JetBrains } from "../jetbrains.js"
 import { Project } from "../Project.js"
@@ -12,7 +14,9 @@ import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { VersionBanner } from '../components/versionBanner.js'
 import { themeAttributeForHtml } from '../utils/themeCookie.js'
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
+
+router.use('/project/:projectId', entityLookupMiddleware)
 
 // Function to generate HTML for combined issues table with project summary footer
 const generateIssuesTable = async (project: Project, locale: string | undefined): Promise<string> => {
@@ -252,20 +256,14 @@ async function prepareGraphData(issues: Issue[]): Promise<{ labels: string[], da
 }
 
 // Project issues page route
-router.get('/project/:projectName', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
+router.get('/project/:projectId', async (req: AppRequest, res: AppResponse) => {
 
   try {
-    const { projectName } = req.params
-    const project = await jetBrains.getProjectByName(projectName)
-    if (!project) {
-      return res.status(404).send('Project not found')
-    }
-
-    const hasMetrics = (await project?.metrics).metricCount > 0
+    const { jetBrains, project } = req
+    const issues = [...(await project?.issues ?? []).values()]
 
     // Prepare graph data
-    const graphData = await prepareGraphData([...(await project.issues).values()])
+    const graphData = await prepareGraphData(issues)
 
     // Generate HTML
     const html = `
@@ -274,12 +272,12 @@ router.get('/project/:projectName', async (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Junie Explorer: ${project.name} Issues</title>
+        <title>Junie Explorer: ${project?.name} Issues</title>
         <link rel="stylesheet" href="/css/app.css">
         <link rel="icon" href="/icons/favicon.png" type="image/png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-        ${(await project.issues).size > 0
+        ${issues.length > 0
       ? `<script>
               // Define the chart data as a global variable
               window.chartData = ${JSON.stringify(graphData)};
@@ -291,36 +289,36 @@ router.get('/project/:projectName', async (req, res) => {
         <script src="/js/reloadPage.js"></script>
         <script src="/js/compareModal.js"></script>
       </head>
-      <body class="bg-base-200 p-5" data-project-id="${escapeHtml(project.name)}">
+      <body class="bg-base-200 p-5" data-project-id="${escapeHtml(project?.name ?? '')}">
         <div class="max-w-[1440px] mx-auto bg-base-100 p-8 rounded-lg shadow-lg">
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
-            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${project.name}</h1>
+            <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${project?.name}</h1>
             <div class="flex items-center gap-3">
               ${ThemeSwitcher()}
               ${ReloadButton()}
             </div>
           </div>
-          ${VersionBanner(jetBrains.version)}
+          ${VersionBanner(jetBrains?.version)}
           ${Breadcrumb({
             items: [
               { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
-              { label: project.name, testId: 'breadcrumb-project-name' }
+              { label: project?.name ?? '', testId: 'breadcrumb-project-name' }
             ]
           })}
 
           <div class="flex gap-2 mb-5" data-testid="ide-icons">
-            ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
+            ${project?.ideNames.map(ide => `
+              <img src="${jetBrains?.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
             `).join('')}
           </div>
 
-          ${hasMetrics
+          ${req.hasMetrics
       ? `<div class="h-96 mb-5 p-4 bg-base-200 rounded-lg border border-base-300" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>`
       : ''
     }
-          ${await generateIssuesTable(project, getLocaleFromRequest(req))}
+          ${project && await generateIssuesTable(project, getLocaleFromRequest(req))}
         </div>
       </body>
       </html>

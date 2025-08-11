@@ -1,6 +1,8 @@
 import express from 'express'
 import fs from 'fs-extra'
 import path from 'node:path'
+import { entityLookupMiddleware } from "../app/middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../app/types.js"
 import { JetBrains } from "../jetbrains.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
@@ -13,7 +15,9 @@ import { ThemeSwitcher } from '../components/themeSwitcher.js'
 import { TaskCard } from '../components/taskCard.js'
 import { themeAttributeForHtml } from '../utils/themeCookie.js'
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
+
+router.use('/project/:projectId/issue/:issueId/task/:taskId*', entityLookupMiddleware)
 
 // Function to prepare data for the LLM events metrics over time graph
 function prepareLlmEventGraphData(events: EventRecord[]): {
@@ -132,20 +136,12 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
 }
 
 // Task event timeline API endpoint
-router.get('/api/project/:projectName/issue/:issueId/task/:taskId/events/timeline', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
+router.get('/api/project/:projectId/issue/:issueId/task/:taskId/events/timeline', async (req: AppRequest, res: AppResponse) => {
   try {
-    const { projectName, issueId, taskId } = req.params
-    const project = await jetBrains.getProjectByName(projectName)
-    const issue = await project?.getIssueById(issueId)
-    const task = await issue?.getTaskById(taskId)
-
-    if (!project || !issue || !task) {
-      return res.status(404).json({ error: 'Task not found' })
-    }
+    const { task } = req
 
     // Get events for the task
-    const events = await task.events
+    const events = task ? await task.events : []
 
     // Map events for Event Timeline
     const timelineEvents = events.map(e => ({
@@ -190,13 +186,9 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events/download', 
 })
 
 // Task events page route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
+router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req: AppRequest, res: AppResponse) => {
   try {
-    const { projectName, issueId, taskId } = req.params
-    const project = await jetBrains.getProjectByName(projectName)
-    const issue = await project?.getIssueById(issueId)
-    const task = await issue?.getTaskById(taskId)
+    const { jetBrains, project, issue, task } = req
 
     if (!project || !issue || !task) {
       return res.status(404).send('Task not found')
@@ -270,30 +262,30 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/events', async (re
               ${ReloadButton()}
             </div>
           </div>
-          ${VersionBanner(jetBrains.version)}
+          ${VersionBanner(jetBrains?.version)}
           ${Breadcrumb({
             items: [
               { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
-              { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
+              { label: project.name, href: `/project/${encodeURIComponent(project.name)}`, testId: 'breadcrumb-project-name' },
               { label: issue?.name || '', testId: 'breadcrumb-issue-name' },
             ]
           })}
 
           <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
+              <img src="${jetBrains?.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
             `).join('')}
           </div>
 
           <div class="mb-5">
             ${await TaskCard({
-              projectName,
-              issueId,
-              taskIndex: taskId,
+              projectName: project.name,
+              issueId: issue.id,
+              taskIndex: task.index,
               task,
               locale: getLocaleFromRequest(req),
               issueTitle: issue.name,
-              actionsHtml: `<a href="/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/download" class=\"btn btn-primary btn-sm\">Download Events as JSONL</a>`,
+              actionsHtml: `<a href="/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/${encodeURIComponent(task.index)}/events/download" class=\"btn btn-primary btn-sm\">Download Events as JSONL</a>`,
               tasksCount: (await issue.tasks).size,
               tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
               currentTab: 'events',

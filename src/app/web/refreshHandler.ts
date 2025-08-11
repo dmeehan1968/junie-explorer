@@ -1,6 +1,8 @@
+import { JetBrains } from "../../jetbrains.js"
 import { AppRequest, AppResponse } from "../types.js"
 
 export async function refreshHandler(req: AppRequest, res: AppResponse) {
+  const jetBrains = req.app.locals.jetBrainsInstance as JetBrains
   const referer = req.headers.referer
   if (referer) {
     const url = new URL(referer)
@@ -20,10 +22,11 @@ export async function refreshHandler(req: AppRequest, res: AppResponse) {
     } else if (project) {
       project.reload()
     } else {
-      await req.app.locals.jetBrainsInstance.reload()
+      await jetBrains.reload()
     }
+
+    await jetBrains.metrics // causes the metrics to be recalculated which will load other needed data
   }
-  await req.app.locals.jetBrainsInstance.metrics // causes the metrics to be recalculated which will load other needed data
 
   res.redirect(req.headers.referer || '/')
 }

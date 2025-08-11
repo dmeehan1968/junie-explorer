@@ -1,13 +1,14 @@
-import express, { Express } from "express"
+import express, { Express, NextFunction, Router } from "express"
 import { Server } from "http"
 import { JetBrains } from "../jetbrains.js"
-import homeRoutes from "../routes/homeRoutes.js"
+import homeRoutes, { homeRouteHandler } from "../app/web/homeRoutes.js"
 import projectRoutes from "../routes/projectRoutes.js"
 import taskEventsRoute from "../routes/taskEventsRoute.js"
 import taskTrajectoriesRoute from "../routes/taskTrajectoriesRoute.js"
 import { entityLookupMiddleware } from "./middleware/entityLookupMiddleware.js"
 import { errorHandler } from "./middleware/errorHandler.js"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware.js"
+import { AppRequest, AppResponse } from "./types.js"
 import { notFoundRouteHandler } from "./web/notFoundRouteHandler.js"
 import { refreshHandler } from "./web/refreshHandler.js"
 
@@ -17,11 +18,15 @@ export class JunieExplorer {
   constructor(public readonly jetBrains: JetBrains) {
 
     this.app = express()
-    this.app.locals.jetBrains = jetBrains
+    this.app.locals.jetBrains = jetBrains   // TODO: remove this
 
     // middleware
+    this.app.use(async (req: AppRequest, res: AppResponse, next: NextFunction) => {
+      req.jetBrains = jetBrains
+      req.hasMetrics = (await jetBrains.metrics).metricCount > 0
+      next()
+    })
     this.app.use(serveStaticsFromBunVfsMiddleware)
-    this.app.use(entityLookupMiddleware)
 
     // routes
     this.app.get('/refresh', refreshHandler)
@@ -36,10 +41,12 @@ export class JunieExplorer {
 
   }
 
-  listen(port: number | string, callback: (server: Server, host: string, port: number) => void) {
+  listen(port: number | string, callback?: (server: Server, host: string, port: number) => void) {
     const server = this.app.listen(port, (...args: any[]) => {
       const [ , host, port ] = args
-      callback(server, host, port)
+      callback?.(server, host, port)
     })
+
+    return server
   }
 }

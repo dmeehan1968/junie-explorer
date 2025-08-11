@@ -1,6 +1,8 @@
 import express from 'express'
 import fs from 'fs-extra'
 import path from 'node:path'
+import { entityLookupMiddleware } from "../app/middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../app/types.js"
 import { Breadcrumb } from '../components/breadcrumb.js'
 import { collapseIcon } from "../components/collapseIcon.js"
 import { expandIcon } from "../components/expandIcon.js"
@@ -23,7 +25,9 @@ import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
 import { themeAttributeForHtml } from '../utils/themeCookie.js'
 import { ToggleComponent } from '../utils/toggleComponent.js'
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
+
+router.use('/project/:projectId/issue/:issueId/task/:taskId*', entityLookupMiddleware)
 
 function ToolDecorator() {
   return (tool: Tool) => {
@@ -170,13 +174,9 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId/trajectories/d
 })
 
 // Task trajectories page route
-router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
+router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async (req: AppRequest, res: AppResponse) => {
   try {
-    const { projectName, issueId, taskId } = req.params
-    const project = await jetBrains.getProjectByName(projectName)
-    const issue = await project?.getIssueById(issueId)
-    const task = await issue?.getTaskById(taskId)
+    const { jetBrains, project, issue, task } = req
 
     if (!project || !issue || !task) {
       return res.status(404).send('Task not found')
@@ -223,31 +223,31 @@ router.get('/project/:projectName/issue/:issueId/task/:taskId/trajectories', asy
               ${ReloadButton()}
             </div>
           </div>
-          ${VersionBanner(jetBrains.version)}
+          ${VersionBanner(jetBrains?.version)}
           ${Breadcrumb({
       items: [
         { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
-        { label: projectName, href: `/project/${encodeURIComponent(projectName)}`, testId: 'breadcrumb-project-name' },
+        { label: project.name, href: `/project/${encodeURIComponent(project.name)}`, testId: 'breadcrumb-project-name' },
         { label: issue.name, testId: 'breadcrumb-issue-name' },
       ],
     })}
 
           <div class="flex gap-2 mb-5" data-testid="ide-icons">
             ${project.ideNames.map(ide => `
-              <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
+              <img src="${jetBrains?.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
             `).join('')}
           </div>
 
           <div class="mb-5">
             ${
               await TaskCard({
-                projectName,
-                issueId,
-                taskIndex: taskId,
+                projectName: project.name,
+                issueId: issue.id,
+                taskIndex: task.index,
                 task,
                 locale: getLocaleFromRequest(req),
                 issueTitle: issue.name,
-                actionsHtml: hasMetrics ? `<a href="/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/download" class=\"btn btn-primary btn-sm\">Download Trajectories as JSONL</a>` : '',
+                actionsHtml: hasMetrics ? `<a href="/api/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/${encodeURIComponent(task.index)}/trajectories/download" class=\"btn btn-primary btn-sm\">Download Trajectories as JSONL</a>` : '',
                 tasksCount: (await issue.tasks).size,
                 tasksDescriptions: [...(await issue.tasks).values()].map(t => t?.context?.description ?? ''),
                 currentTab: 'trajectories',

@@ -94,8 +94,9 @@ export const JunieTaskSchema = z.looseObject({
   finalAgentState: AgentState.nullish(),
   sessionHistory: SessionHistory.nullish(),
   patch: z.string().nullish(),
-}).transform(({ id: _, artifactPath, ...task }) => ({
+}).transform(({ id, artifactPath, ...task }) => ({
   id: artifactPath,
+  index: id.index,
   ...task,
 }))
 export type JunieTask = z.infer<typeof JunieTaskSchema>

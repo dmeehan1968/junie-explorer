@@ -1,15 +1,17 @@
 import express from 'express'
-import { JetBrains } from "../jetbrains.js"
-import { Project } from '../Project.js'
-import { getLocaleFromRequest } from "../utils/getLocaleFromRequest.js"
-import { jetBrainsPath } from '../utils/jetBrainsPath.js'
-import { VersionBanner } from '../components/versionBanner.js'
-import { ReloadButton } from '../components/reloadButton.js'
-import { ThemeSwitcher } from '../components/themeSwitcher.js'
-import { themeAttributeForHtml } from '../utils/themeCookie.js'
-import { SortIcon } from '../components/sortIcon.js'
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../types.js"
+import { JetBrains } from "../../jetbrains.js"
+import { Project } from '../../Project.js'
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
+import { jetBrainsPath } from '../../utils/jetBrainsPath.js'
+import { VersionBanner } from '../../components/versionBanner.js'
+import { ReloadButton } from '../../components/reloadButton.js'
+import { ThemeSwitcher } from '../../components/themeSwitcher.js'
+import { themeAttributeForHtml } from '../../utils/themeCookie.js'
+import { SortIcon } from '../../components/sortIcon.js'
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
 
 // Function to prepare data for the projects graph
 async function prepareProjectsGraphData(projects: Project[]): Promise<{
@@ -230,15 +232,12 @@ function ProjectMetricsChartOptions() {
   `
 }
 
-// Homepage route (now shows projects instead of IDEs)
-router.get('/', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
-  const hasMetrics = (await jetBrains.metrics).metricCount > 0
+export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
   const locale = getLocaleFromRequest(req)
-  
-  try {
 
-    const projects: Project[] = Array.from((await jetBrains.projects).values())
+  try {
+    const { jetBrains } = req
+    const projects = [...(await jetBrains?.projects ?? []).values()]
 
     // Get all unique IDE names from all projects
     const allIdes = new Set<string>()
@@ -279,26 +278,26 @@ router.get('/', async (req, res) => {
               ${ReloadButton()}
             </div>
           </div>
-          ${VersionBanner(jetBrains.version)}
+          ${VersionBanner(jetBrains?.version)}
           <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
 
-          ${!hasMetrics
-            ? `
+          ${!req.hasMetrics
+      ? `
                 <div class="bg-base-content/10 p-4 rounded mb-4">
                   The Junie logs do not contain token or cost metrics, which means that the projects were most
                   likely created by the Junie General Availability (GA) plugin which does not collect metrics.
                 </div>
               `
-            : ``
-          }
+      : ``
+    }
 
-          ${hasMetrics ? ProjectMetricsChart() : ''}
+          ${req.hasMetrics ? ProjectMetricsChart() : ''}
 
           <div class="flex flex-wrap gap-3 mb-5 p-3 bg-base-200 rounded" data-testid="ide-filter-toolbar">
             <div class="font-medium text-base-content flex items-center">Filter by IDE</div>
             ${uniqueIdes.map(ide => `
               <div class="ide-filter cursor-pointer transition-all duration-300 p-1 rounded hover:bg-base-300" data-testid="ide-filter" data-ide="${ide}" onclick="toggleIdeFilter(this)">
-                <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
+                <img src="${jetBrains?.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-8 h-8" />
               </div>
             `).join('')}
           </div>
@@ -307,7 +306,7 @@ router.get('/', async (req, res) => {
             <table class="table table-zebra w-full bg-base-100" id="projects-table">
               <thead>
                 <tr class="!bg-base-200">
-                  ${hasMetrics ? `
+                  ${req.hasMetrics ? `
                     <th class="w-12 text-center">
                       <input type=\"checkbox\" id=\"select-all-projects\" onchange=\"toggleSelectAllProjects()\" class=\"checkbox checkbox-primary checkbox-sm\" title=\"Select All\"> 
                     </th>
@@ -340,9 +339,9 @@ router.get('/', async (req, res) => {
               </thead>
               <tbody id="project-list" data-testid="projects-list">
                 ${projects.length > 0
-                  ? (await Promise.all(projects.map(async project => `
+      ? (await Promise.all(projects.map(async project => `
                     <tr class="project-row cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md" data-ides='${JSON.stringify(project.ideNames)}'>
-                      ${hasMetrics ? `
+                      ${req.hasMetrics ? `
                         <td class="text-center align-top py-3 px-2">
                           <input type=\"checkbox\" id=\"project-${encodeURIComponent(project.name)}\" class=\"project-checkbox checkbox checkbox-primary checkbox-sm\" data-project-name=\"${project.name}\" onchange=\"handleProjectSelection(this)\" onclick=\"event.stopPropagation()\">
                         </td>
@@ -361,14 +360,14 @@ router.get('/', async (req, res) => {
                       <td class="text-right whitespace-nowrap w-0 align-top py-3 px-2" role="link" tabindex="0" onclick="window.location.href='/project/${encodeURIComponent(project.name)}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}">
                         <div class="flex gap-1 justify-end" data-testid="ide-icons">
                           ${project.ideNames.map(ide => `
-                            <img src="${jetBrains.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
+                            <img src="${jetBrains?.getIDEIcon(ide)}" alt="${ide}" title="${ide}" class="w-6 h-6" />
                           `).join('')}
                         </div>
                       </td>
                     </tr>
                   `))).join('')
-                  : '<tr><td colspan="5" class="p-4 text-center text-base-content/70" data-testid="empty-projects-message">No JetBrains projects found</td></tr>'
-                }
+      : '<tr><td colspan="5" class="p-4 text-center text-base-content/70" data-testid="empty-projects-message">No JetBrains projects found</td></tr>'
+    }
               </tbody>
             </table>
           </div>
@@ -382,15 +381,17 @@ router.get('/', async (req, res) => {
     console.error('Error generating homepage:', error)
     res.status(500).send('An error occurred while generating the homepage')
   }
-})
+}
+
+// Homepage route (now shows projects instead of IDEs)
+router.get('/', homeRouteHandler)
 
 // API endpoint to get projects by name
-router.get('/api/projects', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
+router.get('/api/projects', async (req: AppRequest, res: AppResponse) => {
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
-    const allProjects: Project[] = Array.from((await jetBrains.projects).values())
+    const allProjects: Project[] = Array.from((await req.jetBrains?.projects ?? []).values())
 
     // Filter projects by name if names are provided
     const projects: Project[] = projectNames.length > 0
@@ -405,13 +406,11 @@ router.get('/api/projects', async (req, res) => {
 })
 
 // API endpoint to get graph data for selected projects
-router.get('/api/projects/graph', async (req, res) => {
-  const jetBrains = req.app.locals.jetBrains as JetBrains
-
+router.get('/api/projects/graph', async (req: AppRequest, res: AppResponse) => {
   try {
     const { names } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
-    const allProjects: Project[] = Array.from((await jetBrains.projects).values())
+    const allProjects: Project[] = Array.from((await req.jetBrains?.projects ?? []).values())
 
     // Filter projects by name if names are provided
     const projects: Project[] = projectNames.length > 0

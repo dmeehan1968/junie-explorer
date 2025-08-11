@@ -17,6 +17,7 @@ import { loadEvents } from "./workers/loadEvents.js"
 
 export class Task {
   public id: string = ''
+  public index: number = 0
   public created: Date = new Date()
   public context: JunieTaskContext = { description: '' }
   public isDeclined: boolean = false
@@ -73,6 +74,7 @@ export class Task {
   private init() {
     const task = this.load()
     this.id = task.id
+    this.index = task.index
     this.created = task.created
     this.context = task.context
     this.isDeclined = task.isDeclined
