@@ -7,7 +7,7 @@ const McpToolParameters = z.looseObject({
     type: z.string(),
     description: z.string().optional(),
   })),
-  required: z.string().array(),
+  required: z.string().array().nullable(),
   description: z.string().optional(),
 })
 export type McpToolParameters = z.infer<typeof McpToolParameters>
@@ -48,7 +48,6 @@ export const Tool = z.looseObject({
   type: z.string().optional(),
   ToolType: z.enum(['UserTool']).optional(),
   params: z.union([
-
     ToolAnyProperty.array().default(() => ([])).transform(params => {
       return {
         type: 'com.intellij.ml.llm.matterhorn.llm.ToolParametersSchema.McpToolParametersSchema',
