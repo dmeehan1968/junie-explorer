@@ -27,24 +27,44 @@
       compareBtn.disabled = count < 2;
     }
 
+    // Determine storage key per project
+    const projectId = (document.body && document.body.dataset && document.body.dataset.projectId) || '';
+    const storageKey = projectId ? `junie-explorer-${projectId}-selectedIssues` : '';
+
+    // Persist current selection to localStorage
+    function saveSelectedToStorage(){
+      try {
+        if (storageKey) {
+          const selectedIds = getSelected().map(s => s.id);
+          localStorage.setItem(storageKey, JSON.stringify(selectedIds));
+        }
+      } catch (e) { /* ignore storage errors */ }
+    }
+
     if (selectAll){
       selectAll.addEventListener('change', () => {
         document.querySelectorAll('.issue-select').forEach(cb => {
           cb.checked = selectAll.checked;
         });
+        // After toggling all, sync and persist
         updateButton();
+        saveSelectedToStorage();
       });
     }
 
     document.addEventListener('change', (e) => {
       const t = e.target;
       if (t && t.classList && t.classList.contains('issue-select')){
+        // When any individual issue selection changes, update select-all state, button, and persist
+        if (selectAll){
+          const all = Array.from(document.querySelectorAll('.issue-select'));
+          const checked = all.filter(cb => cb.checked).length;
+          selectAll.checked = (all.length > 0 && checked === all.length);
+        }
         updateButton();
+        saveSelectedToStorage();
       }
     });
-
-    const projectId = (document.body && document.body.dataset && document.body.dataset.projectId) || '';
-    const storageKey = projectId ? `junie-explorer-${projectId}-selectedIssues` : '';
 
     function openModal(){
       // Save selections to localStorage only when Compare is pressed
