@@ -70,7 +70,7 @@ class ModelPerformanceChart {
   }
   
   setupMetricToggle() {
-    const toggleContainer = document.getElementById('llm-latency-metric-toggle');
+    const toggleContainer = document.getElementById('model-performance-metric-toggle');
     if (!toggleContainer) return;
 
     const buttons = Array.from(toggleContainer.querySelectorAll('button[data-metric]'));
@@ -97,7 +97,7 @@ class ModelPerformanceChart {
   }
 
   createProviderFilters() {
-    const container = document.getElementById('llm-latency-provider-filters');
+    const container = document.getElementById('model-performance-provider-filters');
     if (!container) return;
     
     container.innerHTML = '';
@@ -346,9 +346,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const issueId = pathParts[4];
         const taskId = pathParts[6];
         
-        const apiUrl = `/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/llm-latency`;
+        const apiUrl = `/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/model-performance`;
         
-        new ModelPerformanceChart('llm-latency-chart', apiUrl);
+        new ModelPerformanceChart('model-performance-chart', apiUrl);
         chartInitialized = true;
       }, 100);
     }

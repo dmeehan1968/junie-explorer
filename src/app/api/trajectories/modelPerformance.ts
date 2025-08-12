@@ -7,7 +7,7 @@ const router = express.Router({ mergeParams: true })
 router.use('/api/project/:projectId/issue/:issueId/task/:taskId*', entityLookupMiddleware)
 
 // LLM request latency API endpoint
-router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/llm-latency', async (req: AppRequest, res: AppResponse) => {
+router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/model-performance', async (req: AppRequest, res: AppResponse) => {
   try {
     const { task } = req
 
