@@ -3,7 +3,6 @@ import { AppError, AppParams, AppRequest, AppResponse } from "../types.js"
 
 export async function entityLookupMiddleware(req: AppRequest, res: AppResponse, next: NextFunction) {
   try {
-    console.log(req.path, req.params)
     const params = AppParams.parse(req.params)
 
     req.project = params.projectId && await res.app.locals.jetBrains.getProjectByName(params.projectId) || req.project
