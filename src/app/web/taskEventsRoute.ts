@@ -88,18 +88,31 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
     stepSize = Math.max(1, Math.floor(dateRange / (YEAR * MIN_LABELS)))
   }
 
-  // Create datasets for cost and aggregate tokens
+  // Create datasets for cost and token breakdowns
   const costData = llmEvents.map(event => ({
     x: event.timestamp.toISOString(),
-    y: (event.event as any).answer.cost,
+    y: event.event.answer.cost,
   }))
 
-  const tokenData = llmEvents.map(event => {
-    const answer = (event.event as any).answer
-    return {
-      x: event.timestamp.toISOString(),
-      y: answer.inputTokens + answer.outputTokens + answer.cacheCreateInputTokens,
-    }
+  const inputTokenData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.inputTokens ?? 0,
+  }))
+
+  const outputTokenData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.outputTokens ?? 0,
+  }))
+
+  const cacheTokenData = llmEvents.map(event => {
+    const ans = event.event.answer
+    return { x: event.timestamp.toISOString(), y: ans.cacheCreateInputTokens }
+  })
+
+  const combinedTokenData = llmEvents.map(event => {
+    const ans = event.event.answer
+    const total = (ans.inputTokens ?? 0) + (ans.outputTokens ?? 0) + ans.cacheCreateInputTokens
+    return { x: event.timestamp.toISOString(), y: total }
   })
 
   const datasets = [
@@ -113,8 +126,35 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
       yAxisID: 'y',
     },
     {
-      label: 'Tokens (Input + Output + Cache)',
-      data: tokenData,
+      label: 'Input Tokens',
+      data: inputTokenData,
+      borderColor: 'rgb(75, 192, 192)',
+      backgroundColor: 'rgba(75, 192, 192, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1',
+    },
+    {
+      label: 'Output Tokens',
+      data: outputTokenData,
+      borderColor: 'rgb(255, 205, 86)',
+      backgroundColor: 'rgba(255, 205, 86, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1',
+    },
+    {
+      label: 'Cache Tokens',
+      data: cacheTokenData,
+      borderColor: 'rgb(153, 102, 255)',
+      backgroundColor: 'rgba(153, 102, 255, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1',
+    },
+    {
+      label: 'Tokens (Combined)',
+      data: combinedTokenData,
       borderColor: 'rgb(255, 99, 132)',
       backgroundColor: 'rgba(255, 99, 132, 0.5)',
       fill: false,
@@ -251,6 +291,24 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
                     <div class="flex items-center gap-3 flex-wrap justify-between">
                       <div id="llm-provider-filters" class="join flex flex-wrap" data-testid="llm-provider-filters">
                         <!-- Provider buttons will be populated by JavaScript -->
+                      </div>
+                      <div id="llm-token-filters" class="join flex flex-wrap" data-testid="llm-token-filters">
+                        <label class="btn btn-sm join-item">
+                          <input type="checkbox" class="hidden" data-token="input">
+                          Input
+                        </label>
+                        <label class="btn btn-sm join-item">
+                          <input type="checkbox" class="hidden" data-token="output">
+                          Output
+                        </label>
+                        <label class="btn btn-sm join-item">
+                          <input type="checkbox" class="hidden" data-token="cache">
+                          Cache
+                        </label>
+                        <label class="btn btn-sm join-item btn-primary">
+                          <input type="checkbox" class="hidden" data-token="combined" checked>
+                          Combined
+                        </label>
                       </div>
                     </div>
                   </div>

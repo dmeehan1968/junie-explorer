@@ -11,7 +11,10 @@ import {
   SessionHistory,
   SummaryMetrics,
 } from "./schema.js"
+import { AutoSelectedLlm } from "./schema/AutoSelectedLlm.js"
 import { EventRecord } from "./schema/eventRecord.js"
+import { Event } from "./schema/event.js"
+import { LlmResponseEvent } from "./schema/llmResponseEvent.js"
 import { Step } from "./Step.js"
 import { loadEvents } from "./workers/loadEvents.js"
 
@@ -200,7 +203,7 @@ export class Task {
     return path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
   }
 
-  private async loadEvents(): Promise<EventRecord[]> {
+  private async loadEvents() {
     let events: EventRecord[] = []
 
     try {
@@ -220,7 +223,40 @@ export class Task {
       }
     }
 
-    return events
+    const isGpt5AssistantEvent = (event: Event): event is LlmResponseEvent => event.type === LlmResponseEvent.shape.type.value && !event.answer.llm.isSummarizer && AutoSelectedLlm.shape.jbai.options.includes(event.answer.llm.jbai as never)
+    const adjustedEvents = events.map((record, index) => {
+      // GPT-5 cacheCreateInputTokens is not provided needs to be calculated, so that its the difference
+      // in cacheInputTokens since the previous event.  However, its not consistent and sometimes gives a lower
+      // figure, and then pops back up to roughly where it should be on the next event.
+      if (isGpt5AssistantEvent(record.event)) {
+        // find the previous response event of the same time
+        const previousEvent = events
+          .slice(0, index)
+          .reverse()
+          .find(previous => isGpt5AssistantEvent(previous.event))
+
+        if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
+          // next line is a bit of a kludge so we can use cacheCreateInputTokens in the same way as Sonnet and still get
+          // them costed correctly.
+          record.event.answer.llm.cacheCreateInputPrice = record.event.answer.llm.cacheInputPrice
+          record.event.answer.cacheCreateInputTokens = Math.max(0, (record.event.answer.cacheInputTokens ?? 0) - (previousEvent.event.answer.cacheInputTokens ?? 0))
+        } else {
+          record.event.answer.cacheCreateInputTokens = record.event.answer.cacheInputTokens
+        }
+      }
+      return record
+    })
+
+    // Even then, there's an anomaly on the last event that would turn it negative and is likely a total of input
+    // tokens for the session.
+    const lastResponse = adjustedEvents.reverse().find(record => isGpt5AssistantEvent(record.event))
+    if (lastResponse) {
+      if (lastResponse.event.type === LlmResponseEvent.shape.type.value) {
+        lastResponse.event.answer.inputTokens = 0
+      }
+    }
+
+    return adjustedEvents
   }
 
   get events(): Promise<EventRecord[]> {

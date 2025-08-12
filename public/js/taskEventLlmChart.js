@@ -49,13 +49,25 @@ function filterChartData(selectedProviders) {
     y: event.event.answer.cost,
   }));
   
-  const tokenData = filteredEvents.map(event => {
-    const answer = event.event.answer;
-    return {
-      x: event.timestamp.toISOString(),
-      y: answer.inputTokens + answer.outputTokens + answer.cacheCreateInputTokens,
-    };
-  });
+  const inputTokenData = filteredEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.inputTokens,
+  }));
+
+  const outputTokenData = filteredEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.outputTokens,
+  }));
+
+  const cacheTokenData = filteredEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.cacheCreateInputTokens,
+  }));
+
+  const combinedTokenData = filteredEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.inputTokens + event.event.answer.outputTokens + event.event.answer.cacheCreateInputTokens,
+  }));
   
   return {
     ...originalChartData,
@@ -67,7 +79,19 @@ function filterChartData(selectedProviders) {
       },
       {
         ...originalChartData.datasets[1],
-        data: tokenData
+        data: inputTokenData
+      },
+      {
+        ...originalChartData.datasets[2],
+        data: outputTokenData
+      },
+      {
+        ...originalChartData.datasets[3],
+        data: cacheTokenData
+      },
+      {
+        ...originalChartData.datasets[4],
+        data: combinedTokenData
       }
     ]
   };
@@ -86,6 +110,24 @@ function updateChart() {
 
   selectedProvidersSet = new Set(selectedProviders);
   llmChart.data = filterChartData(selectedProviders);
+  // Reapply token visibility if available
+  try {
+    const tokenDatasetIndex = { input: 1, output: 2, cache: 3, combined: 4 };
+    // Determine current visibility from UI
+    const container = document.getElementById('llm-token-filters');
+    if (container) {
+      const labels = Array.from(container.querySelectorAll('label'));
+      labels.forEach(label => {
+        const input = label.querySelector('input[type="checkbox"]');
+        if (!input) return;
+        const token = input.getAttribute('data-token');
+        const idx = tokenDatasetIndex[token];
+        if (typeof idx === 'number' && llmChart.data.datasets[idx]) {
+          llmChart.data.datasets[idx].hidden = !input.checked;
+        }
+      });
+    }
+  } catch (_) {}
   llmChart.update();
 }
 
@@ -219,6 +261,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Create the chart
       llmChart = new Chart(ctx, config);
+
+      // Token dataset visibility controls (checkbox button group)
+      const tokenFiltersContainer = document.getElementById('llm-token-filters');
+      // Map token types to dataset indices in the chart
+      const tokenDatasetIndex = { input: 1, output: 2, cache: 3, combined: 4 };
+      // Maintain current visibility state for re-application after provider filter
+      const tokenVisibility = { input: false, output: false, cache: false, combined: true };
+
+      const applyTokenVisibility = () => {
+        if (!llmChart) return;
+        Object.keys(tokenDatasetIndex).forEach(key => {
+          const idx = tokenDatasetIndex[key];
+          if (llmChart.data.datasets[idx]) {
+            llmChart.data.datasets[idx].hidden = !tokenVisibility[key];
+          }
+        });
+        llmChart.update();
+      };
+
+      if (tokenFiltersContainer) {
+        // Initialize based on checkboxes state and add listeners
+        const labels = Array.from(tokenFiltersContainer.querySelectorAll('label'));
+        labels.forEach(label => {
+          const input = label.querySelector('input[type="checkbox"]');
+          if (!input) return;
+          const token = input.getAttribute('data-token');
+          const checked = input.checked;
+          if (token in tokenVisibility) tokenVisibility[token] = checked;
+          // Style active
+          label.classList.toggle('btn-primary', !!checked);
+          // Toggle on click
+          label.addEventListener('click', (e) => {
+            // Prevent default focus toggle weirdness; we'll manage manually
+            e.preventDefault();
+            input.checked = !input.checked;
+            const isChecked = input.checked;
+            label.classList.toggle('btn-primary', isChecked);
+            if (token in tokenVisibility) tokenVisibility[token] = isChecked;
+            applyTokenVisibility();
+          });
+        });
+        // Apply initial state
+        applyTokenVisibility();
+      }
       
       // Build provider filter button group (exclusive: All or one provider)
       const providerFiltersContainer = document.getElementById('llm-provider-filters');

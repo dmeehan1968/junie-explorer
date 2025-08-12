@@ -33,11 +33,12 @@ export const LlmResponseEvent = z.looseObject({
       cacheInputTokens: answer.cacheInputTokens ?? 0,
       cacheCreateInputTokens: answer.cacheCreateInputTokens ?? 0,
       time: answer.time ?? 0,
-      metricCount:
-        (answer.inputTokens !== undefined ? 1 : 0) +
-        (answer.outputTokens !== undefined ? 1 : 0) +
-        (answer.cacheInputTokens !== undefined ? 1 : 0) +
-        (answer.cacheCreateInputTokens !== undefined ? 1 : 0),
+      metricCount: [
+        answer.inputTokens,
+        answer.outputTokens,
+        answer.cacheInputTokens,
+        answer.cacheCreateInputTokens
+      ].filter(v => v !== undefined).length,
     }
   }),
 })
