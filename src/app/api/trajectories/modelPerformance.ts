@@ -1,4 +1,9 @@
 import express from "express"
+import { AgentActionExecutionFinished } from "../../../schema/agentActionExecutionFinished.js"
+import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice.js"
+import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice.js"
+import { AssistantChatMessageWithToolUses } from "../../../schema/assistantChatMessageWithToolUses.js"
+import { MatterhornMessage } from "../../../schema/llmRequestEvent.js"
 import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.js"
 import { AppRequest, AppResponse } from "../../types.js"
 
@@ -25,6 +30,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
       latency: number // milliseconds
       outputTokens: number
       tokensPerSecond: number
+      description?: string
     }> = []
 
     for (let i = 0 ; i < sortedEvents.length ; i++) {
@@ -37,6 +43,19 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
         const outputTokens = currentEvent.event.answer.outputTokens ?? 0
         const tokensPerSecond = latency > 0 ? (outputTokens / (latency / 1000)) : 0
 
+        let description = currentEvent.event.answer.contentChoices.map(choice => {
+          const maxLabelLength = 80
+          if (choice.type === AIContentAnswerChoice.shape.type.value) {
+            return choice.content.length <= maxLabelLength ? choice.content : choice.content.substring(0, (maxLabelLength/2)-2) + ' ... ' + choice.content.substring(choice.content.length - (maxLabelLength/2)-2);
+          } else if (choice.type === AIToolUseAnswerChoice.shape.type.value) {
+            return choice.usages.map(usage => {
+              const params = JSON.stringify(usage.toolParams.rawJsonObject)
+              const trimmedParams = params.length <= maxLabelLength ? params : params.substring(0, (maxLabelLength/2)-2) + ' ... ' + params.substring(params.length - (maxLabelLength/2)-2);
+              return usage.toolName + ' ' + trimmedParams
+            }).join(', ')
+          }
+        }).join('')
+
         performanceData.push({
           timestamp: currentEvent.timestamp.toISOString(),
           provider,
@@ -44,6 +63,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
           latency,
           outputTokens,
           tokensPerSecond,
+          description,
         })
       }
     }

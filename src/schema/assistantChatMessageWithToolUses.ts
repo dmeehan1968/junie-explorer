@@ -19,3 +19,4 @@ export const AssistantChatMessageWithToolUses = z.looseObject({
     encryptedContent: z.string(),
   }).array().optional(),
 })
+export type AssistantChatMessageWithToolUses = z.infer<typeof AssistantChatMessageWithToolUses>
