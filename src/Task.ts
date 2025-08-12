@@ -232,7 +232,7 @@ export class Task {
         // find the previous response event of the same time
         const previousEvent = events
           .slice(0, index)
-          .reverse()
+          .reverse()    // in-place, but the slice has created a copy so no unintended side effect
           .find(previous => isGpt5AssistantEvent(previous.event))
 
         if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
@@ -249,7 +249,9 @@ export class Task {
 
     // Even then, there's an anomaly on the last event that would turn it negative and is likely a total of input
     // tokens for the session.
-    const lastResponse = adjustedEvents.reverse().find(record => isGpt5AssistantEvent(record.event))
+    const lastResponse = [...adjustedEvents]      // shallow copy
+      .reverse()                                  // in place on shallow copy
+      .find(record => isGpt5AssistantEvent(record.event))
     if (lastResponse) {
       if (lastResponse.event.type === LlmResponseEvent.shape.type.value) {
         lastResponse.event.answer.inputTokens = 0

@@ -438,12 +438,12 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
         let timestampDisplay = '-'
         if (index === 0) {
           // First record: show time only
-          timestampDisplay = new Date(eventRecord.timestamp).toLocaleTimeString()
+          timestampDisplay = eventRecord.timestamp.toLocaleTimeString()
         } else {
           // Subsequent records: show elapsed milliseconds since previous record
           const prevRecord = events[index - 1]
           const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
-          timestampDisplay = `+${elapsed}ms`
+          timestampDisplay = `${elapsed}ms`
         }
 
         if (eventRecord.event.type === 'LlmResponseEvent') {
