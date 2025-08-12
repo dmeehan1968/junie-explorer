@@ -346,39 +346,49 @@ function processEvents(events: EventRecord[] = []) {
 
       } else if (record.event.type === 'LlmResponseEvent') {
 
-        messages.push(
-          ...record.event.answer.contentChoices.map(choice => {
+        if (didOutputInitialContext) {
 
-            const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
-              ? choice.usages.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
-              : ''
+          messages.push(
+            ...record.event.answer.contentChoices.map(choice => {
 
-            return MessageDecorator({
-              klass: klass + (!!choice.content ? '' : ' bg-warning text-warning-content'),
-              index,
-              testIdPrefix: 'chat-assistant-toggle',
-              left: false,
-              label: 'Model Response',
-              content: escapeHtml(choice.content || '<unexpectedly_empty>'),
-            }) + toolUses
+              const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
+                ? choice.usages.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
+                : ''
 
-          }).join('')
+              return MessageDecorator({
+                klass: klass + (!!choice.content ? '' : ' bg-warning text-warning-content'),
+                index,
+                testIdPrefix: 'chat-assistant-toggle',
+                left: false,
+                label: 'Model Response',
+                content: escapeHtml(choice.content || '<unexpectedly_empty>'),
+              }) + toolUses
 
-        )
+            }).join('')
+
+          )
+
+        }
 
       } else if (record.event.type === 'AgentActionExecutionFinished') {
-        messages.push(MessageDecorator({
-          klass,
-          index: index + 10002,
-          testIdPrefix: 'chat-user-toggle',
-          left: true,
-          label: 'Tool Result',
-          content: escapeHtml(record.event.result.text),
-        }))
 
-        if (record.event.result.images && record.event.result.images.length) {
-          // TODO: handle images as well (when we know what the shape is)
-          console.log('Unhandled tool result image', record.event.result.images)
+        // synthetic_submit is a special case and called at the start of a task, so doesn't need to be logged
+        if (record.event.actionToExecute.id !== 'synthetic_submit') {
+
+          messages.push(MessageDecorator({
+            klass,
+            index: index + 10002,
+            testIdPrefix: 'chat-user-toggle',
+            left: true,
+            label: 'Tool Result',
+            content: escapeHtml(record.event.result.text),
+          }))
+
+          if (record.event.result.images && record.event.result.images.length) {
+            // TODO: handle images as well (when we know what the shape is)
+            console.log('Unhandled tool result image', record.event.result.images)
+          }
+
         }
 
       } else if (record.event.type === 'ActionRequestBuildingFailed') {
