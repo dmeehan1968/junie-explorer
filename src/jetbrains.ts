@@ -41,6 +41,8 @@ export class JetBrains {
   private _metrics: Promise<SummaryMetrics> | undefined
   private _version?: Version
 
+  public hasMetrics: boolean = false
+
   constructor(options?: JetBrainsOptions) {
     if (!options) {
       options = {}
@@ -147,6 +149,8 @@ export class JetBrains {
           metricCount: acc.metricCount + cur.metricCount,
         }
       }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0 } satisfies SummaryMetrics)
+
+      this.hasMetrics = metrics.metricCount > 0
 
       return resolve(metrics)
     })

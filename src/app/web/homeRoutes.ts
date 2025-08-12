@@ -87,7 +87,7 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
           ${VersionBanner(jetBrains?.version)}
           <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">Projects found in: ${jetBrainsPath}</p>
 
-          ${!req.hasMetrics
+          ${!jetBrains!.hasMetrics
       ? `
                 <div class="bg-base-content/10 p-4 rounded mb-4">
                   The Junie logs do not contain token or cost metrics, which means that the projects were most
@@ -97,7 +97,7 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
       : ``
     }
 
-          ${req.hasMetrics ? ProjectMetricsChart() : ''}
+          ${jetBrains!.hasMetrics ? ProjectMetricsChart() : ''}
 
           <div class="flex flex-wrap gap-3 mb-5 p-3 bg-base-200 rounded" data-testid="ide-filter-toolbar">
             <div class="font-medium text-base-content flex items-center">Filter by IDE</div>
@@ -112,7 +112,7 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
             <table class="table table-zebra w-full bg-base-100" id="projects-table">
               <thead>
                 <tr class="!bg-base-200">
-                  ${req.hasMetrics ? `
+                  ${jetBrains!.hasMetrics ? `
                     <th class="w-12 text-center">
                       <input type=\"checkbox\" id=\"select-all-projects\" onchange=\"toggleSelectAllProjects()\" class=\"checkbox checkbox-primary checkbox-sm\" title=\"Select All\"> 
                     </th>
@@ -147,7 +147,7 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
                 ${projects.length > 0
       ? (await Promise.all(projects.map(async project => `
                     <tr class="project-row cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md" data-ides='${JSON.stringify(project.ideNames)}'>
-                      ${req.hasMetrics ? `
+                      ${jetBrains!.hasMetrics ? `
                         <td class="text-center align-top py-3 px-2">
                           <input type=\"checkbox\" id=\"project-${encodeURIComponent(project.name)}\" class=\"project-checkbox checkbox checkbox-primary checkbox-sm\" data-project-name=\"${project.name}\" onchange=\"handleProjectSelection(this)\" onclick=\"event.stopPropagation()\">
                         </td>

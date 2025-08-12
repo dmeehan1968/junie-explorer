@@ -20,7 +20,6 @@ router.use('/project/:projectId', entityLookupMiddleware)
 // Function to generate HTML for combined issues table with project summary footer
 const generateIssuesTable = async (project: Project, locale: string | undefined): Promise<string> => {
   const issuesCount = (await project.issues).size
-  const hasMetrics = (await project.metrics).metricCount > 0
 
   if (issuesCount === 0) {
     return '<p class="p-4 text-center text-base-content/70" data-testid="no-issues-message">No issues found for this project</p>'
@@ -39,7 +38,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
       <span class="font-bold text-base-content" data-testid="summary-elapsed-time">Elapsed Time: ${formatElapsedTime(elapsedTimeSec)}</span>
     </div>
     <div class="overflow-x-auto">
-      ${!hasMetrics 
+      ${!project.hasMetrics 
         ? `
           <div class="bg-base-content/10 p-4 rounded mb-4">
             This project does not contain token or cost metrics, which means that it is most likely created by the 
@@ -48,7 +47,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         `
         : ``
       }
-      ${hasMetrics 
+      ${project.hasMetrics 
         ? `<div class="flex items-center justify-between mb-3">
         <div class="text-sm opacity-70">Select at least two issues to enable compare</div>
         <button id="compareBtn" class="btn btn-primary btn-sm" disabled data-testid="compare-button">Compare</button>
@@ -58,10 +57,10 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
       <table class="table table-zebra w-full bg-base-100" data-testid="issues-table">
         <thead>
           <tr class="!bg-base-200">
-            ${hasMetrics ? `<th class="w-10 text-center align-middle"><input type="checkbox" id="selectAllIssues" class="checkbox checkbox-sm" aria-label="Select all issues" /></th>` : ''}
+            ${project.hasMetrics ? `<th class="w-10 text-center align-middle"><input type="checkbox" id="selectAllIssues" class="checkbox checkbox-sm" aria-label="Select all issues" /></th>` : ''}
             <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
             <th class="text-left whitespace-nowrap">Timestamp</th>
-            ${hasMetrics 
+            ${project.hasMetrics 
               ? `<th class="text-right whitespace-nowrap">Input Tokens</th>
                 <th class="text-right whitespace-nowrap">Output Tokens</th>
                 <th class="text-right whitespace-nowrap">Cache Tokens</th>
@@ -72,10 +71,10 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             <th class="text-right whitespace-nowrap">Status</th>
           </tr>
           <tr class="!bg-base-200 font-bold text-base-content">
-            ${hasMetrics ? '<td></td>' : ''}
+            ${project.hasMetrics ? '<td></td>' : ''}
             <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
-            ${hasMetrics
+            ${project.hasMetrics
               ? `
                 <td class="text-right whitespace-nowrap" data-testid="header-summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
                 <td class="text-right whitespace-nowrap" data-testid="header-summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
@@ -97,7 +96,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
               : `/project/${encodeURIComponent(project.name)}`
             return `
           <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
-            ${hasMetrics ? `
+            ${project.hasMetrics ? `
             <td class="text-center align-top py-3 px-2">
               <input type="checkbox" class="checkbox checkbox-sm issue-select" aria-label="Select issue for comparison" 
                 data-issue-id="${escapeHtml(issue.id)}"
@@ -120,7 +119,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
             <td class="text-left whitespace-nowrap" data-testid="issue-timestamp" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
               ${new Date(issue.created).toLocaleString(locale)}
             </td>
-            ${hasMetrics 
+            ${project.hasMetrics 
               ? `
                 <td class="text-right whitespace-nowrap" data-testid="issue-input-tokens" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
                   ${formatNumber((await issue.metrics).inputTokens)}
@@ -149,10 +148,10 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
         </tbody>
         <tfoot>
           <tr class="!bg-base-200 font-bold text-base-content">
-            ${hasMetrics ? '<td></td>' : ''}
+            ${project.hasMetrics ? '<td></td>' : ''}
             <td class="text-left whitespace-nowrap" data-testid="summary-label">Project Summary</td>
             <td class="text-left whitespace-nowrap"></td>
-            ${hasMetrics 
+            ${project.hasMetrics 
               ? `
                 <td class="text-right whitespace-nowrap" data-testid="summary-input-tokens">${formatNumber(metrics.inputTokens)}</td>
                 <td class="text-right whitespace-nowrap" data-testid="summary-output-tokens">${formatNumber(metrics.outputTokens)}</td>
@@ -174,13 +173,13 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
           <div class="mb-3 flex items-center gap-4">
             <span class="font-semibold">Metric:</span>
             <div class="join" role="group" aria-label="Metric selection">
-              ${hasMetrics ? `
+              ${project.hasMetrics ? `
                 <button type="button" class="btn btn-sm join-item metric-btn" data-metric="input" aria-pressed="false">Input Tokens</button>
                 <button type="button" class="btn btn-sm join-item metric-btn" data-metric="output" aria-pressed="false">Output Tokens</button>
                 <button type="button" class="btn btn-sm join-item metric-btn" data-metric="cache" aria-pressed="false">Cache Tokens</button>
                 <button type="button" class="btn btn-sm join-item metric-btn" data-metric="cost" aria-pressed="false">Cost</button>
               ` : ''}
-              <button type="button" class="btn btn-sm join-item metric-btn" data-metric="time" aria-pressed="${hasMetrics ? 'false' : 'true'}">Time</button>
+              <button type="button" class="btn btn-sm join-item metric-btn" data-metric="time" aria-pressed="${project.hasMetrics ? 'false' : 'true'}">Time</button>
             </div>
           </div>
           <div class="h-[80%]"><canvas id="compareChart" class="w-full h-full"></canvas></div>
@@ -311,7 +310,7 @@ router.get('/project/:projectId', async (req: AppRequest, res: AppResponse) => {
             `).join('')}
           </div>
 
-          ${req.hasMetrics
+          ${project!.hasMetrics
       ? `<div class="h-96 mb-5 p-4 bg-base-200 rounded-lg border border-base-300" data-testid="cost-over-time-graph">
                 <canvas id="costOverTimeChart"></canvas>
               </div>`

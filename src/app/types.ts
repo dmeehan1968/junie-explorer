@@ -28,7 +28,6 @@ export type AppRequest = Request<AppParams, AppReqBody, AppResBody, core.Query, 
   project?: Project
   issue?: Issue
   task?: Task
-  hasMetrics?: boolean
 }
 export type AppResponse = Response<AppResBody, AppLocals>
 

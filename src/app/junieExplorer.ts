@@ -1,6 +1,7 @@
 import express, { Express, NextFunction, Router } from "express"
 import { Server } from "http"
 import { JetBrains } from "../jetbrains.js"
+import refreshRoutes from "./web/refreshRoutes.js"
 import homeRoutes from "../app/web/homeRoutes.js"
 import projectRoutes from "../app/web/projectRoutes.js"
 import taskEventsRoute from "../app/web/taskEventsRoute.js"
@@ -12,7 +13,6 @@ import { errorHandler } from "./middleware/errorHandler.js"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware.js"
 import { AppRequest, AppResponse } from "./types.js"
 import { notFoundRouteHandler } from "./web/notFoundRouteHandler.js"
-import { refreshHandler } from "./web/refreshHandler.js"
 
 export class JunieExplorer {
   private readonly app: Express
@@ -25,13 +25,12 @@ export class JunieExplorer {
     // middleware
     this.app.use(async (req: AppRequest, res: AppResponse, next: NextFunction) => {
       req.jetBrains = jetBrains
-      req.hasMetrics = (await jetBrains.metrics).metricCount > 0
       next()
     })
     this.app.use(serveStaticsFromBunVfsMiddleware)
 
     // routes
-    this.app.get('/refresh', refreshHandler)
+    this.app.use('/', refreshRoutes)
     this.app.use('/', homeRoutes)
     this.app.use('/', projectRoutes)
     this.app.use('/', taskEventsRoute)

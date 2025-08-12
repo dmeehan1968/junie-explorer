@@ -11,6 +11,7 @@ export class Project {
   private _ideNames: Set<string> = new Set()
   private readonly logger: Logger
   public lastUpdated?: Date
+  public hasMetrics: boolean = false
 
   constructor(public readonly name: string, logPath: string, ideName: string, logger?: Logger ) {
     this._logPaths.push(logPath)
@@ -74,6 +75,8 @@ export class Project {
       }))
 
       this._logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
+
+      this.hasMetrics = metrics.metricCount > 0
 
       return resolve(metrics)
     })
