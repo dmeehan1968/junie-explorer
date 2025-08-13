@@ -65,10 +65,11 @@ export async function TaskCard({ projectName, issueId, taskIndex, task, locale, 
     <div class="card-body">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold text-primary">${escapeHtml(computedTitle)}</h3>
-        <div class="flex items-center gap-2">
-          <div class="text-sm text-base-content/70">Created: ${created.toLocaleString(locale)}</div>
-          ${actionsHtml ? `<div class="ml-2">${actionsHtml}</div>` : ''}
-        </div>
+        ${actionsHtml ? `<div class="ml-2">${actionsHtml}</div>` : ''}
+      </div>
+      <div class="flex justify-between items-center gap-2 bg-base-300 mb-4 p-4 rounded">
+        <div class="text-sm text-base-content/70">ID: ${task.id}</div>
+        <div class="text-sm text-base-content/70">Created: ${created.toLocaleString(locale)}</div>
       </div>
       ${typeof tasksCount === 'number' && tasksCount > 0 ? `
       <div class="mb-4" data-testid="task-switcher">
