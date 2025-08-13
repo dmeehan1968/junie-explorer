@@ -305,7 +305,7 @@ function processEvents(events: EventRecord[] = []) {
     .filter((record: EventRecord): record is { event: LlmRequestEvent | LlmResponseEvent | ActionRequestBuildingFailed | AgentActionExecutionFinished, timestamp: Date } => {
       return (
         (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
-        || (record.event.type === 'LlmResponseEvent' && !record.event.answer.llm.isSummarizer)
+        || (record.event.type === 'LlmResponseEvent')
         || record.event.type === 'AgentActionExecutionFinished'
         || record.event.type === 'ActionRequestBuildingFailed'
       )
@@ -346,27 +346,47 @@ function processEvents(events: EventRecord[] = []) {
 
       } else if (record.event.type === 'LlmResponseEvent') {
 
-        if (didOutputInitialContext) {
+        if (record.event.answer.llm.isSummarizer) {
 
           messages.push(
             ...record.event.answer.contentChoices.map(choice => {
 
-              const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
-                ? choice.usages.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
-                : ''
-
               return MessageDecorator({
                 klass: klass + (!!choice.content ? '' : ' bg-warning text-warning-content'),
                 index,
-                testIdPrefix: 'chat-assistant-toggle',
+                testIdPrefix: 'summarizer-assistant-toggle',
                 left: false,
-                label: 'Model Response',
+                label: 'Summary',
                 content: escapeHtml(choice.content || '<unexpectedly_empty>'),
-              }) + toolUses
+              })
 
             }).join('')
-
           )
+
+        } else {
+
+          if (didOutputInitialContext) {
+
+            messages.push(
+              ...record.event.answer.contentChoices.map(choice => {
+
+                const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
+                  ? choice.usages.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
+                  : ''
+
+                return MessageDecorator({
+                  klass: klass + (!!choice.content ? '' : ' bg-warning text-warning-content'),
+                  index,
+                  testIdPrefix: 'chat-assistant-toggle',
+                  left: false,
+                  label: 'Model Response',
+                  content: escapeHtml(choice.content || '<unexpectedly_empty>'),
+                }) + toolUses
+
+              }).join('')
+            )
+
+          }
 
         }
 
