@@ -7,6 +7,17 @@
         "/Users/dmeehan/Documents/Dropbox/Projects/mcp/mcp-filesystem-extended/index.ts",
         "/Users/dmeehan/Library/CloudStorage/Dropbox/Projects/JetBrains/junie-explorer"
       ]
+    },
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "codex"
+      ]
     }
   }
 }
