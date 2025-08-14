@@ -365,28 +365,26 @@ function processEvents(events: EventRecord[] = []) {
 
         } else {
 
-          if (didOutputInitialContext) {
+          const latency = record.event.answer.time
 
-            messages.push(
-              ...record.event.answer.contentChoices.map(choice => {
+          messages.push(
+            ...record.event.answer.contentChoices.map(choice => {
 
-                const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
-                  ? choice.usages.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
-                  : ''
+              const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
+                ? choice.usages.map((tool, toolIndex) => ToolUseDecorator(klass, index + toolIndex + 1000)(tool)).join('')
+                : ''
 
-                return MessageDecorator({
-                  klass: klass + (!!choice.content ? '' : ' bg-warning text-warning-content'),
-                  index,
-                  testIdPrefix: 'chat-assistant-toggle',
-                  left: false,
-                  label: 'Model Response',
-                  content: escapeHtml(choice.content || '<unexpectedly_empty>'),
-                }) + toolUses
+              return MessageDecorator({
+                klass: klass + (!!choice.content ? '' : ' bg-warning text-warning-content'),
+                index,
+                testIdPrefix: 'chat-assistant-toggle',
+                left: false,
+                label: `Model Response <span class="text-primary-content/50">${(latency/1000).toFixed(2)}s</span>`,
+                content: escapeHtml(choice.content || '<unexpectedly_empty>'),
+              }) + toolUses
 
-              }).join('')
-            )
-
-          }
+            }).join('')
+          )
 
         }
 
