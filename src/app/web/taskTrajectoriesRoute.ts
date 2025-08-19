@@ -19,7 +19,7 @@ import { Tool } from "../../schema/tools.js"
 import { escapeHtml } from "../../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
 import { themeAttributeForHtml } from '../../utils/themeCookie.js'
-import { ToggleComponent } from '../../utils/toggleComponent.js'
+import { ToggleComponent } from '../../components/toggleComponent.js'
 
 const router = express.Router({ mergeParams: true })
 
