@@ -3,7 +3,7 @@ import { AgentActionExecutionFinished } from "../../../schema/agentActionExecuti
 import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice.js"
 import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice.js"
 import { AssistantChatMessageWithToolUses } from "../../../schema/assistantChatMessageWithToolUses.js"
-import { MatterhornMessage } from "../../../schema/llmRequestEvent.js"
+import { LlmRequestEvent, MatterhornMessage } from "../../../schema/llmRequestEvent.js"
 import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.js"
 import { AppRequest, AppResponse } from "../../types.js"
 
@@ -31,6 +31,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
       outputTokens: number
       tokensPerSecond: number
       description?: string
+      reasoning?: string
     }> = []
 
     for (let i = 0 ; i < sortedEvents.length ; i++) {
@@ -42,6 +43,13 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
         const latency = currentEvent.event.answer.time ?? 0
         const outputTokens = currentEvent.event.answer.outputTokens ?? 0
         const tokensPerSecond = latency > 0 ? (outputTokens / (latency / 1000)) : 0
+        let reasoning: string | undefined = undefined
+        // find the matching request event
+        const previous = sortedEvents.slice(0, i).reverse().find((e): e is { event: LlmRequestEvent, timestamp: Date } => e.event.type === 'LlmRequestEvent' && e.event.id === currentEvent.event.id)
+        if (previous) {
+          console.log(previous.event.modelParameters.reasoning_effort)
+          reasoning = previous.event.modelParameters.reasoning_effort
+        }
 
         let description = currentEvent.event.answer.contentChoices.map(choice => {
           const maxLabelLength = 80
@@ -64,6 +72,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
           outputTokens,
           tokensPerSecond,
           description,
+          reasoning,
         })
       }
     }

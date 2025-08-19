@@ -165,11 +165,12 @@ class ModelPerformanceChart {
           provider: item.provider,
           model: item.model,
           description: item.description,
+          reasoning: item.reasoning,
         }));
 
       datasets.push({
         label: provider + ' • Latency',
-        data: providerData.map(p => ({ x: p.x, y: p.latencySeconds, provider: p.provider, model: p.model, description: p.description })),
+        data: providerData.map(p => ({ x: p.x, y: p.latencySeconds, provider: p.provider, model: p.model, description: p.description, reasoning: p.reasoning })),
         borderColor: color,
         backgroundColor: color + '20',
         fill: false,
@@ -184,7 +185,7 @@ class ModelPerformanceChart {
       if (this.hasMetrics) {
         datasets.push({
           label: provider + ' • tokens/sec',
-          data: providerData.map(p => ({ x: p.x, y: p.tokensPerSecond, provider: p.provider, model: p.model, description: p.description })),
+          data: providerData.map(p => ({ x: p.x, y: p.tokensPerSecond, provider: p.provider, model: p.model, description: p.description, reasoning: p.reasoning })),
           borderColor: color,
           borderDash: [6, 4],
           backgroundColor: color + '20',
@@ -289,6 +290,9 @@ class ModelPerformanceChart {
                 ];
                 if (dataPoint.description) {
                   lines.push(`Description: ${dataPoint.description}`);
+                }
+                if (dataPoint.reasoning) {
+                  lines.push(`Reasoning: ${dataPoint.reasoning}`);
                 }
                 if (!this.hasMetrics || context.dataset._metric === 'latency') {
                   lines.push(`Latency: ${value.toFixed(2)}s`);
