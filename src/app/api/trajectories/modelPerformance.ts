@@ -47,7 +47,6 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
         // find the matching request event
         const previous = sortedEvents.slice(0, i).reverse().find((e): e is { event: LlmRequestEvent, timestamp: Date } => e.event.type === 'LlmRequestEvent' && e.event.id === currentEvent.event.id)
         if (previous) {
-          console.log(previous.event.modelParameters.reasoning_effort)
           reasoning = previous.event.modelParameters.reasoning_effort
         }
 
