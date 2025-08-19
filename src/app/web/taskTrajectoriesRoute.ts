@@ -310,7 +310,7 @@ function processEvents(events: EventRecord[] = []) {
         || record.event.type === 'ActionRequestBuildingFailed'
       )
     })
-    .map((record, index) => {
+    .map((record, index, records) => {
       const klass = 'p-4 mt-4 bg-base-content/10'
       const messages: string[] = []
 
@@ -366,6 +366,7 @@ function processEvents(events: EventRecord[] = []) {
         } else {
 
           const latency = record.event.answer.time
+          const previous = records.slice(0, index).reverse().find((rec): rec is { event: LlmRequestEvent, timestamp: Date } => rec.event.type === 'LlmRequestEvent' && rec.event.id === record.event.id)
 
           messages.push(
             ...record.event.answer.contentChoices.map(choice => {
@@ -379,7 +380,7 @@ function processEvents(events: EventRecord[] = []) {
                 index,
                 testIdPrefix: 'chat-assistant-toggle',
                 left: false,
-                label: `Model Response <span class="text-primary-content/50">${(latency/1000).toFixed(2)}s</span>`,
+                label: `Model Response <span class="text-primary-content/50">${(latency/1000).toFixed(2)}s/${previous?.event.modelParameters.reasoning_effort}</span>`,
                 content: escapeHtml(choice.content || '<unexpectedly_empty>'),
               }) + toolUses
 
