@@ -162,8 +162,8 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
   )
 }
 
-// Function to generate JSX for combined issues table with project summary footer
-const generateIssuesTable = async (project: Project, locale: string | undefined): Promise<JSX.Element> => {
+// Issues Table Component
+const IssuesTable = async ({ project, locale }: { project: Project, locale: string | undefined }) => {
   const issuesCount = (await project.issues).size
 
   if (issuesCount === 0) {
@@ -347,13 +347,18 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
   
   try {
     const { jetBrains, project } = req
-    const issues = [...(await project?.issues ?? []).values()]
+
+    if (!jetBrains || !project) {
+      return res.status(404).send('Project not found')
+    }
+
+    const issues = [...(await project.issues ?? []).values()]
 
     // Prepare graph data
     const graphData = await prepareGraphData(issues)
 
     const page = <HtmlPage cookies={req.cookies}>
-      <AppHead title={`Junie Explorer: ${project?.name} Issues`}>
+      <AppHead title={`Junie Explorer: ${project.name} Issues`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
           <script>
@@ -364,18 +369,18 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
         <script src="/js/reloadPage.js"></script>
         <script src="/js/compareModal.js"></script>
       </AppHead>
-      <AppBody data-project-id={escapeHtml(project?.name ?? '')}>
-        <AppHeader actions={[<ThemeSwitcher />, <ReloadButton />]} title={project?.name} />
-        <VersionBanner version={jetBrains?.version}/>
+      <AppBody data-project-id={escapeHtml(project.name ?? '')}>
+        <AppHeader actions={[<ThemeSwitcher />, <ReloadButton />]} title={project.name} />
+        <VersionBanner version={jetBrains.version}/>
         <Breadcrumb
           items={[
             { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
-            { label: project?.name ?? '', testId: 'breadcrumb-project-name' }
+            { label: project.name ?? '', testId: 'breadcrumb-project-name' }
           ]}
         />
-        <IdeIcons project={project!} jetBrains={jetBrains} />
-        <CostChart condition={project!.hasMetrics} />
-        {project && await generateIssuesTable(project, locale)}
+        <IdeIcons project={project} jetBrains={jetBrains} />
+        <CostChart condition={project.hasMetrics} />
+        <IssuesTable project={project} locale={locale} />
       </AppBody>
     </HtmlPage>
 
