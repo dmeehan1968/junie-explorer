@@ -23,9 +23,13 @@
     "build": "bun install && bun run build:static && bun run build:apple:x64 && bun run build:apple:arm64 && bun run build:linux:x64 && bun run build:linux:arm64 && bun run build:windows:x64"
   },
   "dependencies": {
+    "@kitajs/html": "^4.2.9",
+    "@kitajs/ts-html-plugin": "^4.1.2",
     "@tailwindcss/cli": "^4.1.11",
     "@types/bun": "^1.2.19",
+    "@types/cookie-parser": "^1.4.9",
     "@types/semver": "^7.7.0",
+    "cookie-parser": "^1.4.7",
     "express": "^4.18.2",
     "fs-extra": "^11.1.1",
     "marked": "^15.0.12",

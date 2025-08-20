@@ -10,7 +10,11 @@
     "noEmit": true,
     "types": ["node", "@playwright/test"],
     "sourceMap": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "jsx": "react",
+    "jsxFactory": "Html.createElement",
+    "jsxFragmentFactory": "Html.Fragment",
+    "plugins": [{ "name": "@kitajs/ts-html-plugin" }]
   },
   "include": ["src", "features", "public"]
 }
