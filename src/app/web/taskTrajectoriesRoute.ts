@@ -2,8 +2,8 @@ import express from 'express'
 import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
 import { AppRequest, AppResponse } from "../types.js"
 import { Breadcrumb } from '../../components/breadcrumb.js'
-import { collapseIcon } from "../../components/collapseIcon.js"
-import { expandIcon } from "../../components/expandIcon.js"
+import { CollapseIcon } from "../../components/collapseIcon.js"
+import { ExpandIcon } from "../../components/expandIcon.js"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { TaskCard } from '../../components/taskCard.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
@@ -62,7 +62,7 @@ function ToolCallDecorator(klass: string, index: number, testIdPrefix: string, t
   const content = `<div class="py-2"><span class="bg-secondary text-secondary-content p-2 rounded shadow">${escapeHtml(tool.name)}</span></div>${params}`
   return `
     <div class="relative ml-48 mb-8">
-      ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix, index })}
+      ${ToggleComponent({ expandIcon: ExpandIcon({}), collapseIcon: CollapseIcon({}), testIdPrefix, index })}
       <div class="relative">
         <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow">${tool.label}</h3>
         <div class="${klass} rounded shadow flex flex-col gap-1 pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${content}</div>        
@@ -91,7 +91,7 @@ function MessageDecorator(props: {
 }) {
   return `
         <div class="relative mb-8 ${props.left ? 'mr-48' : 'ml-48'}">
-          ${ToggleComponent({ expandIcon, collapseIcon, testIdPrefix: props.testIdPrefix, index: props.index })}
+          ${ToggleComponent({ expandIcon: ExpandIcon({}), collapseIcon: CollapseIcon({}), testIdPrefix: props.testIdPrefix, index: props.index })}
           <div class="relative">
             <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow z-50">${props.label}</h3>
             <div class="${props.klass} rounded shadow pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out">${props.content}</div>

@@ -7,7 +7,7 @@ import { Breadcrumb } from '../../components/breadcrumb.js'
 import { escapeHtml } from "../../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
 import { ReloadButton } from '../../components/reloadButton.js'
-import { getStatusBadge } from "../../components/statusBadge.js"
+import { StatusBadge } from "../../components/statusBadge.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../../utils/timeUtils.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
@@ -140,7 +140,7 @@ const generateIssuesTable = async (project: Project, locale: string | undefined)
               ${formatSeconds((await issue.metrics).time / 1000)}
             </td>
             <td class="text-right whitespace-nowrap" data-testid="issue-status" role="link" tabindex="0" onclick="window.location.href='${href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}">
-              ${getStatusBadge(issue.state)}
+              ${StatusBadge({ state: issue.state })}
             </td>
           </tr>
           `

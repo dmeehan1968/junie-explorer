@@ -1,5 +1,10 @@
-// Function to generate colored status badge based on issue state
-export const getStatusBadge = (state: string): string => {
+import { Component, Html } from "@kitajs/html"
+
+interface StatusBadgeProps {
+  state: string
+}
+
+const getStateClass = (state: string): string => {
   const lowerState = state.toLowerCase()
 
   // Map states to colors based on original CSS
@@ -15,7 +20,11 @@ export const getStatusBadge = (state: string): string => {
     'declined': 'bg-gray-100 text-gray-600 border border-gray-200',
   }
 
-  const styleClass = stateStyles[lowerState] || stateStyles[lowerState.replace(/\s+/g, '-')] || 'bg-gray-100 text-gray-600 border border-gray-200'
-
-  return `<span class="inline-block px-2 py-1 text-xs font-bold rounded ${styleClass} whitespace-nowrap">${state}</span>`
+  return stateStyles[lowerState] || stateStyles[lowerState.replace(/\s+/g, '-')] || 'bg-gray-100 text-gray-600 border border-gray-200'
 }
+
+export const StatusBadge: Component<StatusBadgeProps> = ({ state }) => (
+  <span class={`inline-block px-2 py-1 text-xs font-bold rounded ${getStateClass(state)} whitespace-nowrap`}>
+    {state}
+  </span>
+)
