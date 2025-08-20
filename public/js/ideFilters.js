@@ -129,13 +129,13 @@ function applyFilters(ideFilters, searchTerm = '') {
 // Toggle visibility of the search clear button
 function toggleSearchClearBtn() {
   const input = document.getElementById('project-search-input');
-  const btn = document.getElementById('project-search-clear');
-  if (!input || !btn) return;
+  const clear = document.getElementById('project-search-clear');
+  if (!input || !clear) return;
   const hasText = (input.value || '').trim().length > 0;
   if (hasText) {
-    btn.classList.remove('hidden');
+    clear.classList.remove('hidden');
   } else {
-    btn.classList.add('hidden');
+    clear.classList.add('hidden');
   }
 }
 
