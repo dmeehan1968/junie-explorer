@@ -90,8 +90,15 @@ When loading the logs, concurrent workers are used to improve performance.  By d
 supported by your system will be used (CPU cores).  If you want to limit the concurrency to avoid interference
 with other processes, you can use the CONCURRENCY environment variable:
 
+Bash:
 ```shell
 CONCURRENCY=4 junie-explorer-apple-arm64
+```
+
+Windows PowerShell:
+```shell
+$Env:CONCURRENCY = 4
+.\junie-explorer-windows-x64.exe
 ```
 
 - Setting CONCURRENCY to 0 will disable concurrency.
