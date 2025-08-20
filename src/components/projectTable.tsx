@@ -1,6 +1,6 @@
 import { Component, Html } from "@kitajs/html"
-import { Project } from "playwright/test"
 import { JetBrains } from "../jetbrains.js"
+import { Project } from "../Project.js"
 import { Conditional } from "./conditional.js"
 import { SortIcon } from "./sortIcon.js"
 
