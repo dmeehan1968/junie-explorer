@@ -11,7 +11,7 @@ export const LlmResponseEvent = z.looseObject({
   id: z.string(),
   answer: z.looseObject({
     llm: LLM,
-    contentChoices: ContentAnswer.array(),
+    contentChoices: ContentAnswer.array().default(() => ([])),
     inputTokens: z.number().int().optional(),
     outputTokens: z.number().int().optional(),
     cacheInputTokens: z.number().int().optional(),
