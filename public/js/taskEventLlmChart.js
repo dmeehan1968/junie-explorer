@@ -24,10 +24,18 @@ let selectedProvider = 'all';
 
 // Function to filter chart data based on selected providers
 function filterChartData(selectedProviders) {
-  if (!originalChartData || !window.llmEvents) return originalChartData;
+
+  const llmEventsEl = document.getElementById('llmEvents');
+  const llmEvents = llmEventsEl ? JSON.parse(llmEventsEl.textContent) : null;
+  // Convert ISO string back to Date object
+  llmEvents.forEach(event => {
+    event.timestamp = new Date(event.timestamp);
+  });
+
+  if (!originalChartData || !llmEvents) return originalChartData;
   
   // Filter events based on selected providers
-  const filteredEvents = window.llmEvents.filter(event => {
+  const filteredEvents = llmEvents.filter(event => {
     const provider = event.event.answer?.llm?.provider;
     return selectedProviders.includes(provider);
   });
@@ -144,14 +152,15 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       // Check if llmChartData exists (it won't if there are no LLM events)
-      if (!window.llmChartData) {
+      const chartDataEl = document.getElementById('llmChartData');
+      const chartData = chartDataEl ? JSON.parse(chartDataEl.textContent) : null;
+      if (!chartData) {
         console.log('No LLM chart data available - chart will not be initialized');
         return;
       }
 
       const ctx = chartElement.getContext('2d');
       // Use a global variable to avoid JSON parsing issues
-      const chartData = window.llmChartData;
       originalChartData = chartData;
       const timeUnit = chartData.timeUnit;
       const stepSize = chartData.stepSize;
