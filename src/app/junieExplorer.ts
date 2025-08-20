@@ -13,6 +13,7 @@ import { errorHandler } from "./middleware/errorHandler.js"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware.js"
 import { AppRequest, AppResponse } from "./types.js"
 import { notFoundRouteHandler } from "./web/notFoundRouteHandler.js"
+import cookieParser from 'cookie-parser'
 
 export class JunieExplorer {
   private readonly app: Express
@@ -23,6 +24,7 @@ export class JunieExplorer {
     this.app.locals.jetBrains = jetBrains   // TODO: remove this
 
     // middleware
+    this.app.use(cookieParser())
     this.app.use(async (req: AppRequest, res: AppResponse, next: NextFunction) => {
       req.jetBrains = jetBrains
       next()

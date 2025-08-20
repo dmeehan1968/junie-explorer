@@ -292,11 +292,11 @@ router.get('/project/:projectId', async (req: AppRequest, res: AppResponse) => {
           <div class="flex justify-between items-start mb-5 pb-3 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-primary flex-1 mr-8">Junie Explorer: ${project?.name}</h1>
             <div class="flex items-center gap-3">
-              ${ThemeSwitcher()}
-              ${ReloadButton()}
+              ${ThemeSwitcher({})}
+              ${ReloadButton({})}
             </div>
           </div>
-          ${VersionBanner(jetBrains?.version)}
+          ${VersionBanner({ version: jetBrains?.version})}
           ${Breadcrumb({
             items: [
               { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },
