@@ -14,17 +14,13 @@ export async function refreshHandler(req: AppRequest, res: AppResponse) {
     const parts = url.pathname.split('/')
     const projectId = parts[2]
     const issueId = parts[4]
-    const taskId = parts[6]
 
-    console.log('Reloading', JSON.stringify({ projectId, issueId, taskId }))
+    console.log('Reloading', JSON.stringify({ projectId, issueId }))
 
     let project: Project | undefined = projectId && await jetBrains?.getProjectByName(projectId) || undefined
     let issue: Issue | undefined = issueId && await project?.getIssueById(issueId) || undefined
-    let task: Task | undefined = taskId && await issue?.getTaskById(taskId) || undefined
 
-    if (task) {
-      task.reload()
-    } else if (issue) {
+    if (issue) {
       issue.reload()
     } else if (project) {
       project.reload()
