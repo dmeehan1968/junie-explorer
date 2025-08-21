@@ -62,10 +62,10 @@ export class Task {
           if (workerStatsInterval > 0) {
             setInterval(() => {
               console.log(new Date().toISOString().slice(0, 19) + `: ${this._workerPool!.name}: ` + Object.entries({
-                executions: this._workerPool!.executionsCount,
-                executing: this._workerPool!.executingCount,
+                workers: this._workerPool!.workerCount,
                 idle: this._workerPool!.idleCount,
                 queued: this._workerPool!.queuedCount,
+                executions: this._workerPool!.executionsCount,
                 failed: this._workerPool!.failedCount,
               }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
             }, workerStatsInterval * 1000)

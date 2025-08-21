@@ -40,6 +40,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   public get queuedCount() { return this.queue.length }
   public get idleCount() { return this.workers.filter(w => !w.busy).length }
   public get executingCount() { return this.workers.filter(w => w.busy).length }
+  public get workerCount() { return this.workers.length }
 
   constructor(options: WorkerPoolOptions) {
     let { minConcurrency, maxConcurrency, workerPath, idleTimeoutMs, errorHandler, name } = options
