@@ -5,6 +5,9 @@ type Job<TIn, TOut> = {
 }
 
 interface WorkerPoolOptions {
+  minConcurrency: number
+  maxConcurrency: number
+  workerPath: string
   idleTimeoutMs?: number
   errorHandler?: (e: any) => void
 }
@@ -32,15 +35,16 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   public get idleCount() { return this.workers.filter(w => !w.busy).length }
   public get executingCount() { return this.workers.filter(w => w.busy).length }
 
-  constructor(minConcurrency: number, maxConcurrency: number, workerPath: string, options: WorkerPoolOptions = {}) {
+  constructor(options: WorkerPoolOptions) {
+    let { minConcurrency, maxConcurrency, workerPath, idleTimeoutMs, errorHandler } = options
     if (!Number.isFinite(minConcurrency) || minConcurrency < 1) minConcurrency = 1
     if (!Number.isFinite(maxConcurrency) || maxConcurrency < minConcurrency) maxConcurrency = minConcurrency
     maxConcurrency = Math.min(maxConcurrency, navigator.hardwareConcurrency)
     this.minConcurrency = minConcurrency
     this.maxConcurrency = maxConcurrency
     this.workerPath = workerPath
-    this.idleTimeoutMs = options.idleTimeoutMs ?? 5000
-    this.errorHandler = options.errorHandler
+    this.idleTimeoutMs = idleTimeoutMs ?? 5000
+    this.errorHandler = errorHandler
 
     // Pre-warm to min
     for (let i = 0; i < this.minConcurrency; i++) {
@@ -49,40 +53,40 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   }
 
   private spawnWorker() {
-    const w = new Worker(this.workerPath, { type: 'module' })
-    const entry: WorkerEntry = { worker: w, busy: false, timer: undefined }
+    const worker = new Worker(this.workerPath, { type: 'module' })
+    const entry: WorkerEntry = { worker, busy: false, timer: undefined }
 
     // Route messages per job execution
-    w.onmessage = (ev: MessageEvent) => {
+    worker.onmessage = (event: MessageEvent) => {
       // The worker replies with { ok, result?, error? }
-      const currentJob = this.currentJobMap.get(w)
+      const currentJob = this.currentJobMap.get(worker)
       if (!currentJob) return
       entry.busy = false
       this.clearIdleTimer(entry)
       // Count completion and failures appropriately
       this.executionsCount++
-      if (ev.data && ev.data.ok) {
-        currentJob.resolve(ev.data.result as TOut)
+      if (event.data && event.data.ok) {
+        currentJob.resolve(event.data.result as TOut)
       } else {
         this.failedCount++
-        currentJob.reject(ev.data?.error ?? new Error('Worker error'))
+        currentJob.reject(event.data?.error ?? new Error('Worker error'))
       }
-      this.currentJobMap.delete(w)
+      this.currentJobMap.delete(worker)
       this.schedule()
       this.ensureIdleRetention()
     }
 
-    w.onerror = (e) => {
-      const currentJob = this.currentJobMap.get(w)
+    worker.onerror = (errorEvent) => {
+      const currentJob = this.currentJobMap.get(worker)
       if (currentJob) {
         this.failedCount++
         this.executionsCount++
-        currentJob.reject(e)
+        currentJob.reject(errorEvent)
       }
-      this.currentJobMap.delete(w)
-      this.errorHandler?.(e)
+      this.currentJobMap.delete(worker)
+      this.errorHandler?.(errorEvent)
       // remove and respawn if needed
-      this.removeWorker(w)
+      this.removeWorker(worker)
       this.schedule()
     }
 
@@ -90,51 +94,45 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     return entry
   }
 
-  private removeWorker(w: Worker) {
-    const idx = this.workers.findIndex(we => we.worker === w)
-    if (idx >= 0) {
-      try { this.workers[idx].worker.terminate() } catch {}
-      this.workers.splice(idx, 1)
+  private removeWorker(worker: Worker) {
+    const index = this.workers.findIndex(entry => entry.worker === worker)
+    if (index >= 0) {
+      try { this.workers[index].worker.terminate() } catch {}
+      this.workers.splice(index, 1)
     }
   }
 
   private currentJobMap = new Map<Worker, Job<TIn, TOut>>()
 
+  private postJobToEntry(entry: WorkerEntry, job: Job<TIn, TOut>) {
+    entry.busy = true
+    this.currentJobMap.set(entry.worker, job)
+    try {
+      entry.worker.postMessage(job.data)
+    } catch (error) {
+      entry.busy = false
+      this.currentJobMap.delete(entry.worker)
+      // count as failed completion
+      this.failedCount++
+      this.executionsCount++
+      job.reject(error)
+    }
+  }
+
   private schedule() {
     // Fill available workers with queued jobs
     for (const entry of this.workers) {
-      if (!this.queue.length) break
+      if (!this.queuedCount) break
       if (entry.busy) continue
       const job = this.queue.shift()!
-      entry.busy = true
-      this.currentJobMap.set(entry.worker, job)
-      try {
-        entry.worker.postMessage(job.data)
-      } catch (e) {
-        entry.busy = false
-        this.currentJobMap.delete(entry.worker)
-        // count as failed completion
-        this.failedCount++
-        this.executionsCount++
-        job.reject(e)
-      }
+      this.postJobToEntry(entry, job)
     }
 
     // If queue remains and we can grow, spawn more
-    while (this.queue.length && this.workers.length < this.maxConcurrency) {
+    while (this.queuedCount && this.workers.length < this.maxConcurrency) {
       const entry = this.spawnWorker()
       const job = this.queue.shift()!
-      entry.busy = true
-      this.currentJobMap.set(entry.worker, job)
-      try {
-        entry.worker.postMessage(job.data)
-      } catch (e) {
-        entry.busy = false
-        this.currentJobMap.delete(entry.worker)
-        this.failedCount++
-        this.executionsCount++
-        job.reject(e)
-      }
+      this.postJobToEntry(entry, job)
     }
 
     // Start idle timers for idle workers beyond min
@@ -149,23 +147,21 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   }
 
   private ensureIdleRetention() {
-    let idle = this.workers.filter(w => !w.busy)
-    const surplus = Math.max(0, idle.length - this.minConcurrency)
-    // terminate surplus idles after timeout
-    let toTerminate = surplus
-    for (const entry of idle) {
-      if (toTerminate <= 0) break
+    const idleEntries = this.workers.filter(entry => !entry.busy)
+    let surplusIdleCount = Math.max(0, idleEntries.length - this.minConcurrency)
+    for (const entry of idleEntries) {
+      if (surplusIdleCount <= 0) break
       if (!entry.timer) {
         entry.timer = setTimeout(() => {
           // Terminate if still idle and we have more than min
-          if (!entry.busy && this.workers.filter(w => !w.busy).length > this.minConcurrency) {
+          if (!entry.busy && this.idleCount > this.minConcurrency) {
             this.removeWorker(entry.worker)
           } else {
             this.clearIdleTimer(entry)
           }
         }, this.idleTimeoutMs)
       }
-      toTerminate--
+      surplusIdleCount--
     }
   }
 
