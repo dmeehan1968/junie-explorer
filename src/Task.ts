@@ -73,17 +73,11 @@ export class Task {
                 queued: metrics.queuedCount,
                 workers: metrics.workerCount,
                 peak: metrics.peakWorkerCount,
+                successes: metrics.successCount,
+                failures: metrics.failureCount,
+                'avg-exec': `${metrics.averageExecutionTimeMs.toFixed(1).padStart(5)}ms`,
+                'avg-wait': `${metrics.averageQueueWaitTimeMs.toFixed(1).padStart(8)}ms`,
               }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
-              
-              // Performance stats on second line if there's activity
-              if (metrics.successCount > 0 || metrics.failureCount > 0) {
-                console.log(`${' '.repeat(timestamp.length + 2 + this._workerPool!.name.length + 2)}` + Object.entries({
-                  successes: metrics.successCount,
-                  failures: metrics.failureCount,
-                  'avg-exec': `${metrics.averageExecutionTimeMs.toFixed(1)}ms`,
-                  'avg-wait': `${metrics.averageQueueWaitTimeMs.toFixed(1)}ms`,
-                }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
-              }
             }, workerStatsInterval * 1000)
           }
         }
