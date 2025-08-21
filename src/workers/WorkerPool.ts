@@ -12,7 +12,7 @@ interface WorkerPoolOptions {
 interface WorkerEntry {
   worker: Worker
   busy: boolean
-  timer?: number
+  timer?: NodeJS.Timeout
 }
 
 export class WorkerPool<TIn extends object, TOut extends object> {
@@ -26,8 +26,8 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   private workers: WorkerEntry[] = []
 
   // metrics
-  public totalExecutions = 0
-  public failedExecutions = 0
+  public executionsCount = 0
+  public failedCount = 0
   public get queuedCount() { return this.queue.length }
   public get idleCount() { return this.workers.filter(w => !w.busy).length }
   public get executingCount() { return this.workers.filter(w => w.busy).length }
@@ -60,11 +60,11 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       entry.busy = false
       this.clearIdleTimer(entry)
       // Count completion and failures appropriately
-      this.totalExecutions++
+      this.executionsCount++
       if (ev.data && ev.data.ok) {
         currentJob.resolve(ev.data.result as TOut)
       } else {
-        this.failedExecutions++
+        this.failedCount++
         currentJob.reject(ev.data?.error ?? new Error('Worker error'))
       }
       this.currentJobMap.delete(w)
@@ -75,8 +75,8 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     w.onerror = (e) => {
       const currentJob = this.currentJobMap.get(w)
       if (currentJob) {
-        this.failedExecutions++
-        this.totalExecutions++
+        this.failedCount++
+        this.executionsCount++
         currentJob.reject(e)
       }
       this.currentJobMap.delete(w)
@@ -114,8 +114,8 @@ export class WorkerPool<TIn extends object, TOut extends object> {
         entry.busy = false
         this.currentJobMap.delete(entry.worker)
         // count as failed completion
-        this.failedExecutions++
-        this.totalExecutions++
+        this.failedCount++
+        this.executionsCount++
         job.reject(e)
       }
     }
@@ -131,8 +131,8 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       } catch (e) {
         entry.busy = false
         this.currentJobMap.delete(entry.worker)
-        this.failedExecutions++
-        this.totalExecutions++
+        this.failedCount++
+        this.executionsCount++
         job.reject(e)
       }
     }
@@ -141,7 +141,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     this.ensureIdleRetention()
   }
 
-  private clearIdleTimer(entry: { timer?: number }) {
+  private clearIdleTimer(entry: { timer?: NodeJS.Timeout }) {
     if (entry.timer) {
       clearTimeout(entry.timer)
       entry.timer = undefined
@@ -163,7 +163,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
           } else {
             this.clearIdleTimer(entry)
           }
-        }, this.idleTimeoutMs) as unknown as number
+        }, this.idleTimeoutMs)
       }
       toTerminate--
     }
