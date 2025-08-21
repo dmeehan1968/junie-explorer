@@ -1,3 +1,5 @@
+import path from "node:path"
+
 type Job<TIn, TOut> = {
   data: TIn
   resolve: (value: TOut) => void
@@ -41,7 +43,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
 
   constructor(options: WorkerPoolOptions) {
     let { minConcurrency, maxConcurrency, workerPath, idleTimeoutMs, errorHandler, name } = options
-    if (!Number.isFinite(minConcurrency) || minConcurrency < 1) minConcurrency = 1
+    if (!Number.isFinite(minConcurrency) || minConcurrency < 0) minConcurrency = 0
     if (!Number.isFinite(maxConcurrency) || maxConcurrency < minConcurrency) maxConcurrency = minConcurrency
     maxConcurrency = Math.min(maxConcurrency, navigator.hardwareConcurrency)
     this.minConcurrency = minConcurrency
@@ -50,18 +52,14 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     this.idleTimeoutMs = idleTimeoutMs ?? 5000
     this.errorHandler = errorHandler
     // default name from provided name or worker file basename
-    const derivedName = (() => {
+    this.name = (() => {
       if (name && name.trim().length) return name.trim()
       try {
-        // workerPath might be relative; take last segment
-        const parts = workerPath.split(/[\\\/]/)
-        const base = parts[parts.length - 1] || workerPath
-        return base.replace(/\.[cm]?tsx?$/i, '')
+        return path.parse(workerPath).name
       } catch {
         return 'worker-pool'
       }
     })()
-    this.name = derivedName
 
     // Pre-warm to min
     for (let i = 0; i < this.minConcurrency; i++) {

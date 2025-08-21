@@ -43,15 +43,15 @@ export class Task {
       return this._workerPool
     }
 
-    const concurrency = getMaxConcurrency()
+    const maxConcurrency = getMaxConcurrency()
 
     if (this._workerPool === undefined) {
-      if (concurrency > 0) {
+      if (maxConcurrency > 0) {
         const workerPath = './src/workers/loadEventsWorker.ts'
-        console.log(`Concurrency is ${concurrency}. Set environment CONCURRENCY to configure`)
+        console.log(`Concurrency is ${maxConcurrency}. Set environment CONCURRENCY to configure`)
         this._workerPool = new WorkerPool({
-          minConcurrency: 1,
-          maxConcurrency: concurrency,
+          minConcurrency: 0,
+          maxConcurrency: maxConcurrency,
           workerPath,
           idleTimeoutMs: 5000,
           errorHandler: (e) => console.error('Worker pool error:', e),
