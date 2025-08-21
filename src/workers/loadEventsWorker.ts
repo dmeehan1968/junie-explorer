@@ -1,19 +1,13 @@
-import { EventRecord } from "../schema/eventRecord.js"
 import { loadEvents } from "./loadEvents.js"
+import { LoadEventsInput } from "./loadEventsInput.js"
+import { LoadEventsOutput } from "./loadEventsOutput.js"
+
 declare var self: Worker;
-
-interface LoadEventsInput {
-  eventsFilePath: string
-}
-
-interface LoadEventsOutput {
-  events: EventRecord[]
-}
 
 self.onmessage = async (ev: MessageEvent<LoadEventsInput>) => {
   const data = ev.data
   if (!data) {
-    self.postMessage({ ok: false, error: new Error('No data provided') })
+    self.postMessage({ ok: false, error: 'No data provided' })
   }
   try {
     const result: LoadEventsOutput = await loadEvents(data.eventsFilePath)

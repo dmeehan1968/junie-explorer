@@ -2,6 +2,8 @@ import fs from "fs-extra"
 import path from "node:path"
 import { setInterval } from "timers"
 import { getMaxConcurrency } from "./getMaxConcurrency.js"
+import { LoadEventsInput } from "./workers/loadEventsInput.js"
+import { LoadEventsOutput } from "./workers/loadEventsOutput.js"
 import { WorkerPool } from "./workers/WorkerPool.js"
 import {
   AgentState,
@@ -49,7 +51,7 @@ export class Task {
       if (maxConcurrency > 0) {
         const workerPath = './src/workers/loadEventsWorker.ts'
         console.log(`Concurrency is ${maxConcurrency}. Set environment CONCURRENCY to configure`)
-        this._workerPool = new WorkerPool({
+        this._workerPool = new WorkerPool<LoadEventsInput, LoadEventsOutput>({
           minConcurrency: 0,
           maxConcurrency: maxConcurrency,
           workerPath,

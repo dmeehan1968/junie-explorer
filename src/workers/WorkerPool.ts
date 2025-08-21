@@ -21,6 +21,18 @@ interface WorkerEntry {
   timer?: NodeJS.Timeout
 }
 
+interface Success<T> {
+  ok: true
+  result: T
+}
+
+interface Failure {
+  ok: false
+  error: any
+}
+
+type Response<T> = Success<T> | Failure
+
 export class WorkerPool<TIn extends object, TOut extends object> {
   private minConcurrency: number
   private maxConcurrency: number
@@ -73,8 +85,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     const entry: WorkerEntry = { worker, busy: false, timer: undefined }
 
     // Route messages per job execution
-    worker.onmessage = (event: MessageEvent) => {
-      // The worker replies with { ok, result?, error? }
+    worker.onmessage = (event: MessageEvent<Response<TOut>>) => {
       const currentJob = this.currentJobMap.get(worker)
       if (!currentJob) return
       entry.busy = false
@@ -82,10 +93,10 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       // Count completion and failures appropriately
       this.executionsCount++
       if (event.data && event.data.ok) {
-        currentJob.resolve(event.data.result as TOut)
+        currentJob.resolve(event.data.result)
       } else {
         this.failedCount++
-        currentJob.reject(event.data?.error ?? new Error('Worker error'))
+        currentJob.reject(event.data.error ?? new Error('Worker error'))
       }
       this.currentJobMap.delete(worker)
       this.schedule()
@@ -120,7 +131,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
 
   private currentJobMap = new Map<Worker, Job<TIn, TOut>>()
 
-  private postJobToEntry(entry: WorkerEntry, job: Job<TIn, TOut>) {
+  private postJobToWorkerEntry(entry: WorkerEntry, job: Job<TIn, TOut>) {
     entry.busy = true
     this.currentJobMap.set(entry.worker, job)
     try {
@@ -141,14 +152,14 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       if (!this.queuedCount) break
       if (entry.busy) continue
       const job = this.queue.shift()!
-      this.postJobToEntry(entry, job)
+      this.postJobToWorkerEntry(entry, job)
     }
 
     // If queue remains and we can grow, spawn more
     while (this.queuedCount && this.workers.length < this.maxConcurrency) {
       const entry = this.spawnWorker()
       const job = this.queue.shift()!
-      this.postJobToEntry(entry, job)
+      this.postJobToWorkerEntry(entry, job)
     }
 
     // Start idle timers for idle workers beyond min
