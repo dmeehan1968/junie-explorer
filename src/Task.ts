@@ -50,7 +50,10 @@ export class Task {
         const workerPath = './src/workers/loadEventsWorker.ts'
         console.log(`Concurrency is ${concurrency}. Set environment CONCURRENCY to configure`)
         // min: 1, max: concurrency
-        this._workerPool = new WorkerPool(1, concurrency, workerPath, { idleTimeoutMs: 5000, errorHandler: (e) => console.error('Worker pool error:', e) })
+        this._workerPool = new WorkerPool(1, concurrency, workerPath, {
+          idleTimeoutMs: 5000,
+          errorHandler: (e) => console.error('Worker pool error:', e)
+        })
 
         if (process.env.WORKER_STATS) {
           const workerStatsInterval = parseFloat(process.env.WORKER_STATS ?? '10')
