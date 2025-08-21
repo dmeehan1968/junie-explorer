@@ -63,13 +63,27 @@ export class Task {
           const workerStatsInterval = parseFloat(process.env.WORKER_STATS ?? '10')
           if (workerStatsInterval > 0) {
             setInterval(() => {
-              console.log(new Date().toISOString().slice(0, 19) + `: ${this._workerPool!.name}: ` + Object.entries({
-                busy: this._workerPool!.busyCount,
-                idle: this._workerPool!.idleCount,
-                queued: this._workerPool!.queuedCount,
-                successes: this._workerPool!.successCount,
-                failures: this._workerPool!.failureCount,
+              const metrics = this._workerPool!.getMetrics()
+              const timestamp = new Date().toISOString().slice(0, 19)
+              
+              // Basic stats on first line
+              console.log(`${timestamp}: ${this._workerPool!.name}: ` + Object.entries({
+                busy: metrics.busyCount,
+                idle: metrics.idleCount,
+                queued: metrics.queuedCount,
+                workers: metrics.workerCount,
+                peak: metrics.peakWorkerCount,
               }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
+              
+              // Performance stats on second line if there's activity
+              if (metrics.successCount > 0 || metrics.failureCount > 0) {
+                console.log(`${' '.repeat(timestamp.length + 2 + this._workerPool!.name.length + 2)}` + Object.entries({
+                  successes: metrics.successCount,
+                  failures: metrics.failureCount,
+                  'avg-exec': `${metrics.averageExecutionTimeMs.toFixed(1)}ms`,
+                  'avg-wait': `${metrics.averageQueueWaitTimeMs.toFixed(1)}ms`,
+                }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
+              }
             }, workerStatsInterval * 1000)
           }
         }
