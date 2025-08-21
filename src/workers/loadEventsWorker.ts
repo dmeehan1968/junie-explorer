@@ -1,24 +1,24 @@
-import { ThreadWorker } from "@poolifier/poolifier-web-worker"
 import { EventRecord } from "../schema/eventRecord.js"
-import { UnknownEventRecord } from "../schema/unknownEventRecord.js"
 import { loadEvents } from "./loadEvents.js"
+declare var self: Worker;
 
 interface LoadEventsInput {
   eventsFilePath: string
 }
 
 interface LoadEventsOutput {
-  events: (EventRecord | UnknownEventRecord)[]
+  events: EventRecord[]
 }
 
-async function loadEventsFunction(data?: LoadEventsInput): Promise<LoadEventsOutput> {
+self.onmessage = async (ev: MessageEvent<LoadEventsInput>) => {
+  const data = ev.data
   if (!data) {
-    throw new Error('No data provided')
+    self.postMessage({ ok: false, error: new Error('No data provided') })
   }
-  const { eventsFilePath } = data
-  return await loadEvents(eventsFilePath)
+  try {
+    const result: LoadEventsOutput = await loadEvents(data.eventsFilePath)
+    self.postMessage({ ok: true, result })
+  } catch (error) {
+    self.postMessage({ ok: false, error: error instanceof Error ? error.message : String(error) })
+  }
 }
-
-export default new ThreadWorker(loadEventsFunction, {
-  maxInactiveTime: 5000,
-})

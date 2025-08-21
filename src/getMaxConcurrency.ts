@@ -1,5 +1,6 @@
-import { availableParallelism } from "@poolifier/poolifier-web-worker"
-
 export function getMaxConcurrency() {
-  return Math.min(availableParallelism(), parseInt(process.env.CONCURRENCY ?? availableParallelism().toString()))
+  const hw = navigator.hardwareConcurrency
+  const env = parseInt(process.env.CONCURRENCY ?? hw.toString())
+  const configured = Number.isFinite(env) && env > 0 ? env : hw
+  return Math.min(hw, configured)
 }

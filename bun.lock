@@ -6,7 +6,6 @@
       "dependencies": {
         "@kitajs/html": "^4.2.9",
         "@kitajs/ts-html-plugin": "^4.1.2",
-        "@poolifier/poolifier-web-worker": "npm:@jsr/poolifier__poolifier-web-worker",
         "@tailwindcss/cli": "^4.1.11",
         "@types/bun": "^1.2.19",
         "@types/cookie-parser": "^1.4.9",
@@ -115,8 +114,6 @@
     "@pkgjs/parseargs": ["@pkgjs/parseargs@0.11.0", "", {}, "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg=="],
 
     "@playwright/test": ["@playwright/test@1.54.1", "", { "dependencies": { "playwright": "1.54.1" }, "bin": { "playwright": "cli.js" } }, "sha512-FS8hQ12acieG2dYSksmLOF7BNxnVf2afRJdCuM1eMSxj6QTSE6G4InGF7oApGgDb65MX7AwMVlIkpru0yZA4Xw=="],
-
-    "@poolifier/poolifier-web-worker": ["@jsr/poolifier__poolifier-web-worker@0.5.10", "https://npm.jsr.io/~/11/@jsr/poolifier__poolifier-web-worker/0.5.10.tgz", {}, "sha512-6UHPmWew38ROEb1uBhAiTDHIonFNiQWMUSMBfc7EFqidu3JpRuWlCERuA+RRbHhYs9r1t93yKxsemBOU+z9ACw=="],
 
     "@tailwindcss/cli": ["@tailwindcss/cli@4.1.11", "", { "dependencies": { "@parcel/watcher": "^2.5.1", "@tailwindcss/node": "4.1.11", "@tailwindcss/oxide": "4.1.11", "enhanced-resolve": "^5.18.1", "mri": "^1.2.0", "picocolors": "^1.1.1", "tailwindcss": "4.1.11" }, "bin": { "tailwindcss": "dist/index.mjs" } }, "sha512-7RAFOrVaXCFz5ooEG36Kbh+sMJiI2j4+Ozp71smgjnLfBRu7DTfoq8DsTvzse2/6nDeo2M3vS/FGaxfDgr3rtQ=="],
 

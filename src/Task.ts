@@ -1,8 +1,8 @@
 import fs from "fs-extra"
 import path from "node:path"
-import { AbstractPool, DynamicThreadPool, FixedThreadPool, ThreadPoolOptions } from "@poolifier/poolifier-web-worker"
 import { setInterval } from "timers"
 import { getMaxConcurrency } from "./getMaxConcurrency.js"
+import { WorkerPool } from "./workers/WorkerPool.js"
 import {
   AgentState,
   JuniePlan,
@@ -36,9 +36,7 @@ export class Task {
   private _eventTypes: Promise<string[]> | undefined = undefined
 
   // Static worker pool for loading events
-  private static _workerPool: AbstractPool<Worker, { eventsFilePath: string }, {
-    events: EventRecord[]
-  }> | null | undefined = undefined
+  private static _workerPool: WorkerPool<{ eventsFilePath: string }, { events: EventRecord[] }> | null | undefined = undefined
 
   private static get workerPool() {
     const concurrency = getMaxConcurrency()
@@ -49,20 +47,18 @@ export class Task {
     if (this._workerPool === undefined) {
       if (concurrency > 0) {
         const workerPath = './src/workers/loadEventsWorker.ts'
-        const isDynamic = concurrency > 1
-        const options: ThreadPoolOptions = {
-          errorEventHandler: (e) => {
-            console.error('Worker pool error:', e)
-          },
-        }
         console.log(`Concurrency is ${concurrency}. Set environment CONCURRENCY to configure`)
-        this._workerPool = isDynamic
-          ? new DynamicThreadPool(1, concurrency, workerPath, options)
-          : new FixedThreadPool(concurrency, workerPath, options)
+        // min: 1, max: concurrency
+        this._workerPool = new WorkerPool(1, concurrency, workerPath, { idleTimeoutMs: 5000, errorHandler: (e) => console.error('Worker pool error:', e) })
 
-        // Task stealing causes problems on reload (slow or fails to complete) and barely makes a difference
-        // to performance as its only helpful as workers become idle
-        this._workerPool.enableTasksQueue(true, { taskStealing: false, tasksStealingOnBackPressure: false })
+        setInterval(() => {
+          console.log(new Date().toISOString() + ': ' + Object.entries({
+            executions: this._workerPool?.totalExecutions,
+            executing: this._workerPool?.executingCount,
+            idle: this._workerPool?.idleCount,
+            queued: this._workerPool?.queuedCount,
+          }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
+        }, 1000)
       } else {
         this._workerPool = null
         console.warn(`Concurrency disabled. Set environment CONCURRENCY > 0 to enable`)

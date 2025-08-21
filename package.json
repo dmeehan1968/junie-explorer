@@ -25,7 +25,6 @@
   "dependencies": {
     "@kitajs/html": "^4.2.9",
     "@kitajs/ts-html-plugin": "^4.1.2",
-    "@poolifier/poolifier-web-worker": "npm:@jsr/poolifier__poolifier-web-worker",
     "@tailwindcss/cli": "^4.1.11",
     "@types/bun": "^1.2.19",
     "@types/cookie-parser": "^1.4.9",
