@@ -441,7 +441,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                       testIdPrefix="chat-assistant-toggle"
                       left={false}
                       label={`Model Response <span class="text-primary-content/50">${(latency/1000).toFixed(2)}s/${previous?.event.modelParameters.reasoning_effort}</span>`}
-                      content={choice.content || '<unexpectedly_empty>'}
+                      content={escapeHtml(choice.content || '<unexpectedly_empty>')}
                     />
                     {toolUses}
                   </div>
