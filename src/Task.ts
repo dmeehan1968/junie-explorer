@@ -39,10 +39,11 @@ export class Task {
   private static _workerPool: WorkerPool<{ eventsFilePath: string }, { events: EventRecord[] }> | null | undefined = undefined
 
   private static get workerPool() {
-    const concurrency = getMaxConcurrency()
     if (this._workerPool) {
       return this._workerPool
     }
+
+    const concurrency = getMaxConcurrency()
 
     if (this._workerPool === undefined) {
       if (concurrency > 0) {
@@ -51,14 +52,18 @@ export class Task {
         // min: 1, max: concurrency
         this._workerPool = new WorkerPool(1, concurrency, workerPath, { idleTimeoutMs: 5000, errorHandler: (e) => console.error('Worker pool error:', e) })
 
-        setInterval(() => {
-          console.log(new Date().toISOString() + ': ' + Object.entries({
-            executions: this._workerPool?.totalExecutions,
-            executing: this._workerPool?.executingCount,
-            idle: this._workerPool?.idleCount,
-            queued: this._workerPool?.queuedCount,
-          }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
-        }, 1000)
+        if (process.env.WORKER_STATS) {
+          setInterval(() => {
+            console.log(new Date().toISOString().slice(0, 19) + ': WorkerPool: ' + Object.entries({
+              executions: this._workerPool?.totalExecutions,
+              executing: this._workerPool?.executingCount,
+              idle: this._workerPool?.idleCount,
+              queued: this._workerPool?.queuedCount,
+              failed: this._workerPool?.failedExecutions,
+            }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
+          }, Math.max(1, parseInt(process.env.WORKER_STATS ?? '10')) * 1000)
+        }
+
       } else {
         this._workerPool = null
         console.warn(`Concurrency disabled. Set environment CONCURRENCY > 0 to enable`)

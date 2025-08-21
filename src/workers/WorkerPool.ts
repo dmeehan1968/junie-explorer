@@ -27,6 +27,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
 
   // metrics
   public totalExecutions = 0
+  public failedExecutions = 0
   public get queuedCount() { return this.queue.length }
   public get idleCount() { return this.workers.filter(w => !w.busy).length }
   public get executingCount() { return this.workers.filter(w => w.busy).length }
@@ -58,9 +59,12 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       if (!currentJob) return
       entry.busy = false
       this.clearIdleTimer(entry)
+      // Count completion and failures appropriately
+      this.totalExecutions++
       if (ev.data && ev.data.ok) {
         currentJob.resolve(ev.data.result as TOut)
       } else {
+        this.failedExecutions++
         currentJob.reject(ev.data?.error ?? new Error('Worker error'))
       }
       this.currentJobMap.delete(w)
@@ -70,7 +74,11 @@ export class WorkerPool<TIn extends object, TOut extends object> {
 
     w.onerror = (e) => {
       const currentJob = this.currentJobMap.get(w)
-      if (currentJob) currentJob.reject(e)
+      if (currentJob) {
+        this.failedExecutions++
+        this.totalExecutions++
+        currentJob.reject(e)
+      }
       this.currentJobMap.delete(w)
       this.errorHandler?.(e)
       // remove and respawn if needed
@@ -105,6 +113,9 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       } catch (e) {
         entry.busy = false
         this.currentJobMap.delete(entry.worker)
+        // count as failed completion
+        this.failedExecutions++
+        this.totalExecutions++
         job.reject(e)
       }
     }
@@ -115,7 +126,15 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       const job = this.queue.shift()!
       entry.busy = true
       this.currentJobMap.set(entry.worker, job)
-      entry.worker.postMessage(job.data)
+      try {
+        entry.worker.postMessage(job.data)
+      } catch (e) {
+        entry.busy = false
+        this.currentJobMap.delete(entry.worker)
+        this.failedExecutions++
+        this.totalExecutions++
+        job.reject(e)
+      }
     }
 
     // Start idle timers for idle workers beyond min
@@ -152,7 +171,6 @@ export class WorkerPool<TIn extends object, TOut extends object> {
 
   public execute(data: TIn): Promise<TOut> {
     return new Promise<TOut>((resolve, reject) => {
-      this.totalExecutions++
       const job: Job<TIn, TOut> = { data, resolve, reject }
       this.queue.push(job)
       this.schedule()

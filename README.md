@@ -109,6 +109,11 @@ about doubling the time taken to process the logs.
 - The more workers you use, the more memory you are likely to need.  If memory is an issue, constrain
 the maximum number of workers
 
+### Worker Stats
+
+Enable worker statistics reporting with `WORKER_STATS={interval}` environment variable.  This will print statistics on
+current worker activity every `interval` seconds.
+
 ##  Development
 
 ## Development Workflow
