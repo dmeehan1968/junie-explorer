@@ -67,8 +67,8 @@ export class Task {
                 busy: this._workerPool!.busyCount,
                 idle: this._workerPool!.idleCount,
                 queued: this._workerPool!.queuedCount,
-                executions: this._workerPool!.executionsCount,
-                failed: this._workerPool!.failedCount,
+                successes: this._workerPool!.successCount,
+                failures: this._workerPool!.failureCount,
               }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
             }, workerStatsInterval * 1000)
           }

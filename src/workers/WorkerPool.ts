@@ -50,8 +50,8 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   private busyWorkers: WorkerEntry[] = []
 
   // metrics
-  public executionsCount = 0
-  public failedCount = 0
+  public successCount = 0
+  public failureCount = 0
   public get queuedCount() { return this.queue.length }
   public get busyCount() { return this.busyWorkers.length }
   public get idleCount() { return this.idleWorkers.length }
@@ -95,11 +95,11 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       entry.busy = false
       this.clearIdleTimer(entry)
       // Count completion and failures appropriately
-      this.executionsCount++
       if (event.data && event.data.ok) {
+        this.successCount++
         currentJob.resolve(event.data.result)
       } else {
-        this.failedCount++
+        this.failureCount++
         currentJob.reject(event.data.error ?? new Error('Worker error'))
       }
       this.currentJobMap.delete(worker)
@@ -114,8 +114,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     worker.onerror = (errorEvent) => {
       const currentJob = this.currentJobMap.get(worker)
       if (currentJob) {
-        this.failedCount++
-        this.executionsCount++
+        this.failureCount++
         currentJob.reject(errorEvent)
       }
       this.currentJobMap.delete(worker)
@@ -160,8 +159,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       if (idx >= 0) this.busyWorkers.splice(idx, 1)
       this.idleWorkers.push(entry)
       // count as failed completion
-      this.failedCount++
-      this.executionsCount++
+      this.failureCount++
       job.reject(error)
     }
   }
