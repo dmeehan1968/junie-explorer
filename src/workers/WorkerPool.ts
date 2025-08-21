@@ -17,7 +17,6 @@ interface WorkerPoolOptions {
 
 interface WorkerEntry {
   worker: Worker
-  busy: boolean
   timer?: NodeJS.Timeout
   createdAt: Date
 }
@@ -85,14 +84,13 @@ export class WorkerPool<TIn extends object, TOut extends object> {
 
   private spawnWorker() {
     const worker = new Worker(this.workerPath, { type: 'module' })
-    const entry: WorkerEntry = { worker, busy: false, timer: undefined, createdAt: new Date() }
+    const entry: WorkerEntry = { worker, timer: undefined, createdAt: new Date() }
 
     // Route messages per job execution
     worker.onmessage = (event: MessageEvent<Response<TOut>>) => {
       const currentJob = this.currentJobMap.get(worker)
       if (!currentJob) return
       // Job completed on this worker
-      entry.busy = false
       this.clearIdleTimer(entry)
       // Count completion and failures appropriately
       if (event.data && event.data.ok) {
@@ -147,12 +145,10 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   private currentJobMap = new Map<Worker, Job<TIn, TOut>>()
 
   private postJobToWorkerEntry(entry: WorkerEntry, job: Job<TIn, TOut>) {
-    entry.busy = true
     this.currentJobMap.set(entry.worker, job)
     try {
       entry.worker.postMessage(job.data)
     } catch (error) {
-      entry.busy = false
       this.currentJobMap.delete(entry.worker)
       // Remove from busy queue if present and return to idle tail to keep rotation consistent
       const idx = this.busyWorkers.findIndex(e => e.worker === entry.worker)
@@ -204,7 +200,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       if (!entry.timer) {
         entry.timer = setTimeout(() => {
           // Terminate if still idle and we have more than min
-          if (!entry.busy && this.idleCount > this.minConcurrency) {
+          if (this.idleCount > this.minConcurrency) {
             this.removeWorker(entry.worker)
           } else {
             this.clearIdleTimer(entry)
