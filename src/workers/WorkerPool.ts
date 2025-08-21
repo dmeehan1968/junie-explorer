@@ -10,6 +10,7 @@ interface WorkerPoolOptions {
   workerPath: string
   idleTimeoutMs?: number
   errorHandler?: (e: any) => void
+  name?: string
 }
 
 interface WorkerEntry {
@@ -25,6 +26,9 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   private idleTimeoutMs: number
   private errorHandler?: (e: any) => void
 
+  // optional human-friendly name for logging/metrics
+  public readonly name: string
+
   private queue: Job<TIn, TOut>[] = []
   private workers: WorkerEntry[] = []
 
@@ -36,7 +40,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   public get executingCount() { return this.workers.filter(w => w.busy).length }
 
   constructor(options: WorkerPoolOptions) {
-    let { minConcurrency, maxConcurrency, workerPath, idleTimeoutMs, errorHandler } = options
+    let { minConcurrency, maxConcurrency, workerPath, idleTimeoutMs, errorHandler, name } = options
     if (!Number.isFinite(minConcurrency) || minConcurrency < 1) minConcurrency = 1
     if (!Number.isFinite(maxConcurrency) || maxConcurrency < minConcurrency) maxConcurrency = minConcurrency
     maxConcurrency = Math.min(maxConcurrency, navigator.hardwareConcurrency)
@@ -45,6 +49,19 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     this.workerPath = workerPath
     this.idleTimeoutMs = idleTimeoutMs ?? 5000
     this.errorHandler = errorHandler
+    // default name from provided name or worker file basename
+    const derivedName = (() => {
+      if (name && name.trim().length) return name.trim()
+      try {
+        // workerPath might be relative; take last segment
+        const parts = workerPath.split(/[\\\/]/)
+        const base = parts[parts.length - 1] || workerPath
+        return base.replace(/\.[cm]?tsx?$/i, '')
+      } catch {
+        return 'worker-pool'
+      }
+    })()
+    this.name = derivedName
 
     // Pre-warm to min
     for (let i = 0; i < this.minConcurrency; i++) {

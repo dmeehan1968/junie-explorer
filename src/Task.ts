@@ -49,25 +49,24 @@ export class Task {
       if (concurrency > 0) {
         const workerPath = './src/workers/loadEventsWorker.ts'
         console.log(`Concurrency is ${concurrency}. Set environment CONCURRENCY to configure`)
-        // min: 1, max: concurrency
         this._workerPool = new WorkerPool({
           minConcurrency: 1,
           maxConcurrency: concurrency,
           workerPath,
           idleTimeoutMs: 5000,
-          errorHandler: (e) => console.error('Worker pool error:', e)
+          errorHandler: (e) => console.error('Worker pool error:', e),
         })
 
         if (process.env.WORKER_STATS) {
           const workerStatsInterval = parseFloat(process.env.WORKER_STATS ?? '10')
           if (workerStatsInterval > 0) {
             setInterval(() => {
-              console.log(new Date().toISOString().slice(0, 19) + ': WorkerPool: ' + Object.entries({
-                executions: this._workerPool?.executionsCount,
-                executing: this._workerPool?.executingCount,
-                idle: this._workerPool?.idleCount,
-                queued: this._workerPool?.queuedCount,
-                failed: this._workerPool?.failedCount,
+              console.log(new Date().toISOString().slice(0, 19) + `: ${this._workerPool!.name}: ` + Object.entries({
+                executions: this._workerPool!.executionsCount,
+                executing: this._workerPool!.executingCount,
+                idle: this._workerPool!.idleCount,
+                queued: this._workerPool!.queuedCount,
+                failed: this._workerPool!.failedCount,
               }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
             }, workerStatsInterval * 1000)
           }
