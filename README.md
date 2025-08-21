@@ -112,7 +112,8 @@ the maximum number of workers
 ### Worker Stats
 
 Enable worker statistics reporting with `WORKER_STATS={interval}` environment variable.  This will print statistics on
-current worker activity every `interval` seconds.
+current worker activity every `interval` seconds.  Setting to 0 will disable (as will omitting the variable), and you
+can use fractions of a second.
 
 ##  Development
 
