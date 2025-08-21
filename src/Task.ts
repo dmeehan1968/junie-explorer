@@ -64,7 +64,7 @@ export class Task {
           if (workerStatsInterval > 0) {
             setInterval(() => {
               console.log(new Date().toISOString().slice(0, 19) + `: ${this._workerPool!.name}: ` + Object.entries({
-                workers: this._workerPool!.workerCount,
+                busy: this._workerPool!.busyCount,
                 idle: this._workerPool!.idleCount,
                 queued: this._workerPool!.queuedCount,
                 executions: this._workerPool!.executionsCount,

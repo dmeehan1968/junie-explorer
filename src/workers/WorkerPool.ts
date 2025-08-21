@@ -19,6 +19,7 @@ interface WorkerEntry {
   worker: Worker
   busy: boolean
   timer?: NodeJS.Timeout
+  createdAt: Date
 }
 
 interface Success<T> {
@@ -44,15 +45,17 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   public readonly name: string
 
   private queue: Job<TIn, TOut>[] = []
-  private workers: WorkerEntry[] = []
+  // Separate queues for round-robin management
+  private idleWorkers: WorkerEntry[] = [] // head = 0 (shift), tail = push
+  private busyWorkers: WorkerEntry[] = []
 
   // metrics
   public executionsCount = 0
   public failedCount = 0
   public get queuedCount() { return this.queue.length }
-  public get idleCount() { return this.workers.filter(w => !w.busy).length }
-  public get executingCount() { return this.workers.filter(w => w.busy).length }
-  public get workerCount() { return this.workers.length }
+  public get busyCount() { return this.busyWorkers.length }
+  public get idleCount() { return this.idleWorkers.length }
+  public get workerCount() { return this.idleWorkers.length + this.busyWorkers.length }
 
   constructor(options: WorkerPoolOptions) {
     let { minConcurrency, maxConcurrency, workerPath, idleTimeoutMs, errorHandler, name } = options
@@ -82,12 +85,13 @@ export class WorkerPool<TIn extends object, TOut extends object> {
 
   private spawnWorker() {
     const worker = new Worker(this.workerPath, { type: 'module' })
-    const entry: WorkerEntry = { worker, busy: false, timer: undefined }
+    const entry: WorkerEntry = { worker, busy: false, timer: undefined, createdAt: new Date() }
 
     // Route messages per job execution
     worker.onmessage = (event: MessageEvent<Response<TOut>>) => {
       const currentJob = this.currentJobMap.get(worker)
       if (!currentJob) return
+      // Job completed on this worker
       entry.busy = false
       this.clearIdleTimer(entry)
       // Count completion and failures appropriately
@@ -99,6 +103,10 @@ export class WorkerPool<TIn extends object, TOut extends object> {
         currentJob.reject(event.data.error ?? new Error('Worker error'))
       }
       this.currentJobMap.delete(worker)
+      // Move worker from busy -> idle (tail) for round-robin
+      const idx = this.busyWorkers.findIndex(e => e.worker === worker)
+      if (idx >= 0) this.busyWorkers.splice(idx, 1)
+      this.idleWorkers.push(entry)
       this.schedule()
       this.ensureIdleRetention()
     }
@@ -117,16 +125,24 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       this.schedule()
     }
 
-    this.workers.push(entry)
+    // New worker starts idle at the tail for rotation
+    this.idleWorkers.push(entry)
     return entry
   }
 
   private removeWorker(worker: Worker) {
-    const index = this.workers.findIndex(entry => entry.worker === worker)
-    if (index >= 0) {
-      try { this.workers[index].worker.terminate() } catch {}
-      this.workers.splice(index, 1)
+    const removeFrom = (arr: WorkerEntry[]) => {
+      const index = arr.findIndex(entry => entry.worker === worker)
+      if (index >= 0) {
+        const entry = arr[index]
+        try { entry.worker.terminate() } catch {}
+        arr.splice(index, 1)
+        return true
+      }
+      return false
     }
+    if (removeFrom(this.idleWorkers)) return
+    if (removeFrom(this.busyWorkers)) return
   }
 
   private currentJobMap = new Map<Worker, Job<TIn, TOut>>()
@@ -139,6 +155,10 @@ export class WorkerPool<TIn extends object, TOut extends object> {
     } catch (error) {
       entry.busy = false
       this.currentJobMap.delete(entry.worker)
+      // Remove from busy queue if present and return to idle tail to keep rotation consistent
+      const idx = this.busyWorkers.findIndex(e => e.worker === entry.worker)
+      if (idx >= 0) this.busyWorkers.splice(idx, 1)
+      this.idleWorkers.push(entry)
       // count as failed completion
       this.failedCount++
       this.executionsCount++
@@ -147,18 +167,23 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   }
 
   private schedule() {
-    // Fill available workers with queued jobs
-    for (const entry of this.workers) {
-      if (!this.queuedCount) break
-      if (entry.busy) continue
+    // Assign jobs to idle workers in round-robin (head -> tail)
+    while (this.queue.length && this.idleWorkers.length > 0) {
+      const entry = this.idleWorkers.shift()!
       const job = this.queue.shift()!
+      // Move worker to busy queue tail
+      this.clearIdleTimer(entry)
+      this.busyWorkers.push(entry)
       this.postJobToWorkerEntry(entry, job)
     }
 
     // If queue remains and we can grow, spawn more
-    while (this.queuedCount && this.workers.length < this.maxConcurrency) {
-      const entry = this.spawnWorker()
+    while (this.queuedCount && this.workerCount < this.maxConcurrency) {
+      this.spawnWorker()
+      if (this.idleWorkers.length === 0) break
+      const entry = this.idleWorkers.shift()!
       const job = this.queue.shift()!
+      this.busyWorkers.push(entry)
       this.postJobToWorkerEntry(entry, job)
     }
 
@@ -174,7 +199,7 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   }
 
   private ensureIdleRetention() {
-    const idleEntries = this.workers.filter(entry => !entry.busy)
+    const idleEntries = this.idleWorkers
     let surplusIdleCount = Math.max(0, idleEntries.length - this.minConcurrency)
     for (const entry of idleEntries) {
       if (surplusIdleCount <= 0) break
@@ -201,10 +226,14 @@ export class WorkerPool<TIn extends object, TOut extends object> {
   }
 
   public shutdown() {
-    for (const entry of this.workers) {
+    for (const entry of this.idleWorkers) {
       try { entry.worker.terminate() } catch {}
     }
-    this.workers = []
+    for (const entry of this.busyWorkers) {
+      try { entry.worker.terminate() } catch {}
+    }
+    this.idleWorkers = []
+    this.busyWorkers = []
     this.queue.splice(0)
     this.currentJobMap.clear()
   }
