@@ -1,6 +1,7 @@
 import fs from "fs-extra"
 import path from "node:path"
-import { AbstractPool, DynamicThreadPool, FixedThreadPool, ThreadPoolOptions } from "poolifier-web-worker"
+import { AbstractPool, DynamicThreadPool, FixedThreadPool, ThreadPoolOptions } from "@poolifier/poolifier-web-worker"
+import { setInterval } from "timers"
 import { getMaxConcurrency } from "./getMaxConcurrency.js"
 import {
   AgentState,

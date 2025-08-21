@@ -1,4 +1,4 @@
-import { ThreadWorker } from "poolifier-web-worker"
+import { ThreadWorker } from "@poolifier/poolifier-web-worker"
 import { EventRecord } from "../schema/eventRecord.js"
 import { UnknownEventRecord } from "../schema/unknownEventRecord.js"
 import { loadEvents } from "./loadEvents.js"
@@ -20,5 +20,5 @@ async function loadEventsFunction(data?: LoadEventsInput): Promise<LoadEventsOut
 }
 
 export default new ThreadWorker(loadEventsFunction, {
-  maxInactiveTime: 60000,
+  maxInactiveTime: 5000,
 })
