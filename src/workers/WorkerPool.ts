@@ -68,7 +68,8 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       workerPath,
       idleTimeoutMs,
       errorHandler,
-      name
+      name,
+      onFileIOStats
     } = options
 
     this.minConcurrency = Math.max(0, Number.isFinite(rawMin) ? rawMin : 0)
@@ -100,7 +101,8 @@ export class WorkerPool<TIn extends object, TOut extends object> {
       (executionTime) => this.metricsCollector.recordSuccess(executionTime),
       (executionTime) => this.metricsCollector.recordFailure(executionTime),
       () => this.schedule(),
-      this.errorHandler
+      this.errorHandler,
+      onFileIOStats
     )
 
     try {

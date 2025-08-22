@@ -4,6 +4,7 @@ import { WorkerEntry } from "./WorkerEntry.js"
 import { WorkerExecutionError } from "./WorkerExecutionError.js"
 import { WorkerPoolError } from "./WorkerPoolError.js"
 import { WorkerSpawnError } from "./WorkerSpawnError.js"
+import { WorkerFileIOStats } from "../stats/StatsTypes.js"
 
 /**
  * Manages worker lifecycle and state
@@ -22,6 +23,7 @@ export class WorkerManager<TIn extends object, TOut extends object> {
     private onFailure: (executionTime: number) => void,
     private onSchedule: () => void,
     private errorHandler?: (e: WorkerPoolError) => void,
+    private onFileIOStats?: (stats: WorkerFileIOStats) => void,
   ) {
   }
 
@@ -48,6 +50,11 @@ export class WorkerManager<TIn extends object, TOut extends object> {
           if (event.data && event.data.ok) {
             jobInfo.job.resolve(event.data.result)
             this.onSuccess(executionTime)
+            
+            // Handle file I/O stats if present
+            if (event.data.fileIOStats && this.onFileIOStats) {
+              this.onFileIOStats(event.data.fileIOStats)
+            }
           } else {
             const error = event.data && !event.data.ok ? (event.data as Failure).error : new Error('Worker returned unsuccessful response')
             jobInfo.job.reject(error)

@@ -1,4 +1,5 @@
 import { WorkerPoolError } from "./WorkerPoolError.js"
+import { WorkerFileIOStats } from "../stats/StatsTypes.js"
 
 /**
  * Configuration options for WorkerPool
@@ -16,4 +17,6 @@ export interface WorkerPoolOptions {
   errorHandler?: (e: WorkerPoolError) => void
   /** Human-friendly name for the pool */
   name?: string
+  /** Handler for file I/O statistics from workers */
+  onFileIOStats?: (stats: WorkerFileIOStats) => void
 }

@@ -67,6 +67,11 @@ export class Task {
           workerPath,
           idleTimeoutMs: 5000,
           errorHandler: (e) => console.error('Worker pool error:', e),
+          onFileIOStats: (stats) => {
+            if (this._statsCollector) {
+              this._statsCollector.mergeWorkerFileIOStats(stats)
+            }
+          },
         })
 
         // Register with stats collector if available

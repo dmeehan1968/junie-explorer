@@ -1,9 +1,12 @@
+import { WorkerFileIOStats } from '../stats/StatsTypes.js'
+
 /**
  * Success response from worker
  */
 interface Success<T> {
   ok: true
   result: T
+  fileIOStats?: WorkerFileIOStats
 }
 
 /**

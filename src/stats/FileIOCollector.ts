@@ -1,6 +1,6 @@
 import fs from 'fs'
 import fsExtra from 'fs-extra'
-import { FileIOStats } from './StatsTypes.js'
+import { FileIOStats, WorkerFileIOStats, WorkerFileIOOperation } from './StatsTypes.js'
 
 interface OperationRecord {
   startTime: number
@@ -62,6 +62,11 @@ export class FileIOCollector {
     this.originalMethods.set('fs.lstatSync', fs.lstatSync)
     this.originalMethods.set('fs.existsSync', fs.existsSync)
     this.originalMethods.set('fs.access', fs.access)
+    
+    // Add globSync if it exists (fs-extra method)
+    if ((fs as any).globSync) {
+      this.originalMethods.set('fs.globSync', (fs as any).globSync)
+    }
 
     // Store original methods for fs-extra
     this.originalMethods.set('fsExtra.readFile', fsExtra.readFile)
@@ -76,6 +81,11 @@ export class FileIOCollector {
     this.originalMethods.set('fsExtra.lstatSync', fsExtra.lstatSync)
     this.originalMethods.set('fsExtra.existsSync', fsExtra.existsSync)
     this.originalMethods.set('fsExtra.access', fsExtra.access)
+    
+    // Add globSync for fs-extra
+    if ((fsExtra as any).globSync) {
+      this.originalMethods.set('fsExtra.globSync', (fsExtra as any).globSync)
+    }
 
     // Wrap async read operations
     fs.readFile = this.wrapAsyncOperation(
@@ -157,6 +167,14 @@ export class FileIOCollector {
       'check'
     ) as typeof fs.access
 
+    // Wrap globSync if it exists
+    if ((fs as any).globSync) {
+      ;(fs as any).globSync = this.wrapSyncOperation(
+        (fs as any).globSync.bind(fs),
+        'directory'
+      )
+    }
+
     // Wrap fs-extra operations
     ;(fsExtra as any).readFile = this.wrapAsyncOperation(
       fsExtra.readFile.bind(fsExtra),
@@ -231,6 +249,14 @@ export class FileIOCollector {
       fsExtra.access.bind(fsExtra),
       'check'
     )
+
+    // Wrap globSync for fs-extra if it exists
+    if ((fsExtra as any).globSync) {
+      ;(fsExtra as any).globSync = this.wrapSyncOperation(
+        (fsExtra as any).globSync.bind(fsExtra),
+        'directory'
+      )
+    }
   }
 
   private wrapAsyncOperation<T extends Function>(
@@ -292,7 +318,8 @@ export class FileIOCollector {
 
   private recordOperation(
     operationType: 'read' | 'write' | 'directory' | 'check',
-    record: OperationRecord
+    record: OperationRecord,
+    skipDebugLog: boolean = false
   ): void {
     const metrics = this.getMetricsForType(operationType)
     const duration = (record.endTime || Date.now()) - record.startTime
@@ -311,6 +338,11 @@ export class FileIOCollector {
     }
     
     metrics.operations.push(record)
+    
+    // Debug logging (only for main process operations)
+    if (!skipDebugLog) {
+      console.log(`FileIO (main): ${operationType} operation - duration: ${duration}ms, size: ${record.size || 0} bytes, error: ${!!record.error}`)
+    }
     
     // Keep only recent operations for per-second calculations
     const cutoffTime = Date.now() - 60000 // Last minute
@@ -389,6 +421,22 @@ export class FileIOCollector {
                            this.calculateOperationsPerSecond(this.checkOps)
       }
     }
+  }
+
+  public mergeWorkerStats(workerStats: WorkerFileIOStats): void {
+    // Process each operation from the worker
+    for (const operation of workerStats.operations) {
+      const record: OperationRecord = {
+        startTime: operation.timestamp,
+        endTime: operation.timestamp + operation.duration,
+        size: operation.size,
+        error: operation.error
+      }
+      
+      this.recordOperation(operation.type, record, true) // Skip debug logging for worker operations
+    }
+    
+    console.log(`FileIO: Merged ${workerStats.operations.length} operations from worker ${workerStats.workerId}`)
   }
 
   public resetStats(): void {

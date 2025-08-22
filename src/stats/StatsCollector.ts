@@ -342,6 +342,10 @@ export class StatsCollector {
     }
   }
 
+  public mergeWorkerFileIOStats(workerStats: import('./StatsTypes.js').WorkerFileIOStats): void {
+    this.fileIOCollector.mergeWorkerStats(workerStats)
+  }
+
   public stop(): void {
     if (this.intervalId) {
       clearInterval(this.intervalId)

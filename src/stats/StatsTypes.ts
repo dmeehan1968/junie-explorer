@@ -141,3 +141,16 @@ export interface StatsQuery {
   period: TimePeriod
   intervalMs?: number
 }
+
+export interface WorkerFileIOOperation {
+  type: 'read' | 'write' | 'directory' | 'check'
+  duration: number
+  size?: number
+  error: boolean
+  timestamp: number
+}
+
+export interface WorkerFileIOStats {
+  operations: WorkerFileIOOperation[]
+  workerId: string
+}
