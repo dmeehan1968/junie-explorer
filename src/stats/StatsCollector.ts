@@ -50,7 +50,7 @@ export class StatsCollector {
     this.stats = this.stats.filter(s => s.timestamp > cutoffTime)
   }
 
-  private aggregateWorkerPoolStats() {
+  public aggregateWorkerPoolStats() {
     let total = {
       successCount: 0,
       failureCount: 0,
@@ -92,6 +92,11 @@ export class StatsCollector {
     total.averageQueueWaitTimeMs = poolCount > 0 ? totalQueueTime / poolCount : 0
 
     return total
+  }
+
+  public getRecentDataPoints(maxPoints: number = 60): SystemStats[] {
+    const recentStats = this.stats.slice(-maxPoints)
+    return recentStats
   }
 
   public getStats(query: StatsQuery): AggregatedStats {

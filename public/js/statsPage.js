@@ -11,19 +11,42 @@ function formatNumber(num) {
   return parseFloat(num).toFixed(2);
 }
 
-function updateCurrentStats(stats) {
-  // Get latest timestamp data for current stats
-  const latest = stats.memory;
-  const latestWorker = stats.workerPool;
-  
-  document.getElementById('memUsed').textContent = formatBytes(latest.used.avg);
-  document.getElementById('heapUsed').textContent = formatBytes(latest.heapUsed.avg);
-  document.getElementById('activeWorkers').textContent = Math.round(latestWorker.busyCount.avg);
-  document.getElementById('queuedJobs').textContent = Math.round(latestWorker.queuedCount.avg);
-  document.getElementById('successCount').textContent = Math.round(latestWorker.successCount.avg);
-  document.getElementById('failureCount').textContent = Math.round(latestWorker.failureCount.avg);
-  document.getElementById('avgExecution').textContent = formatNumber(latestWorker.averageExecutionTimeMs.avg);
-  document.getElementById('peakWorkers').textContent = Math.round(latestWorker.peakWorkerCount.max);
+async function updateCurrentStats() {
+  try {
+    const response = await fetch('/api/stats/current');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const current = await response.json();
+    const memory = current.memory;
+    const worker = current.workerPool;
+    
+    // Update memory metrics
+    document.getElementById('memUsed').textContent = formatBytes(memory.used);
+    document.getElementById('memTotal').textContent = formatBytes(memory.total);
+    document.getElementById('heapUsed').textContent = formatBytes(memory.heapUsed);
+    document.getElementById('heapTotal').textContent = formatBytes(memory.heapTotal);
+    document.getElementById('external').textContent = formatBytes(memory.external);
+    document.getElementById('heapUsagePercent').textContent = formatNumber(memory.heapUsagePercent) + '%';
+    
+    // Update worker metrics
+    document.getElementById('totalWorkers').textContent = worker.workerCount;
+    document.getElementById('busyWorkers').textContent = worker.busyCount;
+    document.getElementById('idleWorkers').textContent = worker.idleCount;
+    document.getElementById('queuedJobs').textContent = worker.queuedCount;
+    document.getElementById('successCount').textContent = worker.successCount;
+    document.getElementById('failureCount').textContent = worker.failureCount;
+    document.getElementById('avgExecution').textContent = formatNumber(worker.averageExecutionTimeMs);
+    document.getElementById('peakWorkers').textContent = worker.peakWorkerCount;
+    document.getElementById('totalExecTime').textContent = formatNumber(worker.totalExecutionTimeMs);
+    document.getElementById('avgQueueWait').textContent = formatNumber(worker.averageQueueWaitTimeMs);
+    
+    return current;
+  } catch (error) {
+    console.error('Error updating current stats:', error);
+    return null;
+  }
 }
 
 function initializeMemoryChart() {
@@ -102,18 +125,16 @@ function initializeMemoryChart() {
   });
 }
 
-function updateMemoryChart(stats) {
+function updateMemoryChart(currentData) {
   if (!memoryChart) {
     initializeMemoryChart();
   }
   
-  const now = Date.now();
-  
-  // Add new data point
-  memoryChart.data.labels.push(new Date(now));
-  memoryChart.data.datasets[0].data.push(formatBytes(stats.memory.used.avg));
-  memoryChart.data.datasets[1].data.push(formatBytes(stats.memory.heapUsed.avg));
-  memoryChart.data.datasets[2].data.push(formatBytes(stats.memory.external.avg));
+  // Add new data point using actual current values
+  memoryChart.data.labels.push(new Date(currentData.timestamp));
+  memoryChart.data.datasets[0].data.push(formatBytes(currentData.memory.used));
+  memoryChart.data.datasets[1].data.push(formatBytes(currentData.memory.heapUsed));
+  memoryChart.data.datasets[2].data.push(formatBytes(currentData.memory.external));
   
   // Keep only recent data points based on current period
   const maxPoints = getMaxPointsForPeriod(currentPeriod);
@@ -213,18 +234,16 @@ function initializeWorkerChart() {
   });
 }
 
-function updateWorkerChart(stats) {
+function updateWorkerChart(currentData) {
   if (!workerChart) {
     initializeWorkerChart();
   }
   
-  const now = Date.now();
-  
-  // Add new data point
-  workerChart.data.labels.push(new Date(now));
-  workerChart.data.datasets[0].data.push(Math.round(stats.workerPool.busyCount.avg));
-  workerChart.data.datasets[1].data.push(Math.round(stats.workerPool.idleCount.avg));
-  workerChart.data.datasets[2].data.push(Math.round(stats.workerPool.queuedCount.avg));
+  // Add new data point using actual current values
+  workerChart.data.labels.push(new Date(currentData.timestamp));
+  workerChart.data.datasets[0].data.push(currentData.workerPool.busyCount);
+  workerChart.data.datasets[1].data.push(currentData.workerPool.idleCount);
+  workerChart.data.datasets[2].data.push(currentData.workerPool.queuedCount);
   
   // Keep only recent data points based on current period
   const maxPoints = getMaxPointsForPeriod(currentPeriod);
@@ -248,29 +267,25 @@ async function fetchStats() {
   }
   
   try {
-    const response = await fetch(`/api/stats?period=${period}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Update current stats display
+    const currentData = await updateCurrentStats();
+    
+    if (currentData) {
+      // For progressive updates, only add new data if we have existing charts
+      // and this is not the first load
+      if (lastDataTime > 0 && memoryChart && workerChart) {
+        updateMemoryChart(currentData);
+        updateWorkerChart(currentData);
+      } else {
+        // First load or period change - initialize with current data
+        initializeMemoryChart();
+        initializeWorkerChart();
+        updateMemoryChart(currentData);
+        updateWorkerChart(currentData);
+      }
+      
+      lastDataTime = Date.now();
     }
-    
-    const stats = await response.json();
-    
-    updateCurrentStats(stats);
-    
-    // For progressive updates, only add new data if we have existing charts
-    // and this is not the first load
-    if (lastDataTime > 0 && memoryChart && workerChart) {
-      updateMemoryChart(stats);
-      updateWorkerChart(stats);
-    } else {
-      // First load or period change - initialize with current data
-      initializeMemoryChart();
-      initializeWorkerChart();
-      updateMemoryChart(stats);
-      updateWorkerChart(stats);
-    }
-    
-    lastDataTime = Date.now();
     
   } catch (error) {
     console.error('Error fetching stats:', error);

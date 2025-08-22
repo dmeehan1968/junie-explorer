@@ -71,40 +71,87 @@ export const statsRouteHandler = async (req: AppRequest, res: AppResponse) => {
             {/* Current Stats Summary */}
             <div class="card bg-base-100 shadow-xl lg:col-span-2">
               <div class="card-body">
-                <h2 class="card-title">Current Statistics</h2>
-                <div id="currentStats" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div class="stat">
-                    <div class="stat-title">Memory Used (MB)</div>
-                    <div class="stat-value text-primary" id="memUsed">-</div>
+                <h2 class="card-title">Current Statistics (Live Values)</h2>
+                <div id="currentStats" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  
+                  {/* Memory Metrics */}
+                  <div>
+                    <h3 class="text-lg font-semibold mb-3 text-primary">Memory Metrics</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">RSS Memory (MB)</div>
+                        <div class="stat-value text-sm text-primary" id="memUsed">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Total Memory (MB)</div>
+                        <div class="stat-value text-sm text-primary" id="memTotal">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Heap Used (MB)</div>
+                        <div class="stat-value text-sm text-secondary" id="heapUsed">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Heap Total (MB)</div>
+                        <div class="stat-value text-sm text-secondary" id="heapTotal">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">External (MB)</div>
+                        <div class="stat-value text-sm text-accent" id="external">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Heap Usage %</div>
+                        <div class="stat-value text-sm text-accent" id="heapUsagePercent">-</div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="stat">
-                    <div class="stat-title">Heap Used (MB)</div>
-                    <div class="stat-value text-secondary" id="heapUsed">-</div>
+
+                  {/* Worker Pool Metrics */}
+                  <div>
+                    <h3 class="text-lg font-semibold mb-3 text-info">Worker Pool Metrics</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Total Workers</div>
+                        <div class="stat-value text-sm text-info" id="totalWorkers">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Busy Workers</div>
+                        <div class="stat-value text-sm text-warning" id="busyWorkers">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Idle Workers</div>
+                        <div class="stat-value text-sm text-success" id="idleWorkers">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Queued Jobs</div>
+                        <div class="stat-value text-sm text-error" id="queuedJobs">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Success Count</div>
+                        <div class="stat-value text-sm text-success" id="successCount">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Failure Count</div>
+                        <div class="stat-value text-sm text-error" id="failureCount">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Avg Execution (ms)</div>
+                        <div class="stat-value text-sm text-warning" id="avgExecution">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Peak Workers</div>
+                        <div class="stat-value text-sm text-neutral" id="peakWorkers">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Total Exec Time (ms)</div>
+                        <div class="stat-value text-sm text-neutral" id="totalExecTime">-</div>
+                      </div>
+                      <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-title text-xs">Avg Queue Wait (ms)</div>
+                        <div class="stat-value text-sm text-warning" id="avgQueueWait">-</div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="stat">
-                    <div class="stat-title">Active Workers</div>
-                    <div class="stat-value text-accent" id="activeWorkers">-</div>
-                  </div>
-                  <div class="stat">
-                    <div class="stat-title">Queued Jobs</div>
-                    <div class="stat-value text-info" id="queuedJobs">-</div>
-                  </div>
-                  <div class="stat">
-                    <div class="stat-title">Success Count</div>
-                    <div class="stat-value text-success" id="successCount">-</div>
-                  </div>
-                  <div class="stat">
-                    <div class="stat-title">Failure Count</div>
-                    <div class="stat-value text-error" id="failureCount">-</div>
-                  </div>
-                  <div class="stat">
-                    <div class="stat-title">Avg Execution (ms)</div>
-                    <div class="stat-value text-warning" id="avgExecution">-</div>
-                  </div>
-                  <div class="stat">
-                    <div class="stat-title">Peak Workers</div>
-                    <div class="stat-value text-neutral" id="peakWorkers">-</div>
-                  </div>
+
                 </div>
               </div>
             </div>
