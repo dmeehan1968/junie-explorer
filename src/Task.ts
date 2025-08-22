@@ -5,6 +5,7 @@ import { getMaxConcurrency } from "./getMaxConcurrency.js"
 import { LoadEventsInput } from "./workers/loadEventsInput.js"
 import { LoadEventsOutput } from "./workers/loadEventsOutput.js"
 import { WorkerPool } from "./workers/WorkerPool.js"
+import { StatsCollector } from "./stats/StatsCollector.js"
 import {
   AgentState,
   JuniePlan,
@@ -39,6 +40,15 @@ export class Task {
 
   // Static worker pool for loading events
   private static _workerPool: WorkerPool<{ eventsFilePath: string }, { events: EventRecord[] }> | null | undefined = undefined
+  private static _statsCollector: StatsCollector | null = null
+
+  public static setStatsCollector(statsCollector: StatsCollector) {
+    this._statsCollector = statsCollector
+    // If worker pool already exists, register it
+    if (this._workerPool) {
+      statsCollector.registerWorkerPool(this._workerPool)
+    }
+  }
 
   private static get workerPool() {
     if (this._workerPool) {
@@ -58,6 +68,11 @@ export class Task {
           idleTimeoutMs: 5000,
           errorHandler: (e) => console.error('Worker pool error:', e),
         })
+
+        // Register with stats collector if available
+        if (this._statsCollector) {
+          this._statsCollector.registerWorkerPool(this._workerPool)
+        }
 
         if (process.env.WORKER_STATS) {
           const workerStatsInterval = parseFloat(process.env.WORKER_STATS ?? '10')

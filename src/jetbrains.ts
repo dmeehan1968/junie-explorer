@@ -8,6 +8,7 @@ import publicFiles from "./bun/public.js"
 import { Project } from "./Project.js"
 import { SummaryMetrics } from "./schema.js"
 import { StatsCollector } from "./stats/StatsCollector.js"
+import { Task } from "./Task.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -56,6 +57,9 @@ export class JetBrains {
     this._logPath = options.logPath
     this.logger = options.logger ?? console
     this.statsCollector = new StatsCollector()
+    
+    // Register stats collector with Task class for WorkerPool monitoring
+    Task.setStatsCollector(this.statsCollector)
   }
 
   getCurrentLocaleFromEnv = (): string | undefined => {
