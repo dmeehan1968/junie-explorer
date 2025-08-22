@@ -28,6 +28,12 @@ Replace the previously stated 'workflow' with the following:
 7. Provide a summary of the changes made and the final status of the issue. 
 8. Use the `submit` command to provide the complete response back to the user.
 
+## [The command output exceeded the display limit and has been saved in...]
+
+When calling any tools, the response may be truncated, as indicated by `the command output exceeds the display limit`.
+
+You MUST read the output by using `get_entire_file` with the specified file as the target.
+
 ## Project Overview
 Junie Explorer is a full-stack web application built with Bun and TypeScript (Express.js) that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
 
