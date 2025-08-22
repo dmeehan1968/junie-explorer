@@ -4,7 +4,7 @@ export const WorkersSection = () => {
   return (
     <div class="grid grid-cols-3 gap-6 mb-6">
       {/* Worker Pool Chart - 2/3 width */}
-      <div class="col-span-2 card bg-base-100 shadow-xl">
+      <div class="col-span-2 card bg-base-100 shadow-xl h-fit">
         <div class="card-body">
           <h2 class="card-title">Worker Pool Activity</h2>
           <div class="h-80">
@@ -14,10 +14,10 @@ export const WorkersSection = () => {
       </div>
 
       {/* Worker Pool Metrics - 1/3 width */}
-      <div class="card bg-base-100 shadow-xl">
+      <div class="card bg-base-100 shadow-xl h-fit">
         <div class="card-body">
           <h3 class="text-lg font-semibold mb-3 text-info">Worker Pool Metrics</h3>
-          <div class="grid grid-cols-1 gap-2">
+          <div class="grid grid-cols-2 gap-2">
             <div class="stat bg-base-200 rounded-lg p-2">
               <div class="stat-title text-xs">Total Workers</div>
               <div class="stat-value text-sm text-info" id="totalWorkers">-</div>
