@@ -13,16 +13,15 @@ function formatNumber(num) {
   return parseFloat(num).toFixed(2);
 }
 
-async function updateCurrentStats() {
+function updateCurrentStats(latestDataPoint) {
+  if (!latestDataPoint) {
+    console.warn('No data point provided for current stats update');
+    return;
+  }
+  
   try {
-    const response = await fetch('/api/stats/current');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const current = await response.json();
-    const memory = current.memory;
-    const worker = current.workerPool;
+    const memory = latestDataPoint.memory;
+    const worker = latestDataPoint.workerPool;
     
     // Update memory metrics
     document.getElementById('memUsed').textContent = formatBytes(memory.used);
@@ -44,10 +43,8 @@ async function updateCurrentStats() {
     document.getElementById('totalExecTime').textContent = formatNumber(worker.totalExecutionTimeMs);
     document.getElementById('avgQueueWait').textContent = formatNumber(worker.averageQueueWaitTimeMs);
     
-    return current;
   } catch (error) {
     console.error('Error updating current stats:', error);
-    return null;
   }
 }
 
@@ -118,7 +115,13 @@ function initializeMemoryChart() {
         x: {
           type: 'time',
           time: {
-            unit: 'minute' // Default, will be updated based on actual data
+            unit: 'minute', // Default, will be updated based on actual data
+            displayFormats: {
+              second: 'HH:mm:ss',
+              minute: 'HH:mm',
+              hour: 'HH:mm',
+              day: 'MMM dd'
+            }
           },
           title: {
             display: true,
@@ -237,7 +240,13 @@ function initializeWorkerChart() {
         x: {
           type: 'time',
           time: {
-            unit: 'minute' // Default, will be updated based on actual data
+            unit: 'minute', // Default, will be updated based on actual data
+            displayFormats: {
+              second: 'HH:mm:ss',
+              minute: 'HH:mm',
+              hour: 'HH:mm',
+              day: 'MMM dd'
+            }
           },
           title: {
             display: true,
@@ -262,7 +271,7 @@ function initializeWorkerChart() {
 
 async function loadHistoricalData(period) {
   try {
-    const response = await fetch(`/api/stats/data?period=${period}`);
+    const response = await fetch(`/api/stats?period=${period}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -276,7 +285,7 @@ async function loadHistoricalData(period) {
 
 async function loadIncrementalData(period, fromTimestamp) {
   try {
-    const response = await fetch(`/api/stats/data?period=${period}&from=${fromTimestamp}`);
+    const response = await fetch(`/api/stats?period=${period}&from=${fromTimestamp}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -330,6 +339,12 @@ async function initializeChartsWithFullData(period) {
     // Update tracking variables
     if (historicalData.length > 0) {
       lastReceivedTimestamp = Math.max(...timestamps);
+      
+      // Find and use the most recent data point for current stats
+      const latestDataPoint = historicalData.find(d => d.timestamp === lastReceivedTimestamp);
+      if (latestDataPoint) {
+        updateCurrentStats(latestDataPoint);
+      }
     }
     
     console.log(`Initialized charts with ${historicalData.length} data points, latest: ${new Date(lastReceivedTimestamp)}`);
@@ -402,7 +417,17 @@ async function updateChartsWithIncrementalData() {
       
       // Update last received timestamp
       const newTimestamps = newData.map(d => d.timestamp);
-      lastReceivedTimestamp = Math.max(lastReceivedTimestamp, ...newTimestamps);
+      const newLatestTimestamp = Math.max(lastReceivedTimestamp, ...newTimestamps);
+      
+      // If we have a new latest timestamp, update current stats
+      if (newLatestTimestamp > lastReceivedTimestamp) {
+        const latestDataPoint = newData.find(d => d.timestamp === newLatestTimestamp);
+        if (latestDataPoint) {
+          updateCurrentStats(latestDataPoint);
+        }
+      }
+      
+      lastReceivedTimestamp = newLatestTimestamp;
       
       // Remove old data points outside the period
       removeOldDataPoints(period);
@@ -411,7 +436,7 @@ async function updateChartsWithIncrementalData() {
       if (memoryChart) memoryChart.update('none');
       if (workerChart) workerChart.update('none');
       
-      console.log(`Added ${newData.length} new data points, latest: ${new Date(lastReceivedTimestamp)}`);
+      // console.log(`Added ${newData.length} new data points, latest: ${new Date(lastReceivedTimestamp)}`);
     }
     
   } catch (error) {
@@ -450,22 +475,6 @@ async function fetchStats() {
       // Regular incremental update
       await updateChartsWithIncrementalData();
     }
-  }
-  
-  try {
-    // Update current stats display
-    await updateCurrentStats();
-    
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    
-    // Show error in the UI
-    const currentStats = document.getElementById('currentStats');
-    currentStats.innerHTML = `
-      <div class="alert alert-error">
-        <span>Error loading statistics: ${error.message}</span>
-      </div>
-    `;
   }
 }
 
