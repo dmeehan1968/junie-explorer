@@ -1,7 +1,6 @@
 let memoryChart = null;
 let workerChart = null;
-let fileIOChart = null;
-let throughputChart = null;
+let fileIOCombinedChart = null;
 let lastDataTime = 0;
 let currentPeriod = '1h';
 let lastReceivedTimestamp = 0;
@@ -301,14 +300,14 @@ function initializeWorkerChart() {
   });
 }
 
-function initializeFileIOChart() {
-  const ctx = document.getElementById('fileIOChart').getContext('2d');
+function initializeFileIOCombinedChart() {
+  const ctx = document.getElementById('fileIOCombinedChart').getContext('2d');
   
-  if (fileIOChart) {
-    fileIOChart.destroy();
+  if (fileIOCombinedChart) {
+    fileIOCombinedChart.destroy();
   }
   
-  fileIOChart = new Chart(ctx, {
+  fileIOCombinedChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: [],
@@ -321,7 +320,8 @@ function initializeFileIOChart() {
           tension: 0.1,
           fill: false,
           pointRadius: 0,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          yAxisID: 'y'
         },
         {
           label: 'Write Ops/sec',
@@ -331,7 +331,8 @@ function initializeFileIOChart() {
           tension: 0.1,
           fill: false,
           pointRadius: 0,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          yAxisID: 'y'
         },
         {
           label: 'Directory Ops/sec',
@@ -341,7 +342,8 @@ function initializeFileIOChart() {
           tension: 0.1,
           fill: false,
           pointRadius: 0,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          yAxisID: 'y'
         },
         {
           label: 'Check Ops/sec',
@@ -351,66 +353,9 @@ function initializeFileIOChart() {
           tension: 0.1,
           fill: false,
           pointRadius: 0,
-          pointHoverRadius: 6
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        intersect: false
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Operations per Second'
-          }
+          pointHoverRadius: 6,
+          yAxisID: 'y'
         },
-        x: {
-          type: 'time',
-          time: {
-            unit: 'minute',
-            displayFormats: {
-              second: 'HH:mm:ss',
-              minute: 'HH:mm',
-              hour: 'HH:mm',
-              day: 'MMM dd'
-            }
-          },
-          title: {
-            display: true,
-            text: 'Time'
-          }
-        }
-      },
-      plugins: {
-        title: {
-          display: true,
-          text: 'File I/O Operations per Second'
-        },
-        legend: {
-          display: true
-        }
-      }
-    }
-  });
-}
-
-function initializeThroughputChart() {
-  const ctx = document.getElementById('throughputChart').getContext('2d');
-  
-  if (throughputChart) {
-    throughputChart.destroy();
-  }
-  
-  throughputChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [
         {
           label: 'Read Throughput (MB/s)',
           data: [],
@@ -419,7 +364,8 @@ function initializeThroughputChart() {
           tension: 0.1,
           fill: false,
           pointRadius: 0,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          yAxisID: 'y1'
         },
         {
           label: 'Write Throughput (MB/s)',
@@ -429,7 +375,8 @@ function initializeThroughputChart() {
           tension: 0.1,
           fill: false,
           pointRadius: 0,
-          pointHoverRadius: 6
+          pointHoverRadius: 6,
+          yAxisID: 'y1'
         }
       ]
     },
@@ -441,10 +388,26 @@ function initializeThroughputChart() {
       },
       scales: {
         y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Operations per Second'
+          }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
           beginAtZero: true,
           title: {
             display: true,
             text: 'Throughput (MB/s)'
+          },
+          grid: {
+            drawOnChartArea: false
           }
         },
         x: {
@@ -467,7 +430,7 @@ function initializeThroughputChart() {
       plugins: {
         title: {
           display: true,
-          text: 'File I/O Throughput'
+          text: 'File I/O Throughput & Operations'
         },
         legend: {
           display: true
@@ -536,15 +499,10 @@ async function initializeChartsWithFullData(period) {
       workerChart.data.datasets.forEach(dataset => dataset.data = []);
       workerChart.options.scales.x.time.unit = optimalTimeUnit;
     }
-    if (fileIOChart) {
-      fileIOChart.data.labels = [];
-      fileIOChart.data.datasets.forEach(dataset => dataset.data = []);
-      fileIOChart.options.scales.x.time.unit = optimalTimeUnit;
-    }
-    if (throughputChart) {
-      throughputChart.data.labels = [];
-      throughputChart.data.datasets.forEach(dataset => dataset.data = []);
-      throughputChart.options.scales.x.time.unit = optimalTimeUnit;
+    if (fileIOCombinedChart) {
+      fileIOCombinedChart.data.labels = [];
+      fileIOCombinedChart.data.datasets.forEach(dataset => dataset.data = []);
+      fileIOCombinedChart.options.scales.x.time.unit = optimalTimeUnit;
     }
     
     // Populate with historical data
@@ -555,8 +513,7 @@ async function initializeChartsWithFullData(period) {
     // Update charts
     if (memoryChart) memoryChart.update('none');
     if (workerChart) workerChart.update('none');
-    if (fileIOChart) fileIOChart.update('none');
-    if (throughputChart) throughputChart.update('none');
+    if (fileIOCombinedChart) fileIOCombinedChart.update('none');
     
     // Update tracking variables
     if (historicalData.length > 0) {
@@ -593,18 +550,14 @@ function addDataPointToCharts(dataPoint) {
     workerChart.data.datasets[2].data.push(dataPoint.workerPool.queuedCount);
   }
   
-  if (fileIOChart) {
-    fileIOChart.data.labels.push(timestamp);
-    fileIOChart.data.datasets[0].data.push(dataPoint.fileIO.read.operationsPerSecond);
-    fileIOChart.data.datasets[1].data.push(dataPoint.fileIO.write.operationsPerSecond);
-    fileIOChart.data.datasets[2].data.push(dataPoint.fileIO.directory.operationsPerSecond);
-    fileIOChart.data.datasets[3].data.push(dataPoint.fileIO.check.operationsPerSecond);
-  }
-  
-  if (throughputChart) {
-    throughputChart.data.labels.push(timestamp);
-    throughputChart.data.datasets[0].data.push(dataPoint.fileIO.read.throughputMBps);
-    throughputChart.data.datasets[1].data.push(dataPoint.fileIO.write.throughputMBps);
+  if (fileIOCombinedChart) {
+    fileIOCombinedChart.data.labels.push(timestamp);
+    fileIOCombinedChart.data.datasets[0].data.push(dataPoint.fileIO.read.operationsPerSecond);
+    fileIOCombinedChart.data.datasets[1].data.push(dataPoint.fileIO.write.operationsPerSecond);
+    fileIOCombinedChart.data.datasets[2].data.push(dataPoint.fileIO.directory.operationsPerSecond);
+    fileIOCombinedChart.data.datasets[3].data.push(dataPoint.fileIO.check.operationsPerSecond);
+    fileIOCombinedChart.data.datasets[4].data.push(dataPoint.fileIO.read.throughputMBps);
+    fileIOCombinedChart.data.datasets[5].data.push(dataPoint.fileIO.write.throughputMBps);
   }
 }
 
@@ -631,21 +584,12 @@ function removeOldDataPoints(period) {
     }
   }
   
-  // Remove old data points from file I/O chart
-  if (fileIOChart) {
-    while (fileIOChart.data.labels.length > 0 && 
-           fileIOChart.data.labels[0].getTime() < cutoffTime) {
-      fileIOChart.data.labels.shift();
-      fileIOChart.data.datasets.forEach(dataset => dataset.data.shift());
-    }
-  }
-  
-  // Remove old data points from throughput chart
-  if (throughputChart) {
-    while (throughputChart.data.labels.length > 0 && 
-           throughputChart.data.labels[0].getTime() < cutoffTime) {
-      throughputChart.data.labels.shift();
-      throughputChart.data.datasets.forEach(dataset => dataset.data.shift());
+  // Remove old data points from file I/O combined chart
+  if (fileIOCombinedChart) {
+    while (fileIOCombinedChart.data.labels.length > 0 && 
+           fileIOCombinedChart.data.labels[0].getTime() < cutoffTime) {
+      fileIOCombinedChart.data.labels.shift();
+      fileIOCombinedChart.data.datasets.forEach(dataset => dataset.data.shift());
     }
   }
 }
@@ -689,8 +633,7 @@ async function updateChartsWithIncrementalData() {
       // Update charts
       if (memoryChart) memoryChart.update('none');
       if (workerChart) workerChart.update('none');
-      if (fileIOChart) fileIOChart.update('none');
-      if (throughputChart) throughputChart.update('none');
+      if (fileIOCombinedChart) fileIOCombinedChart.update('none');
       
       // console.log(`Added ${newData.length} new data points, latest: ${new Date(lastReceivedTimestamp)}`);
     }
@@ -710,11 +653,10 @@ async function fetchStats() {
     currentPeriod = period;
     lastReceivedTimestamp = 0; // Reset to force full reload
     
-    if (!memoryChart || !workerChart || !fileIOChart || !throughputChart) {
+    if (!memoryChart || !workerChart || !fileIOCombinedChart) {
       initializeMemoryChart();
       initializeWorkerChart();
-      initializeFileIOChart();
-      initializeThroughputChart();
+      initializeFileIOCombinedChart();
     }
     
     await initializeChartsWithFullData(period);
@@ -723,11 +665,10 @@ async function fetchStats() {
     // Incremental update for same period
     if (lastDataTime === 0) {
       // First load
-      if (!memoryChart || !workerChart || !fileIOChart || !throughputChart) {
+      if (!memoryChart || !workerChart || !fileIOCombinedChart) {
         initializeMemoryChart();
         initializeWorkerChart();
-        initializeFileIOChart();
-        initializeThroughputChart();
+        initializeFileIOCombinedChart();
       }
       await initializeChartsWithFullData(period);
       lastDataTime = Date.now();
