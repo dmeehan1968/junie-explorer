@@ -79,7 +79,9 @@ function initializeMemoryChart() {
           borderColor: 'rgb(75, 192, 192)',
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           tension: 0.1,
-          fill: false
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: 6
         },
         {
           label: 'Heap Used (MB)',
@@ -87,7 +89,9 @@ function initializeMemoryChart() {
           borderColor: 'rgb(255, 99, 132)',
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           tension: 0.1,
-          fill: false
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: 6
         },
         {
           label: 'External (MB)',
@@ -95,7 +99,9 @@ function initializeMemoryChart() {
           borderColor: 'rgb(255, 205, 86)',
           backgroundColor: 'rgba(255, 205, 86, 0.2)',
           tension: 0.1,
-          fill: false
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: 6
         }
       ]
     },
@@ -187,7 +193,9 @@ function initializeWorkerChart() {
           borderColor: 'rgb(255, 99, 132)',
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           tension: 0.1,
-          fill: false
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: 6
         },
         {
           label: 'Idle Workers',
@@ -195,7 +203,9 @@ function initializeWorkerChart() {
           borderColor: 'rgb(75, 192, 192)',
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           tension: 0.1,
-          fill: false
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: 6
         },
         {
           label: 'Queued Jobs',
@@ -204,7 +214,9 @@ function initializeWorkerChart() {
           backgroundColor: 'rgba(255, 205, 86, 0.2)',
           tension: 0.1,
           fill: false,
-          yAxisID: 'y1'
+          yAxisID: 'y1',
+          pointRadius: 0,
+          pointHoverRadius: 6
         }
       ]
     },
