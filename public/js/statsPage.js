@@ -130,20 +130,43 @@ function updateMemoryChart(currentData) {
     initializeMemoryChart();
   }
   
+  // Check if this data point is newer than the last one (avoid duplicates)
+  const lastLabel = memoryChart.data.labels[memoryChart.data.labels.length - 1];
+  if (lastLabel && new Date(currentData.timestamp).getTime() <= lastLabel.getTime()) {
+    return; // Skip duplicate or older data
+  }
+  
   // Add new data point using actual current values
   memoryChart.data.labels.push(new Date(currentData.timestamp));
   memoryChart.data.datasets[0].data.push(formatBytes(currentData.memory.used));
   memoryChart.data.datasets[1].data.push(formatBytes(currentData.memory.heapUsed));
   memoryChart.data.datasets[2].data.push(formatBytes(currentData.memory.external));
   
-  // Keep only recent data points based on current period
-  const maxPoints = getMaxPointsForPeriod(currentPeriod);
-  if (memoryChart.data.labels.length > maxPoints) {
+  // Keep only data points within the current period timeframe
+  const now = Date.now();
+  const periodMs = getPeriodMs(currentPeriod);
+  const cutoffTime = now - periodMs;
+  
+  // Remove old data points that are outside the period
+  while (memoryChart.data.labels.length > 0 && 
+         memoryChart.data.labels[0].getTime() < cutoffTime) {
     memoryChart.data.labels.shift();
     memoryChart.data.datasets.forEach(dataset => dataset.data.shift());
   }
   
   memoryChart.update('none'); // No animation for real-time updates
+}
+
+function getPeriodMs(period) {
+  switch (period) {
+    case '1m': return 60 * 1000;          // 1 minute
+    case '5m': return 5 * 60 * 1000;      // 5 minutes
+    case '15m': return 15 * 60 * 1000;    // 15 minutes
+    case '1h': return 60 * 60 * 1000;     // 1 hour
+    case '6h': return 6 * 60 * 60 * 1000; // 6 hours
+    case '12h': return 12 * 60 * 60 * 1000; // 12 hours
+    default: return 60 * 60 * 1000;       // Default to 1 hour
+  }
 }
 
 function getMaxPointsForPeriod(period) {
@@ -239,15 +262,26 @@ function updateWorkerChart(currentData) {
     initializeWorkerChart();
   }
   
+  // Check if this data point is newer than the last one (avoid duplicates)
+  const lastLabel = workerChart.data.labels[workerChart.data.labels.length - 1];
+  if (lastLabel && new Date(currentData.timestamp).getTime() <= lastLabel.getTime()) {
+    return; // Skip duplicate or older data
+  }
+  
   // Add new data point using actual current values
   workerChart.data.labels.push(new Date(currentData.timestamp));
   workerChart.data.datasets[0].data.push(currentData.workerPool.busyCount);
   workerChart.data.datasets[1].data.push(currentData.workerPool.idleCount);
   workerChart.data.datasets[2].data.push(currentData.workerPool.queuedCount);
   
-  // Keep only recent data points based on current period
-  const maxPoints = getMaxPointsForPeriod(currentPeriod);
-  if (workerChart.data.labels.length > maxPoints) {
+  // Keep only data points within the current period timeframe
+  const now = Date.now();
+  const periodMs = getPeriodMs(currentPeriod);
+  const cutoffTime = now - periodMs;
+  
+  // Remove old data points that are outside the period
+  while (workerChart.data.labels.length > 0 && 
+         workerChart.data.labels[0].getTime() < cutoffTime) {
     workerChart.data.labels.shift();
     workerChart.data.datasets.forEach(dataset => dataset.data.shift());
   }
@@ -255,15 +289,59 @@ function updateWorkerChart(currentData) {
   workerChart.update('none'); // No animation for real-time updates
 }
 
+async function loadHistoricalData(period) {
+  try {
+    const response = await fetch(`/api/stats/data?period=${period}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const dataPoints = await response.json();
+    return dataPoints;
+  } catch (error) {
+    console.error('Error loading historical data:', error);
+    return [];
+  }
+}
+
+async function initializeChartsWithData(period) {
+  // Initialize empty charts
+  initializeMemoryChart();
+  initializeWorkerChart();
+  
+  // Load historical data for the period
+  const historicalData = await loadHistoricalData(period);
+  
+  if (historicalData.length > 0) {
+    // Populate charts with historical data
+    historicalData.forEach(dataPoint => {
+      // Add memory data
+      memoryChart.data.labels.push(new Date(dataPoint.timestamp));
+      memoryChart.data.datasets[0].data.push(formatBytes(dataPoint.memory.used));
+      memoryChart.data.datasets[1].data.push(formatBytes(dataPoint.memory.heapUsed));
+      memoryChart.data.datasets[2].data.push(formatBytes(dataPoint.memory.external));
+      
+      // Add worker data
+      workerChart.data.labels.push(new Date(dataPoint.timestamp));
+      workerChart.data.datasets[0].data.push(dataPoint.workerPool.busyCount);
+      workerChart.data.datasets[1].data.push(dataPoint.workerPool.idleCount);
+      workerChart.data.datasets[2].data.push(dataPoint.workerPool.queuedCount);
+    });
+    
+    // Update charts to show the data
+    memoryChart.update('none');
+    workerChart.update('none');
+  }
+}
+
 async function fetchStats() {
   const period = document.getElementById('timePeriod').value;
   
-  // If period changed, reinitialize charts
+  // If period changed, reload charts with historical data
   if (period !== currentPeriod) {
     currentPeriod = period;
-    lastDataTime = 0; // Reset to force full chart recreation
-    initializeMemoryChart();
-    initializeWorkerChart();
+    await initializeChartsWithData(period);
+    lastDataTime = Date.now(); // Mark as initialized
   }
   
   try {
@@ -273,18 +351,14 @@ async function fetchStats() {
     if (currentData) {
       // For progressive updates, only add new data if we have existing charts
       // and this is not the first load
-      if (lastDataTime > 0 && memoryChart && workerChart) {
+      if (lastDataTime > 0 && memoryChart && workerChart && period === currentPeriod) {
         updateMemoryChart(currentData);
         updateWorkerChart(currentData);
-      } else {
-        // First load or period change - initialize with current data
-        initializeMemoryChart();
-        initializeWorkerChart();
-        updateMemoryChart(currentData);
-        updateWorkerChart(currentData);
+      } else if (lastDataTime === 0) {
+        // First load - initialize with historical data
+        await initializeChartsWithData(period);
+        lastDataTime = Date.now();
       }
-      
-      lastDataTime = Date.now();
     }
     
   } catch (error) {

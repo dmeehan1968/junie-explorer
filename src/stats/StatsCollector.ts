@@ -95,8 +95,15 @@ export class StatsCollector {
   }
 
   public getRecentDataPoints(maxPoints: number = 60): SystemStats[] {
-    const recentStats = this.stats.slice(-maxPoints)
-    return recentStats
+    return this.stats.slice(-maxPoints)
+  }
+
+  public getDataPointsForPeriod(period: TimePeriod): SystemStats[] {
+    const now = Date.now()
+    const periodMs = this.getPeriodMs(period)
+    const startTime = now - periodMs
+    
+    return this.stats.filter(s => s.timestamp >= startTime)
   }
 
   public getStats(query: StatsQuery): AggregatedStats {

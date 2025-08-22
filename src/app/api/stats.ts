@@ -44,8 +44,26 @@ router.get('/api/stats/data', (req: AppRequest, res: AppResponse) => {
       return res.status(500).json({ error: 'JetBrains instance not available' })
     }
     
-    const maxPoints = parseInt(req.query.maxPoints as string) || 60
-    const dataPoints = req.jetBrains.statsCollector.getRecentDataPoints(maxPoints)
+    const period = (req.query.period as TimePeriod) || '1h'
+    const maxPoints = parseInt(req.query.maxPoints as string) || 0
+    
+    let dataPoints: any[]
+    if (period && period !== '1h') {
+      // Get data for specific period
+      const validPeriods: TimePeriod[] = ['1m', '5m', '15m', '1h', '6h', '12h']
+      if (!validPeriods.includes(period)) {
+        return res.status(400).json({ 
+          error: 'Invalid period. Must be one of: 1m, 5m, 15m, 1h, 6h, 12h' 
+        })
+      }
+      dataPoints = req.jetBrains.statsCollector.getDataPointsForPeriod(period)
+    } else if (maxPoints > 0) {
+      // Get recent points by count
+      dataPoints = req.jetBrains.statsCollector.getRecentDataPoints(maxPoints)
+    } else {
+      // Default to 1 hour of data
+      dataPoints = req.jetBrains.statsCollector.getDataPointsForPeriod('1h')
+    }
     
     res.json(dataPoints)
   } catch (error) {
