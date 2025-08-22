@@ -40,7 +40,7 @@ export const statsRouteHandler = async (req: AppRequest, res: AppResponse) => {
                 </select>
               </label>
               
-              <button id="refreshStats" class="btn btn-primary mt-8">
+              <button id="refreshStats" class="btn btn-primary mt-6">
                 Refresh
               </button>
             </div>

@@ -51,10 +51,9 @@ router.get('/api/stats/data', (req: AppRequest, res: AppResponse) => {
     let dataPoints: any[]
     
     if (fromTimestamp > 0) {
-      // Get data points from a specific timestamp onwards
-      const statsCollector = req.jetBrains.statsCollector
-      const allPeriodData = statsCollector.getDataPointsForPeriod(period)
-      dataPoints = allPeriodData.filter(point => point.timestamp > fromTimestamp)
+      // Get only new data points since the last timestamp, respecting period boundary
+      dataPoints = req.jetBrains.statsCollector.getDataPointsSince(fromTimestamp, period)
+      // console.log(`Incremental fetch: ${dataPoints.length} new points since ${new Date(fromTimestamp)}`)
     } else if (period && period !== '1h') {
       // Get data for specific period
       const validPeriods: TimePeriod[] = ['1m', '5m', '15m', '1h', '6h', '12h']

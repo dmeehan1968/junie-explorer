@@ -106,6 +106,20 @@ export class StatsCollector {
     return this.stats.filter(s => s.timestamp >= startTime)
   }
 
+  public getDataPointsSince(fromTimestamp: number, period?: TimePeriod): SystemStats[] {
+    let filteredStats = this.stats.filter(s => s.timestamp > fromTimestamp)
+    
+    // If period is specified, also respect the period boundary
+    if (period) {
+      const now = Date.now()
+      const periodMs = this.getPeriodMs(period)
+      const periodStartTime = now - periodMs
+      filteredStats = filteredStats.filter(s => s.timestamp >= periodStartTime)
+    }
+    
+    return filteredStats
+  }
+
   public getStats(query: StatsQuery): AggregatedStats {
     const now = Date.now()
     const periodMs = this.getPeriodMs(query.period)
@@ -118,7 +132,7 @@ export class StatsCollector {
     }
 
     const intervalMs = query.intervalMs || this.getOptimalInterval(query.period)
-    const aggregated = this.aggregateStats(relevantStats, intervalMs)
+    const aggregated = this.aggregateStats(relevantStats)
     
     return {
       ...aggregated,
@@ -131,7 +145,7 @@ export class StatsCollector {
     }
   }
 
-  private getPeriodMs(period: TimePeriod): number {
+  public getPeriodMs(period: TimePeriod): number {
     switch (period) {
       case '1m': return 60 * 1000
       case '5m': return 5 * 60 * 1000
@@ -155,7 +169,7 @@ export class StatsCollector {
     }
   }
 
-  private aggregateStats(stats: SystemStats[], intervalMs: number): Omit<AggregatedStats, 'period'> {
+  private aggregateStats(stats: SystemStats[]): Omit<AggregatedStats, 'period'> {
     if (stats.length === 0) {
       return this.createEmptyAggregation()
     }

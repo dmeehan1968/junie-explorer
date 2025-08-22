@@ -4,7 +4,6 @@ let lastDataTime = 0;
 let currentPeriod = '1h';
 let lastReceivedTimestamp = 0;
 let isFetching = false;
-let fetchQueue = [];
 
 function formatBytes(bytes) {
   return (bytes / (1024 * 1024)).toFixed(2);
@@ -268,8 +267,7 @@ async function loadHistoricalData(period) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    const dataPoints = await response.json();
-    return dataPoints;
+    return await response.json();
   } catch (error) {
     console.error('Error loading historical data:', error);
     return [];
@@ -283,8 +281,7 @@ async function loadIncrementalData(period, fromTimestamp) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    const dataPoints = await response.json();
-    return dataPoints;
+    return await response.json();
   } catch (error) {
     console.error('Error loading incremental data:', error);
     return [];
