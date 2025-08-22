@@ -77,31 +77,4 @@ router.get('/api/stats', (req: AppRequest, res: AppResponse) => {
   }
 })
 
-// Test endpoint to generate file I/O activity for testing monitoring
-router.get('/api/stats/test-io', async (req: AppRequest, res: AppResponse) => {
-  try {
-    const testFile = path.join(process.cwd(), 'temp-test-file.txt')
-    const testData = 'Test data for file I/O monitoring ' + Date.now()
-    
-    // Generate some file I/O operations
-    await fs.writeFile(testFile, testData)
-    const content = await fs.readFile(testFile, 'utf-8')
-    const exists = fs.existsSync(testFile)
-    const stats = await fs.stat(testFile)
-    await fs.unlink(testFile)
-    
-    res.json({ 
-      message: 'File I/O test completed',
-      operations: 5,
-      bytesWritten: Buffer.byteLength(testData),
-      bytesRead: content.length,
-      fileExists: exists,
-      fileSize: stats.size
-    })
-  } catch (error) {
-    console.error('Error in test-io endpoint:', error)
-    res.status(500).json({ error: 'Test failed' })
-  }
-})
-
 export default router
