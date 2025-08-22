@@ -72,7 +72,7 @@ export const statsRouteHandler = async (req: AppRequest, res: AppResponse) => {
           </div>
 
           {/* File I/O Metrics Row */}
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
             {/* File I/O Operations Chart */}
             <div class="card bg-base-100 shadow-xl">
@@ -101,7 +101,7 @@ export const statsRouteHandler = async (req: AppRequest, res: AppResponse) => {
             {/* Current Stats Summary */}
             <div class="card bg-base-100 shadow-xl lg:col-span-4">
               <div class="card-body">
-                <h2 class="card-title">Current Statistics (Live Values)</h2>
+                <h2 class="card-title">Live Statistics</h2>
                 <div id="currentStats" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   
                   {/* Memory Metrics */}

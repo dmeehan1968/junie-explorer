@@ -14,7 +14,7 @@ self.onmessage = async (ev: MessageEvent<LoadEventsInput>) => {
     self.postMessage({ ok: false, error: 'No data provided' })
     return
   }
-  
+
   try {
     // Clear previous stats before processing
     fileIOCollector.clearStats()
@@ -23,8 +23,8 @@ self.onmessage = async (ev: MessageEvent<LoadEventsInput>) => {
     
     // Get file I/O stats from this operation
     const fileIOStats = fileIOCollector.getStats()
-    
-    self.postMessage({ 
+
+    self.postMessage({
       ok: true, 
       result,
       fileIOStats: fileIOStats.operations.length > 0 ? fileIOStats : undefined
