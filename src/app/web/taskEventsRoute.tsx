@@ -442,7 +442,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
     const tasksDescriptions = [...(await issue.tasks).values()].map((t: any) => t?.context?.description ?? '')
 
     const page = <HtmlPage cookies={req.cookies}>
-      <AppHead title={`Junie Explorer: ${project.name} ${issue.name} ${task.id} Events`}>
+      <AppHead title={`${project.name} ${issue.name} ${task.id} Events`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
         <Conditional condition={hasMetrics}>
@@ -475,7 +475,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
         <script src="/js/taskRawData.js"></script>
       </AppHead>
       <AppBody>
-        <AppHeader title={`Junie Explorer: ${project.name}`} actions={[<ThemeSwitcher/>, <StatsButton/>, <ReloadButton/>]}/>
+        <AppHeader title={project.name} actions={[<ThemeSwitcher/>, <StatsButton/>, <ReloadButton/>]}/>
         <VersionBanner version={jetBrains?.version}/>
         <Breadcrumb items={[
           { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },

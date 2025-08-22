@@ -359,7 +359,7 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
     const graphData = await prepareGraphData(issues)
 
     const page = <HtmlPage cookies={req.cookies}>
-      <AppHead title={`Junie Explorer: ${project.name} Issues`}>
+      <AppHead title={`${project.name} Issues`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
           <script>
