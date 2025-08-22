@@ -4,7 +4,7 @@ import { TimePeriod } from '../../stats/StatsTypes.js'
 
 const router = Router()
 
-router.get('/api/stats', (req: AppRequest, res: AppResponse) => {
+router.get('/api/stats/data', (req: AppRequest, res: AppResponse) => {
   try {
     if (!req.jetBrains) {
       return res.status(500).json({ error: 'JetBrains instance not available' })

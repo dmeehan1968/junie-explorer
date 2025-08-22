@@ -1,3 +1,48 @@
+export interface FileIOStats {
+  read: {
+    operationCount: number
+    bytesRead: number
+    averageDurationMs: number
+    minDurationMs: number
+    maxDurationMs: number
+    errorCount: number
+    operationsPerSecond: number
+    throughputMBps: number
+  }
+  write: {
+    operationCount: number
+    bytesWritten: number
+    averageDurationMs: number
+    minDurationMs: number
+    maxDurationMs: number
+    errorCount: number
+    operationsPerSecond: number
+    throughputMBps: number
+  }
+  directory: {
+    operationCount: number
+    averageDurationMs: number
+    minDurationMs: number
+    maxDurationMs: number
+    errorCount: number
+    operationsPerSecond: number
+  }
+  check: {
+    operationCount: number
+    averageDurationMs: number
+    minDurationMs: number
+    maxDurationMs: number
+    errorCount: number
+    operationsPerSecond: number
+  }
+  total: {
+    operationCount: number
+    bytesTotal: number
+    errorCount: number
+    operationsPerSecond: number
+  }
+}
+
 export interface SystemStats {
   timestamp: number
   memory: {
@@ -19,6 +64,44 @@ export interface SystemStats {
     workerCount: number
     peakWorkerCount: number
     averageQueueWaitTimeMs: number
+  }
+  fileIO: FileIOStats
+}
+
+export interface AggregatedFileIOStats {
+  read: {
+    operationCount: { min: number; max: number; avg: number }
+    bytesRead: { min: number; max: number; avg: number }
+    averageDurationMs: { min: number; max: number; avg: number }
+    errorCount: { min: number; max: number; avg: number }
+    operationsPerSecond: { min: number; max: number; avg: number }
+    throughputMBps: { min: number; max: number; avg: number }
+  }
+  write: {
+    operationCount: { min: number; max: number; avg: number }
+    bytesWritten: { min: number; max: number; avg: number }
+    averageDurationMs: { min: number; max: number; avg: number }
+    errorCount: { min: number; max: number; avg: number }
+    operationsPerSecond: { min: number; max: number; avg: number }
+    throughputMBps: { min: number; max: number; avg: number }
+  }
+  directory: {
+    operationCount: { min: number; max: number; avg: number }
+    averageDurationMs: { min: number; max: number; avg: number }
+    errorCount: { min: number; max: number; avg: number }
+    operationsPerSecond: { min: number; max: number; avg: number }
+  }
+  check: {
+    operationCount: { min: number; max: number; avg: number }
+    averageDurationMs: { min: number; max: number; avg: number }
+    errorCount: { min: number; max: number; avg: number }
+    operationsPerSecond: { min: number; max: number; avg: number }
+  }
+  total: {
+    operationCount: { min: number; max: number; avg: number }
+    bytesTotal: { min: number; max: number; avg: number }
+    errorCount: { min: number; max: number; avg: number }
+    operationsPerSecond: { min: number; max: number; avg: number }
   }
 }
 
@@ -43,6 +126,7 @@ export interface AggregatedStats {
     peakWorkerCount: { min: number; max: number; avg: number }
     averageQueueWaitTimeMs: { min: number; max: number; avg: number }
   }
+  fileIO: AggregatedFileIOStats
   period: {
     startTime: number
     endTime: number

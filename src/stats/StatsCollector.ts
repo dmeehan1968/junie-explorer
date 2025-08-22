@@ -1,12 +1,15 @@
 import { WorkerPool } from '../workers/WorkerPool.js'
 import { SystemStats, AggregatedStats, TimePeriod, StatsQuery } from './StatsTypes.js'
+import { FileIOCollector } from './FileIOCollector.js'
 
 export class StatsCollector {
   private stats: SystemStats[] = []
   private intervalId: NodeJS.Timeout | null = null
   private workerPools: Set<WorkerPool<any, any>> = new Set()
+  private fileIOCollector: FileIOCollector
 
   constructor() {
+    this.fileIOCollector = new FileIOCollector()
     this.startCollection()
   }
 
@@ -29,6 +32,7 @@ export class StatsCollector {
     const memUsage = process.memoryUsage()
     
     const aggregatedWorkerStats = this.aggregateWorkerPoolStats()
+    const fileIOStats = this.fileIOCollector.getStats()
 
     const stats: SystemStats = {
       timestamp: now,
@@ -40,7 +44,8 @@ export class StatsCollector {
         heapTotal: memUsage.heapTotal,
         external: memUsage.external
       },
-      workerPool: aggregatedWorkerStats
+      workerPool: aggregatedWorkerStats,
+      fileIO: fileIOStats
     }
 
     this.stats.push(stats)
@@ -176,8 +181,9 @@ export class StatsCollector {
 
     const memory = this.aggregateMemoryStats(stats)
     const workerPool = this.aggregateWorkerPoolStatsData(stats)
+    const fileIO = this.aggregateFileIOStats(stats)
 
-    return { memory, workerPool }
+    return { memory, workerPool, fileIO }
   }
 
   private aggregateMemoryStats(stats: SystemStats[]) {
@@ -207,6 +213,47 @@ export class StatsCollector {
       workerCount: this.getMinMaxAvg(workerStats.map(w => w.workerCount)),
       peakWorkerCount: this.getMinMaxAvg(workerStats.map(w => w.peakWorkerCount)),
       averageQueueWaitTimeMs: this.getMinMaxAvg(workerStats.map(w => w.averageQueueWaitTimeMs))
+    }
+  }
+
+  private aggregateFileIOStats(stats: SystemStats[]) {
+    const fileIOStats = stats.map(s => s.fileIO)
+    
+    return {
+      read: {
+        operationCount: this.getMinMaxAvg(fileIOStats.map(f => f.read.operationCount)),
+        bytesRead: this.getMinMaxAvg(fileIOStats.map(f => f.read.bytesRead)),
+        averageDurationMs: this.getMinMaxAvg(fileIOStats.map(f => f.read.averageDurationMs)),
+        errorCount: this.getMinMaxAvg(fileIOStats.map(f => f.read.errorCount)),
+        operationsPerSecond: this.getMinMaxAvg(fileIOStats.map(f => f.read.operationsPerSecond)),
+        throughputMBps: this.getMinMaxAvg(fileIOStats.map(f => f.read.throughputMBps))
+      },
+      write: {
+        operationCount: this.getMinMaxAvg(fileIOStats.map(f => f.write.operationCount)),
+        bytesWritten: this.getMinMaxAvg(fileIOStats.map(f => f.write.bytesWritten)),
+        averageDurationMs: this.getMinMaxAvg(fileIOStats.map(f => f.write.averageDurationMs)),
+        errorCount: this.getMinMaxAvg(fileIOStats.map(f => f.write.errorCount)),
+        operationsPerSecond: this.getMinMaxAvg(fileIOStats.map(f => f.write.operationsPerSecond)),
+        throughputMBps: this.getMinMaxAvg(fileIOStats.map(f => f.write.throughputMBps))
+      },
+      directory: {
+        operationCount: this.getMinMaxAvg(fileIOStats.map(f => f.directory.operationCount)),
+        averageDurationMs: this.getMinMaxAvg(fileIOStats.map(f => f.directory.averageDurationMs)),
+        errorCount: this.getMinMaxAvg(fileIOStats.map(f => f.directory.errorCount)),
+        operationsPerSecond: this.getMinMaxAvg(fileIOStats.map(f => f.directory.operationsPerSecond))
+      },
+      check: {
+        operationCount: this.getMinMaxAvg(fileIOStats.map(f => f.check.operationCount)),
+        averageDurationMs: this.getMinMaxAvg(fileIOStats.map(f => f.check.averageDurationMs)),
+        errorCount: this.getMinMaxAvg(fileIOStats.map(f => f.check.errorCount)),
+        operationsPerSecond: this.getMinMaxAvg(fileIOStats.map(f => f.check.operationsPerSecond))
+      },
+      total: {
+        operationCount: this.getMinMaxAvg(fileIOStats.map(f => f.total.operationCount)),
+        bytesTotal: this.getMinMaxAvg(fileIOStats.map(f => f.total.bytesTotal)),
+        errorCount: this.getMinMaxAvg(fileIOStats.map(f => f.total.errorCount)),
+        operationsPerSecond: this.getMinMaxAvg(fileIOStats.map(f => f.total.operationsPerSecond))
+      }
     }
   }
 
@@ -255,6 +302,42 @@ export class StatsCollector {
         workerCount: empty,
         peakWorkerCount: empty,
         averageQueueWaitTimeMs: empty
+      },
+      fileIO: {
+        read: {
+          operationCount: empty,
+          bytesRead: empty,
+          averageDurationMs: empty,
+          errorCount: empty,
+          operationsPerSecond: empty,
+          throughputMBps: empty
+        },
+        write: {
+          operationCount: empty,
+          bytesWritten: empty,
+          averageDurationMs: empty,
+          errorCount: empty,
+          operationsPerSecond: empty,
+          throughputMBps: empty
+        },
+        directory: {
+          operationCount: empty,
+          averageDurationMs: empty,
+          errorCount: empty,
+          operationsPerSecond: empty
+        },
+        check: {
+          operationCount: empty,
+          averageDurationMs: empty,
+          errorCount: empty,
+          operationsPerSecond: empty
+        },
+        total: {
+          operationCount: empty,
+          bytesTotal: empty,
+          errorCount: empty,
+          operationsPerSecond: empty
+        }
       }
     }
   }
@@ -264,5 +347,6 @@ export class StatsCollector {
       clearInterval(this.intervalId)
       this.intervalId = null
     }
+    this.fileIOCollector.stop()
   }
 }
