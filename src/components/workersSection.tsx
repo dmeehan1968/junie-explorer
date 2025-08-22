@@ -14,7 +14,7 @@ export const WorkersSection = () => {
           </div>
 
           {/* Worker Pool Metrics - 1/3 width */}
-          <div>
+          <div class="flex flex-col justify-center h-80">
             <div class="grid grid-cols-2 gap-2">
               <div class="stat bg-base-200 rounded-lg p-2">
                 <div class="stat-title text-xs">Total Workers</div>
