@@ -6,9 +6,11 @@ import homeRoutes from "../app/web/homeRoutes.js"
 import projectRoutes from "../app/web/projectRoutes.js"
 import taskEventsRoute from "../app/web/taskEventsRoute.js"
 import taskTrajectoriesRoute from "../app/web/taskTrajectoriesRoute.js"
+import statsRoute from "../app/web/statsRoute.js"
 import apiProjects from "./api/projects.js"
 import apiTrajectories from "./api/trajectories/index.js"
 import apiEvents from "./api/events/index.js"
+import apiStats from "./api/stats.js"
 import { errorHandler } from "./middleware/errorHandler.js"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware.js"
 import { AppRequest, AppResponse } from "./types.js"
@@ -37,10 +39,12 @@ export class JunieExplorer {
     this.app.use('/', projectRoutes)
     this.app.use('/', taskEventsRoute)
     this.app.use('/', taskTrajectoriesRoute)
+    this.app.use('/', statsRoute)
 
     this.app.use('/', apiProjects)
     this.app.use('/', apiTrajectories)
     this.app.use('/', apiEvents)
+    this.app.use('/', apiStats)
 
     // error handling
     this.app.use(notFoundRouteHandler)

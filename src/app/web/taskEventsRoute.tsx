@@ -7,6 +7,7 @@ import { Breadcrumb } from '../../components/breadcrumb.js'
 import { Conditional } from "../../components/conditional.js"
 import { HtmlPage } from "../../components/htmlPage.js"
 import { ReloadButton } from '../../components/reloadButton.js'
+import { StatsButton } from '../../components/statsButton.js'
 import { TaskCard } from '../../components/taskCard.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
@@ -474,7 +475,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
         <script src="/js/taskRawData.js"></script>
       </AppHead>
       <AppBody>
-        <AppHeader title={`Junie Explorer: ${project.name}`} actions={[<ThemeSwitcher/>, <ReloadButton/>]}/>
+        <AppHeader title={`Junie Explorer: ${project.name}`} actions={[<ThemeSwitcher/>, <StatsButton/>, <ReloadButton/>]}/>
         <VersionBanner version={jetBrains?.version}/>
         <Breadcrumb items={[
           { label: 'Projects', href: '/', testId: 'breadcrumb-projects' },

@@ -9,6 +9,7 @@ import { IdeSelection } from "../../components/ideSelection.js"
 import { ProjectMetricsChart } from "../../components/projectMetricsChart.js"
 import { ProjectTable } from "../../components/projectTable.js"
 import { ReloadButton } from '../../components/reloadButton.js'
+import { StatsButton } from '../../components/statsButton.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
@@ -46,7 +47,7 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
         <script src="/js/reloadPage.js"></script>
       </AppHead>
       <AppBody>
-        <AppHeader actions={[<ThemeSwitcher/>, <ReloadButton/>]}/>
+        <AppHeader actions={[<ThemeSwitcher/>, <StatsButton/>, <ReloadButton/>]}/>
         <VersionBanner version={jetBrains?.version}/>
         <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">
           Projects found in: {jetBrainsPath}

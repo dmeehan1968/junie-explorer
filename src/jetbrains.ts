@@ -7,6 +7,7 @@ import semver from "semver"
 import publicFiles from "./bun/public.js"
 import { Project } from "./Project.js"
 import { SummaryMetrics } from "./schema.js"
+import { StatsCollector } from "./stats/StatsCollector.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -40,6 +41,7 @@ export class JetBrains {
 
   private _metrics: Promise<SummaryMetrics> | undefined
   private _version?: Version
+  public readonly statsCollector: StatsCollector
 
   public hasMetrics: boolean = false
 
@@ -53,6 +55,7 @@ export class JetBrains {
 
     this._logPath = options.logPath
     this.logger = options.logger ?? console
+    this.statsCollector = new StatsCollector()
   }
 
   getCurrentLocaleFromEnv = (): string | undefined => {

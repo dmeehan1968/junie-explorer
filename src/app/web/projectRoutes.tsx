@@ -13,6 +13,7 @@ import { HtmlPage } from "../../components/htmlPage.js"
 import { escapeHtml } from "../../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
 import { ReloadButton } from '../../components/reloadButton.js'
+import { StatsButton } from '../../components/statsButton.js'
 import { StatusBadge } from "../../components/statusBadge.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../../utils/timeUtils.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
@@ -370,7 +371,7 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
         <script src="/js/compareModal.js"></script>
       </AppHead>
       <AppBody data-project-id={escapeHtml(project.name ?? '')}>
-        <AppHeader actions={[<ThemeSwitcher />, <ReloadButton />]} title={project.name} />
+        <AppHeader actions={[<ThemeSwitcher />, <StatsButton />, <ReloadButton />]} title={project.name} />
         <VersionBanner version={jetBrains.version}/>
         <Breadcrumb
           items={[
