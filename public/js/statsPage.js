@@ -29,7 +29,8 @@ function updateCurrentStats(latestDataPoint) {
     document.getElementById('heapUsed').textContent = formatBytes(memory.heapUsed);
     document.getElementById('heapTotal').textContent = formatBytes(memory.heapTotal);
     document.getElementById('external').textContent = formatBytes(memory.external);
-    document.getElementById('heapUsagePercent').textContent = formatNumber(memory.heapUsagePercent) + '%';
+    const heapUsagePercent = memory.heapTotal > 0 ? (memory.heapUsed / memory.heapTotal) * 100 : 0;
+    document.getElementById('heapUsagePercent').textContent = formatNumber(heapUsagePercent) + '%';
     
     // Update worker metrics
     document.getElementById('totalWorkers').textContent = worker.workerCount;
