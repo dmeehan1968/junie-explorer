@@ -46,9 +46,16 @@ router.get('/api/stats/data', (req: AppRequest, res: AppResponse) => {
     
     const period = (req.query.period as TimePeriod) || '1h'
     const maxPoints = parseInt(req.query.maxPoints as string) || 0
+    const fromTimestamp = parseInt(req.query.from as string) || 0
     
     let dataPoints: any[]
-    if (period && period !== '1h') {
+    
+    if (fromTimestamp > 0) {
+      // Get data points from a specific timestamp onwards
+      const statsCollector = req.jetBrains.statsCollector
+      const allPeriodData = statsCollector.getDataPointsForPeriod(period)
+      dataPoints = allPeriodData.filter(point => point.timestamp > fromTimestamp)
+    } else if (period && period !== '1h') {
       // Get data for specific period
       const validPeriods: TimePeriod[] = ['1m', '5m', '15m', '1h', '6h', '12h']
       if (!validPeriods.includes(period)) {

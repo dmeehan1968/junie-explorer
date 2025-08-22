@@ -2,6 +2,9 @@ let memoryChart = null;
 let workerChart = null;
 let lastDataTime = 0;
 let currentPeriod = '1h';
+let lastReceivedTimestamp = 0;
+let isFetching = false;
+let fetchQueue = [];
 
 function formatBytes(bytes) {
   return (bytes / (1024 * 1024)).toFixed(2);
@@ -197,7 +200,8 @@ function initializeWorkerChart() {
           borderColor: 'rgb(255, 205, 86)',
           backgroundColor: 'rgba(255, 205, 86, 0.2)',
           tension: 0.1,
-          fill: false
+          fill: false,
+          yAxisID: 'y1'
         }
       ]
     },
@@ -209,10 +213,26 @@ function initializeWorkerChart() {
       },
       scales: {
         y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
           beginAtZero: true,
           title: {
             display: true,
-            text: 'Count'
+            text: 'Worker Count'
+          }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Queued Jobs'
+          },
+          grid: {
+            drawOnChartArea: false
           }
         },
         x: {
@@ -256,21 +276,32 @@ async function loadHistoricalData(period) {
   }
 }
 
-// Removed initializeChartsWithData - now using refreshChartsWithLatestData
-
-async function refreshChartsWithLatestData() {
+async function loadIncrementalData(period, fromTimestamp) {
   try {
-    const period = document.getElementById('timePeriod').value;
+    const response = await fetch(`/api/stats/data?period=${period}&from=${fromTimestamp}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    // Get the latest data points for the current period
-    const latestData = await loadHistoricalData(period);
+    const dataPoints = await response.json();
+    return dataPoints;
+  } catch (error) {
+    console.error('Error loading incremental data:', error);
+    return [];
+  }
+}
+
+async function initializeChartsWithFullData(period) {
+  try {
+    // Load all historical data for the period
+    const historicalData = await loadHistoricalData(period);
     
-    if (latestData.length === 0) {
+    if (historicalData.length === 0) {
       return;
     }
     
     // Calculate actual data span
-    const timestamps = latestData.map(d => d.timestamp);
+    const timestamps = historicalData.map(d => d.timestamp);
     const minTime = Math.min(...timestamps);
     const maxTime = Math.max(...timestamps);
     const dataSpanMs = maxTime - minTime;
@@ -282,77 +313,151 @@ async function refreshChartsWithLatestData() {
     if (memoryChart) {
       memoryChart.data.labels = [];
       memoryChart.data.datasets.forEach(dataset => dataset.data = []);
-      
-      // Update time unit based on actual data span
       memoryChart.options.scales.x.time.unit = optimalTimeUnit;
     }
     if (workerChart) {
       workerChart.data.labels = [];
       workerChart.data.datasets.forEach(dataset => dataset.data = []);
-      
-      // Update time unit based on actual data span
       workerChart.options.scales.x.time.unit = optimalTimeUnit;
     }
     
-    // Populate with latest data
-    latestData.forEach(dataPoint => {
-      if (memoryChart) {
-        memoryChart.data.labels.push(new Date(dataPoint.timestamp));
-        memoryChart.data.datasets[0].data.push(formatBytes(dataPoint.memory.used));
-        memoryChart.data.datasets[1].data.push(formatBytes(dataPoint.memory.heapUsed));
-        memoryChart.data.datasets[2].data.push(formatBytes(dataPoint.memory.external));
-      }
-      
-      if (workerChart) {
-        workerChart.data.labels.push(new Date(dataPoint.timestamp));
-        workerChart.data.datasets[0].data.push(dataPoint.workerPool.busyCount);
-        workerChart.data.datasets[1].data.push(dataPoint.workerPool.idleCount);
-        workerChart.data.datasets[2].data.push(dataPoint.workerPool.queuedCount);
-      }
+    // Populate with historical data
+    historicalData.forEach(dataPoint => {
+      addDataPointToCharts(dataPoint);
     });
     
-    // Update charts with new scale configuration
+    // Update charts
     if (memoryChart) memoryChart.update('none');
     if (workerChart) workerChart.update('none');
     
-    // Log the time span for debugging
-    console.log(`Data span: ${formatNumber(dataSpanMs / 1000 / 60)} minutes, using ${optimalTimeUnit} time unit`);
+    // Update tracking variables
+    if (historicalData.length > 0) {
+      lastReceivedTimestamp = Math.max(...timestamps);
+    }
+    
+    console.log(`Initialized charts with ${historicalData.length} data points, latest: ${new Date(lastReceivedTimestamp)}`);
     
   } catch (error) {
-    console.error('Error refreshing charts:', error);
+    console.error('Error initializing charts:', error);
+  }
+}
+
+function addDataPointToCharts(dataPoint) {
+  const timestamp = new Date(dataPoint.timestamp);
+  
+  if (memoryChart) {
+    memoryChart.data.labels.push(timestamp);
+    memoryChart.data.datasets[0].data.push(formatBytes(dataPoint.memory.used));
+    memoryChart.data.datasets[1].data.push(formatBytes(dataPoint.memory.heapUsed));
+    memoryChart.data.datasets[2].data.push(formatBytes(dataPoint.memory.external));
+  }
+  
+  if (workerChart) {
+    workerChart.data.labels.push(timestamp);
+    workerChart.data.datasets[0].data.push(dataPoint.workerPool.busyCount);
+    workerChart.data.datasets[1].data.push(dataPoint.workerPool.idleCount);
+    workerChart.data.datasets[2].data.push(dataPoint.workerPool.queuedCount);
+  }
+}
+
+function removeOldDataPoints(period) {
+  const now = Date.now();
+  const periodMs = getPeriodMs(period);
+  const cutoffTime = now - periodMs;
+  
+  // Remove old data points from memory chart
+  if (memoryChart) {
+    while (memoryChart.data.labels.length > 0 && 
+           memoryChart.data.labels[0].getTime() < cutoffTime) {
+      memoryChart.data.labels.shift();
+      memoryChart.data.datasets.forEach(dataset => dataset.data.shift());
+    }
+  }
+  
+  // Remove old data points from worker chart
+  if (workerChart) {
+    while (workerChart.data.labels.length > 0 && 
+           workerChart.data.labels[0].getTime() < cutoffTime) {
+      workerChart.data.labels.shift();
+      workerChart.data.datasets.forEach(dataset => dataset.data.shift());
+    }
+  }
+}
+
+async function updateChartsWithIncrementalData() {
+  if (isFetching) {
+    return; // Prevent parallel requests
+  }
+  
+  isFetching = true;
+  
+  try {
+    const period = document.getElementById('timePeriod').value;
+    
+    // Get incremental data from last received timestamp
+    const newData = await loadIncrementalData(period, lastReceivedTimestamp);
+    
+    if (newData.length > 0) {
+      // Add new data points
+      newData.forEach(dataPoint => {
+        addDataPointToCharts(dataPoint);
+      });
+      
+      // Update last received timestamp
+      const newTimestamps = newData.map(d => d.timestamp);
+      lastReceivedTimestamp = Math.max(lastReceivedTimestamp, ...newTimestamps);
+      
+      // Remove old data points outside the period
+      removeOldDataPoints(period);
+      
+      // Update charts
+      if (memoryChart) memoryChart.update('none');
+      if (workerChart) workerChart.update('none');
+      
+      console.log(`Added ${newData.length} new data points, latest: ${new Date(lastReceivedTimestamp)}`);
+    }
+    
+  } catch (error) {
+    console.error('Error updating charts incrementally:', error);
+  } finally {
+    isFetching = false;
   }
 }
 
 async function fetchStats() {
   const period = document.getElementById('timePeriod').value;
   
-  // If period changed, reload charts with historical data
+  // If period changed, reinitialize with full data
   if (period !== currentPeriod) {
     currentPeriod = period;
+    lastReceivedTimestamp = 0; // Reset to force full reload
+    
     if (!memoryChart || !workerChart) {
       initializeMemoryChart();
       initializeWorkerChart();
     }
-    await refreshChartsWithLatestData();
-    lastDataTime = Date.now(); // Mark as initialized
+    
+    await initializeChartsWithFullData(period);
+    lastDataTime = Date.now();
+  } else {
+    // Incremental update for same period
+    if (lastDataTime === 0) {
+      // First load
+      if (!memoryChart || !workerChart) {
+        initializeMemoryChart();
+        initializeWorkerChart();
+      }
+      await initializeChartsWithFullData(period);
+      lastDataTime = Date.now();
+    } else {
+      // Regular incremental update
+      await updateChartsWithIncrementalData();
+    }
   }
   
   try {
     // Update current stats display
     await updateCurrentStats();
-    
-    // Refresh charts with latest data to fill any gaps
-    if (lastDataTime > 0 && memoryChart && workerChart) {
-      await refreshChartsWithLatestData();
-    } else {
-      // First load - initialize charts and load data
-      if (!memoryChart || !workerChart) {
-        initializeMemoryChart();
-        initializeWorkerChart();
-      }
-      await refreshChartsWithLatestData();
-      lastDataTime = Date.now();
-    }
     
   } catch (error) {
     console.error('Error fetching stats:', error);
@@ -370,20 +475,26 @@ async function fetchStats() {
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
   // Load initial stats
-  fetchStats();
+  fetchStats().catch(console.error);
   
   // Set up event listeners
-  document.getElementById('refreshStats').addEventListener('click', fetchStats);
-  document.getElementById('timePeriod').addEventListener('change', fetchStats);
+  document.getElementById('refreshStats').addEventListener('click', () => {
+    fetchStats().catch(console.error);
+  });
+  document.getElementById('timePeriod').addEventListener('change', () => {
+    fetchStats().catch(console.error);
+  });
   
   // Auto-refresh every 1 second
-  setInterval(fetchStats, 1000);
+  setInterval(() => {
+    fetchStats().catch(console.error);
+  }, 1000);
   
   // Refresh when page becomes visible again (handles tab switching)
   document.addEventListener('visibilitychange', function() {
     if (!document.hidden) {
       console.log('Tab became visible, refreshing stats...');
-      fetchStats();
+      fetchStats().catch(console.error);
     }
   });
 });
