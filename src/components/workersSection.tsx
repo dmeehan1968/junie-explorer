@@ -49,7 +49,7 @@ export const WorkersSection = () => {
                 <div class="stat-value text-sm text-neutral" id="peakWorkers">-</div>
               </div>
               <div class="stat bg-base-200 rounded-lg p-2">
-                <div class="stat-title text-xs">Total Exec Time (ms)</div>
+                <div class="stat-title text-xs">Total Exec Time (mm:ss.ddd)</div>
                 <div class="stat-value text-sm text-neutral" id="totalExecTime">-</div>
               </div>
               <div class="stat bg-base-200 rounded-lg p-2">

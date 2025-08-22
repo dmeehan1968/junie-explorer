@@ -10,8 +10,27 @@ function formatBytes(bytes) {
   return (bytes / (1024 * 1024)).toFixed(2);
 }
 
+function formatBytesWithUnit(bytes) {
+  if (bytes < 1024) {
+    return `${bytes.toFixed(2)} B`;
+  } else if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(2)} KB`;
+  } else if (bytes < 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  } else {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
+}
+
 function formatNumber(num) {
   return parseFloat(num).toFixed(2);
+}
+
+function formatTimeMs(ms) {
+  const totalSeconds = ms / 1000;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = (totalSeconds % 60).toFixed(3);
+  return `${minutes.toString().padStart(2, '0')}:${seconds.padStart(6, '0')}`;
 }
 
 function updateCurrentStats(latestDataPoint) {
@@ -25,12 +44,14 @@ function updateCurrentStats(latestDataPoint) {
     const worker = latestDataPoint.workerPool;
     
     // Update memory metrics
-    document.getElementById('memUsed').textContent = formatBytes(memory.used);
-    document.getElementById('memTotal').textContent = formatBytes(memory.total);
-    document.getElementById('heapUsed').textContent = formatBytes(memory.heapUsed);
-    document.getElementById('heapTotal').textContent = formatBytes(memory.heapTotal);
-    document.getElementById('external').textContent = formatBytes(memory.external);
-    const heapUsagePercent = memory.heapTotal > 0 ? (memory.heapUsed / memory.heapTotal) * 100 : 0;
+    document.getElementById('memUsed').textContent = formatBytesWithUnit(memory.used);
+    document.getElementById('memTotal').textContent = formatBytesWithUnit(memory.total);
+    document.getElementById('heapUsed').textContent = formatBytesWithUnit(memory.heapUsed);
+    document.getElementById('heapTotal').textContent = formatBytesWithUnit(memory.heapTotal);
+    document.getElementById('external').textContent = formatBytesWithUnit(memory.external);
+    
+    // Fix heap usage calculation - ensure we're comparing the right values
+    const heapUsagePercent = memory.heapTotal > 0 ? Math.min((memory.heapUsed / memory.heapTotal) * 100, 100) : 0;
     document.getElementById('heapUsagePercent').textContent = formatNumber(heapUsagePercent) + '%';
     
     // Update worker metrics
@@ -42,7 +63,7 @@ function updateCurrentStats(latestDataPoint) {
     document.getElementById('failureCount').textContent = worker.failureCount;
     document.getElementById('avgExecution').textContent = formatNumber(worker.averageExecutionTimeMs);
     document.getElementById('peakWorkers').textContent = worker.peakWorkerCount;
-    document.getElementById('totalExecTime').textContent = formatNumber(worker.totalExecutionTimeMs);
+    document.getElementById('totalExecTime').textContent = formatTimeMs(worker.totalExecutionTimeMs);
     document.getElementById('avgQueueWait').textContent = formatNumber(worker.averageQueueWaitTimeMs);
     
     // Update file I/O metrics
@@ -50,7 +71,7 @@ function updateCurrentStats(latestDataPoint) {
     document.getElementById('totalIOOpsPerSec').textContent = formatNumber(fileIO.total.operationsPerSecond);
     document.getElementById('readOpsPerSec').textContent = formatNumber(fileIO.read.operationsPerSecond);
     document.getElementById('writeOpsPerSec').textContent = formatNumber(fileIO.write.operationsPerSecond);
-    document.getElementById('totalIOBytes').textContent = formatBytes(fileIO.total.bytesTotal);
+    document.getElementById('totalIOBytes').textContent = formatBytesWithUnit(fileIO.total.bytesTotal);
     document.getElementById('readThroughput').textContent = formatNumber(fileIO.read.throughputMBps);
     document.getElementById('writeThroughput').textContent = formatNumber(fileIO.write.throughputMBps);
     document.getElementById('totalIOErrors').textContent = fileIO.total.errorCount;

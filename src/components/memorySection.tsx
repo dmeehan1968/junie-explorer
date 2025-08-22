@@ -17,23 +17,23 @@ export const MemorySection = () => {
           <div class="flex flex-col justify-center h-80">
             <div class="grid grid-cols-2 gap-2">
               <div class="stat bg-base-200 rounded-lg p-2">
-                <div class="stat-title text-xs">RSS Memory (MB)</div>
+                <div class="stat-title text-xs">RSS Memory</div>
                 <div class="stat-value text-sm text-primary" id="memUsed">-</div>
               </div>
               <div class="stat bg-base-200 rounded-lg p-2">
-                <div class="stat-title text-xs">Total Memory (MB)</div>
+                <div class="stat-title text-xs">Total Memory</div>
                 <div class="stat-value text-sm text-primary" id="memTotal">-</div>
               </div>
               <div class="stat bg-base-200 rounded-lg p-2">
-                <div class="stat-title text-xs">Heap Used (MB)</div>
+                <div class="stat-title text-xs">Heap Used</div>
                 <div class="stat-value text-sm text-secondary" id="heapUsed">-</div>
               </div>
               <div class="stat bg-base-200 rounded-lg p-2">
-                <div class="stat-title text-xs">Heap Total (MB)</div>
+                <div class="stat-title text-xs">Heap Total</div>
                 <div class="stat-value text-sm text-secondary" id="heapTotal">-</div>
               </div>
               <div class="stat bg-base-200 rounded-lg p-2">
-                <div class="stat-title text-xs">External (MB)</div>
+                <div class="stat-title text-xs">External</div>
                 <div class="stat-value text-sm text-accent" id="external">-</div>
               </div>
               <div class="stat bg-base-200 rounded-lg p-2">
