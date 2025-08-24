@@ -469,7 +469,6 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
         <script src={"https://code.jquery.com/jquery-3.6.0.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"}></script>
         <script src="/js/themeSwitcher.js"></script>
-        <script src="/js/reloadPage.js"></script>
         <script src="/js/taskEventChart.js"></script>
         <script src="/js/taskEventLlmChart.js"></script>
         <script src="/js/taskRawData.js"></script>

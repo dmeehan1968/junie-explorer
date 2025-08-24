@@ -367,7 +367,6 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
           </script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/issueGraph.js"></script>
-        <script src="/js/reloadPage.js"></script>
         <script src="/js/compareModal.js"></script>
       </AppHead>
       <AppBody data-project-id={escapeHtml(project.name ?? '')}>

@@ -21,7 +21,6 @@ export const statsRouteHandler = async (req: AppRequest, res: AppResponse) => {
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/statsPage.js"></script>
-        <script src="/js/reloadPage.js"></script>
       </AppHead>
       <AppBody>
         <AppHeader title="System Statistics" actions={[<ThemeSwitcher/>, <ReloadButton/>]}/>

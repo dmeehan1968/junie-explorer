@@ -283,7 +283,6 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
         <script src={"https://code.jquery.com/jquery-3.6.0.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"}></script>
         <script src="/js/themeSwitcher.js"></script>
-        <script src="/js/reloadPage.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
         <script src="/js/taskModelPerformanceChart.js"></script>
