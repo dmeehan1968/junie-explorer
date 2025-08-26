@@ -1,6 +1,6 @@
-import { Html } from "@kitajs/html"
+import { Component, Html } from "@kitajs/html"
 
-export const MemorySection = () => {
+export const MemorySection: Component = () => {
   return (
     <div class="card bg-base-100 shadow-xl mb-6">
       <div class="card-body">
