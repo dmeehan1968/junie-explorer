@@ -157,7 +157,7 @@ const ChatMessageDecorator = ({ klass, index, message }: { klass: string, index:
         testIdPrefix="chat-message-toggle"
         left={message.kind === 'User'}
         label={message.kind === 'User' ? 'Message' : 'Model Response'}
-        content={message.content}
+        content={escapeHtml(message.content)}
       />
     )
   } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
@@ -372,7 +372,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                 testIdPrefix="system-request-toggle"
                 left={true}
                 label="System Message"
-                content={record.event.chat.system}
+                content={escapeHtml(record.event.chat.system)}
               />
             )
 
@@ -415,7 +415,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                   testIdPrefix="summarizer-assistant-toggle"
                   left={false}
                   label="Summary"
-                  content={choice.content || '<unexpectedly_empty>'}
+                  content={escapeHtml(choice.content || '<unexpectedly_empty>')}
                 />
               ))
             )
@@ -473,7 +473,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
               testIdPrefix="chat-user-toggle"
               left={true}
               label="Tool Error"
-              content={record.event.serializableThrowable?.message ?? 'Unspecified error'}
+              content={escapeHtml(record.event.serializableThrowable?.message ?? 'Unspecified error')}
             />
           )
         }
