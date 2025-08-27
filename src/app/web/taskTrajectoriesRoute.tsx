@@ -78,7 +78,7 @@ const ToolCallDecorator = ({ klass, index, testIdPrefix, tool }: {
             <div class="flex flex-row">
               <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">{key}:</div>
               <div class="flex-grow bg-info text-info-content p-2 rounded">
-                {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                {escapeHtml(typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value))}
               </div>
             </div>
           ))}
