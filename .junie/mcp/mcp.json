@@ -4,8 +4,19 @@
     "filesystem-extended": {
       "command": "bun",
       "args": [
-        "/Users/dmeehan/Documents/Dropbox/Projects/mcp/mcp-filesystem-extended/index.ts",
-        "/Users/dmeehan/Library/CloudStorage/Dropbox/Projects/JetBrains/junie-explorer"
+        "/Users/dmeehan/Documents/Projects/mcp/mcp-filesystem-extended/index.ts",
+        "/Users/dmeehan/Documents/Projects/JetBrains/junie-explorer"
+      ]
+    },
+    "language-server": {
+      "command": "/Users/dmeehan/Documents/Projects/mcp/mcp-language-server/mcp-language-server",
+      "args": [
+        "--workspace",
+        "/Users/dmeehan/Documents/Projects/JetBrains/junie-explorer",
+        "--lsp",
+        "typescript-language-server",
+        "--",
+        "--stdio"
       ]
     }
   }
