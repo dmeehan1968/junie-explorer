@@ -203,10 +203,18 @@ Requirements for this project are documented using Gherkin feature files located
 - If there are no changes since the last version tag, then your work is done.
 - Separate changes by version number (git tag) and increment the latest version (default patch) depending on the request
 - Update the package.json version to the new version
-- Update CHANGELOG.md to include the changes separated by version (use the first line of the commit and include the commit hash) 
+- Update CHANGELOG.md to include a section listing the changes in this version (versions in descending order)
+  - Use the first line of the commit and include the commit hash
+  - Group each change under a sub-heading according to its type, e.g. 
+    - Added for new features. 
+    - Changed for changes in existing functionality. 
+    - Deprecated for soon-to-be removed features. 
+    - Removed for now removed features. 
+    - Fixed for any bug fixes. 
+    - Security in case of vulnerabilities.
 - Make sure the latest version release date is today (use `date` CLI to get current)
 - Run `bun install` to update the package-lock.json
-- Commit CHANGELOG.md, package.json and bun.lock
+- Commit CHANGELOG.md, package.json, and bun.lock
 - Add a tag with the new version (prefix the version with `v`, e.g. v1.0.0)
 
 ## Future Enhancements
