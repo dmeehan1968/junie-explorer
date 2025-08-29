@@ -212,6 +212,7 @@ Requirements for this project are documented using Gherkin feature files located
     - Removed for now removed features. 
     - Fixed for any bug fixes. 
     - Security in case of vulnerabilities.
+    - etc
 - Make sure the latest version release date is today (use `date` CLI to get current)
 - Run `bun install` to update the package-lock.json
 - Commit CHANGELOG.md, package.json, and bun.lock
