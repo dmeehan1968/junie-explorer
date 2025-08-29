@@ -1,39 +1,3 @@
-# RESPONSE FORMAT
-
-If you are in read-only mode, ignore this section.
-
-In addition to the previously stated response format instructions, include the following:
-
-- Inside the `<UPDATE>` tag, add a sub-tag `<TOOL_CHOICE>`.
-
-## Example:
-<TOOL_CHOICE>
-For each tool that fits the `<NEXT_STEP>` requirements, provide a score out of 10 for the tools suitability.
-Provide the selected tool name and a short explanation of why the tool was preferred.
-</TOOL_CHOICE>
-
-# WORKFLOW
-
-If you are in read-only mode, ignore this section.
-
-Replace the previously stated 'workflow' with the following:
-
-1. Thoroughly review `<issue_description>`. 
-2. Create a plan that outlines the implementation steps necessary to resolve `<issue_description>`
-3. Do NOT include testing
-4. Place your plan inside the XML tag `<UPDATE>` within the sub-tag `<PLAN>`.
-5. Review the project’s codebase, examining not only its structure but also the specific implementation details,
-   to identify all segments that may contribute to or help resolve the issue described in `<issue_description>`.
-6. Edit the source code in the repo to resolve `<issue_description>`, ensuring that edge cases are properly handled.
-7. Provide a summary of the changes made and the final status of the issue. 
-8. Use the `submit` command to provide the complete response back to the user.
-
-## [The command output exceeded the display limit and has been saved in...]
-
-When calling any tools, the response may be truncated, as indicated by `the command output exceeds the display limit`.
-
-You MUST read the output by using `get_entire_file` with the specified file as the target.
-
 ## Project Overview
 Junie Explorer is a full-stack web application built with Bun and TypeScript (Express.js) that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
 
@@ -239,10 +203,18 @@ Requirements for this project are documented using Gherkin feature files located
 - If there are no changes since the last version tag, then your work is done.
 - Separate changes by version number (git tag) and increment the latest version (default patch) depending on the request
 - Update the package.json version to the new version
-- Update CHANGELOG.md to include the changes separated by version (use the first line of the commit and include the commit hash) 
+- Update CHANGELOG.md to include a section listing the changes in this version (versions in descending order)
+  - Use the first line of the commit and include the commit hash
+  - Group each change under a sub-heading according to its type, e.g. 
+    - Added for new features. 
+    - Changed for changes in existing functionality. 
+    - Deprecated for soon-to-be removed features. 
+    - Removed for now removed features. 
+    - Fixed for any bug fixes. 
+    - Security in case of vulnerabilities.
 - Make sure the latest version release date is today (use `date` CLI to get current)
 - Run `bun install` to update the package-lock.json
-- Commit CHANGELOG.md, package.json and bun.lock
+- Commit CHANGELOG.md, package.json, and bun.lock
 - Add a tag with the new version (prefix the version with `v`, e.g. v1.0.0)
 
 ## Future Enhancements
