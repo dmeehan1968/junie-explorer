@@ -39,7 +39,7 @@ const ToolDecorator = ({ tool }: { tool: Tool }) => {
       </div>
       <div class="flex flex-row pt-2">
         <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">Description</div>
-        <div class="flex-grow p-2 bg-base-content/10 rounded">{tool.description?.trim() ?? ''}</div>
+        <div class="flex-grow p-2 bg-base-content/10 rounded">{escapeHtml(tool.description?.trim() ?? '')}</div>
       </div>
       {Object.entries(tool.parameters).length > 0 && (
         <div class="w-32 pr-2 text-base-content/50 italic text-right">Parameters</div>
@@ -49,7 +49,7 @@ const ToolDecorator = ({ tool }: { tool: Tool }) => {
           <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">{name}</div>
           <div class="flex flex-row flex-grow gap-2">
             <div class="flex-grow bg-base-content/10 p-2 rounded">
-              {description ? description : JSON.stringify(param, null, 2)}
+              {escapeHtml(description ? description : JSON.stringify(param, null, 2))}
             </div>
             <div class="flex-shrink-0 bg-base-content/10 text-base-content/50 p-2 rounded">{type}</div>
           </div>
