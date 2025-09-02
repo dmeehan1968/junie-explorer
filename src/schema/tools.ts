@@ -3,10 +3,18 @@ import { ToolAnyProperty } from "./toolAnyProperty.js"
 
 const McpToolParameters = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.ToolParametersSchema.McpToolParametersSchema'),
-  rawJsonObject: z.record(z.string(), z.looseObject({
-    type: z.string(),
-    description: z.string().optional(),
-  })),
+  rawJsonObject: z.record(z.string(), z.union([
+    z.looseObject({
+      type: z.string(),
+      description: z.string().optional(),
+    }),
+    z.looseObject({
+      anyOf: z.looseObject({
+        type: z.string(),
+        description: z.string().optional(),
+      }).array(),
+    })
+  ])),
   required: z.string().array().nullable(),
   description: z.string().optional(),
 })

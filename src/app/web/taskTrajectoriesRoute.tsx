@@ -51,7 +51,7 @@ const ToolDecorator = ({ tool }: { tool: Tool }) => {
             <div class="flex-grow bg-base-content/10 p-2 rounded">
               {escapeHtml(description ? description : JSON.stringify(param, null, 2))}
             </div>
-            <div class="flex-shrink-0 bg-base-content/10 text-base-content/50 p-2 rounded">{type}</div>
+            <div class="flex-shrink-0 bg-base-content/10 text-base-content/50 p-2 rounded">{type ?? JSON.stringify(param.anyOf)}</div>
           </div>
         </div>
       ))}
