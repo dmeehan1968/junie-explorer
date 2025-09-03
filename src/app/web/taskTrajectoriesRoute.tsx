@@ -183,13 +183,13 @@ const ChatMessageDecorator = ({ klass, index, message }: { klass: string, index:
 }
 
 // JSX Components for trajectory sections
-const ActionTimelineSection = ({ hasActionEvents }: { hasActionEvents: boolean }) => {
+const ActionTimelineSection = ({ hasActionEvents, actionCount }: { hasActionEvents: boolean, actionCount: number }) => {
   if (!hasActionEvents) return null
 
   return (
     <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="action-timeline-section">
       <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-200 rounded-lg hover:bg-base-100 transition-colors duration-200" data-testid="action-timeline-header">
-        <h3 class="text-xl font-bold text-primary m-0">Action Timeline</h3>
+        <h3 class="text-xl font-bold text-primary m-0">Action Timeline <span class="font-medium text-base-content/70">({actionCount})</span></h3>
         <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
       </div>
       <div class="collapsible-content p-4 hidden transition-all duration-300">
@@ -269,6 +269,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
 
     // Check if there are action events for conditional rendering
     const hasActionEvents = events.some(e => e.event.type === 'AgentActionExecutionStarted')
+    const actionCount = events.filter(e => e.event.type === 'AgentActionExecutionStarted').length
     const hasMetrics = project.hasMetrics
     
     const tasksCount = (await issue.tasks).size
@@ -320,7 +321,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
           })}
         </div>
 
-        <ActionTimelineSection hasActionEvents={hasActionEvents} />
+        <ActionTimelineSection hasActionEvents={hasActionEvents} actionCount={actionCount} />
         <ModelPerformanceSection hasMetrics={hasMetrics} />
         <MessageTrajectoriesSection events={events} />
       </AppBody>
