@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.2] - 2025-09-05
+
+### Added
+- Add action count to ActionTimeline section (c851a7d)
+- Support `anyOf` in McpToolParameters schema (d83ac03)
+
+### Security
+- Escape HTML content in taskTrajectoriesRoute (742cdb8)
+
 ## [3.1.1] - 2025-08-29
 
 ### Added
