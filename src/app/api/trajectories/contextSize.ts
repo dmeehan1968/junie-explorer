@@ -3,6 +3,8 @@ import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.
 import { AppRequest, AppResponse } from "../../types.js"
 import { LlmRequestEvent } from "../../../schema/llmRequestEvent.js"
 import { LlmResponseEvent } from "../../../schema/llmResponseEvent.js"
+import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice.js"
+import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice.js"
 
 const router = express.Router({ mergeParams: true })
 
@@ -24,6 +26,8 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
       provider: string
       model: string
       contextSize: number
+      description?: string
+      reasoning?: string
     }
 
     const rows: Row[] = []
@@ -39,11 +43,36 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
         const cacheInputTokens = resp.answer.cacheInputTokens ?? 0
         const contextSize = inputTokens + outputTokens + cacheInputTokens
 
+        // Find matching request for reasoning effort
+        let reasoning: string | undefined = undefined
+        const previous = sorted.slice(0, i).reverse().find((e): e is { event: LlmRequestEvent, timestamp: Date } => e.event.type === 'LlmRequestEvent' && e.event.id === resp.id)
+        if (previous) {
+          reasoning = previous.event.modelParameters.reasoning_effort
+        }
+
+        // Build a short description similar to model performance API
+        const description = resp.answer.contentChoices.map(choice => {
+          const maxLabelLength = 80
+          if (choice.type === AIContentAnswerChoice.shape.type.value) {
+            return choice.content.length <= maxLabelLength
+              ? choice.content
+              : choice.content.substring(0, (maxLabelLength/2)-2) + ' ... ' + choice.content.substring(choice.content.length - (maxLabelLength/2)-2)
+          } else if (choice.type === AIToolUseAnswerChoice.shape.type.value) {
+            return choice.usages.map(usage => {
+              const params = JSON.stringify(usage.toolParams.rawJsonObject)
+              const trimmedParams = params.length <= maxLabelLength ? params : params.substring(0, (maxLabelLength/2)-2) + ' ... ' + params.substring(params.length - (maxLabelLength/2)-2)
+              return usage.toolName + ' ' + trimmedParams
+            }).join(', ')
+          }
+        }).join('')
+
         rows.push({
           timestamp: ev.timestamp.toISOString(),
           provider,
           model,
           contextSize,
+          description,
+          reasoning,
         })
       } else if (ev.event.type === 'LlmRequestEvent') {
         // In case some token info is available on request, prefer response authoritative values; requests usually don't include tokens

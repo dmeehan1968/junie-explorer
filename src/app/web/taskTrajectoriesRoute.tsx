@@ -239,7 +239,7 @@ const ContextSizeSection = () => {
   return (
     <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="context-size-section">
       <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-200 rounded-lg hover:bg-base-100 transition-colors duration-200" data-testid="context-size-header">
-        <h3 class="text-xl font-bold text-primary m-0">Context Size Over Time</h3>
+        <h3 class="text-xl font-bold text-primary m-0">Context</h3>
         <span class="collapsible-toggle text-sm text-base-content/70 font-normal">Click to expand</span>
       </div>
       <div class="collapsible-content p-4 hidden transition-all duration-300">
@@ -389,7 +389,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
               var self = this;
               this.providers.forEach(function(provider, idx){
                 var color = self.colors[idx % self.colors.length];
-                var points = (self.data.providerGroups[provider] || []).map(function(item){ return { x: new Date(item.timestamp), y: item.contextSize, provider: item.provider, model: item.model }; });
+                var points = (self.data.providerGroups[provider] || []).map(function(item){ return { x: new Date(item.timestamp), y: item.contextSize, provider: item.provider, model: item.model, description: item.description, reasoning: item.reasoning }; });
                 datasets.push({
                   label: provider + ' • Context Size',
                   data: points,
@@ -426,7 +426,13 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
                       callbacks: {
                         title: function(ctx){ return new Date(ctx[0].parsed.x).toLocaleString(); },
                         label: function(context){
-                          var dp = context.raw; var value = context.parsed.y; var formatted = (typeof value === 'number') ? value.toLocaleString() : value; var lines = [ String(context.dataset._provider), 'Model: ' + dp.model, 'Context: ' + formatted + ' tokens' ]; return lines;
+                          var dp = context.raw; var value = context.parsed.y;
+                          var formatted = (typeof value === 'number') ? value.toLocaleString() : value;
+                          var lines = [ String(context.dataset._provider), 'Model: ' + dp.model ];
+                          if (dp.description) { lines.push('Description: ' + dp.description); }
+                          if (dp.reasoning) { lines.push('Reasoning: ' + dp.reasoning); }
+                          lines.push('Context: ' + formatted + ' tokens');
+                          return lines;
                         }
                       }
                     }
