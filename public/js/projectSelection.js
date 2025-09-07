@@ -206,9 +206,15 @@ function createProjectsChart(graphData) {
     }
   }
 
+  // Convert datasets to stacked bars (separate stacks for cost and tokens)
+  filteredDatasets = filteredDatasets.map(ds => Object.assign({}, ds, {
+    type: 'bar',
+    stack: ds.yAxisID === 'y' ? 'cost' : 'tokens'
+  }));
+
   // Create chart configuration
   const config = {
-    type: 'line',
+    type: 'bar',
     data: {
       datasets: filteredDatasets
     },
@@ -229,6 +235,7 @@ function createProjectsChart(graphData) {
       scales: {
         x: {
           type: 'time',
+          stacked: true,
           time: {
             unit: graphData.timeUnit || 'day',
             stepSize: graphData.stepSize || 1,
@@ -253,6 +260,7 @@ function createProjectsChart(graphData) {
         },
         y: {
           position: 'left',
+          stacked: true,
           title: {
             display: true,
             text: 'Cost ($)'
@@ -262,6 +270,7 @@ function createProjectsChart(graphData) {
         },
         y1: {
           position: 'right',
+          stacked: true,
           title: {
             display: true,
             text: 'Tokens'
