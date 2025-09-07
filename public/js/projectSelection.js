@@ -203,16 +203,19 @@ function createProjectsChart(graphData) {
   let filteredDatasets = [];
   if (graphData.datasets) {
     if (displayOption === 'tokens') {
-      filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y1');
+      // Move token datasets to the primary axis (y)
+      filteredDatasets = graphData.datasets
+        .filter(dataset => dataset.yAxisID === 'y1')
+        .map(ds => Object.assign({}, ds, { yAxisID: 'y' }));
     } else { // default to 'cost'
       filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y');
     }
   }
 
-  // Convert datasets to stacked bars (separate stacks for cost and tokens)
+  // Convert datasets to stacked bars (single main stack on primary axis)
   filteredDatasets = filteredDatasets.map(ds => Object.assign({}, ds, {
     type: 'bar',
-    stack: ds.yAxisID === 'y' ? 'cost' : 'tokens'
+    stack: 'main'
   }));
 
   // Create chart configuration
@@ -266,23 +269,32 @@ function createProjectsChart(graphData) {
           stacked: true,
           title: {
             display: true,
-            text: 'Cost ($)'
+            text: displayOption === 'tokens' ? 'Tokens' : 'Cost ($)'
           },
           beginAtZero: true,
-          display: displayOption === 'cost'
+          display: true,
+          ticks: {
+            callback: function(value) {
+              const n = Number(value);
+              if (displayOption === 'tokens') {
+                return n.toLocaleString();
+              }
+              return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+          }
         },
         y1: {
           position: 'right',
           stacked: true,
           title: {
-            display: true,
-            text: 'Tokens'
+            display: false,
+            text: ''
           },
           beginAtZero: true,
           grid: {
             drawOnChartArea: false
           },
-          display: displayOption === 'tokens'
+          display: false
         }
       },
       plugins: {
