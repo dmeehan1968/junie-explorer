@@ -326,7 +326,15 @@ function createProjectsChart(graphData) {
           }
         },
         legend: {
-          display: false
+          display: graphData.projectNames && graphData.projectNames.length > 1,
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            filter: function(legendItem, data) {
+              // Only show legend items for datasets currently in the chart
+              return true;
+            }
+          }
         }
       }
     }
