@@ -2,6 +2,7 @@
 let selectedProjects = {};
 let projectsChart = null;
 let displayOption = 'cost'; // Default display option (cost, tokens)
+let groupOption = 'auto'; // Grouping option for x-axis (auto, hour, day, week, month)
 
 // Initialize project selection from local storage
 function initializeProjectSelection() {
@@ -19,6 +20,15 @@ function initializeProjectSelection() {
     }
     const radio = document.querySelector(`input[name="display-option"][value="${displayOption}"]`);
     if (radio) radio.checked = true;
+  }
+
+  // Initialize group option from local storage or default to 'auto'
+  const storedGroupOption = localStorage.getItem('junie-explorer-groupOption');
+  if (storedGroupOption) {
+    const allowed = ['auto', 'hour', 'day', 'week', 'month'];
+    groupOption = allowed.includes(storedGroupOption) ? storedGroupOption : 'auto';
+    const groupRadio = document.querySelector(`input[name="group-option"][value="${groupOption}"]`);
+    if (groupRadio) groupRadio.checked = true;
   }
 
   // Set initial state of graph container if present
@@ -123,6 +133,16 @@ function handleDisplayOptionChange(radio) {
   }
 }
 
+// Handle group option change (Auto, Hour, Day, Week, Month)
+function handleGroupOptionChange(radio) {
+  const allowed = ['auto', 'hour', 'day', 'week', 'month'];
+  groupOption = allowed.includes(radio.value) ? radio.value : 'auto';
+  localStorage.setItem('junie-explorer-groupOption', groupOption);
+  if (projectsChart) {
+    loadProjectsGraph();
+  }
+}
+
 // Load and display the graph for selected projects
 async function loadProjectsGraph() {
   const graphContainer = document.getElementById('projects-graph-container');
@@ -158,7 +178,7 @@ async function loadProjectsGraph() {
 
   try {
     // Fetch graph data for selected projects
-    const response = await fetch('/api/projects/graph?names=' + selectedProjectNames.join(','));
+    const response = await fetch('/api/projects/graph?names=' + selectedProjectNames.join(',') + '&group=' + encodeURIComponent(groupOption));
     const graphData = await response.json();
 
     // Create or update the chart

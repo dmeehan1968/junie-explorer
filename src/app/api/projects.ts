@@ -5,7 +5,7 @@ import { AppRequest, AppResponse } from "../types.js"
 const router = express.Router({ mergeParams: true })
 
 // Function to prepare data for the projects graph
-async function prepareProjectsGraphData(projects: Project[]): Promise<{
+async function prepareProjectsGraphData(projects: Project[], requestedGroup?: string): Promise<{
   datasets: Array<{
     label: string;
     data: Array<{ x: string; y: number }>;
@@ -86,6 +86,13 @@ async function prepareProjectsGraphData(projects: Project[]): Promise<{
     timeUnit = 'month'
   } else {
     timeUnit = 'year'
+  }
+
+  // Override with requested group if provided (and not 'auto')
+  const allowedGroups = new Set(['hour', 'day', 'week', 'month'])
+  if (requestedGroup && allowedGroups.has(requestedGroup)) {
+    timeUnit = requestedGroup
+    stepSize = 1
   }
 
   // Helper function to convert a date string to the appropriate timeUnit format
@@ -217,8 +224,9 @@ router.get('/api/projects', async (req: AppRequest, res: AppResponse) => {
 // API endpoint to get graph data for selected projects
 router.get('/api/projects/graph', async (req: AppRequest, res: AppResponse) => {
   try {
-    const { names } = req.query
+    const { names, group } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
+    const requestedGroup: string | undefined = typeof group === 'string' ? group : undefined
     const allProjects: Project[] = Array.from((await req.jetBrains?.projects ?? []).values())
 
     // Filter projects by name if names are provided
@@ -241,7 +249,7 @@ router.get('/api/projects/graph', async (req: AppRequest, res: AppResponse) => {
       timeUnit: string;
       stepSize: number;
       projectNames: string[];
-    } = await prepareProjectsGraphData(projects)
+    } = await prepareProjectsGraphData(projects, requestedGroup)
 
     res.json(graphData)
   } catch (error) {
