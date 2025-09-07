@@ -79,29 +79,6 @@ export class Task {
           this._statsCollector.registerWorkerPool(this._workerPool)
         }
 
-        if (process.env.WORKER_STATS) {
-          const workerStatsInterval = parseFloat(process.env.WORKER_STATS ?? '10')
-          if (workerStatsInterval > 0) {
-            setInterval(() => {
-              const metrics = this._workerPool!.getMetrics()
-              const timestamp = new Date().toISOString().slice(0, 19)
-              
-              // Basic stats on first line
-              console.log(`${timestamp}: ${this._workerPool!.name}: ` + Object.entries({
-                busy: metrics.busyCount,
-                idle: metrics.idleCount,
-                queued: metrics.queuedCount,
-                workers: metrics.workerCount,
-                peak: metrics.peakWorkerCount,
-                successes: metrics.successCount,
-                failures: metrics.failureCount,
-                'avg-exec': `${metrics.averageExecutionTimeMs.toFixed(1).padStart(5)}ms`,
-                'avg-wait': `${metrics.averageQueueWaitTimeMs.toFixed(1).padStart(8)}ms`,
-              }).map(([k, v]) => `${k}: ${v?.toString().padStart(5, ' ')}`).join(', '))
-            }, workerStatsInterval * 1000)
-          }
-        }
-
       } else {
         this._workerPool = null
         console.warn(`Concurrency disabled. Set environment CONCURRENCY > 0 to enable`)
