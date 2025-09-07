@@ -398,7 +398,17 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
               var self = this;
               this.providers.forEach(function(provider, idx){
                 var color = self.colors[idx % self.colors.length];
-                var points = (self.data.providerGroups[provider] || []).map(function(item){ return { x: new Date(item.timestamp), y: item.contextSize, provider: item.provider, model: item.model, description: item.description, reasoning: item.reasoning }; });
+                var raw = (self.data.providerGroups[provider] || []);
+                var points = [];
+                for (var i = 0; i < raw.length; i++){
+                  var item = raw[i];
+                  if (self.data.includeAllTasks && i > 0 && raw[i-1].taskIndex !== item.taskIndex){
+                    // Insert a gap between tasks so lines are not connected across task boundaries
+                    // Use an object with y: null to avoid Chart.js parse errors with raw nulls
+                    points.push({ x: new Date(item.timestamp), y: null });
+                  }
+                  points.push({ x: new Date(item.timestamp), y: item.contextSize, provider: item.provider, model: item.model, description: item.description, reasoning: item.reasoning });
+                }
                 datasets.push({
                   label: provider + ' • Context Size',
                   data: points,

@@ -5,6 +5,7 @@ import { LlmRequestEvent } from "../../../schema/llmRequestEvent.js"
 import { LlmResponseEvent } from "../../../schema/llmResponseEvent.js"
 import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice.js"
 import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice.js"
+import { EventRecord } from "../../../schema/eventRecord.js"
 
 const router = express.Router({ mergeParams: true })
 
@@ -21,16 +22,24 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
     const allTasksParam = String((req.query as any)?.allTasks ?? '').toLowerCase()
     const includeAllTasks = allTasksParam === '1' || allTasksParam === 'true' || allTasksParam === 'yes' || allTasksParam === 'on'
 
-    // Collect events from the current task or from all tasks in the issue
-    let events = await task!.events
+    // Collect events from the current task or from all tasks in the issue, preserving task index when needed
+    type EvWithTask = { ev: EventRecord, taskIndex: number }
+    let withTask: EvWithTask[] = []
+
     if (includeAllTasks && issue) {
       const tasks = [...(await issue.tasks).values()]
-      const eventsArrays = await Promise.all(tasks.map(t => t.events))
-      events = eventsArrays.flat()
+      const eventsArrays = await Promise.all(tasks.map(async (t) => {
+        const evs = await t.events
+        return evs.map(ev => ({ ev, taskIndex: t.index }))
+      }))
+      withTask = eventsArrays.flat()
+    } else {
+      const evs = await task!.events
+      withTask = evs.map(ev => ({ ev, taskIndex: task!.index }))
     }
 
     // Sort all events by timestamp first
-    const sorted = events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
+    const sorted = withTask.sort((a, b) => a.ev.timestamp.getTime() - b.ev.timestamp.getTime())
 
     type Row = {
       timestamp: string
@@ -39,12 +48,14 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
       contextSize: number
       description?: string
       reasoning?: string
+      taskIndex: number
     }
 
     const rows: Row[] = []
 
     for (let i = 0; i < sorted.length; i++) {
-      const ev = sorted[i]
+      const cur = sorted[i]
+      const ev = cur.ev
       if (ev.event.type === 'LlmResponseEvent') {
         const resp: LlmResponseEvent = ev.event
         const provider = resp.answer.llm.groupName
@@ -56,9 +67,9 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
 
         // Find matching request for reasoning effort
         let reasoning: string | undefined = undefined
-        const previous = sorted.slice(0, i).reverse().find((e): e is { event: LlmRequestEvent, timestamp: Date } => e.event.type === 'LlmRequestEvent' && e.event.id === resp.id)
+        const previous = sorted.slice(0, i).reverse().find((e): e is { ev: { event: LlmRequestEvent, timestamp: Date }, taskIndex: number } => e.ev.event.type === 'LlmRequestEvent' && (e.ev.event as LlmRequestEvent).id === resp.id)
         if (previous) {
-          reasoning = previous.event.modelParameters.reasoning_effort
+          reasoning = (previous.ev.event as LlmRequestEvent).modelParameters.reasoning_effort
         }
 
         // Build a short description similar to model performance API
@@ -84,6 +95,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
           contextSize,
           description,
           reasoning,
+          taskIndex: cur.taskIndex,
         })
       } else if (ev.event.type === 'LlmRequestEvent') {
         // In case some token info is available on request, prefer response authoritative values; requests usually don't include tokens
@@ -103,6 +115,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
     const providers = Object.keys(providerGroups).sort()
 
     res.json({
+      includeAllTasks,
       contextData: rows,
       providerGroups,
       providers,
