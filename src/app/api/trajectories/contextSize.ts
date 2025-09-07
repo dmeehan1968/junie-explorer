@@ -15,8 +15,19 @@ router.use('/api/project/:projectId/issue/:issueId/task/:taskId*', entityLookupM
 // For each provider, the context size must be non-decreasing over time (cumulative max)
 router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/context-size', async (req: AppRequest, res: AppResponse) => {
   try {
-    const { task } = req
-    const events = await task!.events
+    const { task, issue } = req
+
+    // Determine whether to include all tasks in the issue
+    const allTasksParam = String((req.query as any)?.allTasks ?? '').toLowerCase()
+    const includeAllTasks = allTasksParam === '1' || allTasksParam === 'true' || allTasksParam === 'yes' || allTasksParam === 'on'
+
+    // Collect events from the current task or from all tasks in the issue
+    let events = await task!.events
+    if (includeAllTasks && issue) {
+      const tasks = [...(await issue.tasks).values()]
+      const eventsArrays = await Promise.all(tasks.map(t => t.events))
+      events = eventsArrays.flat()
+    }
 
     // Sort all events by timestamp first
     const sorted = events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())

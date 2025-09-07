@@ -249,6 +249,10 @@ const ContextSizeSection = () => {
               <div id="context-size-provider-filters" class="join flex flex-wrap">
                 {/* Provider buttons populated by JS */}
               </div>
+              <label class="label cursor-pointer gap-2">
+                <input id="context-size-all-tasks-toggle" type="checkbox" class="toggle toggle-sm" />
+                <span class="label-text">Include all tasks in issue</span>
+              </label>
             </div>
           </div>
         </div>
@@ -337,6 +341,11 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
               this.chart = null;
               this.load();
             }
+            ContextSizeChart.prototype.reload = async function(newUrl){
+              if (newUrl) { this.apiUrl = newUrl; }
+              if (this.chart) { this.chart.destroy(); this.chart = null; }
+              await this.load();
+            };
             ContextSizeChart.prototype.load = async function(){
               try{
                 var resp = await fetch(this.apiUrl);
@@ -457,8 +466,18 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
                     var projectName = parts[2];
                     var issueId = parts[4];
                     var taskId = parts[6];
-                    var apiUrl = '/api/project/' + encodeURIComponent(projectName) + '/issue/' + encodeURIComponent(issueId) + '/task/' + encodeURIComponent(taskId) + '/trajectories/context-size';
-                    new ContextSizeChart('context-size-chart', apiUrl);
+                    var checkbox = document.getElementById('context-size-all-tasks-toggle');
+                    function buildApiUrl(){
+                      var base = '/api/project/' + encodeURIComponent(projectName) + '/issue/' + encodeURIComponent(issueId) + '/task/' + encodeURIComponent(taskId) + '/trajectories/context-size';
+                      var includeAll = checkbox && checkbox.checked;
+                      return includeAll ? (base + '?allTasks=1') : base;
+                    }
+                    var chartInstance = new ContextSizeChart('context-size-chart', buildApiUrl());
+                    if (checkbox) {
+                      checkbox.addEventListener('change', function(){
+                        chartInstance.reload(buildApiUrl());
+                      });
+                    }
                     initialized = true;
                   }, 100);
                 }
