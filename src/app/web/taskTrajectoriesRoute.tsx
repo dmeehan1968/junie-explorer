@@ -235,7 +235,7 @@ const ModelPerformanceSection = ({ hasMetrics }: { hasMetrics: boolean }) => {
   )
 }
 
-const ContextSizeSection = () => {
+const ContextSizeSection = ({ showIncludeAllTasks }: { showIncludeAllTasks: boolean }) => {
   return (
     <div class="collapsible-section collapsed mb-5 bg-base-200 rounded-lg border border-base-300 collapsed" data-testid="context-size-section">
       <div class="collapsible-header p-4 cursor-pointer select-none flex justify-between items-center bg-base-200 rounded-lg hover:bg-base-100 transition-colors duration-200" data-testid="context-size-header">
@@ -249,10 +249,12 @@ const ContextSizeSection = () => {
               <div id="context-size-provider-filters" class="join flex flex-wrap">
                 {/* Provider buttons populated by JS */}
               </div>
-              <label class="label cursor-pointer gap-2">
-                <input id="context-size-all-tasks-toggle" type="checkbox" class="toggle toggle-sm" />
-                <span class="label-text">Include all tasks in issue</span>
-              </label>
+              <Conditional condition={showIncludeAllTasks}>
+                <label class="label cursor-pointer gap-2">
+                  <input id="context-size-all-tasks-toggle" type="checkbox" class="toggle toggle-sm" />
+                  <span class="label-text">Include all tasks in issue</span>
+                </label>
+              </Conditional>
             </div>
           </div>
         </div>
@@ -532,7 +534,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
 
         <ActionTimelineSection hasActionEvents={hasActionEvents} actionCount={actionCount} />
         <ModelPerformanceSection hasMetrics={hasMetrics} />
-        <ContextSizeSection />
+        <ContextSizeSection showIncludeAllTasks={tasksCount > 1} />
         <MessageTrajectoriesSection events={events} />
       </AppBody>
       <ImageModal />
