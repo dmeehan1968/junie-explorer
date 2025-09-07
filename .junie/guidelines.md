@@ -196,6 +196,10 @@ The application is designed to be run locally, but could be deployed to a server
 ## Requirements Documentation
 Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth and documentation for the expected behavior of the application.
 
+## Version Control
+
+Do NOT commit changes unless explicitly requested.  If in any doubt, ask the user for confirmation
+
 ### Release a version
 
 - Check the CHANGELOG.md for the most recently mentioned version
