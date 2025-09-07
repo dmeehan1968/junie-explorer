@@ -5,10 +5,8 @@ export const ProjectMetricsChartOptions: Component = () => {
     <div class="flex gap-2 items-center" id="project-chart-display">
       <div class="">Show:</div>
       <div class="join">
-        <input class="join-item btn btn-sm" type="radio" id="display-both" value="both" name="display-option"
-               aria-label="Both" onchange="handleDisplayOptionChange(this)"/>
         <input class="join-item btn btn-sm" type="radio" id="display-cost" value="cost" name="display-option"
-               aria-label="Cost" onchange="handleDisplayOptionChange(this)"/>
+               aria-label="Cost" onchange="handleDisplayOptionChange(this)" checked/>
         <input class="join-item btn btn-sm" type="radio" id="display-tokens" value="tokens" name="display-option"
                aria-label="Tokens" onchange="handleDisplayOptionChange(this)"/>
       </div>

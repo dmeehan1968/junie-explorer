@@ -1,7 +1,7 @@
 // Global variables for project selection
 let selectedProjects = {};
 let projectsChart = null;
-let displayOption = 'both'; // Default display option (both, cost, tokens)
+let displayOption = 'cost'; // Default display option (cost, tokens)
 
 // Initialize project selection from local storage
 function initializeProjectSelection() {
@@ -9,9 +9,14 @@ function initializeProjectSelection() {
   const storedDisplayOption = localStorage.getItem('junie-explorer-displayOption');
   const graphContainer = document.getElementById('projects-graph-container');
 
-  // Initialize display option from local storage or default to 'both'
+  // Initialize display option from local storage or default to 'cost'
   if (storedDisplayOption) {
-    displayOption = storedDisplayOption;
+    // Coerce legacy 'both' value to 'cost'
+    displayOption = storedDisplayOption === 'both' ? 'cost' : storedDisplayOption;
+    // Persist coerced value if it changed
+    if (displayOption !== storedDisplayOption) {
+      localStorage.setItem('junie-explorer-displayOption', displayOption);
+    }
     const radio = document.querySelector(`input[name="display-option"][value="${displayOption}"]`);
     if (radio) radio.checked = true;
   }
@@ -105,9 +110,9 @@ function updateSelectAllCheckbox() {
   }
 }
 
-// Handle display option change (Cost, Tokens, Both)
+// Handle display option change (Cost, Tokens)
 function handleDisplayOptionChange(radio) {
-  displayOption = radio.value;
+  displayOption = radio.value === 'tokens' ? 'tokens' : 'cost'; // default to 'cost' for any unexpected value
 
   // Save to local storage
   localStorage.setItem('junie-explorer-displayOption', displayOption);
@@ -197,12 +202,10 @@ function createProjectsChart(graphData) {
   // Filter datasets based on the selected display option
   let filteredDatasets = [];
   if (graphData.datasets) {
-    if (displayOption === 'both') {
-      filteredDatasets = graphData.datasets;
-    } else if (displayOption === 'cost') {
-      filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y');
-    } else if (displayOption === 'tokens') {
+    if (displayOption === 'tokens') {
       filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y1');
+    } else { // default to 'cost'
+      filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y');
     }
   }
 
@@ -266,7 +269,7 @@ function createProjectsChart(graphData) {
             text: 'Cost ($)'
           },
           beginAtZero: true,
-          display: displayOption === 'both' || displayOption === 'cost'
+          display: displayOption === 'cost'
         },
         y1: {
           position: 'right',
@@ -279,7 +282,7 @@ function createProjectsChart(graphData) {
           grid: {
             drawOnChartArea: false
           },
-          display: displayOption === 'both' || displayOption === 'tokens'
+          display: displayOption === 'tokens'
         }
       },
       plugins: {
