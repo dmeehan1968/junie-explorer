@@ -4,92 +4,141 @@ Junie Explorer is a full-stack web application built with Bun and TypeScript (Ex
 ## Directory Structure
 ```
 junie-explorer/
-├── .gitignore               # Git ignore file
-├── .junie/                  # Project documentation and guidelines
-│   └── guidelines.md        # Project guidelines and documentation
-├── .npmrc                   # NPM configuration
-├── .nvmrc                   # Node version specification
-├── CHANGELOG.md             # Project changelog
-├── CODE_OF_CONDUCT.md       # Code of conduct
-├── CONTRIBUTING.md          # Contributing guidelines
-├── LICENSE                  # Project license
-├── README.md                # Project readme
-├── bun.lock                 # Bun lockfile
-├── cucumber.js              # Cucumber configuration
-├── docs/                    # Documentation
-│   └── overview.md          # Project overview documentation
-├── features/                # Gherkin feature files for requirements documentation
-│   ├── homepage.feature     # Homepage requirements specification
-│   ├── issue.feature        # Issue page requirements
-│   ├── projects.feature     # Projects page requirements
-│   └── task.feature         # Task page requirements
-├── fixtures/                # Test fixtures and sample data
-├── package.json             # Project dependencies and scripts
-├── public/                  # Static assets
-│   ├── css/                 # CSS stylesheets
-│   │   └── app.css          # Main stylesheet (build artefact; do not edit)
-│   ├── icons/               # Icon assets
-│   │   └── favicon.png      # Site favicon
-│   ├── js/                  # JavaScript files
-│   │   ├── collapsibleSections.js       # Collapsible sections UI
-│   │   ├── ideFilters.js                # IDE filtering
-│   │   ├── issueGraph.js                # Issue graph visualization
-│   │   ├── projectSelection.js          # Project selection UI
-│   │   ├── reloadPage.js                # Page reload helper
-│   │   ├── taskActionChart.js           # Task action charts
-│   │   ├── taskEventChart.js            # Task event charts
-│   │   ├── taskEventFilters.js          # Task event filtering
-│   │   ├── taskEventLlmChart.js         # Task event LLM charts
-│   │   ├── taskModelPerformanceChart.js # Task model performance chart
-│   │   ├── taskRawData.js               # Task raw data handling
-│   │   ├── trajectoryToggle.js          # Trajectory toggling
-│   │   ├── compareModal.js              # Compare modal UI
-│   │   ├── imageModal.js                # Image modal UI
-│   │   └── themeSwitcher.js             # Theme toggling
-│   └── version.txt          # Version information file (build artefact; do not edit)
-├── reports/                 # Test and analysis reports
-│   └── cucumber-report.html # Generated test report (build artefact; do not edit)
-├── src/                     # Source code
-│   ├── bun/                 # Bun-specific utilities
-│   │   └── public.ts        # Public asset handling for Bun (build artefact; do not edit)
-│   ├── routes/              # Route handlers
-│   │   ├── homeRoutes.ts    # Homepage route handler
-│   │   ├── issueRoutes.ts   # Issue page route handler
-│   │   ├── projectRoutes.ts # Project page route handler
-│   │   ├── taskEventsRoute.ts # Task events route handler
-│   │   └── taskTrajectoriesRoute.ts # Task trajectories route handler
-│   ├── utils/               # Utility functions
-│   │   ├── escapeHtml.ts    # HTML escaping utilities
-│   │   ├── getLocaleFromRequest.ts # Locale detection utilities
-│   │   ├── jetBrainsPath.ts # JetBrains path utilities
-│   │   ├── metricsUtils.ts  # Metrics calculation utilities
-│   │   ├── timeUtils.ts     # Time and date utilities
-│   │   └── versionBanner.ts # Version banner utilities
-│   ├── components/          # Reusable UI components
-│   │   ├── breadcrumb.ts    # Breadcrumb navigation component
-│   │   ├── collapseIcon.ts  # Collapse icon SVG component
-│   │   ├── expandIcon.ts    # Expand icon SVG component
-│   │   ├── reloadButton.ts  # Reload button component
-│   │   ├── statusBadge.ts   # Status badge component
-│   │   ├── taskCard.ts      # Task summary card component
-│   │   ├── themeSwitcher.ts # Theme switcher component
-│   │   └── versionBanner.ts # Version banner component
-│   ├── workers/             # Background workers
-│   │   └── loadEventsWorker.ts # Event loading worker
-│   ├── Issue.ts             # Issue class implementation
-│   ├── Project.ts           # Project class implementation
-│   ├── Step.ts              # Step class implementation
-│   ├── Task.ts              # Task class implementation
-│   ├── chart.d.ts           # Type definitions for chart library
-│   ├── createServer.ts      # Server creation utilities
-│   ├── index.ts             # Main application entry point
-│   ├── jetbrains.ts         # Main JetBrains class implementation
-│   ├── schema.ts            # Zod schemas for data validation
-│   ├── trajectorySchema.ts  # Trajectory data schemas
-│   └── types.ts             # Type definitions
-├── tsconfig.json            # TypeScript configuration
-├── dist/                    # Compiled JavaScript (build artefact; do not edit)
-└── node_modules/            # Dependencies (installed; do not edit)
+├── .junie/                                  # Project documentation and contributor guidelines
+│   └── guidelines.md                        # Architecture, workflows, and directory map (this file)
+├── CHANGELOG.md                             # Versioned list of notable changes
+├── CODE_OF_CONDUCT.md                       # Community standards for contributors
+├── CONTRIBUTING.md                          # How to contribute, run, and test the project
+├── LICENSE                                  # License for using and distributing this software
+├── README.md                                # Quick start and high‑level overview
+├── bun.lock                                 # Bun dependency lockfile
+├── cucumber.js                              # Cucumber test runner configuration
+├── docs/                                    # Additional documentation
+│   └── overview.md                          # Extended project overview and concepts
+├── features/                                # Gherkin specs describing expected behavior
+│   ├── homepage.feature                     # Requirements for the homepage view
+│   ├── issue.feature                        # Requirements for issue detail flows
+│   ├── projects.feature                     # Requirements for projects listing and filters
+│   └── task.feature                         # Requirements for task, steps, and events views
+├── fixtures/                                # Sample JetBrains cache/projects used for local dev/tests
+├── package.json                             # Scripts, dependencies, and metadata
+├── public/                                  # Static assets served by the web app
+│   ├── css/
+│   │   └── app.css                          # Compiled Tailwind CSS (build artefact; do not edit)
+│   ├── icons/
+│   │   └── favicon.png                      # Site favicon
+│   ├── js/                                  # Frontend behaviors for charts, filters, and UI
+│   │   ├── collapsibleSections.js           # Toggle expand/collapse for UI sections
+│   │   ├── compareModal.js                  # Compare modal open/close and selection logic
+│   │   ├── ideFilters.js                    # Client‑side filtering by IDE across projects
+│   │   ├── imageModal.js                    # Display images in a modal with zoom/close
+│   │   ├── issueGraph.js                    # Render per‑issue graphs (timeline/metrics)
+│   │   ├── projectSelection.js              # Manage project selection and metrics chart rendering
+│   │   ├── reloadPage.js                    # Trigger full page reloads from UI controls
+│   │   ├── taskActionChart.js               # Draw charts for action/request counts over time
+│   │   ├── taskEventChart.js                # Visualize task events timeline in Chart.js
+│   │   ├── taskEventFilters.js              # Filter task events by type/source in UI
+│   │   ├── taskEventLlmChart.js             # Plot LLM‑related task event metrics
+│   │   ├── taskModelPerformanceChart.js     # Show per‑model performance series
+│   │   ├── taskRawData.js                   # Utilities for exporting/inspecting raw task data
+│   │   ├── themeSwitcher.js                 # Toggle light/dark themes and persist choice
+│   │   └── trajectoryToggle.js              # Toggle visibility of trajectory blocks
+│   └── version.txt                          # Version banner content (build artefact; do not edit)
+├── reports/
+│   └── cucumber-report.html                 # Generated acceptance test report (build artefact)
+├── src/                                     # Application source code (TypeScript)
+│   ├── app/                                 # HTTP API, server‑rendered pages, middleware
+│   │   ├── api/                             # Express routers for JSON APIs
+│   │   │   ├── events/                      # Event‑centric API endpoints (LLM/tool events)
+│   │   │   ├── projects.ts                  # GET project metrics/graph data by grouping
+│   │   │   ├── stats.ts                     # Live runtime stats/time‑series endpoints
+│   │   │   └── trajectories/                # Task trajectory analytics APIs
+│   │   │       ├── contextSize.ts           # Return context size series per provider/model
+│   │   │       ├── download.ts              # Download trajectory data as a file/JSON
+│   │   │       ├── index.ts                 # Register trajectory sub‑routes on a router
+│   │   │       ├── modelPerformance.ts      # Summarize model performance with labels/reasoning
+│   │   │       └── timeline.ts              # Chronological sequence of events for a task/issue
+│   │   ├── junieExplorer.ts                 # App bootstrap: build Express app, mount routes
+│   │   ├── middleware/                      # Reusable Express middlewares (entity lookup, etc.)
+│   │   ├── types.ts                         # App‑specific Request/Response typings and helpers
+│   │   └── web/                             # Server‑rendered routes returning HTML
+│   │       ├── homeRoutes.tsx               # Homepage: list projects, filters, metrics chart
+│   │       ├── notFoundRouteHandler.ts      # 404 handler for unmatched routes
+│   │       ├── projectRoutes.tsx            # Per‑project and issue pages with navigation
+│   │       ├── refreshRoutes.ts             # Route to refresh/rescan data and reload
+│   │       ├── statsRoute.tsx               # Web page embedding runtime stats dashboard
+│   │       ├── taskEventsRoute.tsx          # Task events page with charts and filters
+│   │       └── taskTrajectoriesRoute.tsx    # Task trajectory visualization page
+│   ├── bun/
+│   │   └── public.ts                        # Bun VFS/static file handling (build artefact)
+│   ├── components/                          # Server‑side rendered UI components (Kita JSX)
+│   │   ├── appBody.tsx                      # Common <body> wrapper layout
+│   │   ├── appHead.tsx                      # <head> with page title, scripts, and CSS
+│   │   ├── appHeader.tsx                    # Header with actions (theme, stats, reload)
+│   │   ├── breadcrumb.tsx                   # Breadcrumb navigation component
+│   │   ├── collapseIcon.tsx                 # SVG icon for collapse state
+│   │   ├── conditional.tsx                  # Conditional renderer to show/hide children
+│   │   ├── expandIcon.tsx                   # SVG icon for expand state
+│   │   ├── fileIOSection.tsx                # Panel showing worker file I/O metrics
+│   │   ├── htmlPage.tsx                     # Full HTML document wrapper component
+│   │   ├── ideSelection.tsx                 # IDE icons/selector built from discovered IDEs
+│   │   ├── memorySection.tsx                # Panel for memory usage metrics
+│   │   ├── projectMetricsChart.tsx          # Card container with canvas for projects chart
+│   │   ├── projectMetricsChartOptions.tsx   # Radio/controls for chart display/grouping
+│   │   ├── projectTable.tsx                 # Table of projects with metrics and actions
+│   │   ├── reloadButton.tsx                 # Button to trigger a page refresh
+│   │   ├── sortIcon.tsx                     # SVG sort indicator icon
+│   │   ├── statsButton.tsx                  # Link/button to runtime stats page
+│   │   ├── statusBadge.tsx                  # Badge showing task/issue status
+│   │   ├── taskCard.tsx                     # Summary card for a single task
+│   │   ├── themeSwitcher.tsx                # Toggle theme on server‑rendered pages
+│   │   ├── toggleComponent.tsx              # Generic toggle UI control component
+│   │   ├── versionBanner.tsx                # Display running app version in header
+│   │   └── workersSection.tsx               # Panel summarizing worker pool metrics
+│   ├── dashboard/                           # Static assets/templates for stats dashboard
+│   ├── getMaxConcurrency.ts                 # Detect optimal worker concurrency based on CPU
+│   ├── index.ts                             # Main entrypoint: start server and listen on PORT
+│   ├── input.css                            # Tailwind input (source used for building CSS)
+│   ├── jetbrains.ts                         # Orchestrates discovery, projects, metrics, icons
+│   ├── schema/                              # Event and data schema definitions
+│   │   ├── responseTextAppeared.ts          # Schema for response text appeared event
+│   │   ├── stepMetaInfoAppearedEvent.ts     # Schema for step meta info appeared event
+│   │   └── toolPrimitiveProperty.ts         # Schema for tool primitive property model
+│   ├── schema.ts                            # Zod schemas: chains, tasks, steps, metrics
+│   ├── stats/                               # Runtime statistics collection and types
+│   ├── types.ts                             # Shared analysis/result types used across modules
+│   ├── utils/                               # Utility helpers with no side‑effects
+│   │   ├── escapeHtml.ts                    # Escape HTML special characters safely
+│   │   ├── getLocaleFromRequest.ts          # Parse Accept‑Language and cookies to locale
+│   │   ├── jetBrainsPath.ts                 # Resolve and expose JetBrains cache base path
+│   │   ├── metricsUtils.ts                  # Aggregate/format token, cost, and time metrics
+│   │   ├── themeCookie.ts                   # Read/write theme preference cookie
+│   │   └── timeUtils.ts                     # Date/time formatting and range helpers
+│   ├── workers/                             # Worker pool and event loading
+│   │   ├── Job.ts                           # Job descriptor passed to workers
+│   │   ├── JobScheduler.ts                  # Schedule and throttle jobs across the pool
+│   │   ├── MetricsCollector.ts              # Collect per‑task/pool metrics (timings, I/O)
+│   │   ├── PoolMetrics.ts                   # Types for worker/pool metrics reporting
+│   │   ├── Response.ts                      # Generic worker response message shape
+│   │   ├── WorkerEntry.ts                   # Worker file entry point type and helpers
+│   │   ├── WorkerExecutionError.ts          # Error type for failures within a worker
+│   │   ├── WorkerFileIOCollector.ts         # Track file I/O performed by workers
+│   │   ├── WorkerManager.ts                 # High‑level pool manager orchestrating workers
+│   │   ├── WorkerPool.ts                    # Worker pool implementation (spawns, queues jobs)
+│   │   ├── WorkerPoolError.ts               # Error type for pool‑level errors
+│   │   ├── WorkerPoolOptions.ts             # Options for tuning worker pool behavior
+│   │   ├── WorkerSpawnError.ts              # Error type for worker spawn failures
+│   │   ├── loadEvents.ts                    # Load task events from disk using the pool
+│   │   ├── loadEventsInput.ts               # Input type for loadEvents worker task
+│   │   ├── loadEventsOutput.ts              # Output type/result for loadEvents worker task
+│   │   └── loadEventsWorker.ts              # Web worker that reads/returns events from files
+│   ├── Issue.ts                             # Issue class: loads chain, aggregates tasks/metrics
+│   ├── Project.ts                           # Project class: discovers issues, aggregates stats
+│   ├── Step.ts                              # Step class: step data, metrics, and validation
+│   └── Task.ts                              # Task class: events, trajectories, worker usage
+├── tsconfig.json                            # TypeScript compiler configuration
+├── dist/                                    # Compiled JavaScript (build artefact; do not edit)
+└── node_modules/                            # Installed dependencies (do not edit)
 ```
 
 
