@@ -20,8 +20,9 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
   stepSize: number;
   projectNames: string[];
 }> {
-  // Group issues by day and project
+  // Group issues by day and project, and also by hour for finer grouping when requested
   const issuesByDay: Record<string, Record<string, { cost: number; tokens: number }>> = {}
+  const issuesByHour: Record<string, Record<string, { cost: number; tokens: number }>> = {}
   const projectColors: Record<string, string> = {}
 
   // Generate a color for each project
@@ -39,24 +40,34 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
     for (const [, issue] of await project.issues) {
       const date = new Date(issue.created)
       const day = date.toISOString().split('T')[0] // YYYY-MM-DD format
+      const hourKey = date.toISOString().slice(0, 13) + ':00' // YYYY-MM-DDTHH:00 in UTC
 
       if (date < minDate) minDate = date
       if (date > maxDate) maxDate = date
 
+      // Init day bucket
       if (!issuesByDay[day]) {
         issuesByDay[day] = {}
       }
-
       if (!issuesByDay[day][project.name]) {
-        issuesByDay[day][project.name] = {
-          cost: 0,
-          tokens: 0,
-        }
+        issuesByDay[day][project.name] = { cost: 0, tokens: 0 }
+      }
+
+      // Init hour bucket
+      if (!issuesByHour[hourKey]) {
+        issuesByHour[hourKey] = {}
+      }
+      if (!issuesByHour[hourKey][project.name]) {
+        issuesByHour[hourKey][project.name] = { cost: 0, tokens: 0 }
       }
 
       const metrics = await issue.metrics
+      // Aggregate into day
       issuesByDay[day][project.name].cost += metrics.cost
       issuesByDay[day][project.name].tokens += metrics.inputTokens + metrics.outputTokens
+      // Aggregate into hour
+      issuesByHour[hourKey][project.name].cost += metrics.cost
+      issuesByHour[hourKey][project.name].tokens += metrics.inputTokens + metrics.outputTokens
     }
   }
 
@@ -96,12 +107,21 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
   }
 
   // Helper function to convert a date string to the appropriate timeUnit format
+  // dateStr is expected to be:
+  //  - for 'hour': an ISO string like YYYY-MM-DDTHH:00 (already bucketed)
+  //  - for 'day': YYYY-MM-DD
+  //  - for 'week': any day string; it will be converted to the first day (Sunday) of that week
+  //  - for 'month': YYYY-MM-DD -> YYYY-MM
+  //  - for 'year': YYYY-MM-DD -> YYYY
   function formatDateByTimeUnit(dateStr: string, timeUnit: string): string {
+    if (timeUnit === 'hour') {
+      // Assume incoming key is already hour-bucketed; return as-is
+      return dateStr
+    }
+
     const date = new Date(dateStr)
 
     switch (timeUnit) {
-      case 'hour':
-        return `${dateStr}T${date.getHours().toString().padStart(2, '0')}:00`
       case 'day':
         return dateStr // Already in YYYY-MM-DD format
       case 'week':
@@ -120,22 +140,34 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
 
   // Group data by timeUnit
   function groupDataByTimeUnit(
-    issuesByDay: Record<string, Record<string, { cost: number; tokens: number }>>,
+    byDay: Record<string, Record<string, { cost: number; tokens: number }>>,
+    byHour: Record<string, Record<string, { cost: number; tokens: number }>>,
     projectName: string,
     timeUnit: string,
     metricType: 'cost' | 'tokens',
   ): Array<{ x: string; y: number }> {
     const groupedData: Record<string, number> = {}
 
-    Object.keys(issuesByDay)
-      .sort() // Sort days in chronological order
-      .forEach(day => {
-        const value = issuesByDay[day][projectName]?.[metricType] || 0
-        if (value > 0) {
-          const timeUnitKey = formatDateByTimeUnit(day, timeUnit)
-          groupedData[timeUnitKey] = (groupedData[timeUnitKey] || 0) + value
-        }
-      })
+    if (timeUnit === 'hour') {
+      Object.keys(byHour)
+        .sort()
+        .forEach(hourKey => {
+          const value = byHour[hourKey][projectName]?.[metricType] || 0
+          if (value > 0) {
+            groupedData[hourKey] = (groupedData[hourKey] || 0) + value
+          }
+        })
+    } else {
+      Object.keys(byDay)
+        .sort() // Sort days in chronological order
+        .forEach(day => {
+          const value = byDay[day][projectName]?.[metricType] || 0
+          if (value > 0) {
+            const timeUnitKey = formatDateByTimeUnit(day, timeUnit)
+            groupedData[timeUnitKey] = (groupedData[timeUnitKey] || 0) + value
+          }
+        })
+    }
 
     // Convert to array format required for chart
     return Object.keys(groupedData)
@@ -156,7 +188,7 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
     tension: number;
     yAxisID: string;
   }> = projects.map(project => {
-    const data = groupDataByTimeUnit(issuesByDay, project.name, timeUnit, 'cost')
+    const data = groupDataByTimeUnit(issuesByDay, issuesByHour, project.name, timeUnit, 'cost')
 
     return {
       label: `${project.name} (Cost)`,
@@ -180,7 +212,7 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
     tension: number;
     yAxisID: string;
   }> = projects.map(project => {
-    const data = groupDataByTimeUnit(issuesByDay, project.name, timeUnit, 'tokens')
+    const data = groupDataByTimeUnit(issuesByDay, issuesByHour, project.name, timeUnit, 'tokens')
 
     return {
       label: `${project.name} (Tokens)`,

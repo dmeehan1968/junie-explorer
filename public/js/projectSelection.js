@@ -238,6 +238,10 @@ function createProjectsChart(graphData) {
     stack: 'main'
   }));
 
+  // Choose tooltip/date formats based on time unit
+  const unit = graphData.timeUnit || 'day';
+  const tooltipFormat = unit === 'hour' ? 'MMM d, yyyy HH:00' : (unit === 'month' ? 'MMM yyyy' : (unit === 'year' ? 'yyyy' : 'MMM d, yyyy'));
+
   // Create chart configuration
   const config = {
     type: 'bar',
@@ -266,17 +270,17 @@ function createProjectsChart(graphData) {
             unit: graphData.timeUnit || 'day',
             stepSize: graphData.stepSize || 1,
             displayFormats: {
-              hour: 'HH:mm',
+              hour: 'MMM d HH:00',
               day: 'MMM d',
               week: 'MMM d',
               month: 'MMM yyyy',
               year: 'yyyy'
             },
-            tooltipFormat: 'MMM d, yyyy'
+            tooltipFormat: tooltipFormat
           },
           title: {
             display: true,
-            text: 'Date'
+            text: unit === 'hour' ? 'Date/Time' : 'Date'
           },
           adapters: {
             date: {
