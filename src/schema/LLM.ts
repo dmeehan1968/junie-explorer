@@ -14,7 +14,15 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AnthropicSonnet37,
   AnthropicSonnet4,
   AutoSelectedLlm,
-]).parse(data)).transform((data => ({
+]).parse(data)).transform((({ inputPrice, outputPrice, cacheInputPrice, cacheCreateInputPrice, capabilities, ...data }) => ({
   ...data,
-  groupName: `${ data.isSummarizer ? 'Summarizer' : 'Assistant' } (${ data.jbai })`
+  groupName: `${ data.isSummarizer ? 'Summarizer' : 'Assistant' } (${ data.jbai })`,
+  capabilities: {
+    ...capabilities,
+    inputPrice: inputPrice ?? capabilities?.inputPrice ?? 0,
+    outputPrice: outputPrice ?? capabilities?.outputPrice ?? 0,
+    cacheInputPrice: cacheInputPrice ?? capabilities?.cacheInputPrice ?? 0,
+    cacheCreateInputPrice: cacheCreateInputPrice ?? capabilities?.cacheCreateInputPrice ?? capabilities?.cacheInputPrice ?? 0,
+  },
 })))
+export type LLM = z.infer<typeof LLM>

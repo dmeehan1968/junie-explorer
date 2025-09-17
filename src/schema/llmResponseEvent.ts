@@ -17,27 +17,27 @@ export const LlmResponseEvent = z.looseObject({
     cacheInputTokens: z.number().int().optional(),
     cacheCreateInputTokens: z.number().int().optional(),
     time: z.number().optional(),
-  }).transform(answer => {
+  }).transform(({ inputTokens = 0, outputTokens = 0, cacheInputTokens = 0, cacheCreateInputTokens = 0,  ...answer }) => {
     const million = 1_000_000
 
-    const cost = ((answer.inputTokens ?? 0) / million) * (answer.llm?.capabilities?.inputPrice ?? answer.llm?.inputPrice ?? 0)
-      + ((answer.outputTokens ?? 0) / million) * (answer.llm?.capabilities?.outputPrice ?? answer.llm?.outputPrice ?? 0)
-      + ((answer.cacheInputTokens ?? 0) / million) * (answer.llm?.capabilities?.cacheInputPrice ?? answer.llm?.cacheInputPrice ?? 0)
-      + ((answer.cacheCreateInputTokens ?? 0) / million) * (answer.llm?.capabilities?.cacheCreateInputPrice ?? answer.llm?.cacheCreateInputPrice ?? 0)
+    const cost = (inputTokens / million) * answer.llm.capabilities.inputPrice
+      + (outputTokens / million) * answer.llm.capabilities.outputPrice
+      + (cacheInputTokens / million) * answer.llm.capabilities.cacheInputPrice
+      + (cacheCreateInputTokens / million) * answer.llm.capabilities.cacheCreateInputPrice
 
     return {
       ...answer,
       cost,
-      inputTokens: answer.inputTokens ?? 0,
-      outputTokens: answer.outputTokens ?? 0,
-      cacheInputTokens: answer.cacheInputTokens ?? 0,
-      cacheCreateInputTokens: answer.cacheCreateInputTokens ?? 0,
+      inputTokens,
+      outputTokens,
+      cacheInputTokens,
+      cacheCreateInputTokens,
       time: answer.time ?? 0,
       metricCount: [
-        answer.inputTokens,
-        answer.outputTokens,
-        answer.cacheInputTokens,
-        answer.cacheCreateInputTokens
+        inputTokens,
+        outputTokens,
+        cacheInputTokens,
+        cacheCreateInputTokens,
       ].filter(v => v !== undefined).length,
     }
   }),

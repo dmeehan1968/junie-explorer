@@ -255,7 +255,6 @@ export class Task {
         if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
           // next line is a bit of a kludge so we can use cacheCreateInputTokens in the same way as Sonnet and still get
           // them costed correctly.
-          record.event.answer.llm.cacheCreateInputPrice = record.event.answer.llm.cacheInputPrice
           record.event.answer.cacheCreateInputTokens = Math.max(0, (record.event.answer.cacheInputTokens ?? 0) - (previousEvent.event.answer.cacheInputTokens ?? 0))
         } else {
           record.event.answer.cacheCreateInputTokens = record.event.answer.cacheInputTokens
