@@ -49,9 +49,9 @@ const ToolDecorator = ({ tool }: { tool: Tool }) => {
           <div class="w-32 flex-shrink-0 text-base-content/50 pr-2 italic text-right p-2">{name}</div>
           <div class="flex flex-row flex-grow gap-2">
             <div class="flex-grow bg-base-content/10 p-2 rounded">
-              {escapeHtml(description ? description : JSON.stringify(param, null, 2))}
+              {escapeHtml(description ? String(description) : JSON.stringify(param, null, 2))}
             </div>
-            <div class="flex-shrink-0 bg-base-content/10 text-base-content/50 p-2 rounded">{type ?? JSON.stringify(param.anyOf)}</div>
+            <div class="flex-shrink-0 bg-base-content/10 text-base-content/50 p-2 rounded">{type ? String(type) : JSON.stringify(param.anyOf)}</div>
           </div>
         </div>
       ))}
