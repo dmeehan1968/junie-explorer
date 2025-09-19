@@ -3,6 +3,7 @@ import { JetBrains } from "../jetbrains.js"
 import { Project } from "../Project.js"
 import { Conditional } from "./conditional.js"
 import { SortIcon } from "./sortIcon.js"
+import { buildAssistantProviders } from "../utils/assistantProviders.js"
 
 export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains, locale?: string }> = ({
   projects,
@@ -102,19 +103,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
                 {await (async () => {
                   const providersRaw = Array.from(await project.assistantProviders)
-                  const providers = providersRaw.reduce((acc: { provider: string; jbaiTitles: string }[], p) => {
-                    if (!p.provider) return acc
-                    const existing = acc.find(ap => ap.provider === p.provider)
-                    const jbaiVal = (p.jbai ?? '').trim()
-                    if (existing) {
-                      if (jbaiVal && !existing.jbaiTitles.split(', ').includes(jbaiVal)) {
-                        existing.jbaiTitles = existing.jbaiTitles ? `${existing.jbaiTitles}, ${jbaiVal}` : jbaiVal
-                      }
-                    } else {
-                      acc.push({ provider: p.provider, jbaiTitles: jbaiVal })
-                    }
-                    return acc
-                  }, []).sort((a, b) => a.provider.localeCompare(b.provider))
+                  const providers = buildAssistantProviders(providersRaw)
 
                   return providers.length ? (
                     <div class="flex items-center gap-2">

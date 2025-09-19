@@ -18,6 +18,7 @@ import { StatusBadge } from "../../components/statusBadge.js"
 import { formatElapsedTime, formatNumber, formatSeconds } from '../../utils/timeUtils.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
+import { buildAssistantProviders } from '../../utils/assistantProviders.js'
 
 const router = express.Router({ mergeParams: true })
 
@@ -57,20 +58,7 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
     : `/project/${encodeURIComponent(project.name)}`
   const metrics = await issue.metrics
   const assistantProvidersRaw = Array.from(await issue.assistantProviders)
-  // Build unique providers with aggregated jbai values (for tooltip)
-  const assistantProviders = assistantProvidersRaw.reduce((acc: { provider: string; jbaiTitles: string }[], p) => {
-    if (!p.provider) return acc
-    const existing = acc.find(ap => ap.provider === p.provider)
-    const jbaiVal = (p.jbai ?? '').trim()
-    if (existing) {
-      if (jbaiVal && !existing.jbaiTitles.split(', ').includes(jbaiVal)) {
-        existing.jbaiTitles = existing.jbaiTitles ? `${existing.jbaiTitles}, ${jbaiVal}` : jbaiVal
-      }
-    } else {
-      acc.push({ provider: p.provider, jbaiTitles: jbaiVal })
-    }
-    return acc
-  }, []).sort((a, b) => a.provider.localeCompare(b.provider))
+  const assistantProviders = buildAssistantProviders(assistantProvidersRaw)
 
   return (
     <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
