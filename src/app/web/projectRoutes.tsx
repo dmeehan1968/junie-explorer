@@ -56,6 +56,7 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
     ? `/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/0/trajectories`
     : `/project/${encodeURIComponent(project.name)}`
   const metrics = await issue.metrics
+  const assistantProviders = Array.from(await issue.assistantProviders).sort()
 
   return (
     <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
@@ -159,6 +160,16 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
       >
         <StatusBadge state={issue.state} />
       </td>
+      <td 
+        class="text-left whitespace-normal break-words align-middle py-3 px-2"
+        data-testid="issue-assistant-providers" 
+        role="link" 
+        tabindex="0" 
+        onclick={`window.location.href='${href}'`} 
+        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
+      >
+        {assistantProviders.length ? assistantProviders.join(', ') : '-'}
+      </td>
     </tr>
   )
 }
@@ -215,6 +226,7 @@ const IssuesTable = async ({ project, locale }: { project: Project, locale: stri
               </Conditional>
               <th class="text-right whitespace-nowrap">Time</th>
               <th class="text-right whitespace-nowrap">Status</th>
+              <th class="text-left whitespace-nowrap">Providers</th>
             </tr>
             <tr class="!bg-base-200 font-bold text-base-content">
               <Conditional condition={project.hasMetrics}>
@@ -230,6 +242,7 @@ const IssuesTable = async ({ project, locale }: { project: Project, locale: stri
               </Conditional>
               <td class="text-right whitespace-nowrap" data-testid="header-summary-total-time">{formatSeconds(metrics.time / 1000)}</td>
               <td class="text-right whitespace-nowrap"></td>
+              <td class="text-left whitespace-nowrap"></td>
             </tr>
           </thead>
           <tbody>
@@ -252,6 +265,7 @@ const IssuesTable = async ({ project, locale }: { project: Project, locale: stri
               </Conditional>
               <td class="text-right whitespace-nowrap" data-testid="summary-total-time">{formatSeconds(metrics.time / 1000)}</td>
               <td class="text-right whitespace-nowrap"></td>
+              <td class="text-left whitespace-nowrap"></td>
             </tr>
           </tfoot>
         </table>

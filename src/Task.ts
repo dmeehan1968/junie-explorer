@@ -19,6 +19,7 @@ import { AutoSelectedLlm } from "./schema/AutoSelectedLlm.js"
 import { EventRecord } from "./schema/eventRecord.js"
 import { Event } from "./schema/event.js"
 import { LlmResponseEvent } from "./schema/llmResponseEvent.js"
+import { LlmRequestEvent } from "./schema/llmRequestEvent.js"
 import { Step } from "./Step.js"
 import { loadEvents } from "./workers/loadEvents.js"
 
@@ -29,6 +30,7 @@ export class Task {
   public context: JunieTaskContext = { description: '' }
   public isDeclined: boolean = false
   public plan: JuniePlan[] = []
+  public assistantProviders: Set<string> = new Set()
   readonly _steps: Map<number, Step> = new Map()
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
   private _previousTasksInfo?: PreviousTasksInfo | null
@@ -109,6 +111,7 @@ export class Task {
     this._patch = undefined
     this._events = undefined
     this._eventTypes = undefined
+    this.assistantProviders.clear()
     this._steps.clear()
     this.init()
   }
@@ -273,6 +276,16 @@ export class Task {
         lastResponse.event.answer.inputTokens = 0
       }
     }
+
+    // Rebuild providers set from non-summarizer LlmRequestEvent providers
+    this.assistantProviders = new Set(
+      adjustedEvents
+        .filter(r => r.event.type === LlmRequestEvent.shape.type.value)
+        .map(r => r.event)
+        .filter((e: any) => !e.modelParameters?.model?.isSummarizer)
+        .map((e: any) => e.modelParameters?.model?.provider)
+        .filter((p: any): p is string => typeof p === 'string')
+    )
 
     return adjustedEvents
   }

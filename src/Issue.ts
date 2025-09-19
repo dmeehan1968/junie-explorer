@@ -84,4 +84,19 @@ export class Issue {
     return (await this.tasks).get(`${this.id} ${id}`)
   }
 
+  // Recalculate assistant providers across all tasks each time accessed
+  get assistantProviders(): Promise<Set<string>> {
+    return (async () => {
+      const set = new Set<string>()
+      const tasks = [...(await this.tasks).values()]
+      await Promise.all(
+        tasks.map(async (task) => {
+          for (const provider of task.assistantProviders) {
+            set.add(provider)
+          }
+        })
+      )
+      return set
+    })()
+  }
 }
