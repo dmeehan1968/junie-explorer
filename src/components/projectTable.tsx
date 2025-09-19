@@ -56,6 +56,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
             </div>
           </th>
           <th class="text-right whitespace-nowrap w-0">Issues</th>
+          <th class="text-left whitespace-nowrap w-0">LLM</th>
           <th class="text-right whitespace-nowrap w-0">IDEs</th>
         </tr>
         </thead>
@@ -96,6 +97,39 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
                 <span class="text-sm text-base-content/70">{(await project.issues).size}</span>
               </td>
+              <td class="text-left whitespace-normal break-words align-middle py-3 px-2" role="link" tabindex="0"
+                  onclick={`window.location.href='/project/${encodeURIComponent(project.name)}'`}
+                  onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
+                {await (async () => {
+                  const providersRaw = Array.from(await project.assistantProviders)
+                  const providers = providersRaw.reduce((acc: { provider: string; jbaiTitles: string }[], p) => {
+                    if (!p.provider) return acc
+                    const existing = acc.find(ap => ap.provider === p.provider)
+                    const jbaiVal = (p.jbai ?? '').trim()
+                    if (existing) {
+                      if (jbaiVal && !existing.jbaiTitles.split(', ').includes(jbaiVal)) {
+                        existing.jbaiTitles = existing.jbaiTitles ? `${existing.jbaiTitles}, ${jbaiVal}` : jbaiVal
+                      }
+                    } else {
+                      acc.push({ provider: p.provider, jbaiTitles: jbaiVal })
+                    }
+                    return acc
+                  }, []).sort((a, b) => a.provider.localeCompare(b.provider))
+
+                  return providers.length ? (
+                    <div class="flex items-center gap-2">
+                      {providers.map(({ provider, jbaiTitles }) => {
+                        const fileName = encodeURIComponent(provider).replace(/%20/g, ' ')
+                        const src = `/icons/${fileName}.svg`
+                        const title = jbaiTitles || provider
+                        return (
+                          <img src={src} alt={`${provider} icon`} title={title} class="h-4 w-4 object-contain inline-block" loading="lazy" />
+                        )
+                      })}
+                    </div>
+                  ) : '-'
+                })()}
+              </td>
               <td class="text-right whitespace-nowrap w-0 align-top py-3 px-2" role="link" tabindex="0"
                   onclick={`window.location.href='/project/${encodeURIComponent(project.name)}'`}
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
@@ -110,7 +144,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
         </Conditional>
         <Conditional condition={projects.length === 0}>
           <tr>
-            <td colspan="5"
+            <td colspan="6"
                 class="p-4 text-center text-base-content/70"
                 data-testid="empty-projects-message">
               No JetBrains projects found

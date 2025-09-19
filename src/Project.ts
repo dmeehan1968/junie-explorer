@@ -95,4 +95,24 @@ export class Project {
     this._metrics = undefined
   }
 
+  // Aggregate distinct assistant providers across all issues in this project
+  get assistantProviders(): Promise<Set<{ provider: string; name?: string; jbai?: string }>> {
+    return (async () => {
+      const unique = new Map<string, { provider: string; name?: string; jbai?: string }>()
+      const issues = [...(await this.issues).values()]
+      await Promise.all(
+        issues.map(async (issue) => {
+          const providers = await issue.assistantProviders
+          for (const p of providers) {
+            const key = `${p.provider}|${p.name ?? ''}|${p.jbai ?? ''}`
+            if (!unique.has(key)) {
+              unique.set(key, p)
+            }
+          }
+        })
+      )
+      return new Set(unique.values())
+    })()
+  }
+
 }
