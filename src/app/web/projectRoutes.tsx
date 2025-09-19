@@ -56,7 +56,10 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
     ? `/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/0/trajectories`
     : `/project/${encodeURIComponent(project.name)}`
   const metrics = await issue.metrics
-  const assistantProviders = Array.from(await issue.assistantProviders).sort()
+  const assistantProviders = Array.from(await issue.assistantProviders)
+    .map(p => p.provider)
+    .filter((v, i, arr) => v && arr.indexOf(v) === i)
+    .sort()
 
   return (
     <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">

@@ -30,7 +30,7 @@ export class Task {
   public context: JunieTaskContext = { description: '' }
   public isDeclined: boolean = false
   public plan: JuniePlan[] = []
-  public assistantProviders: Set<string> = new Set()
+  public assistantProviders: Set<{ provider: string; name?: string; jbai?: string }> = new Set()
   readonly _steps: Map<number, Step> = new Map()
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
   private _previousTasksInfo?: PreviousTasksInfo | null
@@ -277,15 +277,26 @@ export class Task {
       }
     }
 
-    // Rebuild providers set from non-summarizer LlmRequestEvent providers
-    this.assistantProviders = new Set(
+    // Rebuild providers set from non-summarizer LlmRequestEvent models
+    {
+      const unique = new Map<string, { provider: string; name?: string; jbai?: string }>()
       adjustedEvents
         .filter(r => r.event.type === LlmRequestEvent.shape.type.value)
-        .map(r => r.event)
-        .filter((e: any) => !e.modelParameters?.model?.isSummarizer)
-        .map((e: any) => e.modelParameters?.model?.provider)
-        .filter((p: any): p is string => typeof p === 'string')
-    )
+        .map(r => r.event as LlmRequestEvent)
+        .filter(e => !e.modelParameters?.model?.isSummarizer)
+        .forEach(e => {
+          const provider = (e.modelParameters?.model as any)?.provider as string | undefined
+          const name = (e.modelParameters?.model as any)?.name as string | undefined
+          const jbai = (e.modelParameters?.model as any)?.jbai as string | undefined
+          if (provider) {
+            const key = `${provider}|${name ?? ''}|${jbai ?? ''}`
+            if (!unique.has(key)) {
+              unique.set(key, { provider, name, jbai })
+            }
+          }
+        })
+      this.assistantProviders = new Set(unique.values())
+    }
 
     return adjustedEvents
   }

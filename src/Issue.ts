@@ -85,18 +85,21 @@ export class Issue {
   }
 
   // Recalculate assistant providers across all tasks each time accessed
-  get assistantProviders(): Promise<Set<string>> {
+  get assistantProviders(): Promise<Set<{ provider: string; name?: string; jbai?: string }>> {
     return (async () => {
-      const set = new Set<string>()
+      const unique = new Map<string, { provider: string; name?: string; jbai?: string }>()
       const tasks = [...(await this.tasks).values()]
       await Promise.all(
         tasks.map(async (task) => {
-          for (const provider of task.assistantProviders) {
-            set.add(provider)
+          for (const p of task.assistantProviders) {
+            const key = `${p.provider}|${p.name ?? ''}|${p.jbai ?? ''}`
+            if (!unique.has(key)) {
+              unique.set(key, p)
+            }
           }
         })
       )
-      return set
+      return new Set(unique.values())
     })()
   }
 }
