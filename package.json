@@ -9,7 +9,7 @@
   "scripts": {
     "start": "bun run dev",
     "dev": "bun install && bun run build:css && bun run build:static && bun src/index.ts",
-    "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures/test-logs\" cucumber-js --tags \"not @pending\"",
+    "test": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures\" bunx --bun cucumber-js --tags \"not @pending\"",
     "playwright:install": "playwright install",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/css/app.css",
     "build:version": "sed -n 's/.*\"version\": \"\\(.*\\)\",/\"\\1\"/p' package.json > public/version.txt",

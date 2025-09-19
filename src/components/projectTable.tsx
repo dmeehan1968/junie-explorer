@@ -64,6 +64,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
           {projects.map(async project =>
             <tr
               class="project-row cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md"
+              data-testid={"project-item"}
               data-ides={JSON.stringify(project.ideNames)}>
               <Conditional condition={jetBrains.hasMetrics}>
                 <td class="text-center align-top py-3 px-2">
@@ -80,7 +81,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
                           <span class="project-name text-primary font-bold"
                                 data-testid={`project-link-${project.name}`}>
-                            {project.name}
+                            <span data-testid={"project-name"}>{project.name}</span>
                           </span>
               </td>
               <td class="text-right whitespace-nowrap w-0 align-top py-3 px-2"
