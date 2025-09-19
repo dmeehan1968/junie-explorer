@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2025-09-19
+
+### Added
+- Add assistant provider aggregation and display to the project table (c96fe61)
+- Add unique assistant provider icons and tooltips to project table (97690a8)
+- Add assistant provider handling to tasks and UI display (2139fa2)
+- Add test IDs to `projectTable` and update test script configuration (01e2e9c)
+- Add task boundary handling for context size chart (9b30fef)
+- Add option to include all tasks in issue for Context Size chart (75d5184)
+- Add grouping option to Project Metrics chart (bff5c65)
+- Add description and reasoning to contextSize API and update visualization (ce7a76a)
+- Add Context Size Over Time section to Task Trajectories (0826679)
+- Add version control guidelines to documentation (322f3bc)
+
+### Changed
+- Refactor assistant provider aggregation logic and reuse across components (ca7ed9b)
+- Enhance assistant provider data handling and UI display (df3a2e0)
+- Add `capabilities` enhancements and pricing logic refinement to LLM schema (4177937)
+- Update directory structure in guidelines documentation (5930e89)
+- Update ContextSizeSection to conditionally display "Include all tasks" toggle (e79625b)
+- Update Project Metrics chart to conditionally display legend (3823137)
+- Simplify and unify dataset stacking logic for Project Metrics chart (dcda999)
+- Set 'cost' as the default option for project metrics display (b854de0)
+- Update Project Metrics chart to stacked bar chart (2d45edf)
+
+### Fixed
+- Handle improper type coercion in `taskTrajectoriesRoute` (42523fd)
+- Set default value for `type` field in `ToolParametersSchema` (f4cb769)
+- Fix hourly grouping and improved tooltip formats to Project Metrics chart (4933043)
+
+### Removed
+- Remove worker stats reporting (20fc9e2)
+
 ## [3.1.2] - 2025-09-05
 
 ### Added
