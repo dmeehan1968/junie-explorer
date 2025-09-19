@@ -56,10 +56,21 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
     ? `/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/0/trajectories`
     : `/project/${encodeURIComponent(project.name)}`
   const metrics = await issue.metrics
-  const assistantProviders = Array.from(await issue.assistantProviders)
-    .map(p => p.provider)
-    .filter((v, i, arr) => v && arr.indexOf(v) === i)
-    .sort()
+  const assistantProvidersRaw = Array.from(await issue.assistantProviders)
+  // Build unique providers with aggregated jbai values (for tooltip)
+  const assistantProviders = assistantProvidersRaw.reduce((acc: { provider: string; jbaiTitles: string }[], p) => {
+    if (!p.provider) return acc
+    const existing = acc.find(ap => ap.provider === p.provider)
+    const jbaiVal = (p.jbai ?? '').trim()
+    if (existing) {
+      if (jbaiVal && !existing.jbaiTitles.split(', ').includes(jbaiVal)) {
+        existing.jbaiTitles = existing.jbaiTitles ? `${existing.jbaiTitles}, ${jbaiVal}` : jbaiVal
+      }
+    } else {
+      acc.push({ provider: p.provider, jbaiTitles: jbaiVal })
+    }
+    return acc
+  }, []).sort((a, b) => a.provider.localeCompare(b.provider))
 
   return (
     <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
@@ -171,7 +182,24 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
         onclick={`window.location.href='${href}'`} 
         onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
-        {assistantProviders.length ? assistantProviders.join(', ') : '-'}
+        {assistantProviders.length ? (
+          <div class="flex items-center gap-2">
+            {assistantProviders.map(({ provider, jbaiTitles }) => {
+              const fileName = encodeURIComponent(provider).replace(/%20/g, ' ')
+              const src = `/icons/${fileName}.svg`
+              const title = jbaiTitles || provider
+              return (
+                <img 
+                  src={src} 
+                  alt={`${provider} icon`} 
+                  title={title}
+                  class="h-4 w-4 object-contain inline-block"
+                  loading="lazy"
+                />
+              )
+            })}
+          </div>
+        ) : '-'}
       </td>
     </tr>
   )
@@ -229,7 +257,7 @@ const IssuesTable = async ({ project, locale }: { project: Project, locale: stri
               </Conditional>
               <th class="text-right whitespace-nowrap">Time</th>
               <th class="text-right whitespace-nowrap">Status</th>
-              <th class="text-left whitespace-nowrap">Providers</th>
+              <th class="text-left whitespace-nowrap">LLM</th>
             </tr>
             <tr class="!bg-base-200 font-bold text-base-content">
               <Conditional condition={project.hasMetrics}>
