@@ -112,7 +112,13 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
                         const src = `/icons/${fileName}.svg`
                         const title = jbaiTitles || provider
                         return (
-                          <img src={src} alt={`${provider} icon`} title={title} class="h-4 w-4 object-contain inline-block" loading="lazy" />
+                          <div
+                            class="h-4 w-4 inline-block text-base-content"
+                            style={`background-color: currentColor; mask: url('${src}') no-repeat center / contain; -webkit-mask: url('${src}') no-repeat center / contain;`}
+                            role="img"
+                            aria-label={`${provider} icon`}
+                            title={title}
+                          />
                         )
                       })}
                     </div>

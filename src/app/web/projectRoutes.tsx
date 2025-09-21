@@ -35,7 +35,13 @@ const NoIssuesMessage = () => (
 const IdeIcons = ({ project, jetBrains }: { project: Project, jetBrains: any }) => (
   <div class="flex gap-2 mb-5" data-testid="ide-icons">
     {project.ideNames.map(ide => (
-      <img src={jetBrains.getIDEIcon(ide)} alt={ide} title={ide} class="w-8 h-8" />
+      <div 
+        class="w-8 h-8 text-base-content"
+        style={`background-color: currentColor; mask: url('${jetBrains.getIDEIcon(ide)}') no-repeat center / contain; -webkit-mask: url('${jetBrains.getIDEIcon(ide)}') no-repeat center / contain;`}
+        role="img"
+        aria-label={ide}
+        title={ide}
+      />
     ))}
   </div>
 )
@@ -177,12 +183,12 @@ const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Pro
               const src = `/icons/${fileName}.svg`
               const title = jbaiTitles || provider
               return (
-                <img 
-                  src={src} 
-                  alt={`${provider} icon`} 
+                <div
+                  class="h-4 w-4 inline-block text-base-content"
+                  style={`background-color: currentColor; mask: url('${src}') no-repeat center / contain; -webkit-mask: url('${src}') no-repeat center / contain;`}
+                  role="img"
+                  aria-label={`${provider} icon`}
                   title={title}
-                  class="h-4 w-4 object-contain inline-block"
-                  loading="lazy"
                 />
               )
             })}
