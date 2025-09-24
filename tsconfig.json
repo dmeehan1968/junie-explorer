@@ -8,7 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node", "@playwright/test"],
+    "types": ["node", "@playwright/test", "bun"],
     "sourceMap": true,
     "baseUrl": ".",
     "jsx": "react",
