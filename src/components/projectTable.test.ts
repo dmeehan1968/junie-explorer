@@ -30,10 +30,11 @@ class ProjectTableDSL implements ProjectTable {
     const start = Date.now()
     await this.page.waitForFunction(async (text) => {
       const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('#projects-table tbody tr'))
-      return rows.length > 0 && rows.every(row => row.style.display !== 'none' && row.textContent?.includes(text))
+      return rows.length > 0 && rows.every(row => {
+        const projectName = row.querySelector('[data-testid="project-name"]')
+        return row.style.display !== 'none' && projectName?.textContent?.toLowerCase().includes(text.toLowerCase())
+      })
     }, text)
-    // await this.page.waitForTimeout(500)
-    console.log(`Search took ${Date.now() - start}ms`)
   }
 
   async selectRow(index: number): Promise<void> {
@@ -71,7 +72,7 @@ describe("projectTable", () => {
     server = await new Promise(resolve => {
       junieExplorer.listen(0, resolve)
     })
-    browser = await chromium.launch({ headless: false, slowMo: 1000 })
+    browser = await chromium.launch({ headless: true, /*slowMo: 1000*/ })
   })
 
   beforeEach(async () => {
