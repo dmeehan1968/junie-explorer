@@ -37,11 +37,10 @@ class ProjectTableDSL implements ProjectTable {
   }
 
   async selectRow(index: number): Promise<void> {
-    console.log(await this.page.locator(`#projects-table tbody tr:nth-child(${index})`)
-      .nth(0)
-      .innerHTML()
-    )
-
+    await this.page.locator(`#projects-table tbody tr:nth-child(${index})`)
+      .nth(index - 1)
+      .locator('input.project-checkbox')
+      .click()
   }
 
   get exists() {
@@ -53,7 +52,8 @@ class ProjectTableDSL implements ProjectTable {
   }
 
   get selectedRowCount() {
-    return this.page.$$eval('#projects-table tbody tr.selected', rows => rows.length)
+    const selector = '#projects-table tbody tr input.project-checkbox:checked'
+    return this.page.waitForSelector(selector).then(() => this.page.locator(selector).count())
   }
 
   get visibleRowCount() {
@@ -77,7 +77,7 @@ describe("projectTable", () => {
     server = await new Promise(resolve => {
       junieExplorer.listen(0, resolve)
     })
-    browser = await chromium.launch({ headless: false, slowMo: 2000 })
+    browser = await chromium.launch({ headless: true, /*slowMo: 2000*/ })
   })
 
   beforeEach(async () => {
