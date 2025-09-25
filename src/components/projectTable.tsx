@@ -15,7 +15,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
       <table class="table table-zebra w-full bg-base-100" id="projects-table">
         <thead>
         <tr class="!bg-base-200">
-          <Conditional condition={jetBrains!.hasMetrics}>
+          <Conditional condition={jetBrains.hasMetrics}>
             <th class="w-12 text-center">
               <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()"
                      class="checkbox checkbox-primary checkbox-sm" title="Select All"/>
@@ -68,16 +68,16 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
               class="project-row cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md"
               data-testid={"project-item"}
               data-ides={JSON.stringify(project.ideNames)}>
-              <Conditional condition={jetBrains.hasMetrics}>
-                <td class="text-center align-top py-3 px-2">
-                  <input type="checkbox"
-                         id={`project-${encodeURIComponent(project.name)}`}
-                         class="project-checkbox checkbox checkbox-primary checkbox-sm"
-                         data-project-name={project.name}
-                         onchange="handleProjectSelection(this)"
-                         onclick="event.stopPropagation()"/>
-                </td>
-              </Conditional>
+              <td class="text-center align-top py-3 px-2">
+                <Conditional condition={project.hasMetrics}>
+                    <input type="checkbox"
+                           id={`project-${encodeURIComponent(project.name)}`}
+                           class="project-checkbox checkbox checkbox-primary checkbox-sm"
+                           data-project-name={project.name}
+                           onchange="handleProjectSelection(this)"
+                           onclick="event.stopPropagation()"/>
+                </Conditional>
+              </td>
               <td class="w-full align-top py-3 px-2" role="link" tabindex="0"
                   onclick={`window.location.href='/project/${encodeURIComponent(project.name)}'`}
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
@@ -130,7 +130,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
                 <div class="flex gap-1 justify-end" data-testid="ide-icons">
                   {project.ideNames.map(ide =>
-                    <img src={jetBrains?.getIDEIcon(ide)} alt={ide} title={ide} class="w-6 h-6"/>,
+                    <img src={jetBrains.getIDEIcon(ide)} alt={ide} title={ide} class="w-6 h-6"/>,
                   )}
                 </div>
               </td>
