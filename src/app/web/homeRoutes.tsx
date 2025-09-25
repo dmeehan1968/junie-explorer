@@ -13,7 +13,6 @@ import { StatsButton } from '../../components/statsButton.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
-import { jetBrainsPath } from '../../utils/jetBrainsPath.js'
 import { AppRequest, AppResponse } from "../types.js"
 
 const router = express.Router({ mergeParams: true })
@@ -49,7 +48,7 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
         <AppHeader actions={[<ThemeSwitcher/>, <StatsButton/>, <ReloadButton/>]}/>
         <VersionBanner version={jetBrains?.version}/>
         <p class="mb-5 text-base-content/70" data-testid="logs-directory-path">
-          Projects found in: {jetBrainsPath}
+          Projects found in: {jetBrains?.logPath || 'Unknown'}
         </p>
         <Conditional condition={!jetBrains!.hasMetrics}>
           <div class="bg-base-content/10 p-4 rounded mb-4">

@@ -201,7 +201,6 @@ junie-explorer/
 │   ├── utils/               # Utility functions
 │   │   ├── escapeHtml.ts    # HTML escaping utilities
 │   │   ├── getLocaleFromRequest.ts # Locale detection utilities
-│   │   ├── jetBrainsPath.ts # JetBrains path utilities
 │   │   ├── metricsUtils.ts  # Metrics calculation utilities
 │   │   ├── timeUtils.ts     # Time and date utilities
 │   │   └── versionBanner.ts # Version banner utilities

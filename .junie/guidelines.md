@@ -110,7 +110,6 @@ junie-explorer/
 │   ├── utils/                               # Utility helpers with no side‑effects
 │   │   ├── escapeHtml.ts                    # Escape HTML special characters safely
 │   │   ├── getLocaleFromRequest.ts          # Parse Accept‑Language and cookies to locale
-│   │   ├── jetBrainsPath.ts                 # Resolve and expose JetBrains cache base path
 │   │   ├── metricsUtils.ts                  # Aggregate/format token, cost, and time metrics
 │   │   ├── themeCookie.ts                   # Read/write theme preference cookie
 │   │   └── timeUtils.ts                     # Date/time formatting and range helpers
