@@ -5,7 +5,7 @@ export class ProjectTableDSL {
   constructor(private readonly page: Page, private readonly baseUrl: string) {
   }
 
-  async navigateTo(url: string): Promise<void> {
+  async navigateTo(url: string = '/'): Promise<void> {
     const target = new URL(url, this.baseUrl).toString()
     await this.page.goto(target)
   }
