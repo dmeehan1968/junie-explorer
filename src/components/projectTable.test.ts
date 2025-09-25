@@ -71,7 +71,9 @@ describe("projectTable", () => {
   let server: Server
 
   beforeAll(async () => {
-    junieExplorer = new JunieExplorer(new JetBrains({ logPath: './fixtures' }))
+    const jetbrains = new JetBrains({ logPath: './fixtures' })
+    await jetbrains.preload()
+    junieExplorer = new JunieExplorer(jetbrains)
     server = await new Promise(resolve => {
       junieExplorer.listen(0, resolve)
     })
