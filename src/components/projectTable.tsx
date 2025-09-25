@@ -130,7 +130,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
                 <div class="flex gap-1 justify-end" data-testid="ide-icons">
                   {project.ideNames.map(ide =>
-                    <img src={jetBrains.getIDEIcon(ide)} alt={ide} title={ide} class="w-6 h-6"/>,
+                    <img src={jetBrains?.getIDEIcon(ide)} alt={ide} title={ide} class="w-6 h-6"/>,
                   )}
                 </div>
               </td>

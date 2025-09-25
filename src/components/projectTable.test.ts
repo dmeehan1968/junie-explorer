@@ -27,7 +27,6 @@ class ProjectTableDSL implements ProjectTable {
 
   async search(text: string): Promise<void> {
     await this.page.fill('input[data-testid="project-search"]', text)
-    const start = Date.now()
     await this.page.waitForFunction(async (text) => {
       const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('#projects-table tbody tr'))
       return rows.length > 0 && rows.every(row => {
@@ -38,7 +37,11 @@ class ProjectTableDSL implements ProjectTable {
   }
 
   async selectRow(index: number): Promise<void> {
-    await this.page.click(`#projects-table tbody tr:nth-child(${index}) input[type="checkbox"]`)
+    console.log(await this.page.locator(`#projects-table tbody tr:nth-child(${index})`)
+      .nth(0)
+      .innerHTML()
+    )
+
   }
 
   get exists() {
@@ -72,7 +75,7 @@ describe("projectTable", () => {
     server = await new Promise(resolve => {
       junieExplorer.listen(0, resolve)
     })
-    browser = await chromium.launch({ headless: true, /*slowMo: 1000*/ })
+    browser = await chromium.launch({ headless: false, slowMo: 2000 })
   })
 
   beforeEach(async () => {
