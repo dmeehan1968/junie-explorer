@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "bun:test"
-import { jetBrainsTestInstance, testPage, testServerAddress } from "../../test.setup.js"
+import { testServer } from "../../test.setup.js"
 import { ProjectTableDSL } from "./projectTable.dsl.js"
 
 describe("projectTable", () => {
@@ -7,11 +7,13 @@ describe("projectTable", () => {
   let projectTable: ProjectTableDSL
 
   beforeEach(async () => {
+    const { testPage, testServerAddress } = await testServer()
     projectTable = new ProjectTableDSL(testPage, testServerAddress)
     await projectTable.navigateTo()
   })
 
   it('should exist', async () => {
+    const { jetBrainsTestInstance } = await testServer()
     expect(projectTable.exists).resolves.toBe(true)
     expect(projectTable.rowCount).resolves.toEqual((await jetBrainsTestInstance.projects).size)
   })

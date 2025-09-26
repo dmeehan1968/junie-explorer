@@ -5,25 +5,25 @@ import { BrowserContext } from "playwright"
 import { JunieExplorer } from "./src/app/junieExplorer.js"
 import { JetBrains } from "./src/jetbrains.js"
 
-let browser: Browser
-let context: BrowserContext
-export let testPage: Page
-let junieExplorer: JunieExplorer
-let server: Server
-export let testServerAddress: string
-export let jetBrainsTestInstance: JetBrains
+let browser: Browser | undefined
+let context: BrowserContext | undefined
+export let testPage: Page | undefined
+let junieExplorer: JunieExplorer | undefined
+let server: Server | undefined
+export let testServerAddress: string | undefined
+export let jetBrainsTestInstance: JetBrains | undefined
 
-beforeAll(async () => {
+export async function testServer() {
   if (!jetBrainsTestInstance) {
     jetBrainsTestInstance = new JetBrains({ logPath: './fixtures' })
     await jetBrainsTestInstance.preload()
   }
   junieExplorer ??= new JunieExplorer(jetBrainsTestInstance)
   server ??= await new Promise(resolve => {
-    junieExplorer.listen(0, resolve)
+    junieExplorer!.listen(0, resolve)
   })
   if (!testServerAddress) {
-    const address = server.address()
+    const address = server!.address()
     if (address === null || typeof address === 'string') {
       throw new Error('Server failed to start - ' + address)
     }
@@ -32,14 +32,17 @@ beforeAll(async () => {
   browser ??= await chromium.launch({ headless: true, /*slowMo: 2000*/ })
   context ??= await browser.newContext()
   testPage ??= await context.newPage()
-})
 
-afterAll(async () => {
-  await browser.close()
-  await new Promise(resolve => {
-    server.close(() => resolve(undefined))
-  })
-  await testPage.close()
-  await context.close()
-})
+  return { browser, context, testPage, server, testServerAddress, jetBrainsTestInstance }
+}
 
+export async function testServerCleanup() {
+  await browser?.close()
+  await testPage?.close()
+  await context?.close()
+
+  browser = testPage = context = testServerAddress = undefined
+}
+
+beforeAll(testServer)
+afterAll(testServerCleanup)
