@@ -244,6 +244,64 @@ The application is designed to be run locally, but could be deployed to a server
 ## Requirements Documentation
 Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth and documentation for the expected behavior of the application.
 
+## Unit Testing
+
+- Uses Playwright as an end-to-end test runner
+- Test suites are organized according to feature/UI Component
+- Test suites a per-feature domain-specific language (DSL) to abstract the Playwright API and make the tests more human readable
+
+Example DSL (named `<component>.dsl.ts` and co-located with the component)
+```ts
+import { Page } from "@playwright/test"
+import { test as base } from "playwright/test"
+
+export class ComponentNameDSL {
+  constructor(private readonly page: Page) {
+  }
+
+  // Navigate to the page that contains the element (default to at least one page on which it appears)
+  navigateTo(url: string = '/') {
+    return this.page.goto(url)
+  }
+  
+  // utility functions to manipulate the page
+  async search(text: string) {
+    await (await this.searchInput).fill(text)
+  }  
+  
+  // element getters return Locator
+  get nameColumn() {
+    return this.page.locator('table td:nth-child(1)')
+  }
+  
+  get searchInput() {
+    return this.page.locator('input#search')
+  }
+}
+
+// Always export a test function that supplied the DSL as a parameter
+export const test = base.extend<{ componentName: ComponentNameDSL }>({
+  componentName: async ({ page }, use) => {
+    await use(new ComponentNameDSL(page))
+  }
+})
+
+```
+
+Example Test (named `<component>.test.ts` and co-located with the component)
+```ts
+import { test, expect } from "@playwright/test"
+import { test } from "./<component>.dsl.js"
+
+test.describe('ComponentName', async () => {
+  
+  test('should be visible', async ({ componentName }) => {
+    await expect(componentName.id).toBeVisible()
+  })
+  
+  // etc.
+})
+```
 ## Version Control
 
 Do NOT commit changes unless explicitly requested.  If in any doubt, ask the user for confirmation
