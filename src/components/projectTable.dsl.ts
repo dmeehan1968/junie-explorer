@@ -14,7 +14,7 @@ export class ProjectTableDSL {
   }
 
   async search(text: string): Promise<void> {
-    await this.page.fill('input[data-testid="project-search"]', text)
+    await this.searchInput.fill(text)
     await this.page.waitForFunction(async (text) => {
       const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('#projects-table tbody tr'))
       return rows.length > 0 && rows.every(row => {
@@ -41,6 +41,34 @@ export class ProjectTableDSL {
 
   get visibleRowCount() {
     return this.page.$$eval('#projects-table tbody tr >> visible=true', rows => rows.length)
+  }
+
+  get selectAllButton() {
+    return this.page.getByRole('checkbox', { name: 'Select All' })
+  }
+
+  get nameColumn() {
+    return this.page.locator('#projects-table thead th:nth-child(2)', { hasText: /Name/ })
+  }
+
+  get searchInput() {
+    return this.page.locator('input[data-testid="project-search"]')
+  }
+
+  get lastUpdatedColumn() {
+    return this.page.locator('#projects-table thead th', { hasText: /Last Updated/ })
+  }
+
+  get issueCountColumn() {
+    return this.page.locator('#projects-table thead th', { hasText: /Issues/ })
+  }
+
+  get llmIconColumn() {
+    return this.page.locator('#projects-table thead th', { hasText: /LLM/ })
+  }
+
+  get ideIconColumn() {
+    return this.page.locator('#projects-table thead th', { hasText: /IDEs/ })
   }
 
 }
