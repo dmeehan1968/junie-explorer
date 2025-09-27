@@ -1,13 +1,16 @@
 import { Page } from "@playwright/test"
+import { test as base } from "playwright/test"
 
 export class ProjectTableDSL {
-
-  constructor(private readonly page: Page, private readonly baseUrl: string) {
+  constructor(private readonly page: Page) {
   }
 
-  async navigateTo(url: string = '/'): Promise<void> {
-    const target = new URL(url, this.baseUrl).toString()
-    await this.page.goto(target)
+  navigateTo(url: string = '/') {
+    return this.page.goto(url)
+  }
+
+  get exists() {
+    return this.page.isVisible('#projects-table')
   }
 
   async search(text: string): Promise<void> {
@@ -22,14 +25,9 @@ export class ProjectTableDSL {
   }
 
   async selectRow(index: number): Promise<void> {
-    await this.page.locator(`#projects-table tbody tr:nth-child(${index})`)
-      .nth(index - 1)
-      .locator('input.project-checkbox')
+    await this.page
+      .locator(`#projects-table tbody tr:nth-child(${index}) input.project-checkbox`)
       .click()
-  }
-
-  get exists() {
-    return this.page.isVisible('#projects-table')
   }
 
   get rowCount() {
@@ -44,4 +42,12 @@ export class ProjectTableDSL {
   get visibleRowCount() {
     return this.page.$$eval('#projects-table tbody tr >> visible=true', rows => rows.length)
   }
+
 }
+
+export const test = base.extend<{ projectTable: ProjectTableDSL }>({
+  projectTable: async ({ page }, use) => {
+    await use(new ProjectTableDSL(page))
+  }
+})
+
