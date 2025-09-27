@@ -9,7 +9,7 @@ export class ProjectTableDSL {
     return this.page.goto(url)
   }
 
-  get exists() {
+  get isVisible() {
     return this.page.isVisible('#projects-table')
   }
 

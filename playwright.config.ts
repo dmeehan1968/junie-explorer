@@ -11,6 +11,7 @@ export default defineConfig({
     // stderr: 'pipe',
     // stdout: 'pipe',
   },
+  workers: 10,
   use: {
     headless: true,
   }

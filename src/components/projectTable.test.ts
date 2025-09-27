@@ -8,7 +8,7 @@ test.describe('ProjectTable', async () => {
   })
 
   test('should exist', async ({ page, projectTable }) => {
-    await expect(projectTable.exists).resolves.toEqual(true)
+    await expect(projectTable.isVisible).resolves.toEqual(true)
   })
 
   test('should have one or more projects', async ({ projectTable }) => {
