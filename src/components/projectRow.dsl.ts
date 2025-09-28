@@ -1,24 +1,24 @@
-import { Page } from "@playwright/test"
+import { Locator } from "@playwright/test"
 
 export class ProjectRowDSL {
-  constructor(private readonly page: Page, private readonly index: number) {
-  }
-
-  private get row() {
-    return this.page.locator('#projects-table tbody tr.project-row').nth(this.index)
+  constructor(private readonly row: Locator) {
   }
 
   get element() {
     return this.row
   }
 
+  locator(selectorOrLocator: string | Locator): Locator {
+    return this.row.locator(selectorOrLocator)
+  }
+
   // The name cell contains the project name and should navigate to the project route
   get nameCell() {
-    return this.row.locator('td:has([data-testid="project-name"])')
+    return this.locator('td:has([data-testid="project-name"])')
   }
 
   get nameEl() {
-    return this.row.locator('[data-testid="project-name"]')
+    return this.locator('[data-testid="project-name"]')
   }
 
   // Optional anchor inside the name cell
@@ -31,15 +31,15 @@ export class ProjectRowDSL {
   }
 
   get checkbox() {
-    return this.row.locator('input.project-checkbox')
+    return this.locator('input.project-checkbox')
   }
 
   get updatedCell() {
-    return this.row.locator('td[data-updated-ts]')
+    return this.locator('td[data-updated-ts]')
   }
 
   get llmCell() {
-    return this.row.locator('td[data-updated-ts] + td + td')
+    return this.locator('td[data-updated-ts] + td + td')
   }
 
   get llmIcons() {
@@ -47,7 +47,7 @@ export class ProjectRowDSL {
   }
 
   get ideIcons() {
-    return this.row.locator('[data-testid="ide-icons"] img')
+    return this.locator('[data-testid="ide-icons"] img')
   }
 
   async getNameText(): Promise<string> {
@@ -62,10 +62,6 @@ export class ProjectRowDSL {
   async getIssuesText(): Promise<string> {
     const txt = await this.row.locator('td[data-updated-ts] + td span').textContent()
     return (txt || '').trim()
-  }
-
-  async getDataAttribute(name: string): Promise<string | null> {
-    return this.row.getAttribute(name)
   }
 
   async getNameCellOnclick(): Promise<string | null> {

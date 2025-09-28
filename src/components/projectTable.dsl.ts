@@ -77,12 +77,14 @@ export class ProjectTableDSL {
   }
 
   async getRowAt(index: number): Promise<ProjectRowDSL> {
-    return new ProjectRowDSL(this.page, index)
+    const rowLocator = this.page.locator('#projects-table tbody tr.project-row').nth(index)
+    return new ProjectRowDSL(rowLocator)
   }
 
   async getAllRows(): Promise<ProjectRowDSL[]> {
-    const count = await this.projectRowCount()
-    return Array.from({ length: count }, (_, i) => new ProjectRowDSL(this.page, i))
+    const rowsLocator = this.page.locator('#projects-table tbody tr.project-row')
+    const count = await rowsLocator.count()
+    return Array.from({ length: count }, (_, i) => new ProjectRowDSL(rowsLocator.nth(i)))
   }
 }
 
