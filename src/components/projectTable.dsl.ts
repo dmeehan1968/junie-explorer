@@ -1,5 +1,6 @@
 import { Page } from "@playwright/test"
 import { test as base } from "playwright/test"
+import { ProjectRowDSL } from "./projectRow.dsl.js"
 
 export class ProjectTableDSL {
   constructor(private readonly page: Page) {
@@ -71,6 +72,18 @@ export class ProjectTableDSL {
     return this.page.locator('#projects-table thead th', { hasText: /IDEs/ })
   }
 
+  async projectRowCount(): Promise<number> {
+    return this.page.locator('#projects-table tbody tr.project-row').count()
+  }
+
+  async getRowAt(index: number): Promise<ProjectRowDSL> {
+    return new ProjectRowDSL(this.page, index)
+  }
+
+  async getAllRows(): Promise<ProjectRowDSL[]> {
+    const count = await this.projectRowCount()
+    return Array.from({ length: count }, (_, i) => new ProjectRowDSL(this.page, i))
+  }
 }
 
 export const test = base.extend<{ projectTable: ProjectTableDSL }>({
