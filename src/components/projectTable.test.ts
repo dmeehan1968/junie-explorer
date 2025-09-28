@@ -26,7 +26,7 @@ test.describe('ProjectTable', async () => {
     expect(rows.length).toBeGreaterThan(0)
     for (const row of rows) {
       await expect(row.element).toHaveAttribute('data-testid', 'project-item')
-      await expect(row.element).toHaveAttribute('data-ides', /\[.*\]/)
+      await expect(row.element).toHaveAttribute('data-ides', /\[.*]/)
     }
   })
 

@@ -31,15 +31,6 @@ export class ProjectTableDSL {
       .click()
   }
 
-  get rowCount() {
-    return this.page.$$eval('#projects-table tbody tr', rows => rows.length)
-  }
-
-  get selectedRowCount() {
-    const selector = '#projects-table tbody tr input.project-checkbox:checked'
-    return this.page.waitForSelector(selector).then(() => this.page.locator(selector).count())
-  }
-
   get visibleRowCount() {
     return this.page.$$eval('#projects-table tbody tr >> visible=true', rows => rows.length)
   }
@@ -70,15 +61,6 @@ export class ProjectTableDSL {
 
   get ideIconColumn() {
     return this.page.locator('#projects-table thead th', { hasText: /IDEs/ })
-  }
-
-  async projectRowCount(): Promise<number> {
-    return this.page.locator('#projects-table tbody tr.project-row').count()
-  }
-
-  async getRowAt(index: number): Promise<ProjectRowDSL> {
-    const rowLocator = this.page.locator('#projects-table tbody tr.project-row').nth(index)
-    return new ProjectRowDSL(rowLocator)
   }
 
   async getAllRows(): Promise<ProjectRowDSL[]> {
