@@ -246,9 +246,12 @@ Requirements for this project are documented using Gherkin feature files located
 
 ## Unit Testing
 
-- Uses Playwright as an end-to-end test runner
+- Uses Playwright as the end-to-end test runner
 - Test suites are organized according to feature/UI Component
 - Test suites a per-feature domain-specific language (DSL) to abstract the Playwright API and make the tests more human readable
+- Colocate the test suite with the component
+- To test locally use `bun run test`.  Use the argument `--grep <pattern>` to run focussed tests
+- To test interactively, use `bun run test:ui`
 
 Example DSL (named `<component>.dsl.ts` and co-located with the component)
 ```ts
@@ -302,6 +305,7 @@ test.describe('ComponentName', async () => {
   // etc.
 })
 ```
+
 ## Version Control
 
 Do NOT commit changes unless explicitly requested.  If in any doubt, ask the user for confirmation
