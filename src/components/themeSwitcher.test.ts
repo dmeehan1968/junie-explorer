@@ -7,10 +7,6 @@ const expectedThemes = [
 
 test.describe('ThemeSwitcher', async () => {
 
-  test.beforeEach(async ({ page }) => {
-    await page.context().clearCookies()
-  })
-
   for (const { location, url } of [
     { location: 'Home', url: '/' },
     { location: 'Project', url: '/project/default.999999' },
