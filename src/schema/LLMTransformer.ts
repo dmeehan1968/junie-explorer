@@ -4,6 +4,7 @@
 import * as z from "zod"
 import { AnthropicSonnet37 } from "./anthropicSonnet37.js"
 import { AnthropicSonnet4 } from "./anthropicSonnet4.js"
+import { AnthropicSonnet45 } from "./anthropicSonnet45.js"
 import { AutoSelectedLlm } from "./AutoSelectedLlm.js"
 import { OpenAI41Mini } from "./openAI41Mini.js"
 import { OpenAI4oMini } from "./openAI4oMini.js"
@@ -78,6 +79,9 @@ export const LLMTransformer = z.any().transform(data => {
   }
   if (AnthropicSonnet4.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return AnthropicSonnet4.parse(data)
+  }
+  if (AnthropicSonnet45.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return AnthropicSonnet45.parse(data)
   }
   if (AutoSelectedLlm.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
     return AutoSelectedLlm.parse({
