@@ -13,7 +13,8 @@ export type JunieChain = z.infer<typeof JunieChainSchema>
 
 export const JuniePlanSchema = z.looseObject({
   description: z.string(),
-  status: z.enum(['DONE', 'IN_PROGRESS', 'PENDING', 'ERROR', 'CANCELLED']),
+  status: z.enum(['DONE', 'IN_PROGRESS', 'PENDING', 'ERROR', 'CANCELLED', 'CANCELED'])
+    .transform((status => status === 'CANCELED' ? 'CANCELLED' : status)),
 })
 export type JuniePlan = z.infer<typeof JuniePlanSchema>
 
