@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2025-09-30
+
+### Added
+- Add support for AnthropicSonnet45 in schema and transformer (ba4ea3d)
+- Add `CANCELLED` status to `JuniePlanSchema` (31ec4f2)
+
+### Changed
+- Switch to `<img>` for IDE icons in `projectRoutes.tsx` (d92305e)
+
+### Fixed
+- Fix conditional logic and metrics display in project table (2ed760e)
+- Fix LLM icon rendering for better dark/light mode compatibility (cef02e1)
+
+### Removed
+- Remove `jetBrainsPath` utility and related references (aed9383)
+
 ## [3.2.0] - 2025-09-19
 
 ### Added
