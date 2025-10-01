@@ -1,35 +1,26 @@
 import { Html } from "@kitajs/html"
 import express from 'express'
-import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../types.js"
-import { Issue } from "../../Issue.js"
-import { Project } from "../../Project.js"
 import { AppBody } from "../../components/appBody.js"
 import { AppHead } from "../../components/appHead.js"
 import { AppHeader } from "../../components/appHeader.js"
 import { Breadcrumb } from '../../components/breadcrumb.js'
-import { Conditional } from "../../components/conditional.js"
+import { CostChart } from "../../components/costChart.js"
 import { HtmlPage } from "../../components/htmlPage.js"
-import { escapeHtml } from "../../utils/escapeHtml.js"
-import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
+import { IssuesTable } from "../../components/issuesTable.js"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { StatsButton } from '../../components/statsButton.js'
-import { StatusBadge } from "../../components/statusBadge.js"
-import { formatElapsedTime, formatNumber, formatSeconds } from '../../utils/timeUtils.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
-import { buildAssistantProviders } from '../../utils/assistantProviders.js'
+import { Issue } from "../../Issue.js"
+import { Project } from "../../Project.js"
+import { escapeHtml } from "../../utils/escapeHtml.js"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
+import { AppRequest, AppResponse } from "../types.js"
 
 const router = express.Router({ mergeParams: true })
 
 router.use('/project/:projectId', entityLookupMiddleware)
-
-// No Issues Message Component
-const NoIssuesMessage = () => (
-  <p class="p-4 text-center text-base-content/70" data-testid="no-issues-message">
-    No issues found for this project
-  </p>
-)
 
 // IDE Icons Component
 const IdeIcons = ({ project, jetBrains }: { project: Project, jetBrains: any }) => (
@@ -44,278 +35,6 @@ const IdeIcons = ({ project, jetBrains }: { project: Project, jetBrains: any }) 
     ))}
   </div>
 )
-
-// Cost Chart Component
-const CostChart = ({ condition }: { condition: boolean }) => (
-  <Conditional condition={condition}>
-    <div class="h-96 mb-5 p-4 bg-base-200 rounded-lg border border-base-300" data-testid="cost-over-time-graph">
-      <canvas id="costOverTimeChart"></canvas>
-    </div>
-  </Conditional>
-)
-
-// Issue Row Component
-const IssueRow = async ({ issue, project, locale }: { issue: Issue, project: Project, locale: string | undefined }) => {
-  const tasks = await issue.tasks
-  const hasTasks = tasks.size > 0
-  const href = hasTasks
-    ? `/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/0/trajectories`
-    : `/project/${encodeURIComponent(project.name)}`
-  const metrics = await issue.metrics
-  const assistantProvidersRaw = Array.from(await issue.assistantProviders)
-  const assistantProviders = buildAssistantProviders(assistantProvidersRaw)
-
-  return (
-    <tr class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
-      <Conditional condition={project.hasMetrics}>
-        <td class="text-center align-top py-3 px-2">
-          <input 
-            type="checkbox" 
-            class="checkbox checkbox-sm issue-select" 
-            aria-label="Select issue for comparison"
-            data-issue-id={escapeHtml(issue.id)}
-            data-issue-name={escapeHtml(issue.name)}
-            data-input-tokens={metrics.inputTokens}
-            data-output-tokens={metrics.outputTokens}
-            data-cache-tokens={metrics.cacheTokens}
-            data-cost={metrics.cost}
-            data-time-ms={metrics.time}
-            onclick="event.stopPropagation()"
-          />
-        </td>
-      </Conditional>
-      <td 
-        class="text-left whitespace-normal break-words w-2/5 align-top py-3 px-2" 
-        data-testid="issue-description" 
-        role="link" 
-        tabindex="0" 
-        onclick={`window.location.href='${href}'`} 
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-      >
-        <span class="font-bold text-primary">{escapeHtml(issue.name)}</span>
-        <span class="text-neutral/50">{tasks.size > 1 ? `(${tasks.size})` : ''}</span>
-      </td>
-      <td 
-        class="text-left whitespace-nowrap" 
-        data-testid="issue-timestamp" 
-        role="link" 
-        tabindex="0" 
-        onclick={`window.location.href='${href}'`} 
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-      >
-        {new Date(issue.created).toLocaleString(locale)}
-      </td>
-      <Conditional condition={project.hasMetrics}>
-        <td 
-          class="text-right whitespace-nowrap" 
-          data-testid="issue-input-tokens" 
-          role="link" 
-          tabindex="0" 
-          onclick={`window.location.href='${href}'`} 
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-        >
-          {formatNumber(metrics.inputTokens)}
-        </td>
-        <td 
-          class="text-right whitespace-nowrap" 
-          data-testid="issue-output-tokens" 
-          role="link" 
-          tabindex="0" 
-          onclick={`window.location.href='${href}'`} 
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-        >
-          {formatNumber(metrics.outputTokens)}
-        </td>
-        <td 
-          class="text-right whitespace-nowrap" 
-          data-testid="issue-cache-tokens" 
-          role="link" 
-          tabindex="0" 
-          onclick={`window.location.href='${href}'`} 
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-        >
-          {formatNumber(metrics.cacheTokens)}
-        </td>
-        <td 
-          class="text-right whitespace-nowrap" 
-          data-testid="issue-cost" 
-          role="link" 
-          tabindex="0" 
-          onclick={`window.location.href='${href}'`} 
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-        >
-          {metrics.cost.toFixed(4)}
-        </td>
-      </Conditional>
-      <td 
-        class="text-right whitespace-nowrap" 
-        data-testid="issue-total-time" 
-        role="link" 
-        tabindex="0" 
-        onclick={`window.location.href='${href}'`} 
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-      >
-        {formatSeconds(metrics.time / 1000)}
-      </td>
-      <td 
-        class="text-right whitespace-nowrap" 
-        data-testid="issue-status" 
-        role="link" 
-        tabindex="0" 
-        onclick={`window.location.href='${href}'`} 
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-      >
-        <StatusBadge state={issue.state} />
-      </td>
-      <td 
-        class="text-left whitespace-normal break-words align-middle py-3 px-2"
-        data-testid="issue-assistant-providers" 
-        role="link" 
-        tabindex="0" 
-        onclick={`window.location.href='${href}'`} 
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
-      >
-        {assistantProviders.length ? (
-          <div class="flex items-center gap-2">
-            {assistantProviders.map(({ provider, jbaiTitles }) => {
-              const fileName = encodeURIComponent(provider).replace(/%20/g, ' ')
-              const src = `/icons/${fileName}.svg`
-              const title = jbaiTitles || provider
-              return (
-                <div
-                  class="h-4 w-4 inline-block text-base-content"
-                  style={`background-color: currentColor; mask: url('${src}') no-repeat center / contain; -webkit-mask: url('${src}') no-repeat center / contain;`}
-                  role="img"
-                  aria-label={`${provider} icon`}
-                  title={title}
-                />
-              )
-            })}
-          </div>
-        ) : '-'}
-      </td>
-    </tr>
-  )
-}
-
-// Issues Table Component
-const IssuesTable = async ({ project, locale }: { project: Project, locale: string | undefined }) => {
-  const issuesCount = (await project.issues).size
-
-  if (issuesCount === 0) {
-    return <NoIssuesMessage />
-  }
-
-  const sortedIssues = [...(await project.issues).values()].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
-  const oldestIssue = sortedIssues[sortedIssues.length - 1]
-  const newestIssue = sortedIssues[0]
-  const elapsedTimeMs = new Date(newestIssue.created).getTime() - new Date(oldestIssue.created).getTime()
-  const elapsedTimeSec = elapsedTimeMs / 1000
-  const metrics = await project.metrics
-  
-  return (
-    <div class="mb-5 bg-base-200 rounded shadow-sm p-4">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-primary">{issuesCount} Project Issue{issuesCount !== 1 ? 's' : ''}</h3>
-        <span class="font-bold text-base-content" data-testid="summary-elapsed-time">Elapsed Time: {formatElapsedTime(elapsedTimeSec)}</span>
-      </div>
-      <div class="overflow-x-auto">
-        <Conditional condition={!project.hasMetrics}>
-          <div class="bg-base-content/10 p-4 rounded mb-4">
-            This project does not contain token or cost metrics, which means that it is most likely created by the 
-            Junie General Availability (GA) plugin which does not collect metrics.
-          </div>
-        </Conditional>
-        <Conditional condition={project.hasMetrics}>
-          <div class="flex items-center justify-between mb-3">
-            <div class="text-sm opacity-70">Select at least two issues to enable compare</div>
-            <button id="compareBtn" class="btn btn-primary btn-sm" disabled data-testid="compare-button">Compare</button>
-          </div>
-        </Conditional>
-        <table class="table table-zebra w-full bg-base-100" data-testid="issues-table">
-          <thead>
-            <tr class="!bg-base-200">
-              <Conditional condition={project.hasMetrics}>
-                <th class="w-10 text-center align-middle">
-                  <input type="checkbox" id="selectAllIssues" class="checkbox checkbox-sm" aria-label="Select all issues" />
-                </th>
-              </Conditional>
-              <th class="text-left w-2/5 whitespace-nowrap">Issue Description</th>
-              <th class="text-left whitespace-nowrap">Timestamp</th>
-              <Conditional condition={project.hasMetrics}>
-                <th class="text-right whitespace-nowrap">Input Tokens</th>
-                <th class="text-right whitespace-nowrap">Output Tokens</th>
-                <th class="text-right whitespace-nowrap">Cache Tokens</th>
-                <th class="text-right whitespace-nowrap">Cost</th>
-              </Conditional>
-              <th class="text-right whitespace-nowrap">Time</th>
-              <th class="text-right whitespace-nowrap">Status</th>
-              <th class="text-left whitespace-nowrap">LLM</th>
-            </tr>
-            <tr class="!bg-base-200 font-bold text-base-content">
-              <Conditional condition={project.hasMetrics}>
-                <td></td>
-              </Conditional>
-              <td class="text-left whitespace-nowrap" data-testid="header-summary-label">Project Summary</td>
-              <td class="text-left whitespace-nowrap"></td>
-              <Conditional condition={project.hasMetrics}>
-                <td class="text-right whitespace-nowrap" data-testid="header-summary-input-tokens">{formatNumber(metrics.inputTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="header-summary-output-tokens">{formatNumber(metrics.outputTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="header-summary-cache-tokens">{formatNumber(metrics.cacheTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="header-summary-cost">{metrics.cost.toFixed(2)}</td>
-              </Conditional>
-              <td class="text-right whitespace-nowrap" data-testid="header-summary-total-time">{formatSeconds(metrics.time / 1000)}</td>
-              <td class="text-right whitespace-nowrap"></td>
-              <td class="text-left whitespace-nowrap"></td>
-            </tr>
-          </thead>
-          <tbody>
-            {await Promise.all(sortedIssues.map(async issue => (
-              <IssueRow issue={issue} project={project} locale={locale} />
-            )))}
-          </tbody>
-          <tfoot>
-            <tr class="!bg-base-200 font-bold text-base-content">
-              <Conditional condition={project.hasMetrics}>
-                <td></td>
-              </Conditional>
-              <td class="text-left whitespace-nowrap" data-testid="summary-label">Project Summary</td>
-              <td class="text-left whitespace-nowrap"></td>
-              <Conditional condition={project.hasMetrics}>
-                <td class="text-right whitespace-nowrap" data-testid="summary-input-tokens">{formatNumber(metrics.inputTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="summary-output-tokens">{formatNumber(metrics.outputTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="summary-cache-tokens">{formatNumber(metrics.cacheTokens)}</td>
-                <td class="text-right whitespace-nowrap" data-testid="summary-cost">{metrics.cost.toFixed(2)}</td>
-              </Conditional>
-              <td class="text-right whitespace-nowrap" data-testid="summary-total-time">{formatSeconds(metrics.time / 1000)}</td>
-              <td class="text-right whitespace-nowrap"></td>
-              <td class="text-left whitespace-nowrap"></td>
-            </tr>
-          </tfoot>
-        </table>
-
-        <div id="compareModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-          <div class="bg-base-100 w-[95vw] h-[90vh] rounded-lg shadow-lg relative p-4" role="dialog" aria-modal="true">
-            <button id="closeCompareModal" class="btn btn-sm btn-circle absolute right-3 top-3" aria-label="Close">✕</button>
-            <div class="mb-3 flex items-center gap-4">
-              <span class="font-semibold">Metric:</span>
-              <div class="join" role="group" aria-label="Metric selection">
-                <Conditional condition={project.hasMetrics}>
-                  <button type="button" class="btn btn-sm join-item metric-btn" data-metric="input" aria-pressed="false">Input Tokens</button>
-                  <button type="button" class="btn btn-sm join-item metric-btn" data-metric="output" aria-pressed="false">Output Tokens</button>
-                  <button type="button" class="btn btn-sm join-item metric-btn" data-metric="cache" aria-pressed="false">Cache Tokens</button>
-                  <button type="button" class="btn btn-sm join-item metric-btn" data-metric="cost" aria-pressed="false">Cost</button>
-                </Conditional>
-                <button type="button" class="btn btn-sm join-item metric-btn" data-metric="time" aria-pressed={project.hasMetrics ? 'false' : 'true'}>Time</button>
-              </div>
-            </div>
-            <div class="h-[80%]"><canvas id="compareChart" class="w-full h-full"></canvas></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // Function to prepare data for the cost over time graph
 async function prepareGraphData(issues: Issue[]): Promise<{ labels: string[], datasets: any[], timeUnit: string, stepSize: number }> {
