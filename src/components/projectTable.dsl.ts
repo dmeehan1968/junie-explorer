@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test"
+import { Page, Locator } from "@playwright/test"
 import { test as base } from "playwright/test"
 import { ProjectRowDSL } from "./projectRow.dsl.js"
 
@@ -32,7 +32,11 @@ export class ProjectTableDSL {
   }
 
   get visibleRowCount() {
-    return this.page.$$eval('#projects-table tbody tr >> visible=true', rows => rows.length)
+    return this.page.locator('#projects-table tbody tr >> visible=true').count()
+  }
+
+  get totalRowCount() {
+    return this.page.locator('#projects-table tbody tr').count()
   }
 
   get selectAllButton() {
@@ -44,7 +48,7 @@ export class ProjectTableDSL {
   }
 
   get searchInput() {
-    return this.page.locator('input[data-testid="project-search"]')
+    return this.page.getByTestId('project-search')
   }
 
   get lastUpdatedColumn() {
@@ -61,6 +65,10 @@ export class ProjectTableDSL {
 
   get ideIconColumn() {
     return this.page.locator('#projects-table thead th', { hasText: /IDEs/ })
+  }
+
+  get noMatchingProjects(): Locator {
+    return this.page.getByTestId('no-matching-projects')
   }
 
   async getAllRows(): Promise<ProjectRowDSL[]> {
