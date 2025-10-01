@@ -12,7 +12,7 @@ test.describe('ThemeSwitcher', async () => {
     { location: 'Project', url: '/project/default.999999' },
     { location: 'Trajectories', url: '/project/default.999999/issue/d9210e84-2af4-4e45-a383-cee37492c8e6/task/0/trajectories' },
     { location: 'Events', url: '/project/default.999999/issue/d9210e84-2af4-4e45-a383-cee37492c8e6/task/0/events' },
-    { location: 'Stats', url: 'http://localhost:4000/stats' },
+    { location: 'Stats', url: '/stats' },
   ]) {
     test(`${location} should have a theme switcher button`, async ({ themeSwitcher }) => {
       await themeSwitcher.navigateTo(url)
