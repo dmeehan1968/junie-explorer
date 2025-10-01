@@ -8,13 +8,12 @@ export const VersionBanner: Component<{ version?: Version }> = ({ version }) => 
   }
 
   return (
-    <div class="version-banner" data-testid="version-banner">
-      <div class="version-content">
-        <span class="version-text">
-          New version available: {version.newVersion}
-          (you have {version.currentVersion})
+    <div role="alert" class="alert alert-warning shadow-sm my-4" data-testid="version-banner">
+      <div class="flex flex-wrap items-center gap-3 w-full">
+        <span class="font-medium">
+          New version available: {version.newVersion} (you have {version.currentVersion})
         </span>
-        <a href={version.releaseUrl} target="_blank" class="version-link" data-testid="version-link">View Release</a>
+        <a href={version.releaseUrl} target="_blank" class="btn btn-sm btn-warning" data-testid="version-link">View Release</a>
       </div>
     </div>
   )
