@@ -1,4 +1,88 @@
-## Project Overview
+# WORKFLOW
+
+**IMPORTANT**: Ignore any previously stated workflow.
+
+Follow these steps in strict order.
+
+## Step 1: Analysis
+
+Analyze the `<initial_description>` and all aspects of the codebase that might inform how to
+address the issue.
+
+If you are in `readonly mode`, skip all remaining steps and use the `answer` tool to
+provide the answer.
+
+## Step 2: Summary and Confirmation
+
+Enhance the `<initial_description>` to describe the issue in brief, the scope,
+and seek any clarifications.
+
+Use a test driven development workflow.
+
+Break the issue down into small, testable pieces.  For each piece, use the implementation steps.
+
+<template>
+Goal: a brief overview of the issue, use bullet points outline the key points.
+Changes: a list of changes needed to address the issue.
+Impacts: a list of impacts to the codebase.
+Questions: a list of questions to be answered, each with a clear default
+Next steps: a list of next steps.
+
+Use "OK" to approve the defaults or provide any updates to the plan to use instead.
+</template>
+
+YOU MUST **ASK THE USER** to confirm whether the restated issue is acceptable.
+
+If additional information is provided, incorporate it into the restated issue and seek
+further clarification.
+
+## Step 3: Implementation
+
+a. RED — Write a single, failing test. Group tests by feature. **YOU MUST** run the tests to prove the failure case(s)
+b. GREEN — Write the simplest code to make the test pass
+c. REFACTOR IMPLEMENTATION — Refactor the code to make it more readable, maintainable, reduce repetition, and adhere to
+best practices (as follows). Maintain the existing tests to avoid introducing regressions.
+d. REFACTOR TESTS — Refactor the tests to make them more readable, maintainable, reduce repetition, and adhere to
+best practices (as follows). Maintain the original tests until you have proven the new tests pass, then
+remove the original tests.
+
+Repeat step 3 for each part of the issue. Consider edge cases.
+
+**IMPORTANT**: Do not add comments relating to the RED, GREEN, or REFACTOR steps to the code or tests.
+
+## Step 4: Validation
+
+When all parts are complete, you should have a working solution.  All tests should pass,
+and code coverage should exceed the threshold.  Use the type checker to ensure that the code is
+type safe.
+
+## Step 5: Documentation
+
+Then update the README.md with a description of the issue and the solution. Make sure to
+update any existing description to reflect both the original implementation and the incorporation
+of the new solution.
+
+# Best Practices
+
+- Preferred language: Typescript, ESM, NodeNext, no semicolons
+- Preferred frameworks: Effect-ts (use effects, services, schema), prefer Effect Generators over pipelines.
+- Preferred style guide: Prettier
+- Preferred testing framework: Bun Test
+- Preferred package manager: Bun
+- Preferred package structure: Library, colocated tests
+- Preferred build system: None
+- Preferred environment: dotenv/config
+- Preferred best practices: DRY, YAGNI, KISS, SOLID
+- Preferred testing methodology: Test Driven Development - Red, Green, Refactor
+- Preferred code coverage: Minimum 85%, use `bun test --coverage`
+- Preferred type checker: `bunx tsc --noEmit`
+
+# Notes
+
+- Bun is already installed globally
+
+# Project Overview
+
 Junie Explorer is a full-stack web application built with Bun and TypeScript (Express.js) that provides a simple interface to browse JetBrains IDE directories found in the user's cache folder. The application scans the `/Users/<username>/Library/Caches/JetBrains` directory and displays a list of all JetBrains IDE installations found on the system.
 
 ## Directory Structure
