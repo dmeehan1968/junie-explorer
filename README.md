@@ -134,9 +134,9 @@ This will start the server using ts-node, which compiles and runs TypeScript cod
 ## Testing
 To test the application functionality:
 ```bash
-npm test
+bun run test
 ```
-This will run a test script that checks if the JetBrains directory exists and lists all IDE directories found there.
+This will run the Playwright test suite.
 
 ## Miscellaneous
 

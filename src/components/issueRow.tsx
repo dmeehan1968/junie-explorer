@@ -50,7 +50,9 @@ export const IssueRow = async ({ issue, project, locale }: {
         onclick={`window.location.href='${href}'`}
         onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
-        <span class="font-bold text-primary">{escapeHtml(issue.name)}</span>
+        <a class="font-bold text-primary" href={href} data-testid="issue-description-link">
+          {escapeHtml(issue.name)}
+        </a>
         <span class="text-neutral/50">{tasks.size > 1 ? `(${tasks.size})` : ''}</span>
       </td>
       <td

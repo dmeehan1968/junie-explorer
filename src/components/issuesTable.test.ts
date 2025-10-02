@@ -1,4 +1,5 @@
-import { expect } from "@playwright/test"
+import { expect, Locator } from "@playwright/test"
+import { IssueRowDSL } from "./issueRow.dsl.js"
 import { test } from "./issuesTable.dsl.js"
 
 // Helper to assert numeric formatted string (digits, commas)
@@ -56,7 +57,7 @@ test.describe('IssuesTable', async () => {
   })
 
   test.describe('default project (with metrics and issues)', async () => {
-    test.beforeEach(async ({ issuesTable }) => {
+    test.beforeEach(async ({ issuesTable, context }) => {
       await issuesTable.navigateToProject('default.999999')
     })
 
@@ -98,17 +99,31 @@ test.describe('IssuesTable', async () => {
       const rows = await issuesTable.getAllRows()
       expect(rows.length).toBeGreaterThan(0)
       for (const row of rows) {
-        await expect(row.descriptionCell).toBeVisible()
-        await expect(row.timestampCell).toBeVisible()
-        await expect(row.totalTimeCell).toBeVisible()
-        await expect(row.statusCell).toBeVisible()
-        await expect(row.assistantProvidersCell).toBeVisible()
+        // Check that expected cells are visible and have onclick handlers to navigate to trajectories
+        for(const cell of ["descriptionCell", "timestampCell", "inputTokensCell", "outputTokensCell", "cacheTokensCell", "costCell", "totalTimeCell", "statusCell", "assistantProvidersCell"] as (keyof IssueRowDSL)[]) {
+          await expect((row[cell] as Locator)).toBeVisible()
+          await expect((row[cell] as Locator).getAttribute('onclick')).resolves.toMatch(/task\/0\/trajectories/)
+        }
 
-        // Metrics cells visible when metrics are present
-        await expect(row.inputTokensCell).toBeVisible()
-        await expect(row.outputTokensCell).toBeVisible()
-        await expect(row.cacheTokensCell).toBeVisible()
-        await expect(row.costCell).toBeVisible()
+        // Description cell should contain a link to the trajectories route and non-empty text
+        const link = row.descriptionCell.locator('a')
+        const linkCount = await link.count()
+        if (linkCount > 0) {
+          const href = (await link.first().getAttribute('href')) || ''
+          expect(href).toMatch(/\/project\/[^/]+\/issue\/[^/]+\/task\/0\/trajectories$/)
+        }
+
+        const trimmedLength = (text: string | null | undefined) => (text || '').trim().length
+
+        expect(trimmedLength(await row.descriptionCell.textContent())).toBeGreaterThan(0)
+        await expect(row.timestampCell.textContent()).resolves.toMatch(/\d{1,2}\/\d{1,2}\/\d{4}, \d{1,2}:\d{2}:\d{2} [AP]M/)
+        expect(isFormattedNumber(await row.inputTokensCell.textContent() ?? '')).toBeTruthy()
+        expect(isFormattedNumber(await row.outputTokensCell.textContent() ?? '')).toBeTruthy()
+        expect(isFormattedNumber(await row.cacheTokensCell.textContent() ?? '')).toBeTruthy()
+        expect(/^\d+\.(\d{4})$/.test(await row.costCell.textContent() ?? '')).toBeTruthy()
+        expect(isFormattedTime(await row.totalTimeCell.textContent() ?? '')).toBeTruthy()
+        expect(trimmedLength(await row.statusCell.textContent())).toBeGreaterThan(0)
+        await expect(row.assistantProvidersCell.getByRole('img').count()).resolves.toBeGreaterThan(0)
 
         // Checkbox is present for compare
         expect(await row.hasCheckbox()).toBeTruthy()
