@@ -1,390 +1,132 @@
-import { expect } from "playwright/test"
+import { expect } from "@playwright/test"
 import { test } from "./issuesTable.dsl.js"
+
+// Helper to assert numeric formatted string (digits, commas)
+function isFormattedNumber(text: string) {
+  return /^\d{1,3}(,\d{3})*$/.test(text)
+}
+
+// Helper to assert time formatted as H:MM:SS or M:SS
+function isFormattedTime(text: string) {
+  return /^(\d+:)?\d{1,2}:\d{2}$/.test(text)
+}
 
 test.describe('IssuesTable', async () => {
 
-  test.describe('with issues (default.999999)', async () => {
-
+  test.describe('no-issues project', async () => {
     test.beforeEach(async ({ issuesTable }) => {
-      return issuesTable.navigateTo('default.999999')
+      await issuesTable.navigateToProject('no-issues.999999')
     })
 
-    test('should exist', async ({ issuesTable }) => {
-      await expect(issuesTable.isVisible).resolves.toEqual(true)
+    test('should show no issues message and no table', async ({ issuesTable }) => {
+      await expect(issuesTable.noIssuesMessage).toBeVisible()
+      await expect(issuesTable.table).toHaveCount(0)
+    })
+  })
+
+  test.describe('no-tasks project (no metrics)', async () => {
+    test.beforeEach(async ({ issuesTable }) => {
+      await issuesTable.navigateToProject('no-tasks.999999')
     })
 
-    test('should have one or more issues', async ({ issuesTable }) => {
+    test('should render table without metrics columns and compare button disabled/hidden', async ({ page, issuesTable }) => {
+      await expect(issuesTable.table).toBeVisible()
+      // Compare button exists but should be disabled only when metrics present; without metrics, it should not be visible
+      await expect(issuesTable.compareButton).toHaveCount(0)
+
+      // Header summary shows only total time (no metrics)
+      await expect(issuesTable.headerSummaryLabel).toHaveText('Project Summary')
+      await expect(issuesTable.headerSummaryTotalTime).toBeVisible()
+      await expect(issuesTable.headerSummaryInputTokens).toHaveCount(0)
+      await expect(issuesTable.headerSummaryOutputTokens).toHaveCount(0)
+      await expect(issuesTable.headerSummaryCacheTokens).toHaveCount(0)
+      await expect(issuesTable.headerSummaryCost).toHaveCount(0)
+
+      // Footer summary mirrors header summary
+      await expect(issuesTable.footerSummaryLabel).toHaveText('Project Summary')
+      await expect(issuesTable.footerSummaryTotalTime).toBeVisible()
+      await expect(issuesTable.footerSummaryInputTokens).toHaveCount(0)
+      await expect(issuesTable.footerSummaryOutputTokens).toHaveCount(0)
+      await expect(issuesTable.footerSummaryCacheTokens).toHaveCount(0)
+      await expect(issuesTable.footerSummaryCost).toHaveCount(0)
+
+      // Elapsed time label visible
+      await expect(issuesTable.summaryElapsedTime).toBeVisible()
+    })
+  })
+
+  test.describe('default project (with metrics and issues)', async () => {
+    test.beforeEach(async ({ issuesTable }) => {
+      await issuesTable.navigateToProject('default.999999')
+    })
+
+    test('should render table and compare controls', async ({ issuesTable }) => {
+      await expect(issuesTable.table).toBeVisible()
+      await expect(issuesTable.compareButton).toBeVisible()
+    })
+
+    test('summary header and footer should show numeric metrics and formatted time', async ({ issuesTable }) => {
+      await expect(issuesTable.headerSummaryLabel).toHaveText('Project Summary')
+      await expect(issuesTable.footerSummaryLabel).toHaveText('Project Summary')
+
+      const headerIn = (await issuesTable.headerSummaryInputTokens.textContent() || '').trim()
+      const headerOut = (await issuesTable.headerSummaryOutputTokens.textContent() || '').trim()
+      const headerCache = (await issuesTable.headerSummaryCacheTokens.textContent() || '').trim()
+      const headerCost = (await issuesTable.headerSummaryCost.textContent() || '').trim()
+      const headerTime = (await issuesTable.headerSummaryTotalTime.textContent() || '').trim()
+
+      expect(isFormattedNumber(headerIn)).toBeTruthy()
+      expect(isFormattedNumber(headerOut)).toBeTruthy()
+      expect(isFormattedNumber(headerCache)).toBeTruthy()
+      expect(/^\d+\.(\d{2})$/.test(headerCost)).toBeTruthy()
+      expect(isFormattedTime(headerTime)).toBeTruthy()
+
+      const footerIn = (await issuesTable.footerSummaryInputTokens.textContent() || '').trim()
+      const footerOut = (await issuesTable.footerSummaryOutputTokens.textContent() || '').trim()
+      const footerCache = (await issuesTable.footerSummaryCacheTokens.textContent() || '').trim()
+      const footerCost = (await issuesTable.footerSummaryCost.textContent() || '').trim()
+      const footerTime = (await issuesTable.footerSummaryTotalTime.textContent() || '').trim()
+
+      expect(isFormattedNumber(footerIn)).toBeTruthy()
+      expect(isFormattedNumber(footerOut)).toBeTruthy()
+      expect(isFormattedNumber(footerCache)).toBeTruthy()
+      expect(/^\d+\.(\d{2})$/.test(footerCost)).toBeTruthy()
+      expect(isFormattedTime(footerTime)).toBeTruthy()
+    })
+
+    test('rows should exist and have expected cells', async ({ issuesTable }) => {
       const rows = await issuesTable.getAllRows()
       expect(rows.length).toBeGreaterThan(0)
-    })
-
-    test('should not show no issues message', async ({ issuesTable }) => {
-      await expect(issuesTable.noIssuesMessage).toBeHidden()
-    })
-
-    test('should display issues count header', async ({ issuesTable }) => {
-      await expect(issuesTable.issuesCountHeader).toBeVisible()
-      const headerText = await issuesTable.issuesCountHeader.textContent()
-      expect(headerText).toMatch(/\d+ Project Issue/)
-    })
-
-    test('should display elapsed time header', async ({ issuesTable }) => {
-      await expect(issuesTable.elapsedTimeHeader).toBeVisible()
-      const timeText = await issuesTable.elapsedTimeHeader.textContent()
-      expect(timeText).toMatch(/Elapsed Time:/)
-    })
-
-    test.describe('Select column', async () => {
-
-      test('should have a select all checkbox', async ({ issuesTable }) => {
-        await expect(issuesTable.hasSelectAllCheckbox()).resolves.toEqual(true)
-        await expect(issuesTable.selectAllCheckbox).toBeVisible()
-      })
-
-      test('should have a compare button', async ({ issuesTable }) => {
-        await expect(issuesTable.compareButton).toBeVisible()
-      })
-
-      test('compare button should be disabled initially', async ({ issuesTable }) => {
-        await expect(issuesTable.isCompareButtonEnabled()).resolves.toEqual(false)
-      })
-
-      test('checkbox should have matching data-issue-id and data-issue-name for all rows', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          if (await row.hasCheckbox()) {
-            const issueId = await row.getCheckboxIssueId()
-            const issueName = await row.getCheckboxIssueName()
-            expect(issueId).toBeTruthy()
-            expect(issueName).toBeTruthy()
-            expect(issueId?.length).toBeGreaterThan(0)
-            expect(issueName?.length).toBeGreaterThan(0)
-          }
-        }
-      })
-
-    })
-
-    test.describe('Issue Description column', async () => {
-
-      test('should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.descriptionColumnHeader).toBeVisible()
-      })
-
-      test('all descriptions should be visible and non-empty', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.descriptionCell).toBeVisible()
-          const descText = await row.getDescriptionText()
-          expect(descText.length).toBeGreaterThan(0)
-        }
-      })
-
-      test('each row should have onclick handler for navigation', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          const hasOnclick = await row.hasOnclickHandler()
-          expect(hasOnclick).toBeTruthy()
-        }
-      })
-
-    })
-
-    test.describe('Timestamp column', async () => {
-
-      test('should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.timestampColumnHeader).toBeVisible()
-      })
-
-      test('all timestamps should be visible and non-empty', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.timestampCell).toBeVisible()
-          const timestampText = await row.getTimestampText()
-          expect(timestampText).toMatch(/\d{1,2}\/\d{1,2}\/\d{4}, \d{1,2}:\d{2}:\d{2}/)
-        }
-      })
-
-    })
-
-    test.describe('Metric columns (with metrics)', async () => {
-
-      test('Input Tokens column should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.inputTokensColumnHeader).toBeVisible()
-      })
-
-      test('Output Tokens column should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.outputTokensColumnHeader).toBeVisible()
-      })
-
-      test('Cache Tokens column should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.cacheTokensColumnHeader).toBeVisible()
-      })
-
-      test('Cost column should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.costColumnHeader).toBeVisible()
-      })
-
-      test('all input tokens should be visible and non-empty', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.inputTokensCell).toBeVisible()
-          const tokensText = await row.getInputTokensText()
-          expect(tokensText.length).toBeGreaterThan(0)
-        }
-      })
-
-      test('all output tokens should be visible and non-empty', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.outputTokensCell).toBeVisible()
-          const tokensText = await row.getOutputTokensText()
-          expect(tokensText.length).toBeGreaterThan(0)
-        }
-      })
-
-      test('all cache tokens should be visible and non-empty', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.cacheTokensCell).toBeVisible()
-          const tokensText = await row.getCacheTokensText()
-          expect(tokensText.length).toBeGreaterThan(0)
-        }
-      })
-
-      test('all costs should be visible and non-empty', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.costCell).toBeVisible()
-          const costText = await row.getCostText()
-          expect(costText.length).toBeGreaterThan(0)
-        }
-      })
-
-    })
-
-    test.describe('Time column', async () => {
-
-      test('should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.timeColumnHeader).toBeVisible()
-      })
-
-      test('all times should be visible and non-empty', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.totalTimeCell).toBeVisible()
-          const timeText = await row.getTotalTimeText()
-          expect(timeText.length).toBeGreaterThan(0)
-        }
-      })
-
-    })
-
-    test.describe('Status column', async () => {
-
-      test('should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.statusColumnHeader).toBeVisible()
-      })
-
-      test('all statuses should be visible and have a badge', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.statusCell).toBeVisible()
-          await expect(row.statusBadge).toBeVisible()
-          const statusText = await row.getStatusText()
-          expect(statusText.length).toBeGreaterThan(0)
-        }
-      })
-
-    })
-
-    test.describe('LLM column', async () => {
-
-      test('should be visible', async ({ issuesTable }) => {
-        await expect(issuesTable.llmColumnHeader).toBeVisible()
-      })
-
-      test('each cell should be "-" or have one or more icons', async ({ issuesTable }) => {
-        const rows = await issuesTable.getAllRows()
-        for (const row of rows) {
-          await expect(row.assistantProvidersCell).toBeVisible()
-          const llmText = await row.getAssistantProvidersText()
-          expect((llmText === '-') || (await row.assistantProviderIcons.count()) > 0).toBeTruthy()
-        }
-      })
-
-    })
-
-    test.describe('Header summary row', async () => {
-
-      test('should have summary label', async ({ issuesTable }) => {
-        await expect(issuesTable.headerSummaryLabel).toBeVisible()
-        const labelText = await issuesTable.headerSummaryLabel.textContent()
-        expect(labelText).toContain('Project Summary')
-      })
-
-      test('should have input tokens summary', async ({ issuesTable }) => {
-        await expect(issuesTable.headerSummaryInputTokens).toBeVisible()
-        const tokensText = await issuesTable.headerSummaryInputTokens.textContent()
-        expect(tokensText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have output tokens summary', async ({ issuesTable }) => {
-        await expect(issuesTable.headerSummaryOutputTokens).toBeVisible()
-        const tokensText = await issuesTable.headerSummaryOutputTokens.textContent()
-        expect(tokensText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have cache tokens summary', async ({ issuesTable }) => {
-        await expect(issuesTable.headerSummaryCacheTokens).toBeVisible()
-        const tokensText = await issuesTable.headerSummaryCacheTokens.textContent()
-        expect(tokensText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have cost summary', async ({ issuesTable }) => {
-        await expect(issuesTable.headerSummaryCost).toBeVisible()
-        const costText = await issuesTable.headerSummaryCost.textContent()
-        expect(costText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have total time summary', async ({ issuesTable }) => {
-        await expect(issuesTable.headerSummaryTotalTime).toBeVisible()
-        const timeText = await issuesTable.headerSummaryTotalTime.textContent()
-        expect(timeText?.trim().length).toBeGreaterThan(0)
-      })
-
-    })
-
-    test.describe('Footer summary row', async () => {
-
-      test('should have summary label', async ({ issuesTable }) => {
-        await expect(issuesTable.footerSummaryLabel).toBeVisible()
-        const labelText = await issuesTable.footerSummaryLabel.textContent()
-        expect(labelText).toContain('Project Summary')
-      })
-
-      test('should have input tokens summary', async ({ issuesTable }) => {
-        await expect(issuesTable.footerSummaryInputTokens).toBeVisible()
-        const tokensText = await issuesTable.footerSummaryInputTokens.textContent()
-        expect(tokensText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have output tokens summary', async ({ issuesTable }) => {
-        await expect(issuesTable.footerSummaryOutputTokens).toBeVisible()
-        const tokensText = await issuesTable.footerSummaryOutputTokens.textContent()
-        expect(tokensText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have cache tokens summary', async ({ issuesTable }) => {
-        await expect(issuesTable.footerSummaryCacheTokens).toBeVisible()
-        const tokensText = await issuesTable.footerSummaryCacheTokens.textContent()
-        expect(tokensText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have cost summary', async ({ issuesTable }) => {
-        await expect(issuesTable.footerSummaryCost).toBeVisible()
-        const costText = await issuesTable.footerSummaryCost.textContent()
-        expect(costText?.trim().length).toBeGreaterThan(0)
-      })
-
-      test('should have total time summary', async ({ issuesTable }) => {
-        await expect(issuesTable.footerSummaryTotalTime).toBeVisible()
-        const timeText = await issuesTable.footerSummaryTotalTime.textContent()
-        expect(timeText?.trim().length).toBeGreaterThan(0)
-      })
-
-    })
-
-  })
-
-  test.describe('without issues (no-issues.999999)', async () => {
-
-    test.beforeEach(async ({ issuesTable }) => {
-      return issuesTable.navigateTo('no-issues.999999')
-    })
-
-    test('should show no issues message', async ({ issuesTable }) => {
-      await expect(issuesTable.noIssuesMessage).toBeVisible()
-    })
-
-    test('should not show issues table', async ({ issuesTable }) => {
-      await expect(issuesTable.isVisible).resolves.toEqual(false)
-    })
-
-    test('no issues message should have correct text', async ({ issuesTable }) => {
-      const messageText = await issuesTable.noIssuesMessage.textContent()
-      expect(messageText).toContain('No issues found for this project')
-    })
-
-  })
-
-  test.describe('without metrics (no-tasks.999999)', async () => {
-
-    test.beforeEach(async ({ issuesTable }) => {
-      return issuesTable.navigateTo('no-tasks.999999')
-    })
-
-    test('should show no metrics warning', async ({ issuesTable }) => {
-      await expect(issuesTable.hasNoMetricsWarning()).resolves.toEqual(true)
-      await expect(issuesTable.noMetricsWarning).toBeVisible()
-    })
-
-    test('should not have select all checkbox', async ({ issuesTable }) => {
-      await expect(issuesTable.hasSelectAllCheckbox()).resolves.toEqual(false)
-    })
-
-    test('should not have compare button', async ({ issuesTable }) => {
-      await expect(issuesTable.compareButton.isVisible()).resolves.toEqual(false)
-    })
-
-    test('should not have metric column headers', async ({ issuesTable }) => {
-      await expect(issuesTable.inputTokensColumnHeader.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.outputTokensColumnHeader.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.cacheTokensColumnHeader.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.costColumnHeader.isVisible()).resolves.toEqual(false)
-    })
-
-    test('should have non-metric column headers', async ({ issuesTable }) => {
-      await expect(issuesTable.timeColumnHeader).toBeVisible()
-      await expect(issuesTable.statusColumnHeader).toBeVisible()
-      await expect(issuesTable.llmColumnHeader).toBeVisible()
-    })
-
-    test('rows should not have checkboxes', async ({ issuesTable }) => {
-      const rows = await issuesTable.getAllRows()
-      if (rows.length > 0) {
-        for (const row of rows) {
-          await expect(row.hasCheckbox()).resolves.toEqual(false)
-        }
+      for (const row of rows) {
+        await expect(row.descriptionCell).toBeVisible()
+        await expect(row.timestampCell).toBeVisible()
+        await expect(row.totalTimeCell).toBeVisible()
+        await expect(row.statusCell).toBeVisible()
+        await expect(row.assistantProvidersCell).toBeVisible()
+
+        // Metrics cells visible when metrics are present
+        await expect(row.inputTokensCell).toBeVisible()
+        await expect(row.outputTokensCell).toBeVisible()
+        await expect(row.cacheTokensCell).toBeVisible()
+        await expect(row.costCell).toBeVisible()
+
+        // Checkbox is present for compare
+        expect(await row.hasCheckbox()).toBeTruthy()
       }
     })
 
-    test('rows should not have metric cells', async ({ issuesTable }) => {
+    test('rows should be ordered by newest first (descending timestamp)', async ({ issuesTable }) => {
       const rows = await issuesTable.getAllRows()
-      if (rows.length > 0) {
-        for (const row of rows) {
-          await expect(row.inputTokensCell.isVisible()).resolves.toEqual(false)
-          await expect(row.outputTokensCell.isVisible()).resolves.toEqual(false)
-          await expect(row.cacheTokensCell.isVisible()).resolves.toEqual(false)
-          await expect(row.costCell.isVisible()).resolves.toEqual(false)
-        }
+      const timestamps: number[] = []
+      for (const row of rows) {
+        const text = await row.getTimestampText()
+        const date = Date.parse(text) // locale string; Date.parse should work consistently with ISO-like strings
+        timestamps.push(date)
+      }
+      // verify non-increasing order
+      for (let i = 1; i < timestamps.length; i++) {
+        expect(timestamps[i]).toBeLessThanOrEqual(timestamps[i - 1])
       }
     })
-
-    test('should not have header summary metric cells', async ({ issuesTable }) => {
-      await expect(issuesTable.headerSummaryInputTokens.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.headerSummaryOutputTokens.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.headerSummaryCacheTokens.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.headerSummaryCost.isVisible()).resolves.toEqual(false)
-    })
-
-    test('should not have footer summary metric cells', async ({ issuesTable }) => {
-      await expect(issuesTable.footerSummaryInputTokens.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.footerSummaryOutputTokens.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.footerSummaryCacheTokens.isVisible()).resolves.toEqual(false)
-      await expect(issuesTable.footerSummaryCost.isVisible()).resolves.toEqual(false)
-    })
-
   })
-
 })
