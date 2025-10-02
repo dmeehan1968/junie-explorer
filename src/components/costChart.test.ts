@@ -12,6 +12,10 @@ test.describe("costChart", () => {
     test('should be visible', async ({ costChart }) => {
       await expect(costChart.element).toBeVisible()
     })
+
+    test('should match snapshot', async ({ costChart }) => {
+      await expect(costChart.element).toHaveScreenshot({ animations: "disabled" })
+    })
   })
 
   test.describe('without metrics (no-tasks.999999)', () => {
