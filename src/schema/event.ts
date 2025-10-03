@@ -23,14 +23,15 @@ import { LongDelayDetected } from "./longDelayDetected.js"
 import { McpInitFinished } from "./mcpInitFinished.js"
 import { McpInitStarted } from "./mcpInitStarted.js"
 import { PlanUpdatedEvent } from "./planUpdatedEvent.js"
+import { ResponseTextAppeared } from "./responseTextAppeared.js"
 import { SemanticCheckFinished } from "./semanticCheckFinished.js"
 import { SemanticCheckStarted } from "./semanticCheckStarted.js"
+import { SerializableEventSerializationError } from "./serializableEventSerializationError.js"
 import { StepMetaInfoAppearedEvent } from "./stepMetaInfoAppearedEvent.js"
 import { StepSummaryCreatedEvent } from "./stepSummaryCreatedEvent.js"
 import { TaskReportCreatedEvent } from "./taskReportCreatedEvent.js"
 import { TaskResultCreatedEvent } from "./taskResultCreatedEvent.js"
 import { TaskSummaryCreatedEvent } from "./taskSummaryCreatedEvent.js"
-import { ResponseTextAppeared } from "./responseTextAppeared.js"
 
 export const Event = z.discriminatedUnion('type', [
   BeforeArtifactBuildingStarted,
@@ -65,5 +66,6 @@ export const Event = z.discriminatedUnion('type', [
   EditEvent,
   McpInitStarted,
   McpInitFinished,
+  SerializableEventSerializationError,
 ])
 export type Event = z.infer<typeof Event>
