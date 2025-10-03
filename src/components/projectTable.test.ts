@@ -1,4 +1,4 @@
-import { expect } from "playwright/test"
+import { expect } from "../playwright/test.js"
 import { test } from "./projectTable.dsl.js"
 
 test.describe('ProjectTable', async () => {
@@ -39,10 +39,9 @@ test.describe('ProjectTable', async () => {
     test('checkbox (when present) should have matching data-project-name for all rows', async ({ projectTable }) => {
       const rows = await projectTable.getAllRows()
       for (const row of rows) {
-        const nameText = await row.getNameText()
-        expect(nameText.length).toBeGreaterThan(0)
+        await expect(row.nameEl).toHaveTrimmedText(1)
         if (await row.hasCheckbox()) {
-          await expect(row.checkbox).toHaveAttribute('data-project-name', nameText)
+          await expect(row.checkbox).toHaveAttribute('data-project-name', await row.getNameText())
         }
       }
     })
@@ -66,9 +65,7 @@ test.describe('ProjectTable', async () => {
     test('all names should be visible and non-empty', async ({ projectTable }) => {
       const rows = await projectTable.getAllRows()
       for (const row of rows) {
-        await expect(row.nameEl).toBeVisible()
-        const nameText = await row.getNameText()
-        expect(nameText.length).toBeGreaterThan(0)
+        await expect(row.nameEl).toHaveTrimmedText(1)
       }
     })
 
@@ -103,8 +100,7 @@ test.describe('ProjectTable', async () => {
       const rows = await projectTable.getAllRows()
       for (const row of rows) {
         await expect(row.updatedCell).toHaveAttribute('data-updated-ts', /^(0|[1-9]\d*)$/)
-        const updatedText = ((await row.updatedCell.textContent()) || '').trim()
-        expect(updatedText.length).toBeGreaterThan(0)
+        await expect(row.updatedCell).toHaveTrimmedText()
       }
     })
 
@@ -120,7 +116,7 @@ test.describe('ProjectTable', async () => {
       const rows = await projectTable.getAllRows()
       for (const row of rows) {
         const issuesText = await row.getIssuesText()
-        expect(/^\d+$/.test(issuesText)).toBeTruthy()
+        expect(issuesText).toMatch(/^\d+$/)
       }
     })
 

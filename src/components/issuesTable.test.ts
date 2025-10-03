@@ -1,16 +1,7 @@
-import { expect, Locator } from "@playwright/test"
+import { Locator } from "@playwright/test"
+import { expect } from "../playwright/test.js"
 import { IssueRowDSL } from "./issueRow.dsl.js"
 import { test } from "./issuesTable.dsl.js"
-
-// Helper to assert numeric formatted string (digits, commas)
-function isFormattedNumber(text: string) {
-  return /^\d{1,3}(,\d{3})*$/.test(text)
-}
-
-// Helper to assert time formatted as H:MM:SS or M:SS
-function isFormattedTime(text: string) {
-  return /^(\d+:)?\d{1,2}:\d{2}$/.test(text)
-}
 
 test.describe('IssuesTable', async () => {
 
@@ -21,7 +12,7 @@ test.describe('IssuesTable', async () => {
 
     test('should show no issues message and no table', async ({ issuesTable }) => {
       await expect(issuesTable.noIssuesMessage).toBeVisible()
-      await expect(issuesTable.table).toHaveCount(0)
+      await expect(issuesTable.table).toBeMissing()
     })
   })
 
@@ -33,23 +24,23 @@ test.describe('IssuesTable', async () => {
     test('should render table without metrics columns and compare button disabled/hidden', async ({ page, issuesTable }) => {
       await expect(issuesTable.table).toBeVisible()
       // Compare button exists but should be disabled only when metrics present; without metrics, it should not be visible
-      await expect(issuesTable.compareButton).toHaveCount(0)
+      await expect(issuesTable.compareButton).toBeMissing()
 
       // Header summary shows only total time (no metrics)
       await expect(issuesTable.headerSummaryLabel).toHaveText('Project Summary')
       await expect(issuesTable.headerSummaryTotalTime).toBeVisible()
-      await expect(issuesTable.headerSummaryInputTokens).toHaveCount(0)
-      await expect(issuesTable.headerSummaryOutputTokens).toHaveCount(0)
-      await expect(issuesTable.headerSummaryCacheTokens).toHaveCount(0)
-      await expect(issuesTable.headerSummaryCost).toHaveCount(0)
+      await expect(issuesTable.headerSummaryInputTokens).toBeMissing()
+      await expect(issuesTable.headerSummaryOutputTokens).toBeMissing()
+      await expect(issuesTable.headerSummaryCacheTokens).toBeMissing()
+      await expect(issuesTable.headerSummaryCost).toBeMissing()
 
       // Footer summary mirrors header summary
       await expect(issuesTable.footerSummaryLabel).toHaveText('Project Summary')
       await expect(issuesTable.footerSummaryTotalTime).toBeVisible()
-      await expect(issuesTable.footerSummaryInputTokens).toHaveCount(0)
-      await expect(issuesTable.footerSummaryOutputTokens).toHaveCount(0)
-      await expect(issuesTable.footerSummaryCacheTokens).toHaveCount(0)
-      await expect(issuesTable.footerSummaryCost).toHaveCount(0)
+      await expect(issuesTable.footerSummaryInputTokens).toBeMissing()
+      await expect(issuesTable.footerSummaryOutputTokens).toBeMissing()
+      await expect(issuesTable.footerSummaryCacheTokens).toBeMissing()
+      await expect(issuesTable.footerSummaryCost).toBeMissing()
 
       // Elapsed time label visible
       await expect(issuesTable.summaryElapsedTime).toBeVisible()
@@ -70,29 +61,17 @@ test.describe('IssuesTable', async () => {
       await expect(issuesTable.headerSummaryLabel).toHaveText('Project Summary')
       await expect(issuesTable.footerSummaryLabel).toHaveText('Project Summary')
 
-      const headerIn = (await issuesTable.headerSummaryInputTokens.textContent() || '').trim()
-      const headerOut = (await issuesTable.headerSummaryOutputTokens.textContent() || '').trim()
-      const headerCache = (await issuesTable.headerSummaryCacheTokens.textContent() || '').trim()
-      const headerCost = (await issuesTable.headerSummaryCost.textContent() || '').trim()
-      const headerTime = (await issuesTable.headerSummaryTotalTime.textContent() || '').trim()
+      await expect(issuesTable.headerSummaryInputTokens).toBeFormattedNumber()
+      await expect(issuesTable.headerSummaryOutputTokens).toBeFormattedNumber()
+      await expect(issuesTable.headerSummaryCacheTokens).toBeFormattedNumber()
+      await expect(issuesTable.headerSummaryCost).toBeDecimalNumber(2)
+      await expect(issuesTable.headerSummaryTotalTime).toBeFormattedTime()
 
-      expect(isFormattedNumber(headerIn)).toBeTruthy()
-      expect(isFormattedNumber(headerOut)).toBeTruthy()
-      expect(isFormattedNumber(headerCache)).toBeTruthy()
-      expect(/^\d+\.(\d{2})$/.test(headerCost)).toBeTruthy()
-      expect(isFormattedTime(headerTime)).toBeTruthy()
-
-      const footerIn = (await issuesTable.footerSummaryInputTokens.textContent() || '').trim()
-      const footerOut = (await issuesTable.footerSummaryOutputTokens.textContent() || '').trim()
-      const footerCache = (await issuesTable.footerSummaryCacheTokens.textContent() || '').trim()
-      const footerCost = (await issuesTable.footerSummaryCost.textContent() || '').trim()
-      const footerTime = (await issuesTable.footerSummaryTotalTime.textContent() || '').trim()
-
-      expect(isFormattedNumber(footerIn)).toBeTruthy()
-      expect(isFormattedNumber(footerOut)).toBeTruthy()
-      expect(isFormattedNumber(footerCache)).toBeTruthy()
-      expect(/^\d+\.(\d{2})$/.test(footerCost)).toBeTruthy()
-      expect(isFormattedTime(footerTime)).toBeTruthy()
+      await expect(issuesTable.footerSummaryInputTokens).toBeFormattedNumber()
+      await expect(issuesTable.footerSummaryOutputTokens).toBeFormattedNumber()
+      await expect(issuesTable.footerSummaryCacheTokens).toBeFormattedNumber()
+      await expect(issuesTable.footerSummaryCost).toBeDecimalNumber(2)
+      await expect(issuesTable.footerSummaryTotalTime).toBeFormattedTime()
     })
 
     test('rows should exist and have expected cells', async ({ issuesTable }) => {
@@ -113,17 +92,15 @@ test.describe('IssuesTable', async () => {
           expect(href).toMatch(/\/project\/[^/]+\/issue\/[^/]+\/task\/0\/trajectories$/)
         }
 
-        const trimmedLength = (text: string | null | undefined) => (text || '').trim().length
-
-        expect(trimmedLength(await row.descriptionCell.textContent())).toBeGreaterThan(0)
+        await expect(row.descriptionCell).toHaveTrimmedText(1)
         await expect(row.timestampCell.textContent()).resolves.toMatch(/\d{1,2}\/\d{1,2}\/\d{4}, \d{1,2}:\d{2}:\d{2} [AP]M/)
-        expect(isFormattedNumber(await row.inputTokensCell.textContent() ?? '')).toBeTruthy()
-        expect(isFormattedNumber(await row.outputTokensCell.textContent() ?? '')).toBeTruthy()
-        expect(isFormattedNumber(await row.cacheTokensCell.textContent() ?? '')).toBeTruthy()
-        expect(/^\d+\.(\d{4})$/.test(await row.costCell.textContent() ?? '')).toBeTruthy()
-        expect(isFormattedTime(await row.totalTimeCell.textContent() ?? '')).toBeTruthy()
-        expect(trimmedLength(await row.statusCell.textContent())).toBeGreaterThan(0)
-        await expect(row.assistantProvidersCell.getByRole('img').count()).resolves.toBeGreaterThan(0)
+        await expect(row.inputTokensCell).toBeFormattedNumber()
+        await expect(row.outputTokensCell).toBeFormattedNumber()
+        await expect(row.cacheTokensCell).toBeFormattedNumber()
+        await expect(row.costCell).toBeDecimalNumber(4)
+        await expect(row.totalTimeCell).toBeFormattedTime()
+        await expect(row.statusCell).toHaveTrimmedText(1)
+        await expect(row.assistantProvidersCell.getByRole('img')).toHaveCountInRange(1)
 
         // Checkbox is present for compare
         expect(await row.hasCheckbox()).toBeTruthy()
