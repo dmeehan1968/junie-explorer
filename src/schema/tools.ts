@@ -50,11 +50,17 @@ function parameterReducer(acc: Record<string, Param>, param: ToolAnyProperty ) {
   }
   return acc
 }
+
+export const EmptyToolParametersSchema = z.object({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.ToolParametersSchema.EmptyToolParametersSchema'),
+  rawJsonObject: z.record(z.string(), z.any()).default(() => ({})),
+})
+
 export const Tool = z.looseObject({
   name: z.string(),
   description: z.string().optional(),
   type: z.string().optional(),
-  ToolType: z.enum(['UserTool']).optional(),
+  ToolType: z.enum(['UserTool', 'PredefinedTool']).optional(),
   params: z.union([
     ToolAnyProperty.array().default(() => ([])).transform(params => {
       return {
@@ -82,6 +88,7 @@ export const Tool = z.looseObject({
     }),
 
     McpToolParameters,
+    EmptyToolParametersSchema,
   ]),
 }).transform(({ type, ToolType, params, ...tool }) => ({
   ...tool,
