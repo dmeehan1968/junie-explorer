@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.1] - 2025-10-03
+
+### Added
+- Add `SerializableEventSerializationError` to event schema (338d626)
+- Add `EmptyToolParametersSchema` and `PredefinedTool` type to schema (87af2e3)
+
+### Changed
+- Refactor `projectRoutes.tsx` and extract reusable components (dfe172b)
+- Update styles and structure of `versionBanner` (64f0305)
+- Add transformation logic for `CANCELED` status in `JuniePlanSchema` (b49e888)
+
 ## [3.3.0] - 2025-09-30
 
 ### Added
