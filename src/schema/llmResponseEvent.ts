@@ -18,6 +18,7 @@ export const LlmResponseEvent = z.looseObject({
     cacheCreateInputTokens: z.number().int().optional(),
     webSearchCount: z.number().int().optional(),
     time: z.number().optional(),
+    cached: z.boolean().default(() => false),
     usage: z.looseObject({
       inputTokens: z.number().int().optional(),
       outputTokens: z.number().int().optional(),
