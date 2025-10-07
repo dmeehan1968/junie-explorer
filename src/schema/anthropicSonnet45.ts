@@ -1,6 +1,6 @@
 import * as z from "zod"
-import { AnthropicSonnet37 } from "./anthropicSonnet37.js"
+import { AnthropicSonnet4 } from "./anthropicSonnet4.js"
 
-export const AnthropicSonnet45 = AnthropicSonnet37.extend({
+export const AnthropicSonnet45 = AnthropicSonnet4.extend({
   jbai: z.literal('anthropic-claude-4-5-sonnet'),
 })

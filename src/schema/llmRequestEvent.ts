@@ -20,6 +20,7 @@ export const LlmRequestEvent = z.looseObject({
     system: z.string(),
     messages: MatterhornMessage.array(),
     tools: Tools,
+    cacheUserGroupID: z.string().optional(),
   }),
   modelParameters: z.looseObject({
     model: LLM,
