@@ -151,11 +151,12 @@ export class JetBrains {
           inputTokens: acc.inputTokens + cur.inputTokens,
           outputTokens: acc.outputTokens + cur.outputTokens,
           cacheTokens: acc.cacheTokens + cur.cacheTokens,
+          webSearchCount: acc.webSearchCount + cur.webSearchCount,
           cost: acc.cost + cur.cost,
           time: acc.time + cur.time,
           metricCount: acc.metricCount + cur.metricCount,
         }
-      }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0 } satisfies SummaryMetrics)
+      }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0, webSearchCount: 0 } satisfies SummaryMetrics)
 
       this.hasMetrics = metrics.metricCount > 0
 

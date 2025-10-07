@@ -25,6 +25,7 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
     outputPrice: outputPrice ?? capabilities?.outputPrice ?? 0,
     cacheInputPrice: cacheInputPrice ?? capabilities?.cacheInputPrice ?? 0,
     cacheCreateInputPrice: cacheCreateInputPrice ?? capabilities?.cacheCreateInputPrice ?? capabilities?.cacheInputPrice ?? 0,
+    webSearchPrice: capabilities?.webSearchPrice ?? 0,
   },
 })))
 export type LLM = z.infer<typeof LLM>

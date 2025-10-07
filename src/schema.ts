@@ -181,6 +181,7 @@ export interface SummaryMetrics {
   inputTokens: number;
   outputTokens: number;
   cacheTokens: number;
+  webSearchCount: number;
   cost: number;
   time: number;
   metricCount: number;

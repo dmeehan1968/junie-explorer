@@ -372,14 +372,9 @@ const EventsTable = ({ events }: { events: EventRecord[] }) => {
         </thead>
         <tbody>
         {events.map((eventRecord, index) => {
-          let timestampDisplay = '-'
-          if (index === 0) {
-            timestampDisplay = eventRecord.timestamp.toLocaleTimeString()
-          } else {
-            const prevRecord = events[index - 1]
-            const elapsed = eventRecord.timestamp.getTime() - prevRecord.timestamp.getTime()
-            timestampDisplay = `${elapsed}ms`
-          }
+          const pad = (n: number, len = 2) => n.toString().padStart(len, '0')
+          const d = eventRecord.timestamp
+          const timestampDisplay = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)}`
 
           if (eventRecord.event.type === 'LlmResponseEvent') {
             cost += eventRecord.event.answer.cost

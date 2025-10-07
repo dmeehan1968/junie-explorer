@@ -62,13 +62,14 @@ export class Project {
 
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
-      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0 }
+      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0, webSearchCount: 0 }
 
       await Promise.all([...(await this.issues).values()].map(async (issue) => {
         const issueMetrics = await issue.metrics
         metrics.inputTokens += issueMetrics.inputTokens
         metrics.outputTokens += issueMetrics.outputTokens
         metrics.cacheTokens += issueMetrics.cacheTokens
+        metrics.webSearchCount += issueMetrics.webSearchCount
         metrics.cost += issueMetrics.cost
         metrics.time += issueMetrics.time
         metrics.metricCount += issueMetrics.metricCount

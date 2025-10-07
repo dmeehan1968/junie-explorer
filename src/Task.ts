@@ -123,6 +123,7 @@ export class Task {
         inputTokens: 0,
         outputTokens: 0,
         cacheTokens: 0,
+        webSearchCount: 0,
         cost: 0,
         time: 0,
         metricCount: 0,
@@ -140,6 +141,7 @@ export class Task {
           metrics.inputTokens += event.event.answer.inputTokens
           metrics.outputTokens += event.event.answer.outputTokens
           metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
+          metrics.webSearchCount += event.event.answer.webSearchCount
           metrics.time += event.event.answer.time
           metrics.metricCount += event.event.answer.metricCount
         }
