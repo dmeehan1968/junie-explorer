@@ -163,7 +163,7 @@ const ChatMessageDecorator = ({ klass, index, message }: { klass: string, index:
   } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
     return (
       <>
-        {message.parts.map((part, partIndex) => (
+        {message.parts.map((part) => (
           <MessageDecorator
             klass={klass}
             index={index}
@@ -638,7 +638,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                 content={
                   record.event.chat.tools.length ? (
                     <>
-                      {record.event.chat.tools.map((tool, toolIndex) => (
+                      {record.event.chat.tools.map((tool) => (
                         <ToolDecorator tool={tool} />
                       ))}
                     </>
@@ -660,7 +660,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
         } else if (record.event.type === 'LlmResponseEvent') {
           if (record.event.answer.llm.isSummarizer) {
             messages.push(
-              ...record.event.answer.contentChoices.map((choice, choiceIndex) => (
+              ...record.event.answer.contentChoices.map((choice) => (
                 <MessageDecorator
                   klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
                   index={index}
@@ -677,8 +677,21 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
               rec.event.type === 'LlmRequestEvent' && rec.event.id === record.event.id
             )
 
+            if (record.event.answer.webSearchCount > 0) {
+              messages.push(
+                <MessageDecorator
+                  klass={klass}
+                  index={index}
+                  testIdPrefix="web-search-assistant-toggle"
+                  left={false}
+                  label={`Web Search`}
+                  content={escapeHtml(`Count: ${record.event.answer.webSearchCount}`)}
+                />
+              )
+            }
+
             messages.push(
-              ...record.event.answer.contentChoices.map((choice, choiceIndex) => {
+              ...record.event.answer.contentChoices.map((choice) => {
                 const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice' 
                   ? choice.usages.map((tool, toolIndex) => (
                       <ToolUseDecorator klass={klass} index={index + toolIndex + 1000} tool={tool} />
@@ -687,16 +700,6 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
 
                 return (
                   <div>
-                    <Conditional condition={record.event.answer.webSearchCount > 0}>
-                      <MessageDecorator
-                        klass={klass}
-                        index={index}
-                        testIdPrefix="web-search-assistant-toggle"
-                        left={false}
-                        label={`Web Search`}
-                        content={escapeHtml(`Count: ${record.event.answer.webSearchCount}`)}
-                      />
-                    </Conditional>
                     <MessageDecorator
                       klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
                       index={index}
