@@ -115,12 +115,17 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
 
   const cacheTokenData = llmEvents.map(event => {
     const ans = event.event.answer
-    return { x: event.timestamp.toISOString(), y: ans.cacheCreateInputTokens }
+    return { x: event.timestamp.toISOString(), y: ans.cacheInputTokens ?? 0 }
+  })
+
+  const cacheCreateTokenData = llmEvents.map(event => {
+    const ans = event.event.answer
+    return { x: event.timestamp.toISOString(), y: ans.cacheCreateInputTokens ?? 0 }
   })
 
   const combinedTokenData = llmEvents.map(event => {
     const ans = event.event.answer
-    const total = (ans.inputTokens ?? 0) + (ans.outputTokens ?? 0) + ans.cacheCreateInputTokens
+    const total = (ans.inputTokens ?? 0) + (ans.outputTokens ?? 0) + (ans.cacheCreateInputTokens ?? 0)
     return { x: event.timestamp.toISOString(), y: total }
   })
 
@@ -159,6 +164,16 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
       data: cacheTokenData,
       borderColor: 'rgb(153, 102, 255)',
       backgroundColor: 'rgba(153, 102, 255, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1',
+      hidden: true,
+    },
+    {
+      label: 'Cache Create Tokens',
+      data: cacheCreateTokenData,
+      borderColor: 'rgb(186, 85, 211)',
+      backgroundColor: 'rgba(186, 85, 211, 0.5)',
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',

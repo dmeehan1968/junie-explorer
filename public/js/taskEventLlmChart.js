@@ -69,12 +69,20 @@ function filterChartData(selectedProviders) {
 
   const cacheTokenData = filteredEvents.map(event => ({
     x: event.timestamp.toISOString(),
+    y: event.event.answer.cacheInputTokens,
+  }));
+
+  const cacheCreateTokenData = filteredEvents.map(event => ({
+    x: event.timestamp.toISOString(),
     y: event.event.answer.cacheCreateInputTokens,
   }));
 
   const combinedTokenData = filteredEvents.map(event => ({
     x: event.timestamp.toISOString(),
-    y: event.event.answer.inputTokens + event.event.answer.outputTokens + event.event.answer.cacheCreateInputTokens,
+    y: event.event.answer.inputTokens
+      + event.event.answer.outputTokens
+      + event.event.answer.cacheInputTokens
+      + event.event.answer.cacheCreateInputTokens,
   }));
   
   return {
@@ -99,6 +107,10 @@ function filterChartData(selectedProviders) {
       },
       {
         ...originalChartData.datasets[4],
+        data: cacheCreateTokenData
+      },
+      {
+        ...originalChartData.datasets[5],
         data: combinedTokenData
       }
     ]
