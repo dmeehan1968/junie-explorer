@@ -30,7 +30,7 @@ export const LlmRequestEvent = z.looseObject({
     stop: z.record(z.string(), z.string()).optional(),
     max_tokens: z.number().optional(),
     user: z.string().optional(),
-    reasoning_effort: z.string().optional(),
+    reasoning_effort: z.string().default(() => 'reasoning unknown'),
     text_verbosity: z.string().optional(),
     model_api_version: z.string().optional(),
     include_encrypted_content: z.boolean().optional(),
