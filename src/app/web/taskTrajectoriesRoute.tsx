@@ -175,11 +175,50 @@ const ChatMessageDecorator = ({ klass, index, message }: { klass: string, index:
         ))}
       </>
     )
+  // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
+  //   return (
+  //     <>
+  //       {message.content && (
+  //         <MessageDecorator
+  //           klass={klass}
+  //           index={index}
+  //           testIdPrefix="assistant-message-toggle"
+  //           left={false}
+  //           label="Assistant Response"
+  //           content={escapeHtml(message.content)}
+  //         />
+  //       )}
+  //       {message.toolUses.map((toolUse, toolIndex) => (
+  //         <ToolCallDecorator
+  //           klass={klass}
+  //           index={index * 100 + toolIndex}
+  //           testIdPrefix="assistant-tool-use-toggle"
+  //           tool={{
+  //             name: toolUse.name,
+  //             params: toolUse.input.rawJsonObject,
+  //             label: 'Tool Use',
+  //           }}
+  //         />
+  //       ))}
+  //     </>
+  //   )
+  // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
+  //   return (
+  //     <>
+  //       {message.toolResults.map((toolResult, resultIndex) => (
+  //         <MessageDecorator
+  //           klass={klass}
+  //           index={index * 100 + resultIndex}
+  //           testIdPrefix="user-tool-result-toggle"
+  //           left={true}
+  //           label={toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
+  //           content={escapeHtml(toolResult.content)}
+  //         />
+  //       ))}
+  //     </>
+  //   )
   }
   return null
-  // we don't process these, as they are covered by the response and action events
-  // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
-  // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
 }
 
 // JSX Components for trajectory sections
@@ -558,7 +597,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
 
   let didOutputInitialContext = false
   const klass = 'p-4 mt-4 bg-base-content/10'
-  
+
   const filteredEvents = events.filter((record: EventRecord): record is { 
     event: LlmRequestEvent | LlmResponseEvent | ActionRequestBuildingFailed | AgentActionExecutionFinished, 
     timestamp: Date 
@@ -648,6 +687,16 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
 
                 return (
                   <div>
+                    <Conditional condition={record.event.answer.webSearchCount > 0}>
+                      <MessageDecorator
+                        klass={klass}
+                        index={index}
+                        testIdPrefix="web-search-assistant-toggle"
+                        left={false}
+                        label={`Web Search`}
+                        content={escapeHtml(`Count: ${record.event.answer.webSearchCount}`)}
+                      />
+                    </Conditional>
                     <MessageDecorator
                       klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
                       index={index}
