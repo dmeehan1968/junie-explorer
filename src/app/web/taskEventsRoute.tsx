@@ -142,6 +142,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',
+      hidden: true,
     },
     {
       label: 'Output Tokens',
@@ -151,6 +152,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',
+      hidden: true,
     },
     {
       label: 'Cache Tokens',
@@ -160,6 +162,7 @@ function prepareLlmEventGraphData(events: EventRecord[]): {
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',
+      hidden: true,
     },
     {
       label: 'Tokens (Combined)',
@@ -200,24 +203,6 @@ const EventMetricsSection = ({ hasMetrics }: { hasMetrics: boolean }) => {
             <div class="flex items-center gap-3 flex-wrap justify-between">
               <div id="llm-provider-filters" class="join flex flex-wrap" data-testid="llm-provider-filters">
                 {/* Provider buttons will be populated by JavaScript */}
-              </div>
-              <div id="llm-token-filters" class="join flex flex-wrap" data-testid="llm-token-filters">
-                <label class="btn btn-sm join-item">
-                  <input type="checkbox" class="hidden" data-token="input"/>
-                  Input
-                </label>
-                <label class="btn btn-sm join-item">
-                  <input type="checkbox" class="hidden" data-token="output"/>
-                  Output
-                </label>
-                <label class="btn btn-sm join-item">
-                  <input type="checkbox" class="hidden" data-token="cache"/>
-                  Cache
-                </label>
-                <label class="btn btn-sm join-item btn-primary">
-                  <input type="checkbox" class="hidden" data-token="combined" checked/>
-                  Combined
-                </label>
               </div>
             </div>
           </div>
