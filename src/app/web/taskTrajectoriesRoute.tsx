@@ -564,7 +564,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
             task,
             locale: getLocaleFromRequest(req),
             issueTitle: issue.name,
-            actionsHtml: hasMetrics ? `<a href="/api/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/${encodeURIComponent(task.index)}/trajectories/download" class="btn btn-primary btn-sm">Download Trajectories as JSONL</a>` : '',
+            actionsHtml: hasMetrics ? `<a href="/api/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/${encodeURIComponent(task.index)}/trajectories/download" class="btn btn-primary btn-sm" data-testid="download-btn">Download Trajectories as JSONL</a>` : '',
             tasksCount,
             tasksDescriptions,
             currentTab: 'trajectories',

@@ -74,7 +74,6 @@ of the new solution.
 - Preferred environment: dotenv/config
 - Preferred best practices: DRY, YAGNI, KISS, SOLID
 - Preferred testing methodology: Test Driven Development - Red, Green, Refactor
-- Preferred code coverage: Minimum 85%, use `bun test --coverage`
 - Preferred type checker: `bunx tsc --noEmit`
 
 # Notes
