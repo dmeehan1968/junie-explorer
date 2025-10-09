@@ -3,17 +3,15 @@ import { Component, Html, Children } from "@kitajs/html"
 export interface ToggleComponentProps {
   expandIcon: Children
   collapseIcon: Children
-  testIdPrefix?: string
+  testId?: string
   index: number
 }
 
 export const ToggleComponent: Component<ToggleComponentProps> = ({ 
   expandIcon, 
   collapseIcon, 
-  testIdPrefix = 'toggle', 
-  index 
+  testId = 'toggle',
 }) => {
-  const testId = `${testIdPrefix}-${index}`
 
   return (
     <button 

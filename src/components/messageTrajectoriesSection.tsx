@@ -40,16 +40,18 @@ const ToolDecorator = ({ tool }: { tool: Tool }) => {
     </div>
   )
 }
-const ToolCallDecorator = ({ klass, index, testIdPrefix, tool }: {
+const ToolCallDecorator = ({ klass, testId, tool }: {
   klass: string,
-  index: number,
-  testIdPrefix: string,
+  testId: string,
   tool: { name: string, params: Record<string, any>, label: string }
 }) => {
   return (
     <div class="relative ml-48 mb-8">
-      <ToggleComponent expandIcon={<ExpandIcon/>} collapseIcon={<CollapseIcon/>} testIdPrefix={testIdPrefix}
-                       index={index}/>
+      <ToggleComponent
+        expandIcon={<ExpandIcon/>}
+        collapseIcon={<CollapseIcon/>}
+        testId={testId}
+      />
       <div class="relative">
         <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow">{tool.label}</h3>
         <div
@@ -70,12 +72,11 @@ const ToolCallDecorator = ({ klass, index, testIdPrefix, tool }: {
     </div>
   )
 }
-const ToolUseDecorator = ({ klass, index, tool }: { klass: string, index: number, tool: ToolUseAnswer }) => {
+const ToolUseDecorator = ({ klass, tool }: { klass: string, tool: ToolUseAnswer }) => {
   return (
     <ToolCallDecorator
       klass={klass}
-      index={index}
-      testIdPrefix="tool-use-toggle"
+      testId="tool-use"
       tool={{
         name: tool.toolName,
         params: tool.toolParams.rawJsonObject,
@@ -86,8 +87,7 @@ const ToolUseDecorator = ({ klass, index, tool }: { klass: string, index: number
 }
 const MessageDecorator = (props: {
   klass: string,
-  index: number,
-  testIdPrefix: string,
+  testId: string,
   left: boolean,
   label?: string,
   content: string | JSX.Element
@@ -97,8 +97,7 @@ const MessageDecorator = (props: {
       <ToggleComponent
         expandIcon={<ExpandIcon/>}
         collapseIcon={<CollapseIcon/>}
-        testIdPrefix={props.testIdPrefix}
-        index={props.index}
+        testId={props.testId}
       />
       <div class="relative">
         <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow z-50">
@@ -137,8 +136,7 @@ const ChatMessageDecorator = ({ klass, index, message }: {
     return (
       <MessageDecorator
         klass={klass}
-        index={index}
-        testIdPrefix="chat-message-toggle"
+        testId={message.kind === 'User' ? 'user-chat-message' : 'assistant-chat-message'}
         left={message.kind === 'User'}
         label={message.kind === 'User' ? 'Message' : 'Model Response'}
         content={escapeHtml(message.content)}
@@ -150,8 +148,7 @@ const ChatMessageDecorator = ({ klass, index, message }: {
         {message.parts.map((part) => (
           <MessageDecorator
             klass={klass}
-            index={index}
-            testIdPrefix="chat-multipart-toggle"
+            testId={message.kind === 'User' ? 'user-chat-multipart' : 'assistant-chat-multipart'}
             left={message.kind === 'User'}
             label={part.type === 'image' ? 'Image' : 'Message'}
             content={<MultiPartMessage part={part}/>}
@@ -165,8 +162,7 @@ const ChatMessageDecorator = ({ klass, index, message }: {
     //       {message.content && (
     //         <MessageDecorator
     //           klass={klass}
-    //           index={index}
-    //           testIdPrefix="assistant-message-toggle"
+    //           testId="assistant-message"
     //           left={false}
     //           label="Assistant Response"
     //           content={escapeHtml(message.content)}
@@ -175,8 +171,7 @@ const ChatMessageDecorator = ({ klass, index, message }: {
     //       {message.toolUses.map((toolUse, toolIndex) => (
     //         <ToolCallDecorator
     //           klass={klass}
-    //           index={index * 100 + toolIndex}
-    //           testIdPrefix="assistant-tool-use-toggle"
+    //           testId="assistant-tool-use"
     //           tool={{
     //             name: toolUse.name,
     //             params: toolUse.input.rawJsonObject,
@@ -192,8 +187,7 @@ const ChatMessageDecorator = ({ klass, index, message }: {
     //       {message.toolResults.map((toolResult, resultIndex) => (
     //         <MessageDecorator
     //           klass={klass}
-    //           index={index * 100 + resultIndex}
-    //           testIdPrefix="user-tool-result-toggle"
+    //           testId="user-tool-result"
     //           left={true}
     //           label={toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
     //           content={escapeHtml(toolResult.content)}
@@ -258,8 +252,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
             messages.push(
               <MessageDecorator
                 klass={klass}
-                index={index + 10000}
-                testIdPrefix="system-request-toggle"
+                testId="system-message"
                 left={true}
                 label="System Message"
                 content={escapeHtml(record.event.chat.system)}
@@ -269,8 +262,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
             messages.push(
               <MessageDecorator
                 klass={klass}
-                index={index + 10001}
-                testIdPrefix="user-tools-toggle"
+                testId="user-tools"
                 left={true}
                 label="Tools"
                 content={
@@ -301,8 +293,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
               ...record.event.answer.contentChoices.map((choice) => (
                 <MessageDecorator
                   klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
-                  index={index}
-                  testIdPrefix="summarizer-assistant-toggle"
+                  testId="summarizer-assistant"
                   left={false}
                   label="Summary"
                   content={escapeHtml(choice.content || '<unexpectedly_empty>')}
@@ -322,8 +313,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
               messages.push(
                 <MessageDecorator
                   klass={klass}
-                  index={index}
-                  testIdPrefix="web-search-assistant-toggle"
+                  testId="web-search-assistant"
                   left={false}
                   label={`Web Search`}
                   content={escapeHtml(`Count: ${record.event.answer.webSearchCount}`)}
@@ -343,8 +333,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                   <div>
                     <MessageDecorator
                       klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
-                      index={index}
-                      testIdPrefix="chat-assistant-toggle"
+                      testId="chat-assistant"
                       left={false}
                       label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${previous?.event.modelParameters.reasoning_effort}</span>`}
                       content={escapeHtml(choice.content || '<unexpectedly_empty>')}
@@ -359,8 +348,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
           messages.push(
             <MessageDecorator
               klass={klass}
-              index={index + 10002}
-              testIdPrefix="chat-user-toggle"
+              testId="tool-result"
               left={true}
               label="Tool Result"
               content={escapeHtml(record.event.result.text)}
@@ -375,8 +363,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
           messages.push(
             <MessageDecorator
               klass={klass + ' bg-error text-error-content'}
-              index={index + 10002}
-              testIdPrefix="chat-user-toggle"
+              testId="tool-error"
               left={true}
               label="Tool Error"
               content={escapeHtml(record.event.serializableThrowable?.message ?? 'Unspecified error')}

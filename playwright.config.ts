@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './src',
   testMatch: '**/*.test.ts',
   webServer: {
-    command: 'JETBRAINS_LOG_PATH=./fixtures npm run dev',
+    command: 'JETBRAINS_LOG_PATH=./fixtures bun run dev',
     port: 3000,
     reuseExistingServer: !process.env.CI, // Don’t restart locally if running dev server
     timeout: 5_000,
