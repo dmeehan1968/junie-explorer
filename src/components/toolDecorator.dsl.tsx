@@ -39,41 +39,40 @@ export class ToolDecoratorDSL {
 
   // Root container of the decorator
   get container() {
-    return this.page.locator('div.flex.flex-col')
+    return this.page.getByTestId('tool-decorator')
   }
 
   // Name badge
   get nameBadge() {
-    return this.page.locator('span.bg-secondary')
+    return this.page.getByTestId('tool-name')
   }
 
   // Description row -> right cell
   get descriptionCell() {
-    const firstRow = this.page.locator('div.flex.flex-row').first()
-    return firstRow.locator('div.flex-grow')
+    return this.page.getByTestId('tool-description')
   }
 
   // Parameters header
   get parametersHeader() {
-    return this.page.getByText('Parameters', { exact: true })
+    return this.page.getByTestId('tool-parameters-header')
   }
 
-  // Parameter row by name (left column contains the name)
+  // Parameter row by name using stable test id + attribute
   row(name: string) {
-    return this.page.locator('div.flex.flex-row').filter({ has: this.page.locator('div.w-32', { hasText: name }) })
+    return this.page.locator('[data-testid="tool-param-row"][data-param-name="' + name + '"]')
   }
 
   // Left/center/right cells for a given row
   nameCell(name: string) {
-    return this.row(name).locator('div.w-32')
+    return this.row(name).getByTestId('tool-param-name')
   }
 
   descriptionParamCell(name: string) {
-    return this.row(name).locator('div.flex-row.flex-grow > div').first()
+    return this.row(name).getByTestId('tool-param-desc')
   }
 
   typeCell(name: string) {
-    return this.row(name).locator('div.flex-row.flex-grow > div').last()
+    return this.row(name).getByTestId('tool-param-type')
   }
 }
 
