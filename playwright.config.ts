@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './src',
-  testMatch: '**/*.test.ts',
+  testMatch: ['**/*.test.ts', '**/*.test.tsx'],
   webServer: {
     command: 'JETBRAINS_LOG_PATH=./fixtures bun run dev',
     port: 3000,
