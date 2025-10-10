@@ -297,8 +297,8 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
             messages.push(
               ...record.event.answer.contentChoices.map((choice) => {
                 const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
-                  ? choice.usages.map((tool, toolIndex) => (
-                    <ToolUseDecorator klass={klass} index={index + toolIndex + 1000} tool={tool}/>
+                  ? choice.usages.map((tool) => (
+                    <ToolUseDecorator klass={klass} tool={tool}/>
                   ))
                   : []
 

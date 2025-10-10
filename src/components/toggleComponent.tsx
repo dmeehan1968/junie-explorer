@@ -6,7 +6,6 @@ export interface ToggleComponentProps {
   expandIcon: Children
   collapseIcon: Children
   testId?: string
-  index: number
 }
 
 export const ToggleComponent: Component<ToggleComponentProps> = ({ 
