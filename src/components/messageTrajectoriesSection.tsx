@@ -12,6 +12,12 @@ import { MessageDecorator } from "./messageDecorator.js"
 import { ToolCallDecorator } from "./toolCallDecorator.js"
 import { ToolDecorator } from "./toolDecorator.js"
 
+const Divider = (props: { id: string, children: JSX.Element }) => (
+  <div id={props.id} class={'divider divider-secondary m-8'}>
+    <span class={'text-lg bg-secondary text-secondary-content rounded p-2'}>{props.children}</span>
+  </div>
+)
+
 const ToolUseDecorator = ({ klass, tool }: { klass: string, tool: ToolUseAnswer }) => {
   return (
     <ToolCallDecorator
@@ -69,52 +75,58 @@ const ChatMessageDecorator = ({ klass, message }: {
         ))}
       </>
     )
-    // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
-    //   return (
-    //     <>
-    //       {message.content && (
-    //         <MessageDecorator
-    //           klass={klass}
-    //           testId="assistant-message"
-    //           left={false}
-    //           label="Assistant Response"
-    //           content={escapeHtml(message.content)}
-    //         />
-    //       )}
-    //       {message.toolUses.map((toolUse, toolIndex) => (
-    //         <ToolCallDecorator
-    //           klass={klass}
-    //           testId="assistant-tool-use"
-    //           tool={{
-    //             name: toolUse.name,
-    //             params: toolUse.input.rawJsonObject,
-    //             label: 'Tool Use',
-    //           }}
-    //         />
-    //       ))}
-    //     </>
-    //   )
-    // } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
-    //   return (
-    //     <>
-    //       {message.toolResults.map((toolResult, resultIndex) => (
-    //         <MessageDecorator
-    //           klass={klass}
-    //           testId="user-tool-result"
-    //           left={true}
-    //           label={toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
-    //           content={escapeHtml(toolResult.content)}
-    //         />
-    //       ))}
-    //     </>
-    //   )
+    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
+      return (
+        <>
+          {message.content && (
+            <MessageDecorator
+              klass={klass}
+              testId="assistant-message"
+              left={false}
+              label="Assistant Response"
+              content={escapeHtml(message.content)}
+            />
+          )}
+          {message.toolUses.map((toolUse) => (
+            <ToolCallDecorator
+              klass={klass}
+              testId="assistant-tool-use"
+              tool={{
+                name: toolUse.name,
+                params: toolUse.input.rawJsonObject,
+                label: 'Tool Use',
+              }}
+            />
+          ))}
+        </>
+      )
+    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
+      return (
+        <>
+          {message.toolResults.map((toolResult, resultIndex) => (
+            <MessageDecorator
+              klass={klass}
+              testId="user-tool-result"
+              left={true}
+              label={toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
+              content={escapeHtml(toolResult.content)}
+            />
+          ))}
+        </>
+      )
   }
   return null
 }
 export const MessageTrajectoriesSection = ({ events }: { events: EventRecord[] }) => {
   return (
-    <div class="bg-base-200 text-base-content rounded-lg p-4 border border-base-300">
-      <h3 class="text-xl font-bold text-primary mb-8">Message Trajectories</h3>
+    <div class="bg-base-200 text-base-content rounded-lg p-4 border border-base-300" data-testid="message-trajectories">
+      <h3 class="text-xl font-bold text-primary mb-8">
+        Message Trajectories
+        &#32;
+        <span class="text-sm">
+          (<a href={'#current-session'}>Jump to start of current session</a>)
+        </span>
+      </h3>
       <ProcessedEvents events={events}/>
     </div>
   )
@@ -162,6 +174,9 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
 
         if (record.event.type === 'LlmRequestEvent') {
           if (!didOutputInitialContext) {
+
+            messages.push(<Divider>Start of Context/History</Divider>)
+
             messages.push(
               <MessageDecorator
                 klass={klass}
@@ -197,6 +212,8 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                 <ChatMessageDecorator klass={klass} message={message}/>
               )).filter(Boolean),
             )
+
+            messages.push(<Divider id="current-session">Current Session</Divider>)
 
             didOutputInitialContext = true
           }
