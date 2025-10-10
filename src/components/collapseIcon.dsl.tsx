@@ -39,6 +39,22 @@ export class CollapseIconDSL {
     return this.svg.getAttribute('viewBox')
   }
 
+  get stroke(): Promise<string | null> {
+    return this.svg.getAttribute('stroke')
+  }
+
+  get strokeWidth(): Promise<number> {
+    return this.svg.getAttribute('stroke-width').then(v => z.coerce.number().parse(v))
+  }
+
+  get strokeLineCap(): Promise<string | null> {
+    return this.svg.getAttribute('stroke-linecap')
+  }
+
+  get strokeLineJoin(): Promise<string | null> {
+    return this.svg.getAttribute('stroke-linejoin')
+  }
+
 }
 
 export const test = base.extend<{ collapseIcon: CollapseIconDSL }>({

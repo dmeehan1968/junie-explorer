@@ -9,15 +9,11 @@ test.describe('CollapseIcon (component)', () => {
     await expect(collapseIcon.height).resolves.toEqual(24)
     await expect(collapseIcon.width).resolves.toEqual(24)
     await expect(collapseIcon.viewBox).resolves.toEqual('0 0 24 24')
+    await expect(collapseIcon.stroke).resolves.toEqual('currentColor')
+    await expect(collapseIcon.strokeWidth).resolves.toEqual(1.5)
+    await expect(collapseIcon.strokeLineCap).resolves.toEqual('round')
+    await expect(collapseIcon.strokeLineJoin).resolves.toEqual('round')
 
-    const count = await collapseIcon.paths.count()
     await expect(collapseIcon.paths).toHaveCount(4)
-
-    for (let i = 0; i < count; i++) {
-      await expect(collapseIcon.paths.nth(i)).toHaveAttribute('stroke', 'currentColor')
-      await expect(collapseIcon.paths.nth(i)).toHaveAttribute('stroke-width', '1.5')
-      await expect(collapseIcon.paths.nth(i)).toHaveAttribute('stroke-linecap', 'round')
-      await expect(collapseIcon.paths.nth(i)).toHaveAttribute('stroke-linejoin', 'round')
-    }
   })
 })
