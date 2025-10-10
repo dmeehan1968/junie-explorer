@@ -64,4 +64,9 @@ test.describe('ToolCallDecorator (component)', () => {
     await toolCall.setProps({ tool: { params: {} as any } })
     await expect(toolCall.container.getByTestId('tool-call-param-row')).toHaveCount(0)
   })
+
+  test('includes app stylesheet in HTML wrapper', async ({ toolCall }) => {
+    const link = toolCall['page'].locator('link[rel="stylesheet"][href$="/css/app.css"]')
+    await expect(link).toHaveCount(1)
+  })
 })

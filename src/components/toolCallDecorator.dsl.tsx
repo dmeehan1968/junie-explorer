@@ -32,6 +32,15 @@ const defaultProps: Required<Pick<ToolCallDecoratorProps, 'klass' | 'testId'>> =
   testId: 'tool-call-toggle'
 }
 
+function wrapHtml(body: string) {
+  return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Junie Explorer Test</title>\n</head>\n<body class="min-h-screen p-8">${body}</body>\n</html>`
+}
+
+async function renderWithWrapper(klass: string, testId: string, tool: ToolCall) {
+  const body = await <ToolCallDecorator klass={klass} testId={testId} tool={tool} />
+  return wrapHtml(body)
+}
+
 export class ToolCallDecoratorDSL {
   private constructor(private readonly page: Page, private props: { klass: string; testId: string; tool: ToolCall }) {}
 
@@ -46,7 +55,8 @@ export class ToolCallDecoratorDSL {
       testId: props.testId ?? defaultProps.testId,
       tool: mergedTool
     }
-    await page.setContent(await <ToolCallDecorator klass={merged.klass} testId={merged.testId} tool={merged.tool} />)
+    await page.setContent(await renderWithWrapper(merged.klass, merged.testId, merged.tool))
+    await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
     return new ToolCallDecoratorDSL(page, merged)
   }
 
@@ -66,7 +76,8 @@ export class ToolCallDecoratorDSL {
       testId: next.testId ?? this.props.testId,
       tool: nextTool
     }
-    await this.page.setContent(await <ToolCallDecorator klass={this.props.klass} testId={this.props.testId} tool={this.props.tool} />)
+    await this.page.setContent(await renderWithWrapper(this.props.klass, this.props.testId, this.props.tool))
+    await this.page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
   }
 
   // container

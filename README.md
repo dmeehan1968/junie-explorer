@@ -138,6 +138,10 @@ bun run test
 ```
 This will run the Playwright test suite.
 
+Note:
+- Component DSLs used in Playwright tests (for example `src/components/toolCallDecorator.dsl.tsx`) now render components inside a minimal HTML document and automatically load the app stylesheet from `http://localhost:3000/css/app.css`. This ensures Tailwind/DaisyUI styles are applied and the visual representation matches production.
+- The Playwright config starts the dev server on port 3000 before tests run, so the stylesheet is available during tests. If you run tests against a different port, update the DSL or environment accordingly.
+
 ## Miscellaneous
 
 ### Directory Structure
