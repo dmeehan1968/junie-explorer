@@ -1,8 +1,8 @@
-import { Page, Locator } from "@playwright/test"
-import { test as base } from "playwright/test"
+import { Locator, Page, test as base } from "@playwright/test"
 
 export class ModelPerformanceDSL {
-  constructor(private readonly page: Page) {}
+  constructor(private readonly page: Page) {
+  }
 
   // Default route provided by the issue description
   navigateTo(url: string = "/project/default.999999/issue/d9210e84-2af4-4e45-a383-cee37492c8e6/task/0/trajectories") {
@@ -81,7 +81,7 @@ export class ModelPerformanceDSL {
     }, null, { timeout: 5000 })
   }
 
-  async selectMetric(metric: 'both'|'latency'|'tps') {
+  async selectMetric(metric: 'both' | 'latency' | 'tps') {
     const button = this.metricToggleContainer.locator(`button[data-metric="${metric}"]`)
     if (await button.count()) {
       await button.click()
@@ -103,5 +103,5 @@ export class ModelPerformanceDSL {
 export const test = base.extend<{ modelPerformance: ModelPerformanceDSL }>({
   modelPerformance: async ({ page }, use) => {
     await use(new ModelPerformanceDSL(page))
-  }
+  },
 })

@@ -1,8 +1,8 @@
-import { Page, Locator } from "@playwright/test"
-import { test as base } from "playwright/test"
+import { Locator, Page, test as base } from "@playwright/test"
 
 export class ActionTimelineDSL {
-  constructor(private readonly page: Page) {}
+  constructor(private readonly page: Page) {
+  }
 
   // Default to the provided trajectories route
   navigateTo(url: string = "/project/default.999999/issue/d9210e84-2af4-4e45-a383-cee37492c8e6/task/0/trajectories") {
@@ -73,5 +73,5 @@ export class ActionTimelineDSL {
 export const test = base.extend<{ actionTimeline: ActionTimelineDSL }>({
   actionTimeline: async ({ page }, use) => {
     await use(new ActionTimelineDSL(page))
-  }
+  },
 })

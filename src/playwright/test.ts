@@ -1,5 +1,4 @@
-import { Locator } from "@playwright/test"
-import { expect as base } from "playwright/test"
+import { expect as base, Locator } from "@playwright/test"
 
 export const expect = base.extend({
   async toHaveTrimmedText(locator: Locator, minimumLength: number = 1) {

@@ -1,8 +1,8 @@
-import { Page, Locator } from "@playwright/test"
-import { test as base } from "playwright/test"
+import { Locator, Page, test as base } from "@playwright/test"
 
 export class ContextSizeDSL {
-  constructor(private readonly page: Page) {}
+  constructor(private readonly page: Page) {
+  }
 
   // Default route provided by the issue description
   navigateTo(url: string = "/project/default.999999/issue/d9210e84-2af4-4e45-a383-cee37492c8e6/task/0/trajectories") {
@@ -113,5 +113,5 @@ export class ContextSizeDSL {
 export const test = base.extend<{ contextSize: ContextSizeDSL }>({
   contextSize: async ({ page }, use) => {
     await use(new ContextSizeDSL(page))
-  }
+  },
 })

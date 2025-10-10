@@ -1,9 +1,9 @@
-import { Page, Locator } from "@playwright/test"
-import { test as base } from "playwright/test"
+import { Page, test as base } from "@playwright/test"
 import { IssueRowDSL } from "./issueRow.dsl.js"
 
 export class IssuesTableDSL {
-  constructor(private readonly page: Page) {}
+  constructor(private readonly page: Page) {
+  }
 
   navigateToProject(projectName: string) {
     return this.page.goto(`/project/${encodeURIComponent(projectName)}`)
@@ -90,5 +90,5 @@ export class IssuesTableDSL {
 export const test = base.extend<{ issuesTable: IssuesTableDSL }>({
   issuesTable: async ({ page }, use) => {
     await use(new IssuesTableDSL(page))
-  }
+  },
 })

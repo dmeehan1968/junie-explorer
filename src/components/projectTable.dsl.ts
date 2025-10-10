@@ -1,5 +1,4 @@
-import { Page, Locator } from "@playwright/test"
-import { test as base } from "playwright/test"
+import { Locator, Page, test as base } from "@playwright/test"
 import { ProjectRowDSL } from "./projectRow.dsl.js"
 
 export class ProjectTableDSL {
@@ -81,6 +80,6 @@ export class ProjectTableDSL {
 export const test = base.extend<{ projectTable: ProjectTableDSL }>({
   projectTable: async ({ page }, use) => {
     await use(new ProjectTableDSL(page))
-  }
+  },
 })
 

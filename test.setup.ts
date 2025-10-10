@@ -1,7 +1,6 @@
-import { Browser, chromium, Page } from "@playwright/test"
+import { Browser, BrowserContext, chromium, Page } from "@playwright/test"
 import { afterAll, beforeAll } from "bun:test"
 import { Server } from "http"
-import { BrowserContext } from "playwright"
 import { JunieExplorer } from "./src/app/junieExplorer.js"
 import { JetBrains } from "./src/jetbrains.js"
 

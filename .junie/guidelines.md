@@ -338,8 +338,7 @@ Requirements for this project are documented using Gherkin feature files located
 
 Example DSL (named `<component>.dsl.ts` and co-located with the component)
 ```ts
-import { Page } from "@playwright/test"
-import { test as base } from "playwright/test"
+import { Page, test as base } from "@playwright/test"
 
 export class ComponentNameDSL {
   constructor(private readonly page: Page) {

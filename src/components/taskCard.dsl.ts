@@ -1,8 +1,8 @@
-import { Page, Locator } from "@playwright/test"
-import { test as base } from "playwright/test"
+import { Locator, Page, test as base } from "@playwright/test"
 
 export class TaskCardDSL {
-  constructor(private readonly page: Page) {}
+  constructor(private readonly page: Page) {
+  }
 
   // Default to the provided trajectories route
   navigateTo(url: string = "/project/default.999999/issue/d9210e84-2af4-4e45-a383-cee37492c8e6/task/0/trajectories") {
@@ -88,5 +88,5 @@ export class TaskCardDSL {
 export const test = base.extend<{ taskCard: TaskCardDSL }>({
   taskCard: async ({ page }, use) => {
     await use(new TaskCardDSL(page))
-  }
+  },
 })
