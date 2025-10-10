@@ -335,9 +335,12 @@ Requirements for this project are documented using Gherkin feature files located
 - Colocate the test suite with the component
 - To test locally use `bun run test`.  Use the argument `--grep <pattern>` to run focussed tests
 - To test interactively, use `bun run test:ui`
+- Add the @jsxImportSource directive to the top of the test, DSL and component files.
 
 Example DSL (named `<component>.dsl.ts` and co-located with the component)
 ```ts
+/** @jsxImportSource @kitajs/html */
+
 import { Page, test as base } from "@playwright/test"
 
 export class ComponentNameDSL {
