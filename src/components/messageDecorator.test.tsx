@@ -6,6 +6,12 @@ import { test, expect } from './messageDecorator.dsl.js'
 
 test.describe('MessageDecorator (component)', () => {
 
+  test('wraps content in standard HTML body with classes', async ({ page, messageDecorator }) => {
+    const bodyClass = await page.locator('body').getAttribute('class')
+    expect(bodyClass ?? '').toContain('min-h-screen')
+    expect(bodyClass ?? '').toContain('p-8')
+  })
+
   test('renders the toggle button with default testId and with an override', async ({ page, messageDecorator }) => {
     // default
     await expect(messageDecorator.toggle()).toBeVisible()

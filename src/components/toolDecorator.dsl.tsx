@@ -4,6 +4,7 @@ import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
 import { ToolDecorator } from "./toolDecorator.js"
 import type { Tool } from "../schema/tools.js"
+import { wrapHtml } from "../utils/wrapHtml.js"
 
 export type ToolDecoratorProps = {
   tool: Tool
@@ -25,7 +26,9 @@ export class ToolDecoratorDSL {
 
   static async create(page: Page, tool: Partial<Tool> = {}) {
     const merged: Tool = { ...DefaultTool, ...tool, parameters: { ...DefaultTool.parameters, ...(tool.parameters ?? {}) } }
-    await page.setContent(await <ToolDecorator tool={merged} />)
+    const body = await <ToolDecorator tool={merged} />
+    await page.setContent(wrapHtml(body))
+    await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
     return new ToolDecoratorDSL(page, merged)
   }
 
@@ -34,7 +37,9 @@ export class ToolDecoratorDSL {
       ? (tool.parameters as any)
       : this.tool.parameters
     this.tool = { ...this.tool, ...tool, parameters: nextParameters }
-    await this.page.setContent(await <ToolDecorator tool={this.tool} />)
+    const body = await <ToolDecorator tool={this.tool} />
+    await this.page.setContent(wrapHtml(body))
+    await this.page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
   }
 
   // Root container of the decorator

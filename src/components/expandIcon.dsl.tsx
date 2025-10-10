@@ -4,6 +4,7 @@ import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
 import { z } from "zod"
 import { ExpandIcon } from "./expandIcon.js"
+import { wrapHtml } from "../utils/wrapHtml.js"
 
 export class ExpandIconDSL {
   private readonly pixelSchema = z
@@ -14,7 +15,9 @@ export class ExpandIconDSL {
   private constructor(private readonly page: Page) {}
 
   static async create(page: Page) {
-    await page.setContent(await <ExpandIcon />)
+    const body = await <ExpandIcon />
+    await page.setContent(wrapHtml(body))
+    await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
     return new ExpandIconDSL(page)
   }
 

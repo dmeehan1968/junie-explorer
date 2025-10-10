@@ -4,6 +4,7 @@ import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
 import { Children } from "@kitajs/html"
 import { MessageDecorator } from "./messageDecorator.js"
+import { wrapHtml } from "../utils/wrapHtml.js"
 
 export type MessageDecoratorProps = {
   klass: string
@@ -26,13 +27,17 @@ export class MessageDecoratorDSL {
 
   static async create(page: Page, props: Partial<MessageDecoratorProps> = {}) {
     const merged = { ...DefaultProps, ...props }
-    await page.setContent(await <MessageDecorator {...merged} />)
+    const body = await <MessageDecorator {...merged} />
+    await page.setContent(wrapHtml(body))
+    await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
     return new MessageDecoratorDSL(page, merged)
   }
 
   async setContent(props: Partial<MessageDecoratorProps> = {}) {
     this.props = { ...this.props, ...props }
-    await this.page.setContent(await <MessageDecorator {...this.props} />)
+    const body = await <MessageDecorator {...this.props} />
+    await this.page.setContent(wrapHtml(body))
+    await this.page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
   }
 
   // Root wrapper: div.relative.mb-8 with ml/mr-48 depending on left

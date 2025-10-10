@@ -5,6 +5,11 @@ import { test, expect } from './toolDecorator.dsl.js'
 // Group tests by feature/prop
 
 test.describe('ToolDecorator (component)', () => {
+  test('wraps content in standard HTML body with classes', async ({ page, toolDecorator }) => {
+    const bodyClass = await page.locator('body').getAttribute('class')
+    expect(bodyClass ?? '').toContain('min-h-screen')
+    expect(bodyClass ?? '').toContain('p-8')
+  })
   test('renders tool name in the badge', async ({ toolDecorator }) => {
     await expect(toolDecorator.nameBadge).toBeVisible()
     await expect(toolDecorator.nameBadge).toHaveText('MyTool')

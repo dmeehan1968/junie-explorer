@@ -4,6 +4,7 @@ import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
 import { z } from "zod"
 import { CollapseIcon } from "./collapseIcon.js"
+import { wrapHtml } from "../utils/wrapHtml.js"
 
 export class CollapseIconDSL {
   private readonly pixelSchema = z
@@ -15,7 +16,9 @@ export class CollapseIconDSL {
   }
 
   static async create(page: Page) {
-    await page.setContent(await <CollapseIcon />)
+    const body = await <CollapseIcon />
+    await page.setContent(wrapHtml(body))
+    await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
     return new CollapseIconDSL(page)
   }
 

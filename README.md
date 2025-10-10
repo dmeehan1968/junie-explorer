@@ -138,9 +138,21 @@ bun run test
 ```
 This will run the Playwright test suite.
 
-Note:
-- Component DSLs used in Playwright tests (for example `src/components/toolCallDecorator.dsl.tsx`) now render components inside a minimal HTML document and automatically load the app stylesheet from `http://localhost:3000/css/app.css`. This ensures Tailwind/DaisyUI styles are applied and the visual representation matches production.
+### Component DSL wrapper convention
+All Playwright component DSLs that call `page.setContent` must:
+- Render the component JSX and wrap it using `wrapHtml(body)` from `src/utils/wrapHtml.ts`
+- Call `page.setContent` with the wrapped HTML
+- Load the app stylesheet afterward with `await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })`
+
+This standard wrapper ensures consistent document structure and CSS across tests. It mirrors the implementation used in `src/components/toolCallDecorator.dsl.tsx` and is now applied in:
+- `src/components/messageDecorator.dsl.tsx`
+- `src/components/toolDecorator.dsl.tsx`
+- `src/components/collapseIcon.dsl.tsx`
+- `src/components/expandIcon.dsl.tsx`
+
+Notes:
 - The Playwright config starts the dev server on port 3000 before tests run, so the stylesheet is available during tests. If you run tests against a different port, update the DSL or environment accordingly.
+- If you add a new component DSL, follow the same pattern for initial render and any update methods (e.g., `setProps`, `setTool`).
 
 ## Miscellaneous
 
