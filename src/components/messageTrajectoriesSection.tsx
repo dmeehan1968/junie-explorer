@@ -1,4 +1,3 @@
-import { Html } from "@kitajs/html"
 import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
 import { ToolUseAnswer } from "../schema/AIToolUseAnswerChoice.js"
@@ -127,9 +126,8 @@ const MultiPartMessage = ({ part }: { part: ChatMessagePart }) => {
   }
   return null
 }
-const ChatMessageDecorator = ({ klass, index, message }: {
+const ChatMessageDecorator = ({ klass, message }: {
   klass: string,
-  index: number,
   message: MatterhornMessage
 }) => {
   if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
@@ -280,8 +278,8 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
             )
 
             messages.push(
-              ...record.event.chat.messages.map((message, msgIndex) => (
-                <ChatMessageDecorator klass={klass} index={index * 100 + msgIndex} message={message}/>
+              ...record.event.chat.messages.map((message) => (
+                <ChatMessageDecorator klass={klass} message={message}/>
               )).filter(Boolean),
             )
 
