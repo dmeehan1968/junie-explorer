@@ -1,8 +1,9 @@
 /** @jsxImportSource @kitajs/html */
 
-import { test as base, Page } from "@playwright/test"
+import { Page, test as base } from "@playwright/test"
+import { renderWithWrapper } from "../utils/renderWithWrapper.js"
+
 export { expect } from "@playwright/test"
-import { ToolCallDecorator } from "./toolCallDecorator.js"
 
 export type ToolCall = {
   name: string
@@ -30,15 +31,6 @@ const DefaultToolCall: ToolCall = {
 const defaultProps: Required<Pick<ToolCallDecoratorProps, 'klass' | 'testId'>> = {
   klass: 'bg-base-content/10',
   testId: 'tool-call-toggle'
-}
-
-function wrapHtml(body: string) {
-  return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Junie Explorer Test</title>\n</head>\n<body class="min-h-screen p-8">${body}</body>\n</html>`
-}
-
-async function renderWithWrapper(klass: string, testId: string, tool: ToolCall) {
-  const body = await <ToolCallDecorator klass={klass} testId={testId} tool={tool} />
-  return wrapHtml(body)
 }
 
 export class ToolCallDecoratorDSL {
