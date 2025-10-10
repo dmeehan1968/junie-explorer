@@ -1,3 +1,5 @@
+/** @jsxImportSource @kitajs/html */
+
 import { Component, Html, Children } from "@kitajs/html"
 
 export interface ToggleComponentProps {

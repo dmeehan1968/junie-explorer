@@ -9,6 +9,7 @@ import { Tool } from "../schema/tools.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { CollapseIcon } from "./collapseIcon.js"
 import { ExpandIcon } from "./expandIcon.js"
+import { MessageDecorator } from "./messageDecorator.js"
 import { ToggleComponent } from "./toggleComponent.js"
 
 const ToolDecorator = ({ tool }: { tool: Tool }) => {
@@ -82,32 +83,6 @@ const ToolUseDecorator = ({ klass, tool }: { klass: string, tool: ToolUseAnswer 
         label: 'Tool Request',
       }}
     />
-  )
-}
-const MessageDecorator = (props: {
-  klass: string,
-  testId: string,
-  left: boolean,
-  label?: string,
-  content: string | JSX.Element
-}) => {
-  return (
-    <div class={`relative mb-8 ${props.left ? 'mr-48' : 'ml-48'}`}>
-      <ToggleComponent
-        expandIcon={<ExpandIcon/>}
-        collapseIcon={<CollapseIcon/>}
-        testId={props.testId}
-      />
-      <div class="relative">
-        <h3 class="absolute -top-3 left-4 bg-primary text-primary-content px-2 py-1 rounded shadow z-50">
-          {props.label}
-        </h3>
-        <div
-          class={`${props.klass} rounded shadow pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out`}>
-          {typeof props.content === 'string' ? props.content : props.content}
-        </div>
-      </div>
-    </div>
   )
 }
 const MultiPartMessage = ({ part }: { part: ChatMessagePart }) => {
