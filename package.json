@@ -12,7 +12,7 @@
     "test:cucumber": "NODE_OPTIONS=\"--no-warnings\" JETBRAINS_LOG_PATH=\"./fixtures\" bunx --bun cucumber-js --tags \"not @pending\"",
     "test": "bunx playwright test",
     "test:ui": "bunx playwright test --ui",
-    "playwright:install": "playwright install",
+    "playwright:install": "bunx playwright install",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/css/app.css",
     "build:version": "sed -n 's/.*\"version\": \"\\(.*\\)\",/\"\\1\"/p' package.json > public/version.txt",
     "build:static": "bun run build:version && make-vfs --dir ./public --content-format string --outfile ./src/bun/public.ts",
