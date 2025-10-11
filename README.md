@@ -84,11 +84,11 @@ Memory usage (MB):
 The memory usage is taken immediately after the scanning of logs, and likely before garbage collection can occur, but its
 not guaranteed to be a reflection of peak memory usage.
 
-### Max Workers
+### Max Workers/Concurrency
 
-When loading the logs, concurrent workers are used to improve performance.  By default, the maximum concurrency
-supported by your system will be used (CPU cores).  If you want to limit the concurrency to avoid interference
-with other processes, you can use the CONCURRENCY environment variable:
+By default, the application will use the main thread to load the logs.  This is sufficient for most use cases, but
+if you have a large number of logs, you can enable worker threads to improve performance, up to the maximum number
+of CPU cores on your system. 
 
 Bash:
 ```shell
@@ -101,13 +101,12 @@ $Env:CONCURRENCY = 4
 .\junie-explorer-windows-x64.exe
 ```
 
-- Setting CONCURRENCY to 0 will disable concurrency.
-- Setting CONCURRENCY to 1 will disable concurrency, but a worker is still used which will add a performance penalty
-about doubling the time taken to process the logs.
+- Setting CONCURRENCY to 0 will disable concurrency, all work is done on the main thread.
+- Setting CONCURRENCY to 1 will enable a single worker, which has a slight performance penalty.
 - You cannot set CONCURRENCY to a value greater than the number of CPU cores on your system, it will be adjusted down
   to match the number of cores.
 - The more workers you use, the more memory you are likely to need.  If memory is an issue, constrain
-the maximum number of workers
+  the maximum number of workers
 
 ##  Development
 

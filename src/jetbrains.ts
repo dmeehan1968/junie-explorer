@@ -93,7 +93,7 @@ export class JetBrains {
   async preload() {
     await this.checkForUpdates()
 
-    this.logger.log('Reading logs, please wait...')
+    this.logger.log('Reading logs, patience is a virtue...')
     const start = Date.now()
 
     await this.metrics  // forces a full load
@@ -143,8 +143,11 @@ export class JetBrains {
     this._metrics ??= new Promise(async (resolve) => {
 
       const projectMetrics = await Promise.all([...(await this.projects).values()].map(async project => {
-        return await project.metrics
+        const metrics = await project.metrics
+        project.logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
+        return metrics
       }))
+
       const metrics = projectMetrics.reduce((acc, cur) => {
         return {
           ...acc,

@@ -6,7 +6,7 @@ import { Logger } from "./jetbrains.js"
 import { SummaryMetrics } from "./schema.js"
 
 export class Project {
-  private _logPaths: string[] = []
+  readonly logPaths: string[] = []
   private _metrics: Promise<SummaryMetrics> | undefined
   private _ideNames: Set<string> = new Set()
   private readonly logger: Logger
@@ -14,7 +14,7 @@ export class Project {
   public hasMetrics: boolean = false
 
   constructor(public readonly name: string, logPath: string, ideName: string, logger?: Logger ) {
-    this._logPaths.push(logPath)
+    this.logPaths.push(logPath)
     this._ideNames.add(ideName)
     this.logger = logger ?? console
   }
@@ -25,7 +25,7 @@ export class Project {
 
       const issues = new Map<string, Issue>()
 
-      for (const logPath of this._logPaths) {
+      for (const logPath of this.logPaths) {
         const root = path.join(logPath, 'issues')
 
         if (!fs.existsSync(root)) {
@@ -74,8 +74,18 @@ export class Project {
         metrics.time += issueMetrics.time
         metrics.metricCount += issueMetrics.metricCount
       }))
+      // for (const [_, issue] of await this.issues) {
+      //   const issueMetrics = await issue.metrics
+      //   metrics.inputTokens += issueMetrics.inputTokens
+      //   metrics.outputTokens += issueMetrics.outputTokens
+      //   metrics.cacheTokens += issueMetrics.cacheTokens
+      //   metrics.webSearchCount += issueMetrics.webSearchCount
+      //   metrics.cost += issueMetrics.cost
+      //   metrics.time += issueMetrics.time
+      //   metrics.metricCount += issueMetrics.metricCount
+      // }
 
-      this._logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
+      // this.logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
 
       this.hasMetrics = metrics.metricCount > 0
 
@@ -90,7 +100,7 @@ export class Project {
   }
 
   addLogPath(logPath: string, ideName: string) {
-    this._logPaths.push(logPath)
+    this.logPaths.push(logPath)
     this._ideNames.add(ideName)
     this._issues = undefined
     this._metrics = undefined

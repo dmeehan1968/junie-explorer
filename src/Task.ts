@@ -83,7 +83,6 @@ export class Task {
 
       } else {
         this._workerPool = null
-        console.warn(`Concurrency disabled. Set environment CONCURRENCY > 0 to enable`)
       }
     }
     return this._workerPool

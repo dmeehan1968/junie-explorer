@@ -62,8 +62,7 @@ export class Issue {
 
       const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0, webSearchCount: 0 }
 
-      const tasks = [...(await this.tasks).values()]
-      await Promise.all(tasks.map(async (task) => {
+      for (const [_, task] of await this.tasks) {
         const taskMetrics = await task.metrics
         metrics.inputTokens += taskMetrics.inputTokens
         metrics.outputTokens += taskMetrics.outputTokens
@@ -72,7 +71,7 @@ export class Issue {
         metrics.cost += taskMetrics.cost
         metrics.time += taskMetrics.time
         metrics.metricCount += taskMetrics.metricCount
-      }))
+      }
 
       resolve(metrics)
 
