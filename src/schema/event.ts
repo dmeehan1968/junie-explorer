@@ -22,6 +22,8 @@ import { LlmResponseEvent } from "./llmResponseEvent.js"
 import { LongDelayDetected } from "./longDelayDetected.js"
 import { McpInitFinished } from "./mcpInitFinished.js"
 import { McpInitStarted } from "./mcpInitStarted.js"
+import { PairedGroupEventFinished } from "./pairedGroupEventFinished.js"
+import { PairedGroupEventStarted } from "./pairedGroupEventStarted.js"
 import { PlanUpdatedEvent } from "./planUpdatedEvent.js"
 import { ResponseTextAppeared } from "./responseTextAppeared.js"
 import { SemanticCheckFinished } from "./semanticCheckFinished.js"
@@ -67,5 +69,7 @@ export const Event = z.discriminatedUnion('type', [
   McpInitStarted,
   McpInitFinished,
   SerializableEventSerializationError,
+  PairedGroupEventStarted,
+  PairedGroupEventFinished,
 ])
 export type Event = z.infer<typeof Event>
