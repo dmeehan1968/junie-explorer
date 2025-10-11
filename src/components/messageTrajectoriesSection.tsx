@@ -5,9 +5,9 @@ import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFini
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
-import { ChatMessagePart } from "../schema/multiPartChatMessage.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 import { MessageDecorator } from "./messageDecorator.js"
+import { MultiPartMessage } from "./multiPartMessage.js"
 import { ToolCallDecorator } from "./toolCallDecorator.js"
 import { ToolDecorator } from "./toolDecorator.js"
 
@@ -16,23 +16,6 @@ const Divider = (props: { id: string, children: JSX.Element }) => (
     <span class={'text-lg bg-secondary text-secondary-content rounded p-2'}>{props.children}</span>
   </div>
 )
-
-const MultiPartMessage = ({ part }: { part: ChatMessagePart }) => {
-  if (part.type === 'text') {
-    return <>{part.text}</>
-  } else if (part.type === 'image') {
-    const src = `data:${part.contentType};base64,${part.base64}`
-    return (
-      <img
-        src={src}
-        data-fullsrc={src}
-        alt="Image"
-        class="chat-image-thumb max-w-64 max-h-64 rounded shadow cursor-zoom-in"
-      />
-    )
-  }
-  return null
-}
 
 const ChatMessageDecorator = ({ klass, message }: {
   klass: string,
