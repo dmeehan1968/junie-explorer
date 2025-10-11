@@ -2,7 +2,6 @@
 
 import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
-import { ToolUseAnswer } from "../schema/AIToolUseAnswerChoice.js"
 import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
@@ -18,19 +17,6 @@ const Divider = (props: { id: string, children: JSX.Element }) => (
   </div>
 )
 
-const ToolUseDecorator = ({ klass, tool }: { klass: string, tool: ToolUseAnswer }) => {
-  return (
-    <ToolCallDecorator
-      klass={klass}
-      testId="tool-use"
-      tool={{
-        name: tool.toolName,
-        params: tool.toolParams.rawJsonObject,
-        label: 'Tool Request',
-      }}
-    />
-  )
-}
 const MultiPartMessage = ({ part }: { part: ChatMessagePart }) => {
   if (part.type === 'text') {
     return <>{part.text}</>
@@ -47,6 +33,7 @@ const MultiPartMessage = ({ part }: { part: ChatMessagePart }) => {
   }
   return null
 }
+
 const ChatMessageDecorator = ({ klass, message }: {
   klass: string,
   message: MatterhornMessage
@@ -117,6 +104,7 @@ const ChatMessageDecorator = ({ klass, message }: {
   }
   return null
 }
+
 export const MessageTrajectoriesSection = ({ events }: { events: EventRecord[] }) => {
   return (
     <div class="bg-base-200 text-base-content rounded-lg p-4 border border-base-300" data-testid="message-trajectories">
@@ -131,6 +119,7 @@ export const MessageTrajectoriesSection = ({ events }: { events: EventRecord[] }
     </div>
   )
 }
+
 export const ImageModal = () => {
   return (
     <div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
@@ -143,6 +132,7 @@ export const ImageModal = () => {
     </div>
   )
 }
+
 const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
   if (events.length === 0) {
     return (
@@ -255,7 +245,15 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
               ...record.event.answer.contentChoices.map((choice) => {
                 const toolUses = choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice'
                   ? choice.usages.map((tool) => (
-                    <ToolUseDecorator klass={klass} tool={tool}/>
+                    <ToolCallDecorator
+                      klass={klass}
+                      testId="tool-use"
+                      tool={{
+                        name: tool.toolName,
+                        params: tool.toolParams.rawJsonObject,
+                        label: 'Tool Request',
+                      }}
+                    />
                   ))
                   : []
 
