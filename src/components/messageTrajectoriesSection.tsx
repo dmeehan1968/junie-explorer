@@ -148,7 +148,7 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
         if (record.event.type === 'LlmRequestEvent') {
           if (!didOutputInitialContext) {
 
-            messages.push(<Divider>Start of Context/History</Divider>)
+            messages.push(<Divider id="history">Start of Context/History</Divider>)
 
             messages.push(
               <MessageDecorator
