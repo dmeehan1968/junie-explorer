@@ -1,3 +1,4 @@
+/** @jsxImportSource @kitajs/html */
 // JSX Components for trajectory sections
 import { Html } from "@kitajs/html"
 
