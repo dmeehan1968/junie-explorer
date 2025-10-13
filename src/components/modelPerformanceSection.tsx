@@ -1,3 +1,4 @@
+/** @jsxImportSource @kitajs/html */
 import { Html } from "@kitajs/html"
 import { Conditional } from "./conditional.js"
 
@@ -20,12 +21,13 @@ export const ModelPerformanceSection = ({ hasMetrics }: { hasMetrics: boolean })
               </div>
               <div class="flex items-center gap-3 ml-auto">
                 <div id="model-performance-metric-toggle" class="join">
-                  <Conditional condition={hasMetrics}>
-                    <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">Both
-                    </button>
-                    <button class="btn btn-sm join-item" data-metric="latency" aria-pressed="false">Latency</button>
-                    <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/sec</button>
-                  </Conditional>
+                  {hasMetrics ? (
+                    <>
+                      <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
+                      <button class="btn btn-sm join-item" data-metric="latency" aria-pressed="false">Latency</button>
+                      <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/sec</button>
+                    </>
+                  ) : <></>}
                 </div>
               </div>
             </div>
