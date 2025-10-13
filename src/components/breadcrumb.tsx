@@ -1,3 +1,4 @@
+/** @jsxImportSource @kitajs/html */
 import { Component, Html } from "@kitajs/html"
 
 export interface BreadcrumbItem {
