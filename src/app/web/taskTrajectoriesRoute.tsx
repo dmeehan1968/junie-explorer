@@ -7,7 +7,8 @@ import { AppHeader } from "../../components/appHeader.js"
 import { Breadcrumb } from '../../components/breadcrumb.js'
 import { ContextSizeSection } from "../../components/contextSizeSection.js"
 import { HtmlPage } from "../../components/htmlPage.js"
-import { ImageModal, MessageTrajectoriesSection } from "../../components/messageTrajectoriesSection.js"
+import { ImageModal } from "../../components/imageModal.js"
+import { MessageTrajectoriesSection } from "../../components/messageTrajectoriesSection.js"
 import { ModelPerformanceSection } from "../../components/modelPerformanceSection.js"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { StatsButton } from '../../components/statsButton.js'
