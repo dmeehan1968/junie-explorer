@@ -1,3 +1,4 @@
+/** @jsxImportSource @kitajs/html */
 import { Html } from "@kitajs/html"
 import { Conditional } from "./conditional.js"
 
@@ -15,15 +16,15 @@ export const ContextSizeSection = ({ showIncludeAllTasks }: { showIncludeAllTask
         <div class="mb-4">
           <div class="flex flex-col gap-3">
             <div class="flex items-center gap-3 flex-wrap justify-between">
-              <div id="context-size-provider-filters" class="join flex flex-wrap">
-                {/* Provider buttons populated by JS */}
+              <div id="context-size-provider-filters" class="join flex flex-wrap"></div>
+              <div class="flex items-center gap-3 ml-auto">
+                {showIncludeAllTasks ? (
+                  <label class="label cursor-pointer gap-2">
+                    <input id="context-size-all-tasks-toggle" type="checkbox" class="toggle toggle-sm"/>
+                    <span class="label-text">Include all tasks in issue</span>
+                  </label>
+                ) : <></>}
               </div>
-              <Conditional condition={showIncludeAllTasks}>
-                <label class="label cursor-pointer gap-2">
-                  <input id="context-size-all-tasks-toggle" type="checkbox" class="toggle toggle-sm"/>
-                  <span class="label-text">Include all tasks in issue</span>
-                </label>
-              </Conditional>
             </div>
           </div>
         </div>
