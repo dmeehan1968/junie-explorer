@@ -1,6 +1,9 @@
+/** @jsxImportSource @kitajs/html */
+
+import { Component } from "@kitajs/html"
 import { ChatMessagePart } from "../schema/multiPartChatMessage.js"
 
-export const MultiPartMessage = ({ part }: { part: ChatMessagePart }) => {
+export const MultiPartMessage: Component<{ part: ChatMessagePart }> = ({ part }) => {
   if (part.type === 'text') {
     return <>{part.text}</>
   } else if (part.type === 'image') {
@@ -14,5 +17,5 @@ export const MultiPartMessage = ({ part }: { part: ChatMessagePart }) => {
       />
     )
   }
-  return null
+  return <></>
 }

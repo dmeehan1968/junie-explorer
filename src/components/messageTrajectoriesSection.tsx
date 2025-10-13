@@ -3,12 +3,12 @@
 import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed.js"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
 import { EventRecord } from "../schema/eventRecord.js"
-import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
+import { LlmRequestEvent } from "../schema/llmRequestEvent.js"
 import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { ChatMessageDecorator } from "./chatMessageDecorator.js"
 import { Conditional } from "./conditional.js"
 import { MessageDecorator } from "./messageDecorator.js"
-import { MultiPartMessage } from "./multiPartMessage.js"
 import { ToolCallDecorator } from "./toolCallDecorator.js"
 import { ToolDecorator } from "./toolDecorator.js"
 
@@ -17,77 +17,6 @@ const Divider = (props: { id: string, children: JSX.Element }) => (
     <span class={'text-lg bg-secondary text-secondary-content rounded p-2'}>{props.children}</span>
   </div>
 )
-
-const ChatMessageDecorator = ({ klass, message }: {
-  klass: string,
-  message: MatterhornMessage
-}) => {
-  if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
-    return (
-      <MessageDecorator
-        klass={klass}
-        testId={message.kind === 'User' ? 'user-chat-message' : 'assistant-chat-message'}
-        left={message.kind === 'User'}
-        label={message.kind === 'User' ? 'Message' : 'Model Response'}
-        content={escapeHtml(message.content)}
-      />
-    )
-  } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
-    return (
-      <>
-        {message.parts.map((part) => (
-          <MessageDecorator
-            klass={klass}
-            testId={message.kind === 'User' ? 'user-chat-multipart' : 'assistant-chat-multipart'}
-            left={message.kind === 'User'}
-            label={part.type === 'image' ? 'Image' : 'Message'}
-            content={<MultiPartMessage part={part}/>}
-          />
-        ))}
-      </>
-    )
-    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
-      return (
-        <>
-          {message.content && (
-            <MessageDecorator
-              klass={klass}
-              testId="assistant-message"
-              left={false}
-              label="Assistant Response"
-              content={escapeHtml(message.content)}
-            />
-          )}
-          {message.toolUses.map((toolUse) => (
-            <ToolCallDecorator
-              klass={klass}
-              testId="assistant-tool-use"
-              tool={{
-                name: toolUse.name,
-                params: toolUse.input.rawJsonObject,
-                label: 'Tool Use',
-              }}
-            />
-          ))}
-        </>
-      )
-    } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
-      return (
-        <>
-          {message.toolResults.map((toolResult, resultIndex) => (
-            <MessageDecorator
-              klass={klass}
-              testId="user-tool-result"
-              left={true}
-              label={toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
-              content={escapeHtml(toolResult.content)}
-            />
-          ))}
-        </>
-      )
-  }
-  return null
-}
 
 export const MessageTrajectoriesSection = ({ events }: { events: EventRecord[] }) => {
   return (
