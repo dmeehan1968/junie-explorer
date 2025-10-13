@@ -2,6 +2,7 @@ import fs from "fs-extra"
 import os from "node:os"
 import path from "node:path"
 import * as process from "node:process"
+import { clearTimeout } from "node:timers"
 import { fileURLToPath } from "node:url"
 import semver from "semver"
 import publicFiles from "./bun/public.js"
@@ -91,7 +92,7 @@ export class JetBrains {
   }
 
   async preload() {
-    await this.checkForUpdates()
+    void this.checkForUpdates()   // check for updates in the background
 
     this.logger.log('Reading logs, patience is a virtue...')
     const start = Date.now()
@@ -281,26 +282,31 @@ export class JetBrains {
 
   async checkForUpdates() {
 
-    const response = await fetch('https://api.github.com/repos/dmeehan1968/junie-explorer/releases/latest')
-    if (!response.ok) {
-      console.error('Unable to check for updates:', response.status, response.statusText)
-      return
-    }
-    const latest = await response.json()
-    const currentVersion = JSON.parse(publicFiles['version.txt'])
-
-    if (semver.lt(currentVersion, latest.tag_name)) {
-      this._version = {
-        currentVersion,
-        newVersion: latest.tag_name,
-        releaseUrl: latest.html_url,
+    try {
+      const response = await fetch('https://api.github.com/repos/dmeehan1968/junie-explorer/releases/latest')
+      if (!response.ok) {
+        console.error('Unable to check for updates:', response.status, response.statusText)
+        return
       }
+      const latest = await response.json()
+      const currentVersion = JSON.parse(publicFiles['version.txt'])
 
-      const width = 80
-      console.log('┌' + '─'.repeat(width) + '┐')
-      console.log('│' + ` New version available: ${latest.tag_name} `.padEnd(width) + '│')
-      console.log('│' + ` ${latest.html_url.padEnd(width - 1)}` + '│')
-      console.log('└' + '─'.repeat(width) + '┘')
+      if (semver.lt(currentVersion, latest.tag_name)) {
+        this._version = {
+          currentVersion,
+          newVersion: latest.tag_name,
+          releaseUrl: latest.html_url,
+
+        }
+
+        const width = 80
+        console.log('┌' + '─'.repeat(width) + '┐')
+        console.log('│' + ` New version available: ${latest.tag_name} `.padEnd(width) + '│')
+        console.log('│' + ` ${latest.html_url.padEnd(width - 1)}` + '│')
+        console.log('└' + '─'.repeat(width) + '┘')
+      }
+    } catch (err) {
+      console.error('Check for updates failed: ', String(err))
     }
   }
 
