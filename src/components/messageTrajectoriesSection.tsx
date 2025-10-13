@@ -6,6 +6,7 @@ import { EventRecord } from "../schema/eventRecord.js"
 import { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
 import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { Conditional } from "./conditional.js"
 import { MessageDecorator } from "./messageDecorator.js"
 import { MultiPartMessage } from "./multiPartMessage.js"
 import { ToolCallDecorator } from "./toolCallDecorator.js"
@@ -194,13 +195,15 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
           if (record.event.answer.llm.isSummarizer) {
             messages.push(
               ...record.event.answer.contentChoices.map((choice) => (
-                <MessageDecorator
-                  klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
-                  testId="summarizer-assistant"
-                  left={false}
-                  label="Summary"
-                  content={escapeHtml(choice.content || '<unexpectedly_empty>')}
-                />
+                <Conditional condition={!!choice.content}>
+                  <MessageDecorator
+                    klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
+                    testId="summarizer-assistant"
+                    left={false}
+                    label="Summary"
+                    content={escapeHtml(choice.content)}
+                  />
+                </Conditional>
               )),
             )
           } else {
@@ -242,13 +245,15 @@ const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
 
                 return (
                   <div>
-                    <MessageDecorator
-                      klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
-                      testId="chat-assistant"
-                      left={false}
-                      label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${previous?.event.modelParameters.reasoning_effort}</span>`}
-                      content={escapeHtml(choice.content || '<unexpectedly_empty>')}
-                    />
+                    <Conditional condition={!!choice.content}>
+                      <MessageDecorator
+                        klass={klass + (!!choice.content ? '' : ' bg-warning text-warning-content')}
+                        testId="chat-assistant"
+                        left={false}
+                        label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${previous?.event.modelParameters.reasoning_effort}</span>`}
+                        content={escapeHtml(choice.content)}
+                      />
+                    </Conditional>
                     {toolUses}
                   </div>
                 )
