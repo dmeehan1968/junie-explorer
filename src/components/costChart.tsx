@@ -1,4 +1,4 @@
-// Cost Chart Component
+/** @jsxImportSource @kitajs/html */
 import { Html } from "@kitajs/html"
 import { Conditional } from "./conditional.js"
 
