@@ -1,8 +1,11 @@
-import { defineConfig } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './src',
-  testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+  workers: 10,
+  use: {
+    headless: true,
+  },
   webServer: {
     command: 'JETBRAINS_LOG_PATH=./fixtures bun run dev',
     port: 3000,
@@ -11,8 +14,14 @@ export default defineConfig({
     // stderr: 'pipe',
     // stdout: 'pipe',
   },
-  workers: 10,
-  use: {
-    headless: true,
-  }
+  projects: [
+    {
+      name: 'unit',
+      testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+    },
+    {
+      name: 'e2e',
+      testMatch: ['**/*.e2e.ts', '**/*.e2e.tsx'],
+    },
+  ]
 })

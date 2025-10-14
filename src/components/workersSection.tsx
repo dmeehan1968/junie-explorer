@@ -1,4 +1,4 @@
-import { Html } from "@kitajs/html"
+/** @jsxImportSource @kitajs/html */
 
 export const WorkersSection = () => {
   return (

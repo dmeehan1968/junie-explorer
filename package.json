@@ -51,7 +51,7 @@
     "@types/node": "^22.15.30",
     "daisyui": "^5.0.47",
     "make-vfs": "^1.0.16",
-    "playwright": "^1.40.0",
+    "playwright": "^1.56.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   },
