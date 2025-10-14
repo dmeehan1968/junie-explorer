@@ -74,7 +74,7 @@ of the new solution.
 - Preferred environment: dotenv/config
 - Preferred best practices: DRY, YAGNI, KISS, SOLID
 - Preferred testing methodology: Test Driven Development - Red, Green, Refactor
-- Preferred type checker: `bunx tsc --noEmit`
+- Preferred type checker: `bunx tsc --noEmit && echo TypeChecker: PASS`
 
 # Notes
 
