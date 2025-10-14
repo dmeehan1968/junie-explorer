@@ -87,28 +87,29 @@ Junie Explorer is a full-stack web application built with Bun and TypeScript (Ex
 ## Directory Structure
 ```
 junie-explorer/
-├── .junie/                                  # Project documentation and contributor guidelines
-│   └── guidelines.md                        # Architecture, workflows, and directory map (this file)
+├── .junie/                                  # Project documentation and configs
+│   ├── guidelines.md                        # Architecture, workflows, and directory map (this file)
+│   └── mcp/                                 # Model Context Protocol config
+│       └── mcp.json                         # MCP service configuration
 ├── CHANGELOG.md                             # Versioned list of notable changes
 ├── CODE_OF_CONDUCT.md                       # Community standards for contributors
 ├── CONTRIBUTING.md                          # How to contribute, run, and test the project
 ├── LICENSE                                  # License for using and distributing this software
 ├── README.md                                # Quick start and high‑level overview
 ├── bun.lock                                 # Bun dependency lockfile
-├── cucumber.js                              # Cucumber test runner configuration
-├── docs/                                    # Additional documentation
-│   └── overview.md                          # Extended project overview and concepts
-├── features/                                # Gherkin specs describing expected behavior
-│   ├── homepage.feature                     # Requirements for the homepage view
-│   ├── issue.feature                        # Requirements for issue detail flows
-│   ├── projects.feature                     # Requirements for projects listing and filters
-│   └── task.feature                         # Requirements for task, steps, and events views
-├── fixtures/                                # Sample JetBrains cache/projects used for local dev/tests
 ├── package.json                             # Scripts, dependencies, and metadata
+├── playwright.config.ts                     # Playwright end‑to‑end test configuration
+├── docs/                                    # Additional documentation
+│   ├── overview.md                          # Extended project overview and concepts
+│   └── images/                              # Screenshot assets used in docs
+├── dist/                                    # Prebuilt executables (build artefacts)
+├── fixtures/                                # Test data files used in testing
 ├── public/                                  # Static assets served by the web app
 │   ├── css/
 │   │   └── app.css                          # Compiled Tailwind CSS (build artefact; do not edit)
 │   ├── icons/
+│   │   ├── Anthropic.svg                    # Anthropic provider icon
+│   │   ├── OpenAI.svg                       # OpenAI provider icon
 │   │   └── favicon.png                      # Site favicon
 │   ├── js/                                  # Frontend behaviors for charts, filters, and UI
 │   │   ├── collapsibleSections.js           # Toggle expand/collapse for UI sections
@@ -118,7 +119,9 @@ junie-explorer/
 │   │   ├── issueGraph.js                    # Render per‑issue graphs (timeline/metrics)
 │   │   ├── projectSelection.js              # Manage project selection and metrics chart rendering
 │   │   ├── reloadPage.js                    # Trigger full page reloads from UI controls
+│   │   ├── statsPage.js                     # Runtime stats page client logic
 │   │   ├── taskActionChart.js               # Draw charts for action/request counts over time
+│   │   ├── taskContextSizeChart.js          # Plot task context size series
 │   │   ├── taskEventChart.js                # Visualize task events timeline in Chart.js
 │   │   ├── taskEventFilters.js              # Filter task events by type/source in UI
 │   │   ├── taskEventLlmChart.js             # Plot LLM‑related task event metrics
@@ -133,6 +136,10 @@ junie-explorer/
 │   ├── app/                                 # HTTP API, server‑rendered pages, middleware
 │   │   ├── api/                             # Express routers for JSON APIs
 │   │   │   ├── events/                      # Event‑centric API endpoints (LLM/tool events)
+│   │   │   │   ├── download.ts              # Download event data
+│   │   │   │   ├── index.ts                 # Register event sub‑routes
+│   │   │   │   ├── task.ts                  # Task events endpoint
+│   │   │   │   └── timeline.ts              # Chronological sequence of events for a task/issue
 │   │   │   ├── projects.ts                  # GET project metrics/graph data by grouping
 │   │   │   ├── stats.ts                     # Live runtime stats/time‑series endpoints
 │   │   │   └── trajectories/                # Task trajectory analytics APIs
@@ -140,9 +147,12 @@ junie-explorer/
 │   │   │       ├── download.ts              # Download trajectory data as a file/JSON
 │   │   │       ├── index.ts                 # Register trajectory sub‑routes on a router
 │   │   │       ├── modelPerformance.ts      # Summarize model performance with labels/reasoning
-│   │   │       └── timeline.ts              # Chronological sequence of events for a task/issue
+│   │   │       └── timeline.ts              # Chronological sequence of trajectory events
 │   │   ├── junieExplorer.ts                 # App bootstrap: build Express app, mount routes
 │   │   ├── middleware/                      # Reusable Express middlewares (entity lookup, etc.)
+│   │   │   ├── entityLookupMiddleware.ts    # Entity lookup helper
+│   │   │   ├── errorHandler.ts              # Error handler
+│   │   │   └── serveStaticsFromBunVfsMiddleware.ts # Serve statics from Bun VFS
 │   │   ├── types.ts                         # App‑specific Request/Response typings and helpers
 │   │   └── web/                             # Server‑rendered routes returning HTML
 │   │       ├── homeRoutes.tsx               # Homepage: list projects, filters, metrics chart
@@ -159,16 +169,28 @@ junie-explorer/
 │   │   ├── appHead.tsx                      # <head> with page title, scripts, and CSS
 │   │   ├── appHeader.tsx                    # Header with actions (theme, stats, reload)
 │   │   ├── breadcrumb.tsx                   # Breadcrumb navigation component
+│   │   ├── chatMessageDecorator.tsx         # Decorate chat messages for display
 │   │   ├── collapseIcon.tsx                 # SVG icon for collapse state
 │   │   ├── conditional.tsx                  # Conditional renderer to show/hide children
+│   │   ├── contextSizeSection.tsx           # Context size chart section
+│   │   ├── costChart.tsx                    # Costs chart component
+│   │   ├── divider.tsx                      # UI divider element
 │   │   ├── expandIcon.tsx                   # SVG icon for expand state
 │   │   ├── fileIOSection.tsx                # Panel showing worker file I/O metrics
 │   │   ├── htmlPage.tsx                     # Full HTML document wrapper component
 │   │   ├── ideSelection.tsx                 # IDE icons/selector built from discovered IDEs
+│   │   ├── imageModal.tsx                   # Display images in a modal
+│   │   ├── issueRow.tsx                     # Row for issues list
+│   │   ├── issuesTable.tsx                  # Table of projects/issues
 │   │   ├── memorySection.tsx                # Panel for memory usage metrics
+│   │   ├── messageDecorator.tsx             # Decorate message content
+│   │   ├── messageTrajectoriesSection.tsx   # Trajectories UI section
+│   │   ├── modelPerformanceSection.tsx      # Model performance section
+│   │   ├── multiPartMessage.tsx             # Render multi‑part message content
+│   │   ├── processedEvents.tsx              # Render processed events list
 │   │   ├── projectMetricsChart.tsx          # Card container with canvas for projects chart
-│   │   ├── projectMetricsChartOptions.tsx   # Radio/controls for chart display/grouping
-│   │   ├── projectTable.tsx                 # Table of projects with metrics and actions
+│   │   ├── projectMetricsChartOptions.tsx   # Controls for chart display/grouping
+│   │   ├── projectTable.tsx                 # Table of projects
 │   │   ├── reloadButton.tsx                 # Button to trigger a page refresh
 │   │   ├── sortIcon.tsx                     # SVG sort indicator icon
 │   │   ├── statsButton.tsx                  # Link/button to runtime stats page
@@ -176,51 +198,24 @@ junie-explorer/
 │   │   ├── taskCard.tsx                     # Summary card for a single task
 │   │   ├── themeSwitcher.tsx                # Toggle theme on server‑rendered pages
 │   │   ├── toggleComponent.tsx              # Generic toggle UI control component
-│   │   ├── versionBanner.tsx                # Display running app version in header
-│   │   └── workersSection.tsx               # Panel summarizing worker pool metrics
-│   ├── dashboard/                           # Static assets/templates for stats dashboard
+│   │   ├── toolCallDecorator.tsx            # Decorate tool calls
+│   │   ├── toolDecorator.tsx                # Decorate tool info
+│   │   └── versionBanner.tsx                # Display running app version in header
+│   ├── createServer.ts                      # App/server factory for dev and tests
 │   ├── getMaxConcurrency.ts                 # Detect optimal worker concurrency based on CPU
 │   ├── index.ts                             # Main entrypoint: start server and listen on PORT
 │   ├── input.css                            # Tailwind input (source used for building CSS)
 │   ├── jetbrains.ts                         # Orchestrates discovery, projects, metrics, icons
+│   ├── playwright/                          # Playwright test utilities and scaffolding
 │   ├── schema/                              # Event and data schema definitions
-│   │   ├── responseTextAppeared.ts          # Schema for response text appeared event
-│   │   ├── stepMetaInfoAppearedEvent.ts     # Schema for step meta info appeared event
-│   │   └── toolPrimitiveProperty.ts         # Schema for tool primitive property model
 │   ├── schema.ts                            # Zod schemas: chains, tasks, steps, metrics
 │   ├── stats/                               # Runtime statistics collection and types
 │   ├── types.ts                             # Shared analysis/result types used across modules
 │   ├── utils/                               # Utility helpers with no side‑effects
-│   │   ├── escapeHtml.ts                    # Escape HTML special characters safely
-│   │   ├── getLocaleFromRequest.ts          # Parse Accept‑Language and cookies to locale
-│   │   ├── metricsUtils.ts                  # Aggregate/format token, cost, and time metrics
-│   │   ├── themeCookie.ts                   # Read/write theme preference cookie
-│   │   └── timeUtils.ts                     # Date/time formatting and range helpers
-│   ├── workers/                             # Worker pool and event loading
-│   │   ├── Job.ts                           # Job descriptor passed to workers
-│   │   ├── JobScheduler.ts                  # Schedule and throttle jobs across the pool
-│   │   ├── MetricsCollector.ts              # Collect per‑task/pool metrics (timings, I/O)
-│   │   ├── PoolMetrics.ts                   # Types for worker/pool metrics reporting
-│   │   ├── Response.ts                      # Generic worker response message shape
-│   │   ├── WorkerEntry.ts                   # Worker file entry point type and helpers
-│   │   ├── WorkerExecutionError.ts          # Error type for failures within a worker
-│   │   ├── WorkerFileIOCollector.ts         # Track file I/O performed by workers
-│   │   ├── WorkerManager.ts                 # High‑level pool manager orchestrating workers
-│   │   ├── WorkerPool.ts                    # Worker pool implementation (spawns, queues jobs)
-│   │   ├── WorkerPoolError.ts               # Error type for pool‑level errors
-│   │   ├── WorkerPoolOptions.ts             # Options for tuning worker pool behavior
-│   │   ├── WorkerSpawnError.ts              # Error type for worker spawn failures
-│   │   ├── loadEvents.ts                    # Load task events from disk using the pool
-│   │   ├── loadEventsInput.ts               # Input type for loadEvents worker task
-│   │   ├── loadEventsOutput.ts              # Output type/result for loadEvents worker task
-│   │   └── loadEventsWorker.ts              # Web worker that reads/returns events from files
-│   ├── Issue.ts                             # Issue class: loads chain, aggregates tasks/metrics
-│   ├── Project.ts                           # Project class: discovers issues, aggregates stats
-│   ├── Step.ts                              # Step class: step data, metrics, and validation
-│   └── Task.ts                              # Task class: events, trajectories, worker usage
+│   └── workers/                             # Worker pool and event loading
+├── test-results/                            # Playwright test output (artefact)
 ├── tsconfig.json                            # TypeScript compiler configuration
-├── dist/                                    # Compiled JavaScript (build artefact; do not edit)
-└── node_modules/                            # Installed dependencies (do not edit)
+└── playwright.config.ts                     # Playwright test runner configuration
 ```
 
 
