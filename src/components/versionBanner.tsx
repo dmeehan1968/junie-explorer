@@ -1,8 +1,12 @@
-// Function to generate version banner HTML
-import { Component, Html } from "@kitajs/html"
+/** @jsxImportSource @kitajs/html */
+import { Component } from "@kitajs/html"
 import { Version } from "../jetbrains.js"
 
-export const VersionBanner: Component<{ version?: Version }> = ({ version }) => {
+interface VersionBannerProps {
+  version?: Version
+}
+
+export const VersionBanner: Component<VersionBannerProps> = ({ version }) => {
   if (!version) {
     return <></>
   }
@@ -13,7 +17,9 @@ export const VersionBanner: Component<{ version?: Version }> = ({ version }) => 
         <span class="font-medium">
           New version available: {version.newVersion} (you have {version.currentVersion})
         </span>
-        <a href={version.releaseUrl} target="_blank" class="btn btn-sm btn-warning" data-testid="version-link">View Release</a>
+        <a href={version.releaseUrl} target="_blank" class="btn btn-sm btn-warning" data-testid="version-link">
+          View Release
+        </a>
       </div>
     </div>
   )
