@@ -1,3 +1,5 @@
+/** @jsxImportSource @kitajs/html */
+
 import { Html, Component } from "@kitajs/html"
 
 export type SortDirection = 'asc' | 'desc'

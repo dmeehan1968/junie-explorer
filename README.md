@@ -153,6 +153,7 @@ This standard wrapper ensures consistent document structure and CSS across tests
 - `src/components/actionTimelineSection.dsl.tsx`
 - `src/components/breadcrumb.dsl.tsx` (new)
 - `src/components/divider.dsl.tsx` (new)
+- `src/components/sortIcon.dsl.tsx` (new)
 
 Notes:
 - The Playwright config starts the dev server on port 3000 before tests run, so the stylesheet is available during tests. If you run tests against a different port, update the DSL or environment accordingly.
