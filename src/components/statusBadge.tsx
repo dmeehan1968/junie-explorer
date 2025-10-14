@@ -1,3 +1,5 @@
+/** @jsxImportSource @kitajs/html */
+
 import { Component, Html } from "@kitajs/html"
 
 interface StatusBadgeProps {
