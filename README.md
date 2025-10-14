@@ -157,7 +157,6 @@ junie-explorer/
 ├── LICENSE                  # Project license
 ├── README.md                # Project readme
 ├── bun.lock                 # Bun lockfile
-├── cucumber.js              # Cucumber configuration
 ├── docs/                    # Documentation
 │   └── overview.md          # Project overview documentation
 ├── features/                # Gherkin feature files for requirements documentation
@@ -189,8 +188,6 @@ junie-explorer/
 │   │   ├── imageModal.js                # Image modal UI
 │   │   └── themeSwitcher.js             # Theme toggling
 │   └── version.txt          # Version information file (build artefact; do not edit)
-├── reports/                 # Test and analysis reports
-│   └── cucumber-report.html # Generated test report (build artefact; do not edit)
 ├── src/                     # Source code
 │   ├── bun/                 # Bun-specific utilities
 │   │   └── public.ts        # Public asset handling for Bun (build artefact; do not edit)
