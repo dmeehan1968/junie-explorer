@@ -15,6 +15,16 @@ Junie Explorer is a full-stack web application built with Bun and TypeScript (Ex
     - Asserts fallback styling for unknown states
     - Confirms dynamic updates when the `state` prop changes
 
+- Added unit tests and a Playwright DSL for `ToggleComponent`
+  - Files:
+    - `src/components/toggleComponent.dsl.tsx`
+    - `src/components/toggleComponent.test.tsx`
+  - Coverage:
+    - Verifies default and custom `testId`
+    - Asserts `data-expanded="false"`, `title="Toggle content"`, and presence of `onclick`
+    - Checks base class `content-toggle-btn`
+    - Ensures `expandIcon` renders in `.expand-icon` (visible) and `collapseIcon` renders in `.collapse-icon` (hidden initially)
+
 ## Running Tests
 
 - Run the full test suite:
