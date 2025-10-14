@@ -28,7 +28,7 @@ See the [Documentation](docs/overview.md) for details
   - marked: Markdown parsing library
 
 ### External Development Dependencies
-- Bun 1.2.18+ - Must be installed by the user
+- Bun 1.3.0+ - Must be installed by the user
 
 ### Pre-built executables
 
@@ -57,32 +57,6 @@ From: <pathname>
 ...
 Server is running on http://localhost:60123
 ```
-
-### Memory Reporting
-
-Enabled memory usage statistics after each reload with the `MEMORY_REPORT={truthy}` environment variable (works with
-both binaries and the development mode)
-
-```shell
-MEMORY_REPORT=true junie-explorer-apple-arm64
-```
-
-You will get a table printed after each scan of the logs showing the history of memory use (i.e. after hitting 'reload'
-on any of the pages):
-
-```text
-Memory usage (MB):
-┌──────────────────────────┬──────────────┬────────────────┬──────────────────┬──────────────────┬──────────────────────┐
-│                          │ arrayBuffers │ external       │ heapTotal        │ heapUsed         │ rss                  │
-├──────────────────────────┼──────────────┼────────────────┼──────────────────┼──────────────────┼──────────────────────┤
-│ 2025-07-24T11:13:55.317Z │ 0.00         │ 1.99           │ 7.02             │ 5.30             │ 68.61                │
-│ 2025-07-24T11:14:14.765Z │ 0.94 (+0.94) │ 34.39 (+32.40) │ 159.36 (+152.34) │ 42.71 (+37.41)   │ 3,239.38 (+3,170.77) │
-│ 2025-07-24T11:15:13.297Z │ 0.46 (-0.48) │ 24.77 (-9.62)  │ 126.02 (-33.34)  │ 246.88 (+204.17) │ 3,842.45 (+603.08)   │
-└──────────────────────────┴──────────────┴────────────────┴──────────────────┴──────────────────┴──────────────────────┘
-```
-
-The memory usage is taken immediately after the scanning of logs, and likely before garbage collection can occur, but its
-not guaranteed to be a reflection of peak memory usage.
 
 ### Max Workers/Concurrency
 
@@ -129,29 +103,42 @@ To run the application in development mode:
 ```bash
 bun run dev
 ```
-This will start the server using ts-node, which compiles and runs TypeScript code on-the-fly.
+This will start the server using `bunx`, which runs the TypeScript code without the need for transpiling.
 
 ## Testing
 To test the application functionality:
 ```bash
 bun run test
 ```
-This will run the Playwright test suite.
+This will run the Playwright test suite.  You can add Playwright CLI arguments to the end of this, for example
+`bun run test --grep <pattern>` to run tests that match the specified pattern. 
+
+Tests are co-located with the source code, and are to be run with the Playwright test runner.
+
+Unit tests: Named `<component>.test.ts`
+End-to-end tests: Named `<feature>.e2e.ts`
+
+### JSX Import Source
+
+All tests must include the following JSX import source:
+
+`/** @jsxImportSource @kitajs/html */`
 
 ### Component DSL wrapper convention
+
+Tests typically use a Domain-specific-language (DSL) to interact with the application.  This should be named
+`<component>.dsl.ts`.  Use `.tsx` extension for DSL's containing JSX syntax.
+
 All Playwright component DSLs that call `page.setContent` must:
 - Render the component JSX and wrap it using `wrapHtml(body)` from `src/utils/wrapHtml.ts`
 - Call `page.setContent` with the wrapped HTML
 - Load the app stylesheet afterward with `await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })`
 
-This standard wrapper ensures consistent document structure and CSS across tests. It mirrors the implementation used in `src/components/toolCallDecorator.dsl.tsx` and is now applied in:
-- `src/components/messageDecorator.dsl.tsx`
-- `src/components/toolDecorator.dsl.tsx`
-- `src/components/collapseIcon.dsl.tsx`
-- `src/components/expandIcon.dsl.tsx`
+This standard wrapper ensures a consistent document structure and CSS across tests.
 
 Notes:
-- The Playwright config starts the dev server on port 3000 before tests run, so the stylesheet is available during tests. If you run tests against a different port, update the DSL or environment accordingly.
+- The Playwright config starts the dev server on port 3000 before tests run, so the stylesheet is available during tests. 
+  If you run tests against a different port, update the DSL or environment accordingly.
 - If you add a new component DSL, follow the same pattern for initial render and any update methods (e.g., `setProps`, `setTool`).
 
 ## Miscellaneous
@@ -294,24 +281,6 @@ When loading the application state, the system:
 6. Merges projects that appear in multiple IDEs
 
 This hierarchical structure allows the application to display a comprehensive view of all JetBrains projects, issues, tasks, and steps across different IDE installations.
-
-## Acceptance Tests
-Requirements for this project are documented using Gherkin feature files located in the `features/` directory. These files serve as a source of truth and documentation for the expected behavior of the application.
-
-### Feature Files
-- Feature files use the Gherkin syntax to describe application behavior in a human-readable format
-- Each feature file contains scenarios that outline specific user interactions and expected outcomes
-- The `features/homepage.feature` file describes the expected behavior of the application's homepage
-- The `features/projects.feature` file describes the expected behavior of the project details page
-- The `features/issue.feature` file describes the expected behavior of the issue details page
-- The `features/task.feature` file describes the expected behavior of the task details page
-
-### Using Feature Files
-- Feature files should be consulted when implementing new features or modifying existing ones
-- They serve as acceptance criteria for the application's functionality
-- No step definitions or testing tools should be created at this time - the feature files are purely for documentation purposes
-- When implementing features, developers should ensure their code satisfies all scenarios described in the relevant feature files
-- When code changes are made, make sure that the relevant feature files are updated to reflect new functionality
 
 ## Contributing
 
