@@ -18,10 +18,10 @@ test.describe('ToolCallDecorator (component)', () => {
   })
 
   test('applies klass to content wrapper', async ({ toolCall }) => {
-    await expect(toolCall.content).toHaveClass(/bg-base-content\/10/)
+    await expect(toolCall.content).toContainClass('bg-base-content/10')
 
     await toolCall.setProps({ klass: 'border-2 custom-class' })
-    await expect(toolCall.content).toHaveClass(/custom-class/)
+    await expect(toolCall.content).toContainClass('custom-class')
   })
 
   test('passes testId to ToggleComponent', async ({ toolCall }) => {

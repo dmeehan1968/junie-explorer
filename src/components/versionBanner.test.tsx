@@ -31,7 +31,7 @@ test.describe('VersionBanner', () => {
     await expect(versionBanner.link).toHaveAttribute('data-testid', 'version-link')
 
     await expectClassesToContain(versionBanner, OUTER_CLASSES)
-    await expect(versionBanner.banner.locator('div')).toHaveClass(new RegExp(INNER_CLASSES.join('.*'))) // rough check
+    await expect(versionBanner.banner.locator('div')).toContainClass(INNER_CLASSES.join(' '))
   })
 
   test('updates when version prop changes', async ({ versionBanner }) => {

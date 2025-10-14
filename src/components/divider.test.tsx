@@ -32,17 +32,17 @@ test.describe('Divider', () => {
   test.describe('class names', () => {
     test('root div has expected classes', async ({ divider }) => {
       await divider.setId('root-class-check')
-      await expect(divider.root).toHaveClass(/\bdivider\b/)
-      await expect(divider.root).toHaveClass(/\bdivider-secondary\b/)
-      await expect(divider.root).toHaveClass(/\bm-8\b/)
+      await expect(divider.root).toContainClass('divider')
+      await expect(divider.root).toContainClass('divider-secondary')
+      await expect(divider.root).toContainClass('m-8')
     })
 
     test('inner span has expected classes', async ({ divider }) => {
-      await expect(divider.label).toHaveClass(/\btext-lg\b/)
-      await expect(divider.label).toHaveClass(/\bbg-secondary\b/)
-      await expect(divider.label).toHaveClass(/\btext-secondary-content\b/)
-      await expect(divider.label).toHaveClass(/\brounded\b/)
-      await expect(divider.label).toHaveClass(/\bp-2\b/)
+      await expect(divider.label).toContainClass('text-lg')
+      await expect(divider.label).toContainClass('bg-secondary')
+      await expect(divider.label).toContainClass('text-secondary-content')
+      await expect(divider.label).toContainClass('rounded')
+      await expect(divider.label).toContainClass('p-2')
     })
   })
 })

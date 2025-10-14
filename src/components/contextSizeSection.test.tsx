@@ -15,8 +15,8 @@ test.describe('ContextSizeSection', () => {
     })
 
     test('has initial collapsed state and hidden content', async ({ contextSize }) => {
-      await expect(contextSize.section).toHaveClass(/collapsed/)
-      await expect(contextSize.content).toHaveClass(/hidden/)
+      await expect(contextSize.section).toContainClass('collapsed')
+      await expect(contextSize.content).toContainClass('hidden')
     })
 
     test('renders provider filters container', async ({ contextSize }) => {

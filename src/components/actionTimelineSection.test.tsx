@@ -34,11 +34,11 @@ test.describe('ActionTimelineSection', () => {
       await actionTimeline.setProps({ hasActionEvents: true, actionCount: 1 })
 
       // Section should have the 'collapsed' class initially
-      await expect(actionTimeline.section).toHaveClass(/collapsed/)
+      await expect(actionTimeline.section).toContainClass('collapsed')
 
       // Collapsible content is hidden by default
       const content = page.locator('.collapsible-content')
-      await expect(content).toHaveClass(/hidden/)
+      await expect(content).toContainClass('hidden')
     })
   })
 })

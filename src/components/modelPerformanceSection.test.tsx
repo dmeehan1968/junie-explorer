@@ -15,8 +15,8 @@ test.describe('ModelPerformanceSection', () => {
     })
 
     test('has initial collapsed state and hidden content', async ({ modelPerformance }) => {
-      await expect(modelPerformance.section).toHaveClass(/collapsed/)
-      await expect(modelPerformance.content).toHaveClass(/hidden/)
+      await expect(modelPerformance.section).toContainClass('collapsed')
+      await expect(modelPerformance.content).toContainClass('hidden')
     })
 
     test('renders provider filters container', async ({ modelPerformance }) => {
