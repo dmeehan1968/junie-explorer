@@ -341,3 +341,9 @@ Apache 2.0 (See [License](LICENSE))
   - Validates initial collapsed state of the section UI.
   - Includes a case with special characters in event type names to ensure safe rendering and selectors.
 
+- Added a shared TaskCard test suite function `src/components/taskCard.suite.ts` used by:
+  - `src/components/taskCard.e2e.ts` for the Trajectories page
+  - `src/components/taskCard.events.e2e.ts` for the Events page
+  - Covers header/meta, tabs behavior, download link, metrics, description, and JSON toggle.
+  - The download assertion is robust across routes (matches by link text and verifies the `href`).
+
