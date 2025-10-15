@@ -1,7 +1,14 @@
+/** @jsxImportSource @kitajs/html */
+
+import { Component } from "@kitajs/html"
 import { EventRecord } from "../schema/eventRecord.js"
 
-export const EventTimelineSection = ({ events }: { events: EventRecord[] }) => {
-  if (events.length === 0) return null
+export interface EventTimelineSectionProps {
+  events: EventRecord[]
+}
+
+export const EventTimelineSection: Component<EventTimelineSectionProps> = ({ events }) => {
+  if (events.length === 0) return <></>
 
   return (
     <div class="collapsible-section collapsed mb-5 bg-base-100 rounded-lg border border-base-300 collapsed"
