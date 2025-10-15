@@ -1,6 +1,10 @@
+/** @jsxImportSource @kitajs/html */
 import { escapeHtml } from "../utils/escapeHtml.js"
 
-export const EventFilters = ({ eventTypes }: { eventTypes: string[] }) => {
+export type EventFiltersProps = {
+  eventTypes: string[]
+}
+export const EventFilters = ({ eventTypes }: EventFiltersProps) => {
   if (eventTypes.length === 0) return null
 
   return (
