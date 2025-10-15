@@ -331,3 +331,13 @@ Check out [contribution](CONTRIBUTING.md) guidelines
 
 ## License
 Apache 2.0 (See [License](LICENSE))
+
+
+### New/Updated Tests
+
+- Added `src/components/eventStatisticsSection.dsl.tsx` and `src/components/eventStatisticsSection.test.tsx`.
+  - Verifies render behavior based on `events` and `task.eventTypes` props.
+  - Confirms stats per event type: Sample Count, Min, Max, Avg (rounded).
+  - Validates initial collapsed state of the section UI.
+  - Includes a case with special characters in event type names to ensure safe rendering and selectors.
+

@@ -1,8 +1,15 @@
-import { EventRecord } from "../schema/eventRecord.js"
+/** @jsxImportSource @kitajs/html */
+
+import { Component } from "@kitajs/html"
 import { escapeHtml } from "../utils/escapeHtml.js"
 
-export const EventStatisticsSection = async ({ events, task }: { events: EventRecord[]; task: any }) => {
-  if (events.length === 0) return null
+export interface EventStatisticsSectionProps {
+  events: any[]
+  task: { eventTypes: Promise<string[]> } | { eventTypes: string[] }
+}
+
+export const EventStatisticsSection: Component<EventStatisticsSectionProps> = async ({ events, task }) => {
+  if (events.length === 0) return <></>
 
   // Calculate durations for each event
   const eventDurations = events.map((eventRecord, index) => {
