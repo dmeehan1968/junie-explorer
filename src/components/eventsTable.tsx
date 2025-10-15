@@ -1,7 +1,13 @@
+/** @jsxImportSource @kitajs/html */
+
 import { EventRecord } from "../schema/eventRecord.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
 
-export const EventsTable = ({ events }: { events: EventRecord[] }) => {
+interface EventsTableProps {
+  events: EventRecord[]
+}
+
+export const EventsTable = ({ events }: EventsTableProps) => {
   if (events.length === 0) {
     return (
       <div class="p-4 text-center text-base-content/70" data-testid="no-events-message">
