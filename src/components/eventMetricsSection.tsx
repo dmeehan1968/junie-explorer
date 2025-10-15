@@ -1,3 +1,4 @@
+/** @jsxImportSource @kitajs/html */
 export const EventMetricsSection = ({ hasMetrics }: { hasMetrics: boolean }) => {
   if (!hasMetrics) return null
 
