@@ -120,7 +120,7 @@ End-to-end tests: Named `<feature>.e2e.ts`
 
 ### JSX Import Source
 
-All tests must include the following JSX import source:
+All component, test, and DSL modules must include the following JSX import source:
 
 `/** @jsxImportSource @kitajs/html */`
 
@@ -331,19 +331,3 @@ Check out [contribution](CONTRIBUTING.md) guidelines
 
 ## License
 Apache 2.0 (See [License](LICENSE))
-
-
-### New/Updated Tests
-
-- Added `src/components/eventStatisticsSection.dsl.tsx` and `src/components/eventStatisticsSection.test.tsx`.
-  - Verifies render behavior based on `events` and `task.eventTypes` props.
-  - Confirms stats per event type: Sample Count, Min, Max, Avg (rounded).
-  - Validates initial collapsed state of the section UI.
-  - Includes a case with special characters in event type names to ensure safe rendering and selectors.
-
-- Added a shared TaskCard test suite function `src/components/taskCard.suite.ts` used by:
-  - `src/components/taskCard.e2e.ts` for the Trajectories page
-  - `src/components/taskCard.events.e2e.ts` for the Events page
-  - Covers header/meta, tabs behavior, download link, metrics, description, and JSON toggle.
-  - The download assertion is robust across routes (matches by link text and verifies the `href`).
-
