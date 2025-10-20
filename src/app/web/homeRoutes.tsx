@@ -37,9 +37,6 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
       <AppHead title={'Junie Explorer'}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
-        <script>
-          window.projectsData = {JSON.stringify(projects.map(p => ({ name: p.name, ides: p.ideNames })))};
-        </script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/ideFilters.js"></script>
         <script src="/js/projectMetricsChart.js"></script>
