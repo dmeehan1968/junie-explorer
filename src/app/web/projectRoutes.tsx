@@ -11,7 +11,6 @@ import { ReloadButton } from '../../components/reloadButton.js'
 import { StatsButton } from '../../components/statsButton.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
-import { Issue } from "../../Issue.js"
 import { Project } from "../../Project.js"
 import { escapeHtml } from "../../utils/escapeHtml.js"
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
@@ -36,69 +35,6 @@ const IdeIcons = ({ project, jetBrains }: { project: Project, jetBrains: any }) 
   </div>
 )
 
-// Function to prepare data for the cost over time graph
-async function prepareGraphData(issues: Issue[]): Promise<{ labels: string[], datasets: any[], timeUnit: string, stepSize: number }> {
-  // Sort issues by creation date
-  const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
-
-  // Find min and max dates
-  const minDate = sortedIssues.length > 0 ? new Date(sortedIssues[0].created) : new Date()
-  const maxDate = sortedIssues.length > 0 ? new Date(sortedIssues[sortedIssues.length - 1].created) : new Date()
-
-  // Calculate the date range in milliseconds
-  const dateRange = maxDate.getTime() - minDate.getTime()
-
-  // Determine the appropriate time unit based on the date range
-  let timeUnit
-  let stepSize = 1
-
-  // Constants for time calculations
-  const HOUR = 60 * 60 * 1000
-  const DAY = 24 * HOUR
-  const WEEK = 7 * DAY
-  const MONTH = 30 * DAY
-  const YEAR = 365 * DAY
-
-  if (dateRange < DAY) {
-    timeUnit = 'hour'
-  } else if (dateRange < DAY * 2) {
-    timeUnit = 'hour'
-    stepSize = 3
-  } else if (dateRange < WEEK * 4) {
-    timeUnit = 'day'
-  } else if (dateRange < MONTH * 6) {
-    timeUnit = 'week'
-  } else if (dateRange < YEAR) {
-    timeUnit = 'month'
-  } else {
-    timeUnit = 'year'
-  }
-
-  // Create datasets for each issue
-  const datasets = await Promise.all(sortedIssues.map(async (issue, index) => {
-
-    // Generate a color based on index
-    const hue = (index * 137) % 360 // Use golden ratio to spread colors
-    const color = `hsl(${hue}, 70%, 60%)`
-
-    return {
-      label: issue.name,
-      data: [{ x: issue.created, y: (await issue.metrics).cost }],
-      borderColor: color,
-      backgroundColor: color,
-      fill: false,
-      tension: 0.1,
-    }
-  }))
-
-  return {
-    labels: [minDate.toISOString(), maxDate.toISOString()],
-    datasets,
-    timeUnit,
-    stepSize,
-  }
-}
-
 // Project issues page route
 export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => {
   const locale = getLocaleFromRequest(req)
@@ -110,18 +46,10 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
       return res.status(404).send('Project not found')
     }
 
-    const issues = [...(await project.issues ?? []).values()]
-
-    // Prepare graph data
-    const graphData = await prepareGraphData(issues)
-
     const page = <HtmlPage cookies={req.cookies}>
       <AppHead title={`${project.name} Issues`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
-          <script>
-            window.chartData = {JSON.stringify(graphData)};
-          </script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/issueCostChart.js"></script>
         <script src="/js/compareModal.js"></script>

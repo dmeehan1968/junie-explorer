@@ -290,5 +290,82 @@ router.get('/api/projects/graph', async (req: AppRequest, res: AppResponse) => {
   }
 })
 
+// API endpoint to get issue cost graph data for a single project
+router.get('/api/projects/:projectId/issue-cost', async (req: AppRequest, res: AppResponse) => {
+  try {
+    const { projectId } = req.params as { projectId: string }
+    const allProjects: Project[] = Array.from((await req.jetBrains?.projects ?? []).values())
+    const project = allProjects.find(p => p.name === projectId)
+
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' })
+    }
+
+    const issues = [...(await project.issues ?? []).values()]
+
+    // Prepare graph data (similar to previous server-side implementation)
+    // Sort by creation
+    const sortedIssues = [...issues].sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
+
+    // Find min and max dates
+    const minDate = sortedIssues.length > 0 ? new Date(sortedIssues[0].created) : new Date()
+    const maxDate = sortedIssues.length > 0 ? new Date(sortedIssues[sortedIssues.length - 1].created) : new Date()
+
+    // Determine time unit
+    const HOUR = 60 * 60 * 1000
+    const DAY = 24 * HOUR
+    const WEEK = 7 * DAY
+    const MONTH = 30 * DAY
+    const YEAR = 365 * DAY
+
+    const dateRange = maxDate.getTime() - minDate.getTime()
+
+    let timeUnit: string
+    let stepSize = 1
+
+    if (dateRange < DAY) {
+      timeUnit = 'hour'
+    } else if (dateRange < DAY * 2) {
+      timeUnit = 'hour'
+      stepSize = 3
+    } else if (dateRange < WEEK * 4) {
+      timeUnit = 'day'
+    } else if (dateRange < MONTH * 6) {
+      timeUnit = 'week'
+    } else if (dateRange < YEAR) {
+      timeUnit = 'month'
+    } else {
+      timeUnit = 'year'
+    }
+
+    // Create datasets for each issue
+    const datasets = await Promise.all(sortedIssues.map(async (issue, index) => {
+      const hue = (index * 137) % 360
+      const color = `hsl(${hue}, 70%, 60%)`
+      const metrics = await issue.metrics
+      return {
+        label: issue.name,
+        data: [{ x: issue.created, y: metrics.cost }],
+        borderColor: color,
+        backgroundColor: color,
+        fill: false,
+        tension: 0.1,
+      }
+    }))
+
+    const graphData = {
+      labels: [minDate.toISOString(), maxDate.toISOString()],
+      datasets,
+      timeUnit,
+      stepSize,
+    }
+
+    res.json(graphData)
+  } catch (error) {
+    console.error('Error generating issue cost graph data:', error)
+    res.status(500).json({ error: 'An error occurred while generating issue cost graph data' })
+  }
+})
+
 export default router
 

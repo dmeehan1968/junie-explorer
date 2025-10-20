@@ -22,8 +22,7 @@ window._locale = {
 
 // Initialize the cost over time graph when the page loads
 window.onload = function() {
-  // Add a small delay to ensure all scripts are loaded
-  setTimeout(function() {
+  (async function() {
     try {
       const chartElement = document.getElementById('costOverTimeChart');
       // Only initialize the chart if the element exists (i.e., there are issues)
@@ -32,15 +31,21 @@ window.onload = function() {
         return;
       }
 
-      // Check if chartData exists (it won't if there are no issues)
-      if (!window.chartData) {
-        console.log('No chart data available - chart will not be initialized');
-        return;
+      const body = document.querySelector('body')
+      const projectId = body?.dataset.projectId
+      if (!projectId) {
+        console.warn('No projectId found on body dataset; cannot load chart data')
+        return
       }
 
+      const resp = await fetch(`/api/projects/${encodeURIComponent(projectId)}/issue-cost`)
+      if (!resp.ok) {
+        console.warn('Failed to load chart data:', resp.status)
+        return
+      }
+      const chartData = await resp.json()
+
       const ctx = chartElement.getContext('2d');
-      // Use a global variable to avoid JSON parsing issues
-      const chartData = window.chartData;
       const timeUnit = chartData.timeUnit;
       const stepSize = chartData.stepSize;
 
@@ -125,8 +130,10 @@ window.onload = function() {
 
       // Create the chart
       new Chart(ctx, config);
+      const container = chartElement.closest('[data-testid="cost-over-time-graph"]')
+      if (container) container.setAttribute('data-ready', 'true')
     } catch (error) {
       console.error('Error creating chart:', error);
     }
-  }, 100); // 100ms delay
+  })();
 };

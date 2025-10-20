@@ -84,6 +84,21 @@ $Env:CONCURRENCY = 4
 
 ##  Development
 
+### Issue Cost Chart Data API
+
+The Issue Cost chart now fetches its data from an API endpoint rather than using server-injected globals.
+
+- Endpoint: `GET /api/projects/:projectId/issue-cost`
+- Returns JSON in the shape:
+  - `labels: string[]` — time bounds for the chart
+  - `datasets: { label: string, data: { x: string, y: number }[], borderColor: string, backgroundColor: string, fill: boolean, tension: number }[]`
+  - `timeUnit: 'hour' | 'day' | 'week' | 'month' | 'year'`
+  - `stepSize: number`
+
+The front-end script `public/js/issueCostChart.js` reads the project id from the document body attribute `data-project-id` and fetches from the endpoint above to render the chart.
+
+This refactor removes the server-side method that previously injected `window.chartData` on the project page.
+
 ## Development Workflow
 1. **Setup**: Clone the repository and run `bun install`
 2. **Development**: Use `bun run dev` to start the development server

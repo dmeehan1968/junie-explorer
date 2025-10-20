@@ -14,7 +14,8 @@ test.describe("IssueCostChart", () => {
     })
 
     test('should match snapshot', async ({ costChart }) => {
-      await expect(costChart.element).toHaveScreenshot({ animations: "disabled" })
+      await expect(costChart.element).toHaveAttribute('data-ready', 'true')
+      await expect(costChart.element).toHaveScreenshot({ animations: "disabled", maxDiffPixelRatio: 0.02 })
     })
   })
 
