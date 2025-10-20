@@ -4,7 +4,7 @@ import { AppBody } from "../../components/appBody.js"
 import { AppHead } from "../../components/appHead.js"
 import { AppHeader } from "../../components/appHeader.js"
 import { Breadcrumb } from '../../components/breadcrumb.js'
-import { CostChart } from "../../components/costChart.js"
+import { IssueCostChart } from "../../components/issueCostChart.js"
 import { HtmlPage } from "../../components/htmlPage.js"
 import { IssuesTable } from "../../components/issuesTable.js"
 import { ReloadButton } from '../../components/reloadButton.js'
@@ -123,7 +123,7 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
             window.chartData = {JSON.stringify(graphData)};
           </script>
         <script src="/js/themeSwitcher.js"></script>
-        <script src="/js/issueGraph.js"></script>
+        <script src="/js/issueCostChart.js"></script>
         <script src="/js/compareModal.js"></script>
       </AppHead>
       <AppBody data-project-id={escapeHtml(project.name ?? '')}>
@@ -136,7 +136,7 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
           ]}
         />
         <IdeIcons project={project} jetBrains={jetBrains} />
-        <CostChart condition={project.hasMetrics} />
+        <IssueCostChart condition={project.hasMetrics} />
         <IssuesTable project={project} locale={locale} />
       </AppBody>
     </HtmlPage>

@@ -116,7 +116,7 @@ junie-explorer/
 │   │   ├── compareModal.js                  # Compare modal open/close and selection logic
 │   │   ├── ideFilters.js                    # Client‑side filtering by IDE across projects
 │   │   ├── imageModal.js                    # Display images in a modal with zoom/close
-│   │   ├── issueGraph.js                    # Render per‑issue graphs (timeline/metrics)
+│   │   ├── issueCostChart.js                # Render per‑issue graphs (timeline/metrics)
 │   │   ├── projectSelection.js              # Manage project selection and metrics chart rendering
 │   │   ├── reloadPage.js                    # Trigger full page reloads from UI controls
 │   │   ├── statsPage.js                     # Runtime stats page client logic

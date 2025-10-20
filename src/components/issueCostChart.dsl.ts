@@ -1,6 +1,6 @@
 import { Page, test as base } from "@playwright/test"
 
-class CostChartDSL {
+class IssueCostChartDsl {
   constructor(private readonly page: Page) {
   }
 
@@ -13,8 +13,8 @@ class CostChartDSL {
   }
 }
 
-export const test = base.extend<{ costChart: CostChartDSL }>({
+export const test = base.extend<{ costChart: IssueCostChartDsl }>({
   costChart: async ({ page }, use) => {
-    await use(new CostChartDSL(page))
+    await use(new IssueCostChartDsl(page))
   }
 })
