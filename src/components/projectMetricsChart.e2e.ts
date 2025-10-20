@@ -10,7 +10,7 @@ test.describe('ProjectMetricsChart', () => {
   })
 
   test('should hide chart with no projects selected', async ({ projectMetricsChart }) => {
-    await expect(projectMetricsChart.isVisible).resolves.toEqual(false)
+    await expect(projectMetricsChart.container).toBeHidden()
   })
 
   test.describe('one selected project', () => {
@@ -20,7 +20,7 @@ test.describe('ProjectMetricsChart', () => {
     })
 
     test('should show chart with one project selected', async ({ projectMetricsChart, projectTable }) => {
-      await expect(projectMetricsChart.isVisible).resolves.toEqual(true)
+      await expect(projectMetricsChart.container).toBeVisible()
     })
 
     test('should default to show by cost', async ({ projectMetricsChart }) => {
@@ -38,7 +38,7 @@ test.describe('ProjectMetricsChart', () => {
             test('should show chart', async ({ projectMetricsChart}) => {
               await projectMetricsChart.radioButton(displayBy).check()
               await projectMetricsChart.radioButton(groupBy).check()
-              await expect(projectMetricsChart.screenshot).toHaveScreenshot({ animations: "disabled" })
+              await expect(projectMetricsChart.container).toHaveScreenshot({ animations: "disabled" })
             })
           })
         }

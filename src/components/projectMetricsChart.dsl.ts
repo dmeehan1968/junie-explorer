@@ -13,13 +13,10 @@ export class ProjectMetricsChartDSL {
     return this.page.getByRole('radio', { name, exact: true })
   }
 
-  get screenshot() {
-    return this.page.locator('#projects-graph-container')
+  get container() {
+    return this.page.locator('#project-metrics-chart')
   }
 
-  get isVisible() {
-    return this.page.isVisible('#projects-graph-container')
-  }
 }
 
 export const test = base.extend<{ projectMetricsChart: ProjectMetricsChartDSL }>({

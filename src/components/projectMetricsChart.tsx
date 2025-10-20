@@ -9,7 +9,7 @@ export const ProjectMetricsChart: Component = () => {
           <h2 class="card-title">Project Metrics</h2>
           <ProjectMetricsChartOptions />
         </div>
-        <div id="projects-graph-container" class="h-96 p-2 bg-base-200 rounded-lg hidden">
+        <div id="project-metrics-chart" class="h-96 p-2 bg-base-200 rounded-lg hidden">
           <canvas id="projectsMetricsChart"></canvas>
         </div>
       </div>

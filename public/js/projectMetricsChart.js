@@ -8,7 +8,7 @@ let groupOption = 'auto'; // Grouping option for x-axis (auto, hour, day, week, 
 function initializeProjectSelection() {
   const storedSelection = localStorage.getItem('junie-explorer-selectedProjects');
   const storedDisplayOption = localStorage.getItem('junie-explorer-displayOption');
-  const graphContainer = document.getElementById('projects-graph-container');
+  const graphContainer = document.getElementById('project-metrics-chart');
 
   // Initialize display option from local storage or default to 'cost'
   if (storedDisplayOption) {
@@ -55,7 +55,7 @@ function initializeProjectSelection() {
 
     // Load and display the graph if projects are selected
     if (anySelected) {
-      loadProjectsGraph();
+      loadProjectMetricsChart();
     }
   } else {
     // Initialize with empty selection
@@ -79,7 +79,7 @@ function handleProjectSelection(checkbox) {
   updateSelectAllCheckbox();
 
   // Load and display the graph if projects are selected
-  loadProjectsGraph();
+  loadProjectMetricsChart();
 }
 
 // Toggle select/deselect all projects
@@ -99,7 +99,7 @@ function toggleSelectAllProjects() {
   localStorage.setItem('junie-explorer-selectedProjects', JSON.stringify(selectedProjects));
 
   // Load and display the graph if projects are selected
-  loadProjectsGraph();
+  loadProjectMetricsChart();
 }
 
 // Update the "Select All" checkbox based on individual selections
@@ -129,7 +129,7 @@ function handleDisplayOptionChange(radio) {
 
   // Reload the graph with the new display option
   if (projectsChart) {
-    loadProjectsGraph();
+    loadProjectMetricsChart();
   }
 }
 
@@ -139,13 +139,13 @@ function handleGroupOptionChange(radio) {
   groupOption = allowed.includes(radio.value) ? radio.value : 'auto';
   localStorage.setItem('junie-explorer-groupOption', groupOption);
   if (projectsChart) {
-    loadProjectsGraph();
+    loadProjectMetricsChart();
   }
 }
 
 // Load and display the graph for selected projects
-async function loadProjectsGraph() {
-  const graphContainer = document.getElementById('projects-graph-container');
+async function loadProjectMetricsChart() {
+  const graphContainer = document.getElementById('project-metrics-chart');
   if (!graphContainer) return;
   const selectedProjectNames = Object.keys(selectedProjects).filter(name => selectedProjects[name]);
 

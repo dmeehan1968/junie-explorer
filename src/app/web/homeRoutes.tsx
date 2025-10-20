@@ -42,7 +42,7 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
         </script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/ideFilters.js"></script>
-        <script src="/js/projectSelection.js"></script>
+        <script src="/js/projectMetricsChart.js"></script>
       </AppHead>
       <AppBody>
         <AppHeader actions={[<ThemeSwitcher/>, <StatsButton/>, <ReloadButton/>]}/>
