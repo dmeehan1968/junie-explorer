@@ -2,7 +2,6 @@ import fs from "fs-extra"
 import os from "node:os"
 import path from "node:path"
 import * as process from "node:process"
-import { clearTimeout } from "node:timers"
 import { fileURLToPath } from "node:url"
 import semver from "semver"
 import publicFiles from "./bun/public.js"
@@ -23,10 +22,6 @@ export interface Logger {
   log: (...message: any[]) => void
 }
 
-interface FormatMemoryOptions {
-  showChange?: boolean
-}
-
 export interface Version {
   currentVersion: string,
   newVersion: string,
@@ -35,9 +30,6 @@ export interface Version {
 
 export class JetBrains {
 
-  private readonly memory: Record<string, ReturnType<typeof process.memoryUsage>> = {
-    [new Date().toISOString()]: process.memoryUsage(),
-  }
   private readonly _logPath: string | undefined
   private readonly logger: { log: (...message: any[]) => void }
 
@@ -63,34 +55,6 @@ export class JetBrains {
     Task.setStatsCollector(this.statsCollector)
   }
 
-  getCurrentLocaleFromEnv = (): string | undefined => {
-    // Prioritize LC_ALL, then LANG
-    const lcAll = process.env.LC_ALL ?? process.env.LC_CTYPE
-    const lang = process.env.LANG
-
-    if (lcAll) {
-      // LC_ALL often includes encoding, e.g., "en_US.UTF-8"
-      // We want just the language tag, so we might need to clean it
-      return lcAll.split('.')[0].replace('_', '-') // "en_US" -> "en-US"
-    } else if (lang) {
-      return lang.split('.')[0].replace('_', '-')
-    }
-    return undefined // No specific locale found in environment variables
-  }
-
-  private formatMemory(before: number, after: number, options: FormatMemoryOptions = {}) {
-    const toMB = (bytes: number) => Intl.NumberFormat(this.getCurrentLocaleFromEnv() ?? [], {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(bytes / 1024 / 1024)  //.toFixed(2)
-    if (!options.showChange) {
-      return toMB(after)
-    }
-    const change = after - before
-    const sign = change >= 0 ? '+' : ''
-    return `${toMB(after)} (${sign}${toMB(change)})`
-  }
-
   async preload() {
     void this.checkForUpdates()   // check for updates in the background
 
@@ -102,34 +66,6 @@ export class JetBrains {
     const duration = (Date.now() - start) / 1000
 
     console.log('Loaded in', duration, 'seconds')
-    this.memoryReport()
-  }
-
-  isMemoryReportEnabled() {
-    return /1|true|yes/i.test(process.env.MEMORY_REPORT ?? 'false')
-  }
-
-  memoryReport() {
-    this.memory[new Date().toISOString()] = process.memoryUsage()
-    if (this.isMemoryReportEnabled()) {
-      console.log('Memory usage (MB):')
-      const table = Object.fromEntries(Object.entries(this.memory)
-        .map(([timestamp, memoryUsage], index, memory) => {
-          const previousUsage = memory[index - 1]?.[1]
-          return [
-            timestamp,
-            Object.fromEntries(Object.entries(memoryUsage)
-              .sort(([a], [b]) => a.localeCompare(b))
-              .map(([type, value]) => {
-                return [
-                  type,
-                  this.formatMemory(previousUsage?.[type as never] ?? 0, value, { showChange: previousUsage !== undefined }),
-                ]
-              })),
-          ]
-        }))
-      console.table(table)
-    }
   }
 
   async reload() {
@@ -214,22 +150,6 @@ export class JetBrains {
     })
 
     return this._projects
-  }
-
-  get projectsPath() {
-    return path.join(this.logPath, 'projects')
-  }
-
-  get ideNames(): Promise<string[]> {
-    return new Promise(async (resolve) => {
-      const names = new Set<string>()
-      for (const project of (await this.projects).values()) {
-        for (const ideName of project.ideNames) {
-          names.add(ideName)
-        }
-      }
-      return resolve([...names])
-    })
   }
 
   getIDEIcon(ideName: string): string {
