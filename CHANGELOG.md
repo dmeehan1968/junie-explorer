@@ -5,6 +5,70 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2025-11-04
+
+### Added
+- Add `EventTimelineSection` DSL and tests for Playwright integration (3b3eb88)
+- Add `EventsTable` DSL and tests for Playwright integration (06e0954)
+- Add `EventStatisticsSection` DSL and tests for Playwright integration (09ea759)
+- Add `EventMetricsSection` DSL and tests for Playwright integration (782a89a)
+- Add `ToolDecorator`, `ToolDecoratorDSL`, and Playwright tests for `ToolDecorator` functionality (2aeb12e)
+- Add `ToolCallDecorator`, `ToolCallDecoratorDSL`, and Playwright tests (55ff2af)
+- Add HTML wrapper and stylesheet support to `ToolCallDecoratorDSL` (5d1e843)
+- Add HTML wrapper and stylesheet loading into component DSLs (0ed24af)
+- Add `ExpandIconDSL` and tests (3ef7b9f)
+- Add `CollapseIconDSL` and tests (92b3320)
+- Add `ContextSizeDSL` and tests (192ab30)
+- Add `ModelPerformanceDSL` and tests (edb7a35)
+- Add `ActionTimelineDSL` and tests (ebaac18)
+- Add `TaskCardDSL` and tests for task card functionality (26c911b)
+- Add snapshot test for `CostChart` component (849b1a6)
+- Add Playwright tests for metrics chart and project table (ac52a72, 9d2fd6d, 1c72bd2, 91fa35c)
+- Add unit testing guidelines and DSL example to documentation (4b1ba9f)
+
+### Changed
+- Update README.md and documentation structure; clarify JSX import source and new tests (8bbc434, a279582, 458b1b5, d61ac7e)
+- Refactor and modularize TaskCard test suites (2728148)
+- Extract components for event metrics, timeline, statistics, and filtering (f9c6a59)
+- Refactor tests and DSLs to align with E2E structure and unit tests where appropriate (761a18b, 9491e0a, 865147f, 0863bbe, f6e1c41, 8aafc7e, 93bb330, c3e90b7, bc69621, 0af30e3, 174e93b, aff45f9, e636b28, 5ac570f, b265d0a, ec4f248)
+- Update Playwright scripts to use `bunx` and adjust dependencies (c3171ea, 85fdc10)
+- Update JSX configuration and simplify `ChatMessageDecorator` (fdfc94a)
+- Extract context chart inline script to own module (d8a0a5d)
+- Extract task trajectories sections to own modules (6cbc850)
+- Do check for updates in the background and log errors (0dc3c6f)
+- Wrap `MessageDecorator` with `Conditional` for content validation (79aebaf)
+- Add dividers and session jump link to Message Trajectories Section (ed3c7a4)
+- Inline `renderWithWrapper` into `ToolCallDecoratorDSL` and extract HTML wrapping to utilities (923de55, 48be6bd)
+- Refactor project table and introduce metrics chart DSL with tests (91fa35c)
+- Refactor test assertions to use `toContainClass` instead of `toHaveClass` (c2ed70d)
+
+### Removed
+- Remove unused server-side `projectsData` script injection (7ff7e9b)
+- Remove unused memory reporting and JetBrains unused utilities (c450e81)
+- Remove unused `mcp.json` configuration (81bbc9e)
+- Remove `llm-token-filters` and associated token visibility logic (c09bf8c)
+- Remove unused and redundant methods from `ProjectTableDSL` (c3ba202)
+- Remove Cucumber test support files and features (c72a2ad)
+- Remove `ToolUseDecorator` and inline logic into `ToolCallDecorator` (11fea21)
+
+### Fixed
+- Update `AgentActionExecutionFinished` schema for flexible result handling (06a09fd)
+- Update `reasoning_effort` field in `llmRequestEvent` schema (1a47712)
+- Add `cached` field to `llmResponseEvent` schema (3e4a6d8)
+- Add `cacheInputTokens` to charts and improve combined token calculations (125a148)
+- Optimize JSX mapping and conditional rendering in `taskTrajectoriesRoute.tsx` (fbd32e7)
+- Preload JetBrains instance in tests and clean up conditional rendering (a22250e)
+- Improve project table tests and browser settings (60794ee, 04d2c3f)
+- Refactor row DSLs and improve locator usage (0f27e4a)
+
+### Security
+- N/A
+
+### Chore/Meta
+- Refactor concurrency handling and improve logging/metrics readability (7e8cc47)
+- Add OpenAI 41 and PairedGroupEvent support to schemas (61dd460)
+- Playwright dependency refactors and code style updates across DSL files (85fdc10)
+
 ## [3.3.1] - 2025-10-03
 
 ### Added
