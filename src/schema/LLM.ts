@@ -7,6 +7,7 @@ import { LLMTransformer } from "./LLMTransformer.js"
 import { OpenAI41 } from "./openAI41.js"
 import { OpenAI41Mini } from "./openAI41Mini.js"
 import { OpenAI4oMini } from "./openAI4oMini.js"
+import { OpenAI51 } from "./OpenAI51.js"
 import { OpenAIo3 } from "./openAIo3.js"
 
 export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai', [
@@ -14,6 +15,7 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   OpenAI4oMini,
   OpenAI41Mini,
   OpenAI41,
+  OpenAI51,
   AnthropicSonnet37,
   AnthropicSonnet4,
   AnthropicSonnet45,

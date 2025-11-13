@@ -9,6 +9,7 @@ import { AutoSelectedLlm } from "./AutoSelectedLlm.js"
 import { OpenAI41 } from "./openAI41.js"
 import { OpenAI41Mini } from "./openAI41Mini.js"
 import { OpenAI4oMini } from "./openAI4oMini.js"
+import { OpenAI51 } from "./OpenAI51.js"
 import { OpenAIo3 } from "./openAIo3.js"
 
 export const LLMTransformer = z.any().transform(data => {
@@ -62,6 +63,9 @@ export const LLMTransformer = z.any().transform(data => {
   }
   if (OpenAI41.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return OpenAI41.parse(data)
+  }
+  if (OpenAI51.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return OpenAI51.parse(data)
   }
   if (AnthropicSonnet37.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return AnthropicSonnet37.parse(data)
