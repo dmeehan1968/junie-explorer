@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.1] - 2025-11-14
+
+### Added
+- Add `OpenAI51` schema and update references (aa5f21a)
+
+### Changed
+- Refactor `AgentActionExecutionFinished` schema for reusability and consistency (4af0dbd)
+
 ## [3.4.0] - 2025-11-04
 
 ### Added
