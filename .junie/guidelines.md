@@ -392,25 +392,30 @@ Do NOT commit changes unless explicitly requested.  If in any doubt, ask the use
 
 ### Release a version
 
-- Check the CHANGELOG.md for the most recently mentioned version
-- Use this version (Major.minor.patch) to look for git commits since a tag with the same version (version tags are prefixed `v`, e.g. v1.0.0)
-- If there are no changes since the last version tag, then your work is done.
-- Separate changes by version number (git tag) and increment the latest version (default patch) depending on the request
-- Update the package.json version to the new version
-- Update CHANGELOG.md to include a section listing the changes in this version (versions in descending order)
-  - Use the first line of the commit and include the commit hash
-  - Group each change under a sub-heading according to its type, e.g. 
-    - Added for new features. 
-    - Changed for changes in existing functionality. 
-    - Deprecated for soon-to-be removed features. 
-    - Removed for now removed features. 
-    - Fixed for any bug fixes. 
-    - Security in case of vulnerabilities.
-    - etc
-- Make sure the latest version release date is today (use `date` CLI to get current)
-- Run `bun install` to update the package-lock.json
-- Commit CHANGELOG.md, package.json, and bun.lock
-- Add a tag with the new version (prefix the version with `v`, e.g. v1.0.0)
+When following these instructions, DO NOT write additional code or tests, DO NOT follow TDD process.
+Perform these steps exactly.
+
+1. Check the CHANGELOG.md for the most recently mentioned version
+2. Use this version (Major.minor.patch) to look for git commits since a tag with the same version (version tags are
+   prefixed `v`, e.g. v1.0.0)
+3. If there are no changes since the last version tag, then your work is done.
+4. Separate changes by version number (git tag) and increment the latest version (default patch) depending on the
+   request
+5. Update the package.json version to the new version
+6. Update CHANGELOG.md to include a section listing the changes in this version (versions in descending order)
+   - Use the first line of the commit and include the commit hash
+   - Group each change under a sub-heading according to its type, e.g.
+      - Added for new features.
+      - Changed for changes in existing functionality.
+      - Deprecated for soon-to-be removed features.
+      - Removed for now removed features.
+      - Fixed for any bug fixes.
+      - Security in case of vulnerabilities.
+      - etc
+7. Make sure the latest version release date is today (use `date` CLI to get current)
+8. Run `bun install` to update the package-lock.json
+9. Commit CHANGELOG.md, package.json, and bun.lock
+10. Add a tag with the new version (prefix the version with `v`, e.g. v1.0.0)
 
 ## Future Enhancements
 Potential areas for improvement:
