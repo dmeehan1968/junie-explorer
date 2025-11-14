@@ -1,6 +1,11 @@
 import * as z from "zod"
 import { ActionToExecute } from "./actionToExecute.js"
 
+const ExecutionResult = z.looseObject({
+  text: z.string(),
+  images: z.any().array().optional()
+})
+
 export const AgentActionExecutionFinished = z.looseObject({
   type: z.literal('AgentActionExecutionFinished'),
   actionToExecute: ActionToExecute,
@@ -9,14 +14,11 @@ export const AgentActionExecutionFinished = z.looseObject({
    * interface { text: string; images?: string[]; }
    */
   result: z.union([
-    z.looseObject({
-      text: z.string(),
-      images: z.any().array().optional(),
-    }),
+    ExecutionResult,
     z.looseObject({
       content: z.string(),
-    }).transform(result => ({ text: result.content })),
-    z.string().transform(result => ({ text: result })),
+    }).transform(result => ExecutionResult.parse({ text: result.content })),
+    z.string().transform(result => ExecutionResult.parse({ text: result })),
   ]),
 })
 export type AgentActionExecutionFinished = z.infer<typeof AgentActionExecutionFinished>
