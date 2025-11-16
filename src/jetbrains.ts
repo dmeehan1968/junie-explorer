@@ -126,7 +126,7 @@ export class JetBrains {
         const root = path.join(this.logPath, ideDir.name, 'projects')
 
         if (!fs.existsSync(root)) {
-          this.logger.log('Skipping', ideDir.name, 'because it does not have a projects directory')
+          this.logger.log('Skipping', path.join(ideDir.parentPath, ideDir.name), 'because it does not have a projects directory')
           continue
         }
 
