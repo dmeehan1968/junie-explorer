@@ -1,6 +1,6 @@
 import fs from "fs-extra"
 import { inspect } from "node:util"
-import { Dependencies, Description, JunieStatistics, JunieStepSchema, StepContent } from "./schema.js"
+import { Dependencies, Description, JunieStatistics, JunieStepSchema, StepContent } from "./schema"
 
 export interface Metrics {
   inputTokens: number;

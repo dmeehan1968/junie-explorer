@@ -1,6 +1,6 @@
 /** @jsxImportSource @kitajs/html */
 import { Html } from "@kitajs/html"
-import { Conditional } from "./conditional.js"
+import { Conditional } from "./conditional"
 
 export const ContextSizeSection = ({ showIncludeAllTasks }: { showIncludeAllTasks: boolean }) => {
   return (

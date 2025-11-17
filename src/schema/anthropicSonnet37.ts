@@ -1,6 +1,6 @@
 import * as z from "zod"
-import { AbstractCapabilities } from "./abstractCapabilities.js"
-import { AbstractLLM } from "./abstractLLM.js"
+import { AbstractCapabilities } from "./abstractCapabilities"
+import { AbstractLLM } from "./abstractLLM"
 
 export const AnthropicSonnet37 = AbstractLLM.extend({
   jbai: z.literal('anthropic-claude-3.7-sonnet'),

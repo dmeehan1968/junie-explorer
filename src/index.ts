@@ -1,5 +1,5 @@
 import { Server } from "http"
-import { createServer } from "./createServer.js"
+import { createServer } from "./createServer"
 
 const { app, port } = await createServer()
 app.listen(port, (server: Server, host, port) => {

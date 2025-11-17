@@ -1,7 +1,7 @@
 import * as z from "zod"
-import { AIContentAnswerChoice } from "./AIContentAnswerChoice.js"
-import { AIToolUseAnswerChoice } from "./AIToolUseAnswerChoice.js"
-import { LLM } from "./LLM.js"
+import { AIContentAnswerChoice } from "./AIContentAnswerChoice"
+import { AIToolUseAnswerChoice } from "./AIToolUseAnswerChoice"
+import { LLM } from "./LLM"
 
 export const ContentAnswer = z.discriminatedUnion('type', [AIContentAnswerChoice, AIToolUseAnswerChoice])
 export type ContentAnswer = z.infer<typeof ContentAnswer>

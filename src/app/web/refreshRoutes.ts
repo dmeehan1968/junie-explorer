@@ -1,8 +1,8 @@
 import express from "express"
-import { Issue } from "../../Issue.js"
-import { Project } from "../../Project.js"
-import { Task } from "../../Task.js"
-import { AppRequest, AppResponse } from "../types.js"
+import { Issue } from "../../Issue"
+import { Project } from "../../Project"
+import { Task } from "../../Task"
+import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
 

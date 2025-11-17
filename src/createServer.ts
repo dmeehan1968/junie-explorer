@@ -1,6 +1,6 @@
 import process from "node:process"
-import { JunieExplorer } from "./app/junieExplorer.js"
-import { JetBrains } from "./jetbrains.js"
+import { JunieExplorer } from "./app/junieExplorer"
+import { JetBrains } from "./jetbrains"
 
 export interface ServerOptions {
   jetBrainsInstance?: JetBrains

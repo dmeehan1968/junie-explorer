@@ -1,15 +1,15 @@
 import { Html } from "@kitajs/html"
 import express from 'express'
-import { AppBody } from "../../components/appBody.js"
-import { AppHead } from "../../components/appHead.js"
-import { AppHeader } from "../../components/appHeader.js"
-import { HtmlPage } from "../../components/htmlPage.js"
+import { AppBody } from "../../components/appBody"
+import { AppHead } from "../../components/appHead"
+import { AppHeader } from "../../components/appHeader"
+import { HtmlPage } from "../../components/htmlPage"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
-import { MemorySection } from "../../components/memorySection.js"
-import { FileIOSection } from "../../components/fileIOSection.js"
-import { WorkersSection } from "../../components/workersSection.js"
-import { AppRequest, AppResponse } from "../types.js"
+import { MemorySection } from "../../components/memorySection"
+import { FileIOSection } from "../../components/fileIOSection"
+import { WorkersSection } from "../../components/workersSection"
+import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
 

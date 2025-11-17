@@ -1,25 +1,25 @@
 import express from 'express'
-import { AppBody } from "../../components/appBody.js"
-import { AppHead } from "../../components/appHead.js"
-import { AppHeader } from "../../components/appHeader.js"
+import { AppBody } from "../../components/appBody"
+import { AppHead } from "../../components/appHead"
+import { AppHeader } from "../../components/appHeader"
 import { Breadcrumb } from '../../components/breadcrumb.js'
-import { Conditional } from "../../components/conditional.js"
-import { EventFilters } from "../../components/eventFilters.js"
-import { EventMetricsSection } from "../../components/eventMetricsSection.js"
-import { EventsTable } from "../../components/eventsTable.js"
-import { EventStatisticsSection } from "../../components/eventStatisticsSection.js"
-import { EventTimelineSection } from "../../components/eventTimelineSection.js"
-import { HtmlPage } from "../../components/htmlPage.js"
+import { Conditional } from "../../components/conditional"
+import { EventFilters } from "../../components/eventFilters"
+import { EventMetricsSection } from "../../components/eventMetricsSection"
+import { EventsTable } from "../../components/eventsTable"
+import { EventStatisticsSection } from "../../components/eventStatisticsSection"
+import { EventTimelineSection } from "../../components/eventTimelineSection"
+import { HtmlPage } from "../../components/htmlPage"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { StatsButton } from '../../components/statsButton.js'
 import { TaskCard } from '../../components/taskCard.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
-import { LlmResponseEvent } from "../../schema/llmResponseEvent.js"
-import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
-import { prepareLlmEventGraphData } from "../../utils/prepareLlmEventGraphData.js"
-import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../types.js"
+import { LlmResponseEvent } from "../../schema/llmResponseEvent"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest"
+import { prepareLlmEventGraphData } from "../../utils/prepareLlmEventGraphData"
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
 

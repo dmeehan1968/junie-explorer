@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { test } from "./issueCostChart.dsl.js"
+import { test } from "./issueCostChart.dsl"
 
 test.describe("IssueCostChart", () => {
 

@@ -1,4 +1,4 @@
-import { Job } from "./Job.js"
+import { Job } from "./Job"
 
 /**
  * Manages job queuing and scheduling

@@ -1,5 +1,5 @@
 import { Page, test as base } from "@playwright/test"
-import { IssueRowDSL } from "./issueRow.dsl.js"
+import { IssueRowDSL } from "./issueRow.dsl"
 
 export class IssuesTableDSL {
   constructor(private readonly page: Page) {

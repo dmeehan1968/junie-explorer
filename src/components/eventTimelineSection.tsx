@@ -1,7 +1,7 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Component } from "@kitajs/html"
-import { EventRecord } from "../schema/eventRecord.js"
+import { EventRecord } from "../schema/eventRecord"
 
 export interface EventTimelineSectionProps {
   events: EventRecord[]

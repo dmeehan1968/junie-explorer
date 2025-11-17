@@ -1,6 +1,6 @@
 import express from "express"
-import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../../types.js"
+import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../../types"
 
 const router = express.Router({ mergeParams: true })
 

@@ -1,8 +1,8 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Page, test as base } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { ToolCallDecorator } from "./toolCallDecorator.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { ToolCallDecorator } from "./toolCallDecorator"
 
 export { expect } from "@playwright/test"
 

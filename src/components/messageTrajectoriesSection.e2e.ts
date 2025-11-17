@@ -1,5 +1,5 @@
 import { expect, test as base } from '@playwright/test'
-import { MessageTrajectoriesSectionDSL } from "./messageTrajectoriesSection.dsl.js"
+import { MessageTrajectoriesSectionDSL } from "./messageTrajectoriesSection.dsl"
 
 const test = base.extend<{ messageTrajectories: MessageTrajectoriesSectionDSL }>({
   messageTrajectories: async ({ page }, use) => {

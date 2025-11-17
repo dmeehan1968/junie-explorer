@@ -1,9 +1,9 @@
 /** @jsxImportSource @kitajs/html */
 
 import { expect, Page, test as base } from "@playwright/test"
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { EventStatisticsSection, EventStatisticsSectionProps } from "./eventStatisticsSection.js"
+import { escapeHtml } from "../utils/escapeHtml"
+import { wrapHtml } from "../utils/wrapHtml"
+import { EventStatisticsSection, EventStatisticsSectionProps } from "./eventStatisticsSection"
 
 export { expect } from "@playwright/test"
 

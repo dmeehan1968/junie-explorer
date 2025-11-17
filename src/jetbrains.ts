@@ -4,11 +4,11 @@ import path from "node:path"
 import * as process from "node:process"
 import { fileURLToPath } from "node:url"
 import semver from "semver"
-import publicFiles from "./bun/public.js"
-import { Project } from "./Project.js"
-import { SummaryMetrics } from "./schema.js"
-import { StatsCollector } from "./stats/StatsCollector.js"
-import { Task } from "./Task.js"
+import publicFiles from "./bun/public"
+import { Project } from "./Project"
+import { SummaryMetrics } from "./schema"
+import { StatsCollector } from "./stats/StatsCollector"
+import { Task } from "./Task"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

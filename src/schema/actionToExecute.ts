@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { ToolParams } from "./toolParams.js"
+import { ToolParams } from "./toolParams"
 
 export const ActionToExecute = z.looseObject({
   type: z.string(),

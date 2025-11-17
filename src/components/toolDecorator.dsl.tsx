@@ -2,9 +2,9 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { ToolDecorator } from "./toolDecorator.js"
-import type { Tool } from "../schema/tools.js"
-import { wrapHtml } from "../utils/wrapHtml.js"
+import { ToolDecorator } from "./toolDecorator"
+import type { Tool } from "../schema/tools"
+import { wrapHtml } from "../utils/wrapHtml"
 
 export type ToolDecoratorProps = {
   tool: Tool

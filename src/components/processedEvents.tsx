@@ -1,16 +1,16 @@
 /** @jsxImportSource @kitajs/html */
 
-import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed.js"
-import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished.js"
-import { EventRecord } from "../schema/eventRecord.js"
-import { LlmRequestEvent } from "../schema/llmRequestEvent.js"
-import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { ChatMessageDecorator } from "./chatMessageDecorator.js"
-import { Divider } from "./divider.js"
-import { MessageDecorator } from "./messageDecorator.js"
-import { ToolCallDecorator } from "./toolCallDecorator.js"
-import { ToolDecorator } from "./toolDecorator.js"
+import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed"
+import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished"
+import { EventRecord } from "../schema/eventRecord"
+import { LlmRequestEvent } from "../schema/llmRequestEvent"
+import { LlmResponseEvent } from "../schema/llmResponseEvent"
+import { escapeHtml } from "../utils/escapeHtml"
+import { ChatMessageDecorator } from "./chatMessageDecorator"
+import { Divider } from "./divider"
+import { MessageDecorator } from "./messageDecorator"
+import { ToolCallDecorator } from "./toolCallDecorator"
+import { ToolDecorator } from "./toolDecorator"
 
 export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
   if (events.length === 0) {

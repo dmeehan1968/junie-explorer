@@ -1,10 +1,10 @@
-import { Job } from "./Job.js"
-import { Failure, Response } from "./Response.js"
-import { WorkerEntry } from "./WorkerEntry.js"
-import { WorkerExecutionError } from "./WorkerExecutionError.js"
-import { WorkerPoolError } from "./WorkerPoolError.js"
-import { WorkerSpawnError } from "./WorkerSpawnError.js"
-import { WorkerFileIOStats } from "../stats/StatsTypes.js"
+import { Job } from "./Job"
+import { Failure, Response } from "./Response"
+import { WorkerEntry } from "./WorkerEntry"
+import { WorkerExecutionError } from "./WorkerExecutionError"
+import { WorkerPoolError } from "./WorkerPoolError"
+import { WorkerSpawnError } from "./WorkerSpawnError"
+import { WorkerFileIOStats } from "../stats/StatsTypes"
 
 /**
  * Manages worker lifecycle and state

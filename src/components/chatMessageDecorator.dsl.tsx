@@ -3,9 +3,9 @@
 import { test as base, Page, expect } from "@playwright/test"
 export { expect } from "@playwright/test"
 import { Children } from "@kitajs/html"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { ChatMessageDecorator } from "./chatMessageDecorator.js"
-import type { MatterhornMessage } from "../schema/llmRequestEvent.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { ChatMessageDecorator } from "./chatMessageDecorator"
+import type { MatterhornMessage } from "../schema/llmRequestEvent"
 
 export type ChatMessageDecoratorProps = {
   klass: string

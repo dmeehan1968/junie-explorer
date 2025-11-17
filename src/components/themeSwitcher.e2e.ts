@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { test } from "./themeSwitcher.dsl.js"
+import { test } from "./themeSwitcher.dsl"
 
 const expectedThemes = [
   'Auto','Light','Dark','Cupcake','Bumblebee','Emerald','Corporate','Synthwave','Retro','Cyberpunk','Valentine','Halloween','Garden','Forest','Aqua','Lofi','Pastel','Fantasy','Wireframe','Black','Luxury','Dracula','CMYK','Autumn','Business','Acid','Lemonade','Night','Coffee','Winter','Dim','Nord','Sunset'

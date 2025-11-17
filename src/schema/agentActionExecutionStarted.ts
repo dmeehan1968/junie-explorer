@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { ActionToExecute } from "./actionToExecute.js"
+import { ActionToExecute } from "./actionToExecute"
 
 export const AgentActionExecutionStarted = z.looseObject({
   type: z.literal('AgentActionExecutionStarted'),

@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { test } from "./ideSelection.dsl.js"
+import { test } from "./ideSelection.dsl"
 
 // Tests for the 'filter by IDE' feature using the IdeSelection toolbar
 // Structure and semantics follow the ThemeSwitcher tests and reuse ProjectTable DSL

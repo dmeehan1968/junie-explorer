@@ -1,6 +1,6 @@
 import * as z from "zod"
-import { ContentChoice } from "./contentChoice.js"
-import { ToolParams } from "./toolParams.js"
+import { ContentChoice } from "./contentChoice"
+import { ToolParams } from "./toolParams"
 
 export const ToolUseAnswer = z.object({
   toolId: z.string().nullable(),

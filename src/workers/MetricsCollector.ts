@@ -1,4 +1,4 @@
-import { PoolMetrics } from "./PoolMetrics.js"
+import { PoolMetrics } from "./PoolMetrics"
 
 /**
  * Manages metrics collection and calculation for the worker pool

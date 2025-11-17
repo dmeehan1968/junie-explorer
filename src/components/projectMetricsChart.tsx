@@ -1,5 +1,5 @@
 import { Component, Html } from "@kitajs/html"
-import { ProjectMetricsChartOptions } from "./projectMetricsChartOptions.js"
+import { ProjectMetricsChartOptions } from "./projectMetricsChartOptions"
 
 export const ProjectMetricsChart: Component = () => {
   return (

@@ -1,13 +1,13 @@
 import path from "node:path"
-import { Job } from "./Job.js"
-import { JobScheduler } from "./JobScheduler.js"
-import { MetricsCollector } from "./MetricsCollector.js"
-import { PoolMetrics } from "./PoolMetrics.js"
-import { WorkerExecutionError } from "./WorkerExecutionError.js"
-import { WorkerManager } from "./WorkerManager.js"
-import { WorkerPoolError } from "./WorkerPoolError.js"
-import { WorkerPoolOptions } from "./WorkerPoolOptions.js"
-import { WorkerSpawnError } from "./WorkerSpawnError.js"
+import { Job } from "./Job"
+import { JobScheduler } from "./JobScheduler"
+import { MetricsCollector } from "./MetricsCollector"
+import { PoolMetrics } from "./PoolMetrics"
+import { WorkerExecutionError } from "./WorkerExecutionError"
+import { WorkerManager } from "./WorkerManager"
+import { WorkerPoolError } from "./WorkerPoolError"
+import { WorkerPoolOptions } from "./WorkerPoolOptions"
+import { WorkerSpawnError } from "./WorkerSpawnError"
 
 // Constants
 const DEFAULT_IDLE_TIMEOUT_MS = 5000

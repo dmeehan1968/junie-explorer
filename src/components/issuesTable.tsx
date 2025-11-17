@@ -1,9 +1,9 @@
 // No Issues Message Component
 import { Html } from "@kitajs/html"
-import { Project } from "../Project.js"
-import { formatElapsedTime, formatNumber, formatSeconds } from "../utils/timeUtils.js"
-import { Conditional } from "./conditional.js"
-import { IssueRow } from "./issueRow.js"
+import { Project } from "../Project"
+import { formatElapsedTime, formatNumber, formatSeconds } from "../utils/timeUtils"
+import { Conditional } from "./conditional"
+import { IssueRow } from "./issueRow"
 
 const NoIssuesMessage = () => (
   <p class="p-4 text-center text-base-content/70" data-testid="no-issues-message">

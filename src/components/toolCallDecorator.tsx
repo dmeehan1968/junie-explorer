@@ -1,9 +1,9 @@
 /** @jsxImportSource @kitajs/html */
 
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { CollapseIcon } from "./collapseIcon.js"
-import { ExpandIcon } from "./expandIcon.js"
-import { ToggleComponent } from "./toggleComponent.js"
+import { escapeHtml } from "../utils/escapeHtml"
+import { CollapseIcon } from "./collapseIcon"
+import { ExpandIcon } from "./expandIcon"
+import { ToggleComponent } from "./toggleComponent"
 
 export const ToolCallDecorator = ({ klass, testId, tool }: {
   klass: string,

@@ -2,8 +2,8 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { ModelPerformanceSection } from "./modelPerformanceSection.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { ModelPerformanceSection } from "./modelPerformanceSection"
 
 export type ModelPerformanceProps = {
   hasMetrics: boolean

@@ -1,8 +1,8 @@
 /** @jsxImportSource @kitajs/html */
 
 import { expect, Page, test as base } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { Conditional, ConditionalProps } from "./conditional.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { Conditional, ConditionalProps } from "./conditional"
 
 export { expect } from "@playwright/test"
 

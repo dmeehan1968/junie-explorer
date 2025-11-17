@@ -1,4 +1,4 @@
-import { WorkerPoolError } from "./WorkerPoolError.js"
+import { WorkerPoolError } from "./WorkerPoolError"
 
 export class WorkerExecutionError extends WorkerPoolError {
   constructor(message: string, cause?: any) {

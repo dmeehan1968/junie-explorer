@@ -1,11 +1,11 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Component } from "@kitajs/html"
-import { MatterhornMessage } from "../schema/llmRequestEvent.js"
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { MessageDecorator } from "./messageDecorator.js"
-import { MultiPartMessage } from "./multiPartMessage.js"
-import { ToolCallDecorator } from "./toolCallDecorator.js"
+import { MatterhornMessage } from "../schema/llmRequestEvent"
+import { escapeHtml } from "../utils/escapeHtml"
+import { MessageDecorator } from "./messageDecorator"
+import { MultiPartMessage } from "./multiPartMessage"
+import { ToolCallDecorator } from "./toolCallDecorator"
 
 export const ChatMessageDecorator: Component<{ klass: string; message: MatterhornMessage }> = ({ klass, message }) => {
   if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {

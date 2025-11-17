@@ -1,7 +1,7 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Component } from "@kitajs/html"
-import { escapeHtml } from "../utils/escapeHtml.js"
+import { escapeHtml } from "../utils/escapeHtml"
 
 export interface EventStatisticsSectionProps {
   events: any[]

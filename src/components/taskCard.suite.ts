@@ -1,5 +1,5 @@
-import { expect } from "../playwright/test.js"
-import { test } from "./taskCard.dsl.js"
+import { expect } from "../playwright/test"
+import { test } from "./taskCard.dsl"
 
 export function defineTaskCardSuite({
   name,

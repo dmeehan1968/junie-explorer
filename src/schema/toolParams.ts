@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { ToolParamsArray } from "./toolParamsArray.js"
-import { ToolParamsObject } from "./toolParamsObject.js"
+import { ToolParamsArray } from "./toolParamsArray"
+import { ToolParamsObject } from "./toolParamsObject"
 
 export const ToolParams = z.union([
   ToolParamsObject,

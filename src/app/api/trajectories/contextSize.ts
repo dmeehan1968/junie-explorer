@@ -1,11 +1,11 @@
 import express from "express"
-import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../../types.js"
-import { LlmRequestEvent } from "../../../schema/llmRequestEvent.js"
-import { LlmResponseEvent } from "../../../schema/llmResponseEvent.js"
-import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice.js"
-import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice.js"
-import { EventRecord } from "../../../schema/eventRecord.js"
+import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../../types"
+import { LlmRequestEvent } from "../../../schema/llmRequestEvent"
+import { LlmResponseEvent } from "../../../schema/llmResponseEvent"
+import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice"
+import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice"
+import { EventRecord } from "../../../schema/eventRecord"
 
 const router = express.Router({ mergeParams: true })
 

@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { test } from "./reloadButton.dsl.js"
+import { test } from "./reloadButton.dsl"
 
 test.describe('ReloadButton', async () => {
 

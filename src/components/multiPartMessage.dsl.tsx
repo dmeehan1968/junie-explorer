@@ -2,9 +2,9 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { MultiPartMessage } from "./multiPartMessage.js"
-import type { ChatMessagePart } from "../schema/multiPartChatMessage.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { MultiPartMessage } from "./multiPartMessage"
+import type { ChatMessagePart } from "../schema/multiPartChatMessage"
 
 export type MultiPartMessageProps = {
   part: ChatMessagePart

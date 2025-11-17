@@ -374,7 +374,7 @@ export const test = base.extend<{ componentName: ComponentNameDSL }>({
 Example Test (named `<component>.test.ts` and co-located with the component)
 ```ts
 import { test, expect } from "@playwright/test"
-import { test } from "./<component>.dsl.js"
+import { test } from "./<component>.dsl"
 
 test.describe('ComponentName', async () => {
   

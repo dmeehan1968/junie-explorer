@@ -1,4 +1,4 @@
-import { Metrics, Step } from "../Step.js"
+import { Metrics, Step } from "../Step"
 
 /**
  * Helper function to calculate summary data for a task's steps

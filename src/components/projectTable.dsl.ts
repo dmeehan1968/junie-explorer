@@ -1,5 +1,5 @@
 import { Locator, Page, test as base } from "@playwright/test"
-import { ProjectRowDSL } from "./projectRow.dsl.js"
+import { ProjectRowDSL } from "./projectRow.dsl"
 
 export class ProjectTableDSL {
   constructor(private readonly page: Page) {

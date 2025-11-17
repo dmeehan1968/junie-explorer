@@ -1,5 +1,5 @@
 /** @jsxImportSource @kitajs/html */
-import { escapeHtml } from "../utils/escapeHtml.js"
+import { escapeHtml } from "../utils/escapeHtml"
 
 export type EventFiltersProps = {
   eventTypes: string[]

@@ -1,6 +1,6 @@
 /** @jsxImportSource @kitajs/html */
 import { Html } from "@kitajs/html"
-import { Conditional } from "./conditional.js"
+import { Conditional } from "./conditional"
 
 export const IssueCostChart = ({ condition }: { condition: boolean }) => (
   <Conditional condition={condition}>

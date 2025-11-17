@@ -1,10 +1,10 @@
 import * as z from "zod"
-import { AssistantChatMessageWithToolUses } from "./assistantChatMessageWithToolUses.js"
-import { ChatMessage } from "./chatMessage.js"
-import { LLM } from "./LLM.js"
-import { MultiPartChatMessage } from "./multiPartChatMessage.js"
-import { Tools } from "./tools.js"
-import { UserChatMessageWithToolResults } from "./userChatMessageWithToolResults.js"
+import { AssistantChatMessageWithToolUses } from "./assistantChatMessageWithToolUses"
+import { ChatMessage } from "./chatMessage"
+import { LLM } from "./LLM"
+import { MultiPartChatMessage } from "./multiPartChatMessage"
+import { Tools } from "./tools"
+import { UserChatMessageWithToolResults } from "./userChatMessageWithToolResults"
 
 export const MatterhornMessage = z.discriminatedUnion('type', [
   ChatMessage,

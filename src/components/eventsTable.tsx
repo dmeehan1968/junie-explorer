@@ -1,7 +1,7 @@
 /** @jsxImportSource @kitajs/html */
 
-import { EventRecord } from "../schema/eventRecord.js"
-import { escapeHtml } from "../utils/escapeHtml.js"
+import { EventRecord } from "../schema/eventRecord"
+import { escapeHtml } from "../utils/escapeHtml"
 
 interface EventsTableProps {
   events: EventRecord[]

@@ -2,11 +2,11 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { MessageTrajectoriesSection } from "./messageTrajectoriesSection.js"
-import type { EventRecord } from "../schema/eventRecord.js"
-import type { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent.js"
-import type { LlmResponseEvent } from "../schema/llmResponseEvent.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { MessageTrajectoriesSection } from "./messageTrajectoriesSection"
+import type { EventRecord } from "../schema/eventRecord"
+import type { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent"
+import type { LlmResponseEvent } from "../schema/llmResponseEvent"
 
 // Minimal LLM factory
 const llm = (overrides: Partial<any> = {}) => ({

@@ -1,21 +1,21 @@
 import { Html } from "@kitajs/html"
 import express from 'express'
-import { AppBody } from "../../components/appBody.js"
-import { AppHead } from "../../components/appHead.js"
-import { AppHeader } from "../../components/appHeader.js"
+import { AppBody } from "../../components/appBody"
+import { AppHead } from "../../components/appHead"
+import { AppHeader } from "../../components/appHeader"
 import { Breadcrumb } from '../../components/breadcrumb.js'
-import { IssueCostChart } from "../../components/issueCostChart.js"
-import { HtmlPage } from "../../components/htmlPage.js"
-import { IssuesTable } from "../../components/issuesTable.js"
+import { IssueCostChart } from "../../components/issueCostChart"
+import { HtmlPage } from "../../components/htmlPage"
+import { IssuesTable } from "../../components/issuesTable"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { StatsButton } from '../../components/statsButton.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
-import { Project } from "../../Project.js"
-import { escapeHtml } from "../../utils/escapeHtml.js"
-import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
-import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../types.js"
+import { Project } from "../../Project"
+import { escapeHtml } from "../../utils/escapeHtml"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest"
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
 

@@ -1,6 +1,6 @@
 import * as z from "zod"
-import { AbstractToolProperty } from "./abstractToolProperty.js"
-import { ToolAnyProperty } from "./toolAnyProperty.js"
+import { AbstractToolProperty } from "./abstractToolProperty"
+import { ToolAnyProperty } from "./toolAnyProperty"
 
 export const ToolArrayProperty = AbstractToolProperty.extend({
   MatterhornToolProperty: z.literal('MatterhornToolArrayProperty'),

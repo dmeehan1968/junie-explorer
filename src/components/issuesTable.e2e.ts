@@ -1,7 +1,7 @@
 import { Locator } from "@playwright/test"
-import { expect } from "../playwright/test.js"
-import { IssueRowDSL } from "./issueRow.dsl.js"
-import { test } from "./issuesTable.dsl.js"
+import { expect } from "../playwright/test"
+import { IssueRowDSL } from "./issueRow.dsl"
+import { test } from "./issuesTable.dsl"
 
 test.describe('IssuesTable', async () => {
 

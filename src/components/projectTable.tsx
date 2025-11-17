@@ -1,9 +1,9 @@
 import { Component, Html } from "@kitajs/html"
-import { JetBrains } from "../jetbrains.js"
-import { Project } from "../Project.js"
-import { Conditional } from "./conditional.js"
-import { SortIcon } from "./sortIcon.js"
-import { buildAssistantProviders } from "../utils/assistantProviders.js"
+import { JetBrains } from "../jetbrains"
+import { Project } from "../Project"
+import { Conditional } from "./conditional"
+import { SortIcon } from "./sortIcon"
+import { buildAssistantProviders } from "../utils/assistantProviders"
 
 export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains, locale?: string }> = ({
   projects,

@@ -2,8 +2,8 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { SortIcon, SortDirection } from "./sortIcon.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { SortIcon, SortDirection } from "./sortIcon"
 
 export type SortIconProps = {
   direction: SortDirection

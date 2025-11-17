@@ -1,11 +1,11 @@
 import express from "express"
-import { AgentActionExecutionFinished } from "../../../schema/agentActionExecutionFinished.js"
-import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice.js"
-import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice.js"
-import { AssistantChatMessageWithToolUses } from "../../../schema/assistantChatMessageWithToolUses.js"
-import { LlmRequestEvent, MatterhornMessage } from "../../../schema/llmRequestEvent.js"
-import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../../types.js"
+import { AgentActionExecutionFinished } from "../../../schema/agentActionExecutionFinished"
+import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice"
+import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice"
+import { AssistantChatMessageWithToolUses } from "../../../schema/assistantChatMessageWithToolUses"
+import { LlmRequestEvent, MatterhornMessage } from "../../../schema/llmRequestEvent"
+import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../../types"
 
 const router = express.Router({ mergeParams: true })
 

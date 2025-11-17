@@ -1,19 +1,19 @@
 import { Html } from "@kitajs/html"
 import express from 'express'
-import { AppBody } from "../../components/appBody.js"
-import { AppHead } from "../../components/appHead.js"
-import { AppHeader } from "../../components/appHeader.js"
-import { Conditional } from "../../components/conditional.js"
-import { HtmlPage } from "../../components/htmlPage.js"
-import { IdeSelection } from "../../components/ideSelection.js"
-import { ProjectMetricsChart } from "../../components/projectMetricsChart.js"
-import { ProjectTable } from "../../components/projectTable.js"
+import { AppBody } from "../../components/appBody"
+import { AppHead } from "../../components/appHead"
+import { AppHeader } from "../../components/appHeader"
+import { Conditional } from "../../components/conditional"
+import { HtmlPage } from "../../components/htmlPage"
+import { IdeSelection } from "../../components/ideSelection"
+import { ProjectMetricsChart } from "../../components/projectMetricsChart"
+import { ProjectTable } from "../../components/projectTable"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { StatsButton } from '../../components/statsButton.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
-import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
-import { AppRequest, AppResponse } from "../types.js"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest"
+import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
 

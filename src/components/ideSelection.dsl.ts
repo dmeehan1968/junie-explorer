@@ -1,6 +1,6 @@
 import { Page, Locator, expect } from "@playwright/test"
-import { test as base } from "./projectTable.dsl.js"
-import { ProjectTableDSL } from "./projectTable.dsl.js"
+import { test as base } from "./projectTable.dsl"
+import { ProjectTableDSL } from "./projectTable.dsl"
 
 export class IdeSelectionDSL {
   private readonly projectTable: ProjectTableDSL

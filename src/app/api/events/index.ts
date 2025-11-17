@@ -1,7 +1,7 @@
 import express from "express"
-import download from "./download.js"
-import timeline from "./timeline.js"
-import task from "./task.js"
+import download from "./download"
+import timeline from "./timeline"
+import task from "./task"
 
 const router = express.Router({ mergeParams: true })
 

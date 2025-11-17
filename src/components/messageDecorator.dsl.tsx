@@ -3,8 +3,8 @@
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
 import { Children } from "@kitajs/html"
-import { MessageDecorator } from "./messageDecorator.js"
-import { wrapHtml } from "../utils/wrapHtml.js"
+import { MessageDecorator } from "./messageDecorator"
+import { wrapHtml } from "../utils/wrapHtml"
 
 export type MessageDecoratorProps = {
   klass: string

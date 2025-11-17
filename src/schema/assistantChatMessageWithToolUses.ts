@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { ToolParams } from "./toolParams.js"
+import { ToolParams } from "./toolParams"
 
 export const ToolUse = z.looseObject({
   id: z.string(),

@@ -1,7 +1,7 @@
 /** @jsxImportSource @kitajs/html */
 
-import { EventRecord } from "../schema/eventRecord.js"
-import { ProcessedEvents } from "./processedEvents.js"
+import { EventRecord } from "../schema/eventRecord"
+import { ProcessedEvents } from "./processedEvents"
 
 export const MessageTrajectoriesSection = ({ events }: { events: EventRecord[] }) => {
   return (

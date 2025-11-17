@@ -1,23 +1,23 @@
 import { Html } from "@kitajs/html"
 import express from 'express'
-import { ActionTimelineSection } from "../../components/actionTimelineSection.js"
-import { AppBody } from "../../components/appBody.js"
-import { AppHead } from "../../components/appHead.js"
-import { AppHeader } from "../../components/appHeader.js"
+import { ActionTimelineSection } from "../../components/actionTimelineSection"
+import { AppBody } from "../../components/appBody"
+import { AppHead } from "../../components/appHead"
+import { AppHeader } from "../../components/appHeader"
 import { Breadcrumb } from '../../components/breadcrumb.js'
-import { ContextSizeSection } from "../../components/contextSizeSection.js"
-import { HtmlPage } from "../../components/htmlPage.js"
-import { ImageModal } from "../../components/imageModal.js"
-import { MessageTrajectoriesSection } from "../../components/messageTrajectoriesSection.js"
-import { ModelPerformanceSection } from "../../components/modelPerformanceSection.js"
+import { ContextSizeSection } from "../../components/contextSizeSection"
+import { HtmlPage } from "../../components/htmlPage"
+import { ImageModal } from "../../components/imageModal"
+import { MessageTrajectoriesSection } from "../../components/messageTrajectoriesSection"
+import { ModelPerformanceSection } from "../../components/modelPerformanceSection"
 import { ReloadButton } from '../../components/reloadButton.js'
 import { StatsButton } from '../../components/statsButton.js'
 import { TaskCard } from '../../components/taskCard.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
-import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest.js"
-import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../types.js"
+import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest"
+import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
 

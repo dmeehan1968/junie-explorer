@@ -1,7 +1,7 @@
 import { NextFunction } from "express"
 import mime from "mime-types"
-import publicFiles from "../../bun/public.js"
-import { AppRequest, AppResponse } from "../types.js"
+import publicFiles from "../../bun/public"
+import { AppRequest, AppResponse } from "../types"
 
 /**
  * Serve static files from import created by make-vfs

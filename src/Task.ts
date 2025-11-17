@@ -1,11 +1,10 @@
 import fs from "fs-extra"
 import path from "node:path"
-import { setInterval } from "timers"
-import { getMaxConcurrency } from "./getMaxConcurrency.js"
-import { LoadEventsInput } from "./workers/loadEventsInput.js"
-import { LoadEventsOutput } from "./workers/loadEventsOutput.js"
-import { WorkerPool } from "./workers/WorkerPool.js"
-import { StatsCollector } from "./stats/StatsCollector.js"
+import { getMaxConcurrency } from "./getMaxConcurrency"
+import { LoadEventsInput } from "./workers/loadEventsInput"
+import { LoadEventsOutput } from "./workers/loadEventsOutput"
+import { WorkerPool } from "./workers/WorkerPool"
+import { StatsCollector } from "./stats/StatsCollector"
 import {
   AgentState,
   JuniePlan,
@@ -15,13 +14,13 @@ import {
   SessionHistory,
   SummaryMetrics,
 } from "./schema.js"
-import { AutoSelectedLlm } from "./schema/AutoSelectedLlm.js"
-import { EventRecord } from "./schema/eventRecord.js"
-import { Event } from "./schema/event.js"
-import { LlmResponseEvent } from "./schema/llmResponseEvent.js"
-import { LlmRequestEvent } from "./schema/llmRequestEvent.js"
-import { Step } from "./Step.js"
-import { loadEvents } from "./workers/loadEvents.js"
+import { AutoSelectedLlm } from "./schema/AutoSelectedLlm"
+import { EventRecord } from "./schema/eventRecord"
+import { Event } from "./schema/event"
+import { LlmResponseEvent } from "./schema/llmResponseEvent"
+import { LlmRequestEvent } from "./schema/llmRequestEvent"
+import { Step } from "./Step"
+import { loadEvents } from "./workers/loadEvents"
 
 export class Task {
   public id: string = ''

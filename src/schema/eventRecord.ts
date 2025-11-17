@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { Event } from "./event.js"
+import { Event } from "./event"
 
 export const EventRecord = z.looseObject({
   event: Event,

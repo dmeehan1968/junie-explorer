@@ -1,6 +1,6 @@
 import { NextFunction } from "express"
-import { themeAttributeForHtml } from "../../utils/themeCookie.js"
-import { AppError, AppRequest, AppResponse } from "../types.js"
+import { themeAttributeForHtml } from "../../utils/themeCookie"
+import { AppError, AppRequest, AppResponse } from "../types"
 
 export function errorHandler(err: any, req: AppRequest, res: AppResponse, next: NextFunction) {
   if (err instanceof AppError) {

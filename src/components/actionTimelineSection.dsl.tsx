@@ -2,8 +2,8 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { ActionTimelineSection } from "./actionTimelineSection.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { ActionTimelineSection } from "./actionTimelineSection"
 
 export type ActionTimelineProps = {
   hasActionEvents: boolean

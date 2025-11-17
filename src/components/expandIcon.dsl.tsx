@@ -3,8 +3,8 @@
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
 import { z } from "zod"
-import { ExpandIcon } from "./expandIcon.js"
-import { wrapHtml } from "../utils/wrapHtml.js"
+import { ExpandIcon } from "./expandIcon"
+import { wrapHtml } from "../utils/wrapHtml"
 
 export class ExpandIconDSL {
   private readonly pixelSchema = z

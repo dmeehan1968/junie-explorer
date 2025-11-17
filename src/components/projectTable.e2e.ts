@@ -1,5 +1,5 @@
-import { expect } from "../playwright/test.js"
-import { test } from "./projectTable.dsl.js"
+import { expect } from "../playwright/test"
+import { test } from "./projectTable.dsl"
 
 test.describe('ProjectTable', async () => {
 

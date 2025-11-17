@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { ToolAnyProperty } from "./toolAnyProperty.js"
+import { ToolAnyProperty } from "./toolAnyProperty"
 
 const McpToolParameters = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.ToolParametersSchema.McpToolParametersSchema'),

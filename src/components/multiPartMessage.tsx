@@ -1,7 +1,7 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Component } from "@kitajs/html"
-import { ChatMessagePart } from "../schema/multiPartChatMessage.js"
+import { ChatMessagePart } from "../schema/multiPartChatMessage"
 
 export const MultiPartMessage: Component<{ part: ChatMessagePart }> = ({ part }) => {
   if (part.type === 'text') {

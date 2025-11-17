@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { ActionToExecute } from "./actionToExecute.js"
+import { ActionToExecute } from "./actionToExecute"
 
 const ExecutionResult = z.looseObject({
   text: z.string(),

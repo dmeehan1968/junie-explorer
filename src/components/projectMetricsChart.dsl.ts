@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test"
-import { test as base } from "./projectTable.dsl.js"
+import { test as base } from "./projectTable.dsl"
 
 export class ProjectMetricsChartDSL {
   constructor(private readonly page: Page) {

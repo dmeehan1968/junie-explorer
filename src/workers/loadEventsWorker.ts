@@ -1,7 +1,7 @@
-import { loadEvents } from "./loadEvents.js"
-import { LoadEventsInput } from "./loadEventsInput.js"
-import { LoadEventsOutput } from "./loadEventsOutput.js"
-import { WorkerFileIOCollector } from "./WorkerFileIOCollector.js"
+import { loadEvents } from "./loadEvents"
+import { LoadEventsInput } from "./loadEventsInput"
+import { LoadEventsOutput } from "./loadEventsOutput"
+import { WorkerFileIOCollector } from "./WorkerFileIOCollector"
 
 declare var self: Worker;
 

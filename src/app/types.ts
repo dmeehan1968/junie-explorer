@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
 import * as core from "express-serve-static-core"
 import { z } from "zod"
-import { Issue } from "../Issue.js"
-import { JetBrains } from "../jetbrains.js"
-import { Project } from "../Project.js"
-import { Task } from "../Task.js"
+import { Issue } from "../Issue"
+import { JetBrains } from "../jetbrains"
+import { Project } from "../Project"
+import { Task } from "../Task"
 
 interface AppLocals {
   jetBrains: JetBrains

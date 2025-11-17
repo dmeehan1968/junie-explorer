@@ -1,5 +1,5 @@
 import { NextFunction } from "express"
-import { AppError, AppParams, AppRequest, AppResponse } from "../types.js"
+import { AppError, AppParams, AppRequest, AppResponse } from "../types"
 
 export async function entityLookupMiddleware(req: AppRequest, res: AppResponse, next: NextFunction) {
   try {

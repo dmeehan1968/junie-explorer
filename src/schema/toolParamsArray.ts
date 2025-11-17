@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { ToolParamsObject } from "./toolParamsObject.js"
+import { ToolParamsObject } from "./toolParamsObject"
 
 export const ToolParamsArray = z.looseObject({
   ParameterValue: z.string(),

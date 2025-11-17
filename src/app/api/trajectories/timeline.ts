@@ -1,8 +1,8 @@
 import express from "express"
-import { AgentActionExecutionFinished } from "../../../schema/agentActionExecutionFinished.js"
-import { AgentActionExecutionStarted } from "../../../schema/agentActionExecutionStarted.js"
-import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../../types.js"
+import { AgentActionExecutionFinished } from "../../../schema/agentActionExecutionFinished"
+import { AgentActionExecutionStarted } from "../../../schema/agentActionExecutionStarted"
+import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../../types"
 
 const router = express.Router({ mergeParams: true })
 

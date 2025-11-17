@@ -1,8 +1,8 @@
 /** @jsxImportSource @kitajs/html */
 
 import { expect, Page, test as base } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { EventFilters, EventFiltersProps } from "./eventFilters.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { EventFilters, EventFiltersProps } from "./eventFilters"
 
 export { expect } from "@playwright/test"
 

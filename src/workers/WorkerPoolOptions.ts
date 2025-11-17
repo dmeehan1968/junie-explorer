@@ -1,5 +1,5 @@
-import { WorkerPoolError } from "./WorkerPoolError.js"
-import { WorkerFileIOStats } from "../stats/StatsTypes.js"
+import { WorkerPoolError } from "./WorkerPoolError"
+import { WorkerFileIOStats } from "../stats/StatsTypes"
 
 /**
  * Configuration options for WorkerPool

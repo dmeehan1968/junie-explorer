@@ -2,8 +2,8 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { StatusBadge } from "./statusBadge.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { StatusBadge } from "./statusBadge"
 
 export type StatusBadgeProps = {
   state: string

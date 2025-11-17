@@ -1,7 +1,7 @@
 /** @jsxImportSource @kitajs/html */
 
-import { Tool } from "../schema/tools.js"
-import { escapeHtml } from "../utils/escapeHtml.js"
+import { Tool } from "../schema/tools"
+import { escapeHtml } from "../utils/escapeHtml"
 import type { Component } from "@kitajs/html"
 
 export const ToolDecorator: Component<{ tool: Tool }> = ({ tool }) => {

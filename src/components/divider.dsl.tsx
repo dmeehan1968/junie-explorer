@@ -2,8 +2,8 @@
 
 import { Children } from "@kitajs/html"
 import { Page, test as base } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { Divider, DividerProps } from "./divider.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { Divider, DividerProps } from "./divider"
 
 export { expect } from "@playwright/test"
 

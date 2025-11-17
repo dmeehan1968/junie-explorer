@@ -1,4 +1,4 @@
-import { EventRecord } from "../schema/eventRecord.js"
+import { EventRecord } from "../schema/eventRecord"
 
 export interface LoadEventsOutput {
   events: EventRecord[]

@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { AgentActionExecutionStarted } from "./agentActionExecutionStarted.js"
+import { AgentActionExecutionStarted } from "./agentActionExecutionStarted"
 
 export const AgentActionExecutionFailed = AgentActionExecutionStarted.extend({
   type: z.literal('AgentActionExecutionFailed'),

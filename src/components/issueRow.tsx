@@ -1,12 +1,12 @@
 // Issue Row Component
 import { Html } from "@kitajs/html"
-import { Issue } from "../Issue.js"
-import { Project } from "../Project.js"
-import { buildAssistantProviders } from "../utils/assistantProviders.js"
-import { escapeHtml } from "../utils/escapeHtml.js"
-import { formatNumber, formatSeconds } from "../utils/timeUtils.js"
-import { Conditional } from "./conditional.js"
-import { StatusBadge } from "./statusBadge.js"
+import { Issue } from "../Issue"
+import { Project } from "../Project"
+import { buildAssistantProviders } from "../utils/assistantProviders"
+import { escapeHtml } from "../utils/escapeHtml"
+import { formatNumber, formatSeconds } from "../utils/timeUtils"
+import { Conditional } from "./conditional"
+import { StatusBadge } from "./statusBadge"
 
 export const IssueRow = async ({ issue, project, locale }: {
   issue: Issue,

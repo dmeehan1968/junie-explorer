@@ -1,8 +1,8 @@
 import express from "express"
-import download from "./download.js"
-import timeline from "./timeline.js"
-import modelPerformance from "./modelPerformance.js"
-import contextSize from "./contextSize.js"
+import download from "./download"
+import timeline from "./timeline"
+import modelPerformance from "./modelPerformance"
+import contextSize from "./contextSize"
 
 const router = express.Router({ mergeParams: true })
 

@@ -1,8 +1,8 @@
 import express from "express"
 import fs from "fs-extra"
 import path from "node:path"
-import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware.js"
-import { AppRequest, AppResponse } from "../../types.js"
+import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware"
+import { AppRequest, AppResponse } from "../../types"
 
 const router = express.Router()
 

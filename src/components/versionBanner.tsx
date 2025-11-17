@@ -1,6 +1,6 @@
 /** @jsxImportSource @kitajs/html */
 import { Component } from "@kitajs/html"
-import { Version } from "../jetbrains.js"
+import { Version } from "../jetbrains"
 
 interface VersionBannerProps {
   version?: Version

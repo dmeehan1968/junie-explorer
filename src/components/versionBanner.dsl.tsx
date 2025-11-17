@@ -2,9 +2,9 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { VersionBanner } from "./versionBanner.js"
-import type { Version } from "../jetbrains.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { VersionBanner } from "./versionBanner"
+import type { Version } from "../jetbrains"
 
 export type VersionBannerProps = {
   version?: Version

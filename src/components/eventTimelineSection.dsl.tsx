@@ -1,9 +1,9 @@
 /** @jsxImportSource @kitajs/html */
 
 import { expect, Page, test as base } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { EventTimelineSection } from "./eventTimelineSection.js"
-import type { EventRecord } from "../schema/eventRecord.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { EventTimelineSection } from "./eventTimelineSection"
+import type { EventRecord } from "../schema/eventRecord"
 
 export { expect } from "@playwright/test"
 

@@ -1,9 +1,9 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Component, Children } from "@kitajs/html"
-import { CollapseIcon } from "./collapseIcon.js"
-import { ExpandIcon } from "./expandIcon.js"
-import { ToggleComponent } from "./toggleComponent.js"
+import { CollapseIcon } from "./collapseIcon"
+import { ExpandIcon } from "./expandIcon"
+import { ToggleComponent } from "./toggleComponent"
 
 export interface MessageDecoratorProps {
   klass: string

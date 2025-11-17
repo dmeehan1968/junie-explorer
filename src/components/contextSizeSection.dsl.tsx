@@ -2,8 +2,8 @@
 
 import { test as base, Page } from "@playwright/test"
 export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml.js"
-import { ContextSizeSection } from "./contextSizeSection.js"
+import { wrapHtml } from "../utils/wrapHtml"
+import { ContextSizeSection } from "./contextSizeSection"
 
 export type ContextSizeProps = {
   showIncludeAllTasks: boolean

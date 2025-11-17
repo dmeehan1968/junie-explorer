@@ -1,6 +1,6 @@
 // Function to prepare data for the LLM events metrics over time graph
-import { EventRecord } from "../schema/eventRecord.js"
-import { LlmResponseEvent } from "../schema/llmResponseEvent.js"
+import { EventRecord } from "../schema/eventRecord"
+import { LlmResponseEvent } from "../schema/llmResponseEvent"
 
 export function prepareLlmEventGraphData(events: EventRecord[]): {
   labels: string[],
