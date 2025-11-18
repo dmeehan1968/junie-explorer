@@ -86,7 +86,7 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
                             <span data-testid={"project-name"}>{project.name}</span>
                           </span>
               </td>
-              <td class="text-right whitespace-nowrap w-0 align-top py-3 px-2"
+              <td class="text-right whitespace-nowrap w-0 align-top py-3 px-2 tabular-nums"
                   data-updated-ts={`${project.lastUpdated ? project.lastUpdated.getTime() : 0}`} role="link"
                   tabindex="0" onclick={`window.location.href='/project/${encodeURIComponent(project.name)}'`}
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
