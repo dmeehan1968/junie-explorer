@@ -73,18 +73,6 @@ export class Project {
         metrics.time += issueMetrics.time
         metrics.metricCount += issueMetrics.metricCount
       }))
-      // for (const [_, issue] of await this.issues) {
-      //   const issueMetrics = await issue.metrics
-      //   metrics.inputTokens += issueMetrics.inputTokens
-      //   metrics.outputTokens += issueMetrics.outputTokens
-      //   metrics.cacheTokens += issueMetrics.cacheTokens
-      //   metrics.webSearchCount += issueMetrics.webSearchCount
-      //   metrics.cost += issueMetrics.cost
-      //   metrics.time += issueMetrics.time
-      //   metrics.metricCount += issueMetrics.metricCount
-      // }
-
-      // this.logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
 
       this.hasMetrics = metrics.metricCount > 0
 
