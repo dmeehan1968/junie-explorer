@@ -5,7 +5,7 @@ export async function entityLookupMiddleware(req: AppRequest, res: AppResponse, 
   try {
     const params = AppParams.parse(req.params)
 
-    req.project = params.projectId && await res.app.locals.jetBrains.getProjectByName(params.projectId) || req.project
+    req.project = params.projectId && await req.jetBrains?.getProjectByName(params.projectId) || req.project
     req.issue = params.issueId && await req.project?.getIssueById(params.issueId) || req.issue
     req.task = params.taskId && await req.issue?.getTaskById(params.taskId) || req.task
 

@@ -23,7 +23,6 @@ export class JunieExplorer {
   constructor(public readonly jetBrains: JetBrains) {
 
     this.app = express()
-    this.app.locals.jetBrains = jetBrains   // TODO: remove this
 
     // middleware
     this.app.use(cookieParser())
