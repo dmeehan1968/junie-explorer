@@ -68,16 +68,16 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
               class="project-row cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md"
               data-testid={"project-item"}
               data-ides={JSON.stringify(project.ideNames)}>
-              <td class="text-center align-top py-3 px-2">
-                <Conditional condition={project.hasMetrics}>
-                    <input type="checkbox"
-                           id={`project-${encodeURIComponent(project.name)}`}
-                           class="project-checkbox checkbox checkbox-primary checkbox-sm"
-                           data-project-name={project.name}
-                           onchange="handleProjectSelection(this)"
-                           onclick="event.stopPropagation()"/>
-                </Conditional>
-              </td>
+              <Conditional condition={project.hasMetrics}>
+                <td class="text-center align-top py-3 px-2">
+                      <input type="checkbox"
+                             id={`project-${encodeURIComponent(project.name)}`}
+                             class="project-checkbox checkbox checkbox-primary checkbox-sm"
+                             data-project-name={project.name}
+                             onchange="handleProjectSelection(this)"
+                             onclick="event.stopPropagation()"/>
+                </td>
+              </Conditional>
               <td class="w-full align-top py-3 px-2" role="link" tabindex="0"
                   onclick={`window.location.href='/project/${encodeURIComponent(project.name)}'`}
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
