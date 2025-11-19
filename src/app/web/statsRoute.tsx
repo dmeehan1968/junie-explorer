@@ -1,4 +1,4 @@
-import { Html } from "@kitajs/html"
+import { renderToStream } from "@kitajs/html/suspense"
 import express from 'express'
 import { AppBody } from "../../components/appBody"
 import { AppHead } from "../../components/appHead"
@@ -15,7 +15,7 @@ const router = express.Router({ mergeParams: true })
 
 export const statsRouteHandler = async (req: AppRequest, res: AppResponse) => {
   try {
-    const page = <HtmlPage cookies={req.cookies}>
+    const page = async (rid: number | string) => <HtmlPage cookies={req.cookies}>
       <AppHead title={'System Statistics - Junie Explorer'}>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -60,7 +60,7 @@ export const statsRouteHandler = async (req: AppRequest, res: AppResponse) => {
       </AppBody>
     </HtmlPage>
 
-    res.send(await page)
+    renderToStream(page).pipe(res)
   } catch (error) {
     console.error('Error in stats route:', error)
     res.status(500).send('Internal Server Error')

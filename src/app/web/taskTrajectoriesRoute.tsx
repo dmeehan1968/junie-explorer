@@ -1,4 +1,4 @@
-import { Html } from "@kitajs/html"
+import { renderToStream } from "@kitajs/html/suspense"
 import express from 'express'
 import { ActionTimelineSection } from "../../components/actionTimelineSection"
 import { AppBody } from "../../components/appBody"
@@ -44,7 +44,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
     const tasksDescriptions = [...(await issue.tasks).values()].map(t => t?.context?.description ?? '')
 
     // Generate JSX page
-    const page = <HtmlPage cookies={req.cookies}>
+    const page = async (rid: number | string) => <HtmlPage cookies={req.cookies}>
       <AppHead title={`${project.name} ${issue.name} ${task.id} Trajectories`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
@@ -98,7 +98,8 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
       <ImageModal />
     </HtmlPage>
 
-    res.send(await page)
+    renderToStream(page).pipe(res)
+
   } catch (error) {
     console.error('Error generating task trajectories page:', error)
     res.status(500).send('An error occurred while generating the task trajectories page')

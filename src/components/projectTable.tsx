@@ -1,15 +1,16 @@
 import { Component, Html } from "@kitajs/html"
 import { JetBrains } from "../jetbrains"
-import { Project } from "../Project"
 import { Conditional } from "./conditional"
 import { SortIcon } from "./sortIcon"
 import { buildAssistantProviders } from "../utils/assistantProviders"
 
-export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains, locale?: string }> = ({
-  projects,
+export const ProjectTable: Component<{ jetBrains: JetBrains, locale?: string }> = async ({
   jetBrains,
   locale,
 }) => {
+  await jetBrains.metrics
+  const projects = Array.from((await jetBrains.projects).values())
+
   return (
     <div class="overflow-x-auto">
       <table class="table table-zebra w-full bg-base-100" id="projects-table">
@@ -68,14 +69,16 @@ export const ProjectTable: Component<{ projects: Project[], jetBrains: JetBrains
               class="project-row cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md"
               data-testid={"project-item"}
               data-ides={JSON.stringify(project.ideNames)}>
-              <Conditional condition={project.hasMetrics}>
+              <Conditional condition={jetBrains.hasMetrics}>
                 <td class="text-center align-top py-3 px-2">
+                  <Conditional condition={project.hasMetrics}>
                       <input type="checkbox"
                              id={`project-${encodeURIComponent(project.name)}`}
                              class="project-checkbox checkbox checkbox-primary checkbox-sm"
                              data-project-name={project.name}
                              onchange="handleProjectSelection(this)"
                              onclick="event.stopPropagation()"/>
+                  </Conditional>
                 </td>
               </Conditional>
               <td class="w-full align-top py-3 px-2" role="link" tabindex="0"

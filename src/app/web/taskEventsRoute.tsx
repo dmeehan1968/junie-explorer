@@ -1,3 +1,4 @@
+import { renderToStream } from "@kitajs/html/suspense"
 import express from 'express'
 import { AppBody } from "../../components/appBody"
 import { AppHead } from "../../components/appHead"
@@ -49,7 +50,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
     const tasksCount = (await issue.tasks).size
     const tasksDescriptions = [...(await issue.tasks).values()].map((t: any) => t?.context?.description ?? '')
 
-    const page = <HtmlPage cookies={req.cookies}>
+    const page = async (rid: number | string) => <HtmlPage cookies={req.cookies}>
       <AppHead title={`${project.name} ${issue.name} ${task.id} Events`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
@@ -126,7 +127,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
       <script src="/js/collapsibleSections.js"></script>
     </HtmlPage>
 
-    res.send(await page)
+    renderToStream(page).pipe(res)
   } catch (error) {
     console.error('Error generating task events page:', error)
     res.status(500).send('An error occurred while generating the task events page')
