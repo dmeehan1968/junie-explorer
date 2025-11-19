@@ -25,37 +25,37 @@
     "build": "bun install && bun run build:static && bun run build:apple:x64 && bun run build:apple:arm64 && bun run build:linux:x64 && bun run build:linux:arm64 && bun run build:windows:x64"
   },
   "dependencies": {
-    "@kitajs/html": "^4.2.9",
-    "@kitajs/ts-html-plugin": "^4.1.2",
-    "@tailwindcss/cli": "^4.1.11",
-    "@types/bun": "^1.2.19",
-    "@types/cookie-parser": "^1.4.9",
-    "@types/semver": "^7.7.0",
+    "@kitajs/html": "^4.2.11",
+    "@kitajs/ts-html-plugin": "^4.1.3",
+    "@tailwindcss/cli": "^4.1.17",
+    "@types/bun": "^1.3.2",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/semver": "^7.7.1",
     "cookie-parser": "^1.4.7",
-    "express": "^4.18.2",
-    "fs-extra": "^11.1.1",
+    "express": "^4.21.2",
+    "fs-extra": "^11.3.2",
     "marked": "^15.0.12",
     "mime-types": "^3.0.1",
-    "semver": "^7.7.2",
-    "tailwindcss": "^4.1.11",
-    "zod": "^4.0.14"
+    "semver": "^7.7.3",
+    "tailwindcss": "^4.1.17",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.0",
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/express": "^4.17.21",
+    "@playwright/test": "^1.56.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/express": "^4.17.25",
     "@types/fs-extra": "^11.0.4",
     "@types/marked": "^5.0.2",
     "@types/mime-types": "^3.0.1",
-    "@types/node": "^22.15.30",
-    "daisyui": "^5.0.47",
+    "@types/node": "^22.19.1",
+    "daisyui": "^5.5.5",
     "make-vfs": "^1.0.16",
-    "playwright": "^1.56.0",
+    "playwright": "^1.56.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.9.3"
   },
   "engines": {
-    "bun": ">=1.2.18"
+    "bun": ">=1.3"
   },
   "private": true
 }
