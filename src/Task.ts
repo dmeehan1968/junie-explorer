@@ -1,6 +1,7 @@
 import fs from "fs-extra"
 import path from "node:path"
 import { getMaxConcurrency } from "./getMaxConcurrency"
+import { OpenAI51 } from "./schema/OpenAI51"
 import { LoadEventsInput } from "./workers/loadEventsInput"
 import { LoadEventsOutput } from "./workers/loadEventsOutput"
 import { WorkerPool } from "./workers/WorkerPool"
@@ -243,7 +244,11 @@ export class Task {
       }
     }
 
-    const isGpt5AssistantEvent = (event: Event): event is LlmResponseEvent => event.type === LlmResponseEvent.shape.type.value && !event.answer.llm.isSummarizer && AutoSelectedLlm.shape.jbai.options.includes(event.answer.llm.jbai as never)
+    const isGpt5AssistantEvent = (event: Event): event is LlmResponseEvent =>
+      event.type === LlmResponseEvent.shape.type.value
+      && !event.answer.llm.isSummarizer
+      && [...AutoSelectedLlm.shape.jbai.options, OpenAI51.shape.jbai.value].includes(event.answer.llm.jbai as never)
+
     const adjustedEvents = events.map((record, index) => {
       // GPT-5 cacheCreateInputTokens is not provided needs to be calculated, so that its the difference
       // in cacheInputTokens since the previous event.  However, its not consistent and sometimes gives a lower
@@ -258,9 +263,11 @@ export class Task {
         if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
           // next line is a bit of a kludge so we can use cacheCreateInputTokens in the same way as Sonnet and still get
           // them costed correctly.
-          record.event.answer.cacheCreateInputTokens = Math.max(0, (record.event.answer.cacheInputTokens ?? 0) - (previousEvent.event.answer.cacheInputTokens ?? 0))
+          record.event.answer.cacheCreateInputTokens = Math.max(0, record.event.answer.cacheInputTokens - previousEvent.event.answer.cacheInputTokens - previousEvent.event.answer.cacheCreateInputTokens)
+          record.event.answer.cacheInputTokens = Math.max(record.event.answer.cacheInputTokens - record.event.answer.cacheCreateInputTokens)
         } else {
           record.event.answer.cacheCreateInputTokens = record.event.answer.cacheInputTokens
+          record.event.answer.cacheInputTokens = 0
         }
       }
       return record
