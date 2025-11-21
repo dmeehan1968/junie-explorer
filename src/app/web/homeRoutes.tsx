@@ -40,6 +40,9 @@ export const homeRouteHandler = async (req: AppRequest, res: AppResponse) => {
 
   try {
     const { jetBrains } = req
+    if (!jetBrains) {
+      return res.status(404).send('JetBrains instance not found')
+    }
 
     const page = async (rid: number | string) => {
       return (<HtmlPage cookies={req.cookies}>
