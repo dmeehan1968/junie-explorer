@@ -393,7 +393,9 @@ test.describe('ComponentName', async () => {
 
 ## Version Control
 
-Do NOT commit changes unless explicitly requested.  If in any doubt, ask the user for confirmation
+Do NOT commit changes unless explicitly requested.  If in any doubt, ask the user for confirmation.
+
+When renaming/moving files, use `git mv` to preserve history.
 
 ### Release a version
 
