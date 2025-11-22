@@ -6,6 +6,7 @@ import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
 import { AutoSelectedLlm } from "./AutoSelectedLlm"
+import { Gemini3Pro } from "./Gemini3Pro"
 import { OpenAI41 } from "./openAI41"
 import { OpenAI41Mini } from "./openAI41Mini"
 import { OpenAI4oMini } from "./openAI4oMini"
@@ -66,6 +67,9 @@ export const LLMTransformer = z.any().transform(data => {
   }
   if (OpenAI51.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return OpenAI51.parse(data)
+  }
+  if (Gemini3Pro.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return Gemini3Pro.parse(data)
   }
   if (AnthropicSonnet37.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return AnthropicSonnet37.parse(data)
