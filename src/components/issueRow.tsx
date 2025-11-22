@@ -142,13 +142,14 @@ export const IssueRow = async ({ issue, project, locale }: {
               const src = `/icons/${fileName}.svg`
               const title = jbaiTitles || provider
               return (
-                <div
-                  class="h-4 w-4 inline-block text-base-content"
-                  style={`background-color: currentColor; mask: url('${src}') no-repeat center / contain; -webkit-mask: url('${src}') no-repeat center / contain;`}
-                  role="img"
-                  aria-label={`${provider} icon`}
-                  title={title}
-                />
+                <div class="tooltip tooltip-left" data-tip={title}>
+                  <div
+                    class="h-4 w-4 inline-block text-base-content"
+                    style={`background-color: currentColor; mask: url('${src}') no-repeat center / contain; -webkit-mask: url('${src}') no-repeat center / contain;`}
+                    role="img"
+                    aria-label={`${provider} icon`}
+                  />
+                </div>
               )
             })}
           </div>
