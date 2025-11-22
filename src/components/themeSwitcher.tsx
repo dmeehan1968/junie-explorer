@@ -43,8 +43,8 @@ export const ThemeSwitcher: Component = () => {
     const lowercaseTheme = theme.toLowerCase()
     return <li>
       <a
-        onclick={`setTheme('${lowercaseTheme}')`}
-        onmouseover={`previewTheme('${lowercaseTheme}')`}
+        onclick={`setTheme('${lowercaseTheme}', this)`}
+        onmouseover={`previewTheme('${lowercaseTheme}', this)`}
         data-testid={`theme-${lowercaseTheme}`}>
         {theme}
       </a>

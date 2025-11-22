@@ -30,8 +30,25 @@
     }
   }
 
+  // Helper to check if element is effectively visible in the dropdown
+  function isElementVisible(element) {
+    if (element) {
+      const dropdownContent = element.closest('.dropdown-content');
+      if (dropdownContent) {
+        const style = window.getComputedStyle(dropdownContent);
+        // If opacity is effectively 0 or visibility is hidden, ignore the interaction
+        if (style.opacity === '0' || style.visibility === 'hidden') {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   // Set theme and save to cookie
-  function setTheme(theme) {
+  function setTheme(theme, element) {
+    if (!isElementVisible(element)) return;
+
     try {
       document.cookie = `junie-explorer-theme=${encodeURIComponent(theme)}; Max-Age=31536000; Path=/; SameSite=Lax`;
     } catch (e) {
@@ -54,7 +71,9 @@
   }
 
   // Preview theme with 400ms delay (for hover)
-  function previewTheme(theme) {
+  function previewTheme(theme, element) {
+    if (!isElementVisible(element)) return;
+
     // Clear any existing timeout
     if (previewTimeout) {
       clearTimeout(previewTimeout);

@@ -94,4 +94,36 @@ test.describe('ThemeSwitcher', async () => {
     })
 
   })
+
+  test('should NOT preview theme when dropdown is closed', async ({ themeSwitcher, page }) => {
+    await themeSwitcher.navigateTo('/')
+    const initialTheme = await themeSwitcher.currentTheme
+
+    // Ensure dropdown is closed
+    
+    // Force hover over 'Cupcake' theme item
+    // using force: true just in case, though if it's "visible" to PW it shouldn't be needed.
+    await themeSwitcher.themeItem('Cupcake').hover({ force: true })
+
+    // Wait for preview delay (400ms) + buffer
+    await page.waitForTimeout(600)
+
+    // Should still be initial theme
+    await expect(themeSwitcher.currentTheme).resolves.toBe(initialTheme)
+  })
+
+  test('should NOT switch theme when dropdown is closed', async ({ themeSwitcher, page }) => {
+    await themeSwitcher.navigateTo('/')
+    const initialTheme = await themeSwitcher.currentTheme
+
+    // Ensure dropdown is closed (it is by default)
+
+    // Attempt to click 'Cupcake' theme item
+    // We use force: true because Playwright's strict mode knows it's not visible (opacity 0),
+    // but we want to simulate the user clicking the "ghost" element which IS interactive in the browser.
+    await themeSwitcher.themeItem('Cupcake').click({ force: true })
+
+    // Expect theme NOT to change
+    await expect(themeSwitcher.currentTheme).resolves.toBe(initialTheme)
+  })
 })

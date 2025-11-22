@@ -31,3 +31,10 @@
 .role-user_reflection {
   background-color: oklch(93.6% 0.032 17.717); /* red-100 */
 }
+
+/* Fix for theme switcher ghost interactions */
+/* Ensure dropdown content is non-interactive when not open */
+.dropdown:not(:focus-within):not(:focus) .dropdown-content {
+  visibility: hidden;
+  pointer-events: none;
+}
