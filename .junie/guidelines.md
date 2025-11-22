@@ -328,9 +328,14 @@ Requirements for this project are documented using Gherkin feature files located
 - Test suites are organized according to feature/UI Component
 - Test suites a per-feature domain-specific language (DSL) to abstract the Playwright API and make the tests more human readable
 - Colocate the test suite with the component
-- To test locally use `bun run test`.  Use the argument `--grep <pattern>` to run focussed tests
-- To test interactively, use `bun run test:ui`
+- To run Playwright tests locally use `bun run test`.  Use the argument `--grep <pattern>` to run focussed tests
+- To run Playwright tests interactively, use `bun run test:ui`
+- To run Bun native tests, use `bun test`
 - Add the @jsxImportSource directive to the top of the test, DSL and component files.
+
+**Naming Conventions:**
+- Playwright tests: `*.pw.ts` or `*.pw.tsx` (and `*.e2e.ts` for end-to-end)
+- Bun tests: `*.test.ts` or `*.spec.ts`
 
 Example DSL (named `<component>.dsl.ts` and co-located with the component)
 ```ts
@@ -371,7 +376,7 @@ export const test = base.extend<{ componentName: ComponentNameDSL }>({
 
 ```
 
-Example Test (named `<component>.test.ts` and co-located with the component)
+Example Test (named `<component>.pw.ts` and co-located with the component)
 ```ts
 import { test, expect } from "@playwright/test"
 import { test } from "./<component>.dsl"

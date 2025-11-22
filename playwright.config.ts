@@ -17,7 +17,7 @@ export default defineConfig({
   projects: [
     {
       name: 'unit',
-      testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+      testMatch: ['**/*.pw.ts', '**/*.pw.tsx'],
     },
     {
       name: 'e2e',

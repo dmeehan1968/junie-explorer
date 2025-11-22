@@ -1,4 +1,4 @@
-import { expect } from "../playwright/test"
+import { expect } from "../playwright/test-utils"
 import { test } from "./projectTable.dsl"
 
 test.describe('ProjectTable', async () => {

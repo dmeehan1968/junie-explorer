@@ -1,5 +1,5 @@
 import { Locator } from "@playwright/test"
-import { expect } from "../playwright/test"
+import { expect } from "../playwright/test-utils"
 import { IssueRowDSL } from "./issueRow.dsl"
 import { test } from "./issuesTable.dsl"
 

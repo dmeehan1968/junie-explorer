@@ -121,17 +121,23 @@ bun run dev
 This will start the server using `bunx`, which runs the TypeScript code without the need for transpiling.
 
 ## Testing
-To test the application functionality:
+To test the application functionality using Playwright (Component and E2E tests):
 ```bash
 bun run test
 ```
 This will run the Playwright test suite.  You can add Playwright CLI arguments to the end of this, for example
 `bun run test --grep <pattern>` to run tests that match the specified pattern. 
 
-Tests are co-located with the source code, and are to be run with the Playwright test runner.
+To run native Bun unit tests:
+```bash
+bun test
+```
 
-Unit tests: Named `<component>.test.ts`
-End-to-end tests: Named `<feature>.e2e.ts`
+Tests are co-located with the source code.
+
+- Playwright Unit/Component tests: Named `<component>.pw.ts` or `<component>.pw.tsx`.
+- Playwright End-to-end tests: Named `<feature>.e2e.ts`.
+- Bun Unit tests: Named `<component>.test.ts` or `<component>.spec.ts`.
 
 ### JSX Import Source
 
