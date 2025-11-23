@@ -67,7 +67,7 @@ export const AgentState = z.looseObject({
 export type AgentState = z.infer<typeof AgentState>
 
 export const JunieTaskContext = z.looseObject({
-  type: z.enum(['CHAT']).nullish(),
+  type: z.enum(['CHAT', 'CODE']).nullish(),
   description: z.string(),
 })
 export type JunieTaskContext = z.infer<typeof JunieTaskContext>
