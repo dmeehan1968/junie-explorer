@@ -22,6 +22,7 @@ import { LlmResponseEvent } from "./schema/llmResponseEvent"
 import { LlmRequestEvent } from "./schema/llmRequestEvent"
 import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
+import publicFiles from "./bun/public"
 
 export class Task {
   public id: string = ''
@@ -61,7 +62,13 @@ export class Task {
 
     if (this._workerPool === undefined) {
       if (maxConcurrency > 0) {
-        const workerPath = './src/workers/loadEventsWorker.ts'
+        const bundledWorker = publicFiles['loadEventsWorker.js']
+        if (!bundledWorker) {
+          throw new Error('Failed to load bundled loadEventsWorker.js from public folder')
+        }
+        const blob = new Blob([bundledWorker], { type: 'application/javascript' })
+        const workerPath = URL.createObjectURL(blob)
+
         console.log(`Concurrency is ${maxConcurrency}. Set environment CONCURRENCY to configure`)
         this._workerPool = new WorkerPool<LoadEventsInput, LoadEventsOutput>({
           minConcurrency: 0,

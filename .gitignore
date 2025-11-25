@@ -1,6 +1,7 @@
 # Generated during build process
 /public/css/app.css
 /public/version.txt
+/public/loadEventsWorker.js
 /src/bun/public.ts
 /dist
 

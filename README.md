@@ -99,6 +99,14 @@ The front-end script `public/js/issueCostChart.js` reads the project id from the
 
 This refactor removes the server-side method that previously injected `window.chartData` on the project page.
 
+### Worker Bundling
+
+For the application to work correctly as a single-file executable, web workers must be bundled and embedded into the application.
+The `build:worker` script transpiles `src/workers/loadEventsWorker.ts` into `public/loadEventsWorker.js`.
+This file is then picked up by `make-vfs` during the `build:vfs` phase and embedded into the virtual file system.
+`build:static` covers both the worker and the other public assets.
+The application at runtime detects the presence of the bundled worker and loads it via a Blob URL, ensuring workers function correctly in the standalone executable.
+
 ## Development Workflow
 1. **Setup**: Clone the repository and run `bun install`
 2. **Development**: Use `bun run dev` to start the development server
