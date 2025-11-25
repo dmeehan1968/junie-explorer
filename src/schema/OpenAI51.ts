@@ -4,5 +4,6 @@ import { AbstractLLM } from "./abstractLLM"
 
 export const OpenAI51 = AbstractLLM.extend({
   jbai: z.literal('openai-gpt-5-1'),
+  provider: z.literal('OpenAI'),
   capabilities: AbstractCapabilities,
 })
