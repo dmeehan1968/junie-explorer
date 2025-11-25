@@ -8,7 +8,7 @@ export const ProjectTable: Component<{ jetBrains: JetBrains, locale?: string }> 
   jetBrains,
   locale,
 }) => {
-  await jetBrains.metrics
+  // await jetBrains.metrics
   const projects = Array.from((await jetBrains.projects).values())
 
   return (
