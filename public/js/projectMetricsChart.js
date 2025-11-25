@@ -4,9 +4,31 @@ let projectsChart = null;
 let displayOption = 'cost'; // Default display option (cost, tokens)
 let groupOption = 'auto'; // Grouping option for x-axis (auto, hour, day, week, month)
 
+// Helper to get cookie
+function getCookie(name) {
+  const cookie = document.cookie || '';
+  const match = cookie.split(';').map(p => p.trim()).find(p => p.startsWith(name + '='));
+  if (match) {
+    return decodeURIComponent(match.split('=')[1] || '').trim();
+  }
+  return null;
+}
+
+// Helper to set cookie
+function setCookie(name, value) {
+  try {
+    document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=31536000; Path=/; SameSite=Lax`;
+  } catch (e) {
+    // ignore cookie errors
+  }
+}
+
 // Initialize project selection from local storage
 function initializeProjectSelection() {
-  const storedSelection = localStorage.getItem('junie-explorer-selectedProjects');
+  let storedSelection = getCookie('junie-explorer-selectedProjects');
+  if (!storedSelection) {
+    storedSelection = localStorage.getItem('junie-explorer-selectedProjects');
+  }
   const storedDisplayOption = localStorage.getItem('junie-explorer-displayOption');
   const graphContainer = document.getElementById('project-metrics-chart');
 
@@ -72,8 +94,9 @@ function handleProjectSelection(checkbox) {
   const projectName = checkbox.getAttribute('data-project-name');
   selectedProjects[projectName] = checkbox.checked;
 
-  // Save to local storage
-  localStorage.setItem('junie-explorer-selectedProjects', JSON.stringify(selectedProjects));
+  // Save to cookie
+  const activeProjects = Object.fromEntries(Object.entries(selectedProjects).filter(([_, selected]) => selected));
+  setCookie('junie-explorer-selectedProjects', JSON.stringify(activeProjects));
 
   // Update "Select All" checkbox
   updateSelectAllCheckbox();
@@ -95,8 +118,9 @@ function toggleSelectAllProjects() {
     selectedProjects[projectName] = isChecked;
   });
 
-  // Save to local storage
-  localStorage.setItem('junie-explorer-selectedProjects', JSON.stringify(selectedProjects));
+  // Save to cookie
+  const activeProjects = Object.fromEntries(Object.entries(selectedProjects).filter(([_, selected]) => selected));
+  setCookie('junie-explorer-selectedProjects', JSON.stringify(activeProjects));
 
   // Load and display the graph if projects are selected
   loadProjectMetricsChart();

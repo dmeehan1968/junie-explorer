@@ -15,6 +15,7 @@ all projects across IDE's found on the system.
 - Provides metrics and statistics for issues and tasks
 - Includes a refresh button to update the data
 - Responsive web interface
+- Persists selected projects via cookies (migrated from local storage)
 
 See the [Documentation](docs/overview.md) for details
 
@@ -205,7 +206,7 @@ junie-explorer/
 │   │   ├── ideFilters.js                    # Client‑side filtering by IDE across projects
 │   │   ├── imageModal.js                    # Display images in a modal with zoom/close
 │   │   ├── issueCostChart.js                # Render per‑issue graphs (timeline/metrics)
-│   │   ├── projectSelection.js              # Manage project selection and metrics chart rendering
+│   │   ├── projectMetricsChart.js           # Manage project selection and metrics chart rendering
 │   │   ├── reloadPage.js                    # Trigger full page reloads from UI controls
 │   │   ├── statsPage.js                     # Runtime stats page client logic
 │   │   ├── taskActionChart.js               # Draw charts for action/request counts over time
