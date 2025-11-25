@@ -108,6 +108,12 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
     return { x: event.timestamp.toISOString(), y: total }
   })
 
+  let cumulativeCost = 0
+  const cumulativeCostData = llmEvents.map(event => {
+    cumulativeCost += event.event.answer.cost
+    return { x: event.timestamp.toISOString(), y: cumulativeCost }
+  })
+
   const datasets = [
     {
       label: 'Cost',
@@ -117,6 +123,16 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
       fill: false,
       tension: 0.1,
       yAxisID: 'y',
+    },
+    {
+      label: 'Cumulative Cost',
+      data: cumulativeCostData,
+      borderColor: 'rgb(255, 159, 64)',
+      backgroundColor: 'rgba(255, 159, 64, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y',
+      hidden: true,
     },
     {
       label: 'Input Tokens',

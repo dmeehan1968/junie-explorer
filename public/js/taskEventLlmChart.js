@@ -56,6 +56,15 @@ function filterChartData(selectedProviders) {
     x: event.timestamp.toISOString(),
     y: event.event.answer.cost,
   }));
+
+  let cumulativeCost = 0;
+  const cumulativeCostData = filteredEvents.map(event => {
+    cumulativeCost += event.event.answer.cost;
+    return {
+      x: event.timestamp.toISOString(),
+      y: cumulativeCost
+    };
+  });
   
   const inputTokenData = filteredEvents.map(event => ({
     x: event.timestamp.toISOString(),
@@ -95,22 +104,26 @@ function filterChartData(selectedProviders) {
       },
       {
         ...originalChartData.datasets[1],
-        data: inputTokenData
+        data: cumulativeCostData
       },
       {
         ...originalChartData.datasets[2],
-        data: outputTokenData
+        data: inputTokenData
       },
       {
         ...originalChartData.datasets[3],
-        data: cacheTokenData
+        data: outputTokenData
       },
       {
         ...originalChartData.datasets[4],
-        data: cacheCreateTokenData
+        data: cacheTokenData
       },
       {
         ...originalChartData.datasets[5],
+        data: cacheCreateTokenData
+      },
+      {
+        ...originalChartData.datasets[6],
         data: combinedTokenData
       }
     ]
