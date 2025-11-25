@@ -8,14 +8,13 @@ export const ProjectTable: Component<{ jetBrains: JetBrains, locale?: string }> 
   jetBrains,
   locale,
 }) => {
-  // await jetBrains.metrics
   const projects = Array.from((await jetBrains.projects).values())
 
   return (
     <div class="overflow-x-auto">
       <table class="table table-zebra w-full bg-base-100" id="projects-table">
         <thead>
-        <tr class="!bg-base-200">
+        <tr class="bg-base-200!">
           <Conditional condition={jetBrains.hasMetrics}>
             <th class="w-12 text-center">
               <input type="checkbox" id="select-all-projects" onchange="toggleSelectAllProjects()"
@@ -66,7 +65,7 @@ export const ProjectTable: Component<{ jetBrains: JetBrains, locale?: string }> 
         <Conditional condition={projects.length > 0}>
           {projects.map(async project =>
             <tr
-              class="project-row cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md"
+              class="project-row cursor-pointer hover:bg-accent! transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md"
               data-testid={"project-item"}
               data-ides={JSON.stringify(project.ideNames)}>
               <Conditional condition={jetBrains.hasMetrics}>
@@ -101,7 +100,7 @@ export const ProjectTable: Component<{ jetBrains: JetBrains, locale?: string }> 
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
                 <span class="text-sm text-base-content/70">{(await project.issues).size}</span>
               </td>
-              <td class="text-left whitespace-normal break-words align-middle py-3 px-2" role="link" tabindex="0"
+              <td class="text-left whitespace-normal wrap-break-word align-middle py-3 px-2" role="link" tabindex="0"
                   onclick={`window.location.href='/project/${encodeURIComponent(project.name)}'`}
                   onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/project/${encodeURIComponent(project.name)}'}`}>
                 {await (async () => {
