@@ -38,10 +38,10 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
 
   return (
     <>
-      {filteredEvents.map((record, index, records) => {
+      {filteredEvents.map((current, index, records) => {
         const messages: JSX.Element[] = []
 
-        if (record.event.type === 'LlmRequestEvent') {
+        if (current.event.type === 'LlmRequestEvent') {
           if (!didOutputInitialContext) {
 
             messages.push(<Divider id="history">Start of Context/History</Divider>)
@@ -52,7 +52,7 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                 testId="system-message"
                 left={true}
                 label="System Message"
-                content={escapeHtml(record.event.chat.system)}
+                content={escapeHtml(current.event.chat.system)}
               />,
             )
 
@@ -63,9 +63,9 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
                 left={true}
                 label="Tools"
                 content={
-                  record.event.chat.tools.length ? (
+                  current.event.chat.tools.length ? (
                     <>
-                      {record.event.chat.tools.map((tool) => (
+                      {current.event.chat.tools.map((tool) => (
                         <ToolDecorator tool={tool}/>
                       ))}
                     </>
@@ -77,7 +77,7 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
             )
 
             messages.push(
-              ...record.event.chat.messages.map((message) => (
+              ...current.event.chat.messages.map((message) => (
                 <ChatMessageDecorator klass={klass} message={message}/>
               )).filter(Boolean),
             )
@@ -86,9 +86,9 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
 
             didOutputInitialContext = true
           }
-        } else if (record.event.type === 'LlmResponseEvent') {
-          if (record.event.answer.llm.isSummarizer) {
-            for (const choice of record.event.answer.contentChoices) {
+        } else if (current.event.type === 'LlmResponseEvent') {
+          if (current.event.answer.llm.isSummarizer) {
+            for (const choice of current.event.answer.contentChoices) {
               if (choice.content) {
                 messages.push(
                   <MessageDecorator
@@ -102,27 +102,27 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
               }
             }
           } else {
-            const latency = record.event.answer.time
+            const latency = current.event.answer.time
             const previous = records.slice(0, index).reverse().find((rec): rec is {
                 event: LlmRequestEvent,
                 timestamp: Date
               } =>
-                rec.event.type === 'LlmRequestEvent' && rec.event.id === record.event.id,
+                rec.event.type === 'LlmRequestEvent' && rec.event.id === current.event.id,
             )
 
-            if (record.event.answer.webSearchCount > 0) {
+            if (current.event.answer.webSearchCount > 0) {
               messages.push(
                 <MessageDecorator
                   klass={klass}
                   testId="web-search-assistant"
                   left={false}
                   label={`Web Search`}
-                  content={escapeHtml(`Count: ${record.event.answer.webSearchCount}`)}
+                  content={escapeHtml(`Count: ${current.event.answer.webSearchCount}`)}
                 />,
               )
             }
 
-            for (const choice of record.event.answer.contentChoices) {
+            for (const choice of current.event.answer.contentChoices) {
               if (choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIContentAnswerChoice') {
                 if (choice.content) {
                   messages.push(
@@ -152,29 +152,29 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
               }
             }
           }
-        } else if (record.event.type === 'AgentActionExecutionFinished') {
+        } else if (current.event.type === 'AgentActionExecutionFinished') {
           messages.push(
             <MessageDecorator
               klass={klass}
               testId="tool-result"
               left={true}
               label="Tool Result"
-              content={escapeHtml(record.event.result.text)}
+              content={escapeHtml(current.event.result.text)}
             />,
           )
 
-          if (record.event.result.images && record.event.result.images.length) {
+          if (current.event.result.images && current.event.result.images.length) {
             // TODO: handle images as well (when we know what the shape is)
-            console.log('Unhandled tool result image', record.event.result.images)
+            console.log('Unhandled tool result image', current.event.result.images)
           }
-        } else if (record.event.type === 'ActionRequestBuildingFailed') {
+        } else if (current.event.type === 'ActionRequestBuildingFailed') {
           messages.push(
             <MessageDecorator
               klass={klass + ' bg-error text-error-content'}
               testId="tool-error"
               left={true}
               label="Tool Error"
-              content={escapeHtml(record.event.serializableThrowable?.message ?? 'Unspecified error')}
+              content={escapeHtml(current.event.serializableThrowable?.message ?? 'Unspecified error')}
             />,
           )
         }
