@@ -1,7 +1,7 @@
 /** @jsxImportSource @kitajs/html */
 
 import { EventRecord } from "../schema/eventRecord"
-import { ProcessedEvents } from "./processedEvents"
+import { TrajectoriesView } from "./trajectoriesView"
 
 export const MessageTrajectoriesSection = ({ events }: { events: EventRecord[] }) => {
   return (
@@ -13,7 +13,7 @@ export const MessageTrajectoriesSection = ({ events }: { events: EventRecord[] }
           (<a href={'#current-session'}>Jump to start of current session</a>)
         </span>
       </h3>
-      <ProcessedEvents events={events}/>
+      <TrajectoriesView events={events}/>
     </div>
   )
 }

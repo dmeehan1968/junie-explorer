@@ -33,6 +33,7 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/semver": "^7.7.1",
     "cookie-parser": "^1.4.7",
+    "diff": "^8.0.2",
     "express": "^4.21.2",
     "fs-extra": "^11.3.2",
     "marked": "^15.0.12",

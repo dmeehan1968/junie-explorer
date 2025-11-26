@@ -9,8 +9,8 @@ export interface MessageDecoratorProps {
   klass: string
   testId: string
   left: boolean
-  label?: string
-  content: string | Children
+  label?: Children
+  content: Children
 }
 
 export const MessageDecorator: Component<MessageDecoratorProps> = (props) => {
@@ -26,7 +26,7 @@ export const MessageDecorator: Component<MessageDecoratorProps> = (props) => {
           {props.label}
         </h3>
         <div
-          class={`${props.klass} rounded shadow pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap break-words transition-all duration-300 ease-in-out`}>
+          class={`rounded shadow pt-6 content-wrapper font-mono text-xs leading-relaxed max-h-[200px] overflow-auto whitespace-pre-wrap wrap-break-word transition-all duration-300 ease-in-out ${props.klass}`}>
           {props.content}
         </div>
       </div>

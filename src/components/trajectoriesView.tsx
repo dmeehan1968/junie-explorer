@@ -1,18 +1,17 @@
 /** @jsxImportSource @kitajs/html */
 
-import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed"
-import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished"
 import { EventRecord } from "../schema/eventRecord"
-import { LlmRequestEvent } from "../schema/llmRequestEvent"
-import { LlmResponseEvent } from "../schema/llmResponseEvent"
 import { escapeHtml } from "../utils/escapeHtml"
 import { ChatMessageDecorator } from "./chatMessageDecorator"
 import { Divider } from "./divider"
+import { getMessageDiffs } from "./getMessageDiffs"
+import { getPreviousRequestRecord } from "./getPreviousRequestRecord"
+import { getTrajectoryEventRecords } from "./getTrajectoryEventRecords"
 import { MessageDecorator } from "./messageDecorator"
 import { ToolCallDecorator } from "./toolCallDecorator"
 import { ToolDecorator } from "./toolDecorator"
 
-export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
+export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
   if (events.length === 0) {
     return (
       <div class="p-4 text-center text-base-content/70" data-testid="no-events-message">
@@ -24,21 +23,11 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
   let didOutputInitialContext = false
   const klass = 'p-4 mt-4 bg-base-content/10'
 
-  const filteredEvents = events.filter((record: EventRecord): record is {
-    event: LlmRequestEvent | LlmResponseEvent | ActionRequestBuildingFailed | AgentActionExecutionFinished,
-    timestamp: Date
-  } => {
-    return (
-      (record.event.type === 'LlmRequestEvent' && !record.event.modelParameters.model.isSummarizer)
-      || (record.event.type === 'LlmResponseEvent')
-      || record.event.type === 'AgentActionExecutionFinished'
-      || record.event.type === 'ActionRequestBuildingFailed'
-    )
-  })
+  const trajectoryEvents = getTrajectoryEventRecords(events)
 
   return (
     <>
-      {filteredEvents.map((current, index, records) => {
+      {trajectoryEvents.map((current, index, records) => {
         const messages: JSX.Element[] = []
 
         if (current.event.type === 'LlmRequestEvent') {
@@ -85,6 +74,11 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
             messages.push(<Divider id="current-session">Current Session</Divider>)
 
             didOutputInitialContext = true
+
+          } else {
+
+            messages.push(getMessageDiffs(current, records.slice(0, index), klass))
+
           }
         } else if (current.event.type === 'LlmResponseEvent') {
           if (current.event.answer.llm.isSummarizer) {
@@ -103,12 +97,8 @@ export const ProcessedEvents = ({ events }: { events: EventRecord[] }) => {
             }
           } else {
             const latency = current.event.answer.time
-            const previous = records.slice(0, index).reverse().find((rec): rec is {
-                event: LlmRequestEvent,
-                timestamp: Date
-              } =>
-                rec.event.type === 'LlmRequestEvent' && rec.event.id === current.event.id,
-            )
+
+            const previous = getPreviousRequestRecord(trajectoryEvents.slice(0, index), event => event.id === current.event.id)
 
             if (current.event.answer.webSearchCount > 0) {
               messages.push(
