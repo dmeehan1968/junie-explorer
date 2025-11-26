@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url"
 import semver from "semver"
 import publicFiles from "./bun/public"
 import { Project } from "./Project"
-import { SummaryMetrics } from "./schema"
+import { addSummaryMetrics, initialisedSummaryMetrics, SummaryMetrics } from "./schema"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Task } from "./Task"
 
@@ -79,24 +79,12 @@ export class JetBrains {
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
 
-      const projectMetrics = await Promise.all([...(await this.projects).values()].map(async project => {
-        const metrics = await project.metrics
-        project.logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
-        return metrics
-      }))
+      const metrics = initialisedSummaryMetrics()
 
-      const metrics = projectMetrics.reduce((acc, cur) => {
-        return {
-          ...acc,
-          inputTokens: acc.inputTokens + cur.inputTokens,
-          outputTokens: acc.outputTokens + cur.outputTokens,
-          cacheTokens: acc.cacheTokens + cur.cacheTokens,
-          webSearchCount: acc.webSearchCount + cur.webSearchCount,
-          cost: acc.cost + cur.cost,
-          time: acc.time + cur.time,
-          metricCount: acc.metricCount + cur.metricCount,
-        }
-      }, { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0, webSearchCount: 0 } satisfies SummaryMetrics)
+      await Promise.all([...(await this.projects).values()].map(async project => {
+        addSummaryMetrics(metrics, await project.metrics)
+        project.logPaths.forEach(logPath => this.logger.log('Loaded:', path.resolve(logPath, '../..')))
+      }))
 
       this.hasMetrics = metrics.metricCount > 0
 

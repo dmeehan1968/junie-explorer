@@ -1,6 +1,6 @@
 import fs from "fs-extra"
 import path from "node:path"
-import { JunieChainSchema, SummaryMetrics } from "./schema"
+import { addSummaryMetrics, initialisedSummaryMetrics, JunieChainSchema, SummaryMetrics } from "./schema"
 import { Task } from "./Task"
 
 export class Issue {
@@ -59,17 +59,10 @@ export class Issue {
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
 
-      const metrics: SummaryMetrics = { inputTokens: 0, outputTokens: 0, cacheTokens: 0, cost: 0, time: 0, metricCount: 0, webSearchCount: 0 }
+      const metrics: SummaryMetrics = initialisedSummaryMetrics()
 
       for (const [_, task] of await this.tasks) {
-        const taskMetrics = await task.metrics
-        metrics.inputTokens += taskMetrics.inputTokens
-        metrics.outputTokens += taskMetrics.outputTokens
-        metrics.cacheTokens += taskMetrics.cacheTokens
-        metrics.webSearchCount += taskMetrics.webSearchCount
-        metrics.cost += taskMetrics.cost
-        metrics.time += taskMetrics.time
-        metrics.metricCount += taskMetrics.metricCount
+        addSummaryMetrics(metrics, await task.metrics)
       }
 
       resolve(metrics)

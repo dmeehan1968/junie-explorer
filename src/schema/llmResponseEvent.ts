@@ -31,20 +31,31 @@ export const LlmResponseEvent = z.looseObject({
 
     webSearchCount ||= answer.usage.webSearchCount || 0
 
-    const cost = (inputTokens / million) * answer.llm.capabilities.inputPrice
-      + (outputTokens / million) * answer.llm.capabilities.outputPrice
-      + (cacheInputTokens / million) * answer.llm.capabilities.cacheInputPrice
-      + (cacheCreateInputTokens / million) * answer.llm.capabilities.cacheCreateInputPrice
-      + webSearchCount * answer.llm.capabilities.webSearchPrice
+    const inputTokenCost = (inputTokens / million) * answer.llm.capabilities.inputPrice
+    const outputTokenCost = (outputTokens / million) * answer.llm.capabilities.outputPrice
+    const cacheInputTokenCost = (cacheInputTokens / million) * answer.llm.capabilities.cacheInputPrice
+    const cacheCreateInputTokenCost = (cacheCreateInputTokens / million) * answer.llm.capabilities.cacheCreateInputPrice
+    const webSearchCost = (webSearchCount / million) * answer.llm.capabilities.webSearchPrice
+
+    const cost = inputTokenCost
+      + outputTokenCost
+      + cacheInputTokenCost
+      + cacheCreateInputTokenCost
+      + webSearchCost
 
     return {
       ...answer,
       cost,
       inputTokens,
+      inputTokenCost,
       outputTokens,
+      outputTokenCost,
       cacheInputTokens,
+      cacheInputTokenCost,
       cacheCreateInputTokens,
+      cacheCreateInputTokenCost,
       webSearchCount,
+      webSearchCost,
       time: answer.time ?? 0,
       metricCount: [
         inputTokens,

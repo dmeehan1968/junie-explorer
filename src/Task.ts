@@ -7,7 +7,8 @@ import { LoadEventsOutput } from "./workers/loadEventsOutput"
 import { WorkerPool } from "./workers/WorkerPool"
 import { StatsCollector } from "./stats/StatsCollector"
 import {
-  AgentState,
+  addSummaryMetrics,
+  AgentState, initialisedSummaryMetrics,
   JuniePlan,
   JunieTaskContext,
   JunieTaskSchema,
@@ -125,15 +126,7 @@ export class Task {
   get metrics(): Promise<SummaryMetrics> {
     this._metrics ??= new Promise(async (resolve) => {
 
-      const metrics: SummaryMetrics = {
-        inputTokens: 0,
-        outputTokens: 0,
-        cacheTokens: 0,
-        webSearchCount: 0,
-        cost: 0,
-        time: 0,
-        metricCount: 0,
-      }
+      const metrics: SummaryMetrics = initialisedSummaryMetrics()
 
       // metrics needs to load events, but not retain them
       // but if metrics are already loaded (retained), then just use them
@@ -143,13 +136,19 @@ export class Task {
 
       for (const event of events) {
         if (event.event.type === 'LlmResponseEvent') {
-          metrics.cost += event.event.answer.cost
-          metrics.inputTokens += event.event.answer.inputTokens
-          metrics.outputTokens += event.event.answer.outputTokens
-          metrics.cacheTokens += event.event.answer.cacheCreateInputTokens
-          metrics.webSearchCount += event.event.answer.webSearchCount
-          metrics.time += event.event.answer.time
-          metrics.metricCount += event.event.answer.metricCount
+          addSummaryMetrics(metrics, {
+            cost: event.event.answer.cost,
+            inputTokens: event.event.answer.inputTokens,
+            inputTokenCost: event.event.answer.inputTokenCost,
+            outputTokens: event.event.answer.outputTokens,
+            outputTokenCost: event.event.answer.outputTokenCost,
+            cacheTokens: event.event.answer.cacheCreateInputTokens,
+            cacheTokenCost: event.event.answer.cacheCreateInputTokenCost,
+            webSearchCount: event.event.answer.webSearchCount,
+            webSearchCost: event.event.answer.webSearchCost,
+            time: event.event.answer.time,
+            metricCount: event.event.answer.metricCount,
+          })
         }
       }
 

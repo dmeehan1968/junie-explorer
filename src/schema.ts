@@ -179,10 +179,46 @@ export type JunieStep = z.infer<typeof JunieStepSchema>
 
 export interface SummaryMetrics {
   inputTokens: number;
+  inputTokenCost: number;
   outputTokens: number;
+  outputTokenCost: number;
   cacheTokens: number;
+  cacheTokenCost: number;
   webSearchCount: number;
+  webSearchCost: number;
   cost: number;
   time: number;
   metricCount: number;
 }
+
+export function initialisedSummaryMetrics(): SummaryMetrics {
+  return {
+    inputTokens: 0,
+    inputTokenCost: 0,
+    outputTokens: 0,
+    outputTokenCost: 0,
+    cacheTokens: 0,
+    cacheTokenCost: 0,
+    webSearchCount: 0,
+    webSearchCost: 0,
+    cost: 0,
+    time: 0,
+    metricCount: 0,
+  }
+}
+
+export function addSummaryMetrics(accumulator: SummaryMetrics, addValue: SummaryMetrics) {
+  accumulator.inputTokens += addValue.inputTokens
+  accumulator.inputTokenCost += addValue.inputTokenCost
+  accumulator.outputTokens += addValue.outputTokens
+  accumulator.outputTokenCost += addValue.outputTokenCost
+  accumulator.cacheTokens += addValue.cacheTokens
+  accumulator.cacheTokenCost += addValue.cacheTokenCost
+  accumulator.webSearchCount += addValue.webSearchCount
+  accumulator.webSearchCost += addValue.webSearchCost
+  accumulator.cost += addValue.cost
+  accumulator.time += addValue.time
+  accumulator.metricCount += addValue.metricCount
+}
+
+
