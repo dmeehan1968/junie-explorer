@@ -12,7 +12,7 @@ export const AgentStateUpdatedEvent = z.looseObject({
     }),
     observations: z.looseObject({
       // TODO
-    }).array(),
+    }).array().optional(),
     ideInitialState: z.looseObject({
       content: z.string(),
       kind: z.enum(['User', 'Assistant']),
