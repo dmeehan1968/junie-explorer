@@ -89,7 +89,7 @@ export const JunieTaskSchema = z.looseObject({
   created: z.coerce.date(),
   artifactPath: z.string(),
   context: JunieTaskContext,
-  isDeclined: z.boolean(),
+  isDeclined: z.boolean().default(() => false),
   plan: JuniePlanSchema.array().default(() => ([])),
   previousTasksInfo: PreviousTasksInfo.nullish(),
   finalAgentState: AgentState.nullish(),
