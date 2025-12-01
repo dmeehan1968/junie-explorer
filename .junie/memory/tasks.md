@@ -8,3 +8,23 @@
     "NEW INSTRUCTION": "WHEN asserting defaults or model flags THEN open defining schema file to verify"
 }
 
+[2025-12-01 18:46] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project, refactor Task.ts, update components, update api routes, update charts, update tests, run build, add response-to-request lookup",
+    "BOTTLENECK": "Edits began without a full-reference scan and impact analysis across consumers.",
+    "PROJECT NOTE": "Your regex alternations need grouping and anchoring (e.g., use /^(A|B)$/ to avoid ^ and $ applying to only one side).",
+    "NEW INSTRUCTION": "WHEN changing schema fields or moving properties THEN search project for all references and list impacts"
+}
+
+[2025-12-01 19:39] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project, get file structure, open package manifest, cross-check features",
+    "BOTTLENECK": "Relied solely on README without validating claims against repository structure/code.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN README exists for project overview THEN get file structure, open README and package manifest, then summarize"
+}
+

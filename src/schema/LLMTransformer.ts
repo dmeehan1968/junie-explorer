@@ -11,7 +11,7 @@ import { Gemini3Pro } from "./Gemini3Pro"
 import { OpenAI41 } from "./openAI41"
 import { OpenAI41Mini } from "./openAI41Mini"
 import { OpenAI4oMini } from "./openAI4oMini"
-import { OpenAI51 } from "./OpenAI51"
+import { OpenAI51 } from "./openAI51"
 import { OpenAIo3 } from "./openAIo3"
 
 export const LLMTransformer = z.any().transform(data => {

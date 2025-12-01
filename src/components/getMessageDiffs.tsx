@@ -1,4 +1,5 @@
 import { diffJson } from "diff"
+import { AgentType } from "../schema/agentType"
 import { escapeHtml } from "../utils/escapeHtml"
 import { getPreviousRequestRecord } from "./getPreviousRequestRecord"
 import { TrajectoryEventRecord } from "./getTrajectoryEventRecords"
@@ -10,7 +11,7 @@ export function getMessageDiffs(current: TrajectoryEventRecord, previousEventRec
     return <></>
   }
 
-  const previous = getPreviousRequestRecord(previousEventRecords, event => !event.modelParameters.model.isSummarizer && event.id !== current.event.id)
+  const previous = getPreviousRequestRecord(previousEventRecords, event => event.chat.agentType !== AgentType.TaskSummarizer && event.id !== current.event.id)
 
   if (previous) {
     if (current.event.chat.system !== previous.event.chat.system) {

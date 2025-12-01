@@ -6,6 +6,5 @@ export const OpenAI4oMini = AbstractLLM.extend({
   jbai: z.literal('openai-gpt-4o-mini'),
   provider: z.literal('OpenAI'),
   capabilities: AbstractCapabilities.optional(),
-  isSummarizer: z.boolean().default(() => true)
 })
 

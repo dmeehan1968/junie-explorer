@@ -1,5 +1,6 @@
 /** @jsxImportSource @kitajs/html */
 
+import { AgentType } from "../schema/agentType"
 import { EventRecord } from "../schema/eventRecord"
 import { escapeHtml } from "../utils/escapeHtml"
 import { ChatMessageDecorator } from "./chatMessageDecorator"
@@ -81,7 +82,10 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
 
           }
         } else if (current.event.type === 'LlmResponseEvent') {
-          if (current.event.answer.llm.isSummarizer) {
+
+          const requestRecord = getPreviousRequestRecord(trajectoryEvents.slice(0, index), event => event.id === current.event.id)
+
+          if (requestRecord?.event.chat.agentType === AgentType.TaskSummarizer) {
             for (const choice of current.event.answer.contentChoices) {
               if (choice.content) {
                 messages.push(
@@ -97,8 +101,6 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
             }
           } else {
             const latency = current.event.answer.time
-
-            const previous = getPreviousRequestRecord(trajectoryEvents.slice(0, index), event => event.id === current.event.id)
 
             if (current.event.answer.webSearchCount > 0) {
               messages.push(
@@ -120,7 +122,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
                       klass={klass}
                       testId="chat-assistant"
                       left={false}
-                      label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${previous?.event.modelParameters.reasoning_effort}</span>`}
+                      label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${requestRecord?.event.modelParameters.reasoning_effort}</span>`}
                       content={escapeHtml(choice.content)}
                     />,
                   )

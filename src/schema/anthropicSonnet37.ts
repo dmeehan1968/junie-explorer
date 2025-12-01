@@ -15,5 +15,4 @@ export const AnthropicSonnet37 = AbstractLLM.extend({
     supportsAssistantMessageResuming: z.boolean().default(() => false),
     supportsWebSearch: z.boolean().default(() => false),
   }).optional(),
-  isSummarizer: z.boolean().default(() => false)
 })

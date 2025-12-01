@@ -1,4 +1,5 @@
 import * as z from "zod"
+import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
@@ -8,7 +9,7 @@ import { LLMTransformer } from "./LLMTransformer"
 import { OpenAI41 } from "./openAI41"
 import { OpenAI41Mini } from "./openAI41Mini"
 import { OpenAI4oMini } from "./openAI4oMini"
-import { OpenAI51 } from "./OpenAI51"
+import { OpenAI51 } from "./openAI51"
 import { OpenAIo3 } from "./openAIo3"
 
 export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai', [
@@ -25,7 +26,6 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AutoSelectedLlm,
 ]).parse(data)).transform((({ inputPrice, outputPrice, cacheInputPrice, cacheCreateInputPrice, capabilities, ...data }) => ({
   ...data,
-  groupName: `${ data.isSummarizer ? 'Summarizer' : 'Assistant' } (${ data.jbai })`,
   capabilities: {
     ...capabilities,
     inputPrice: inputPrice ?? capabilities?.inputPrice ?? 0,

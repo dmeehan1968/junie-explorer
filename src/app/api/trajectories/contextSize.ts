@@ -58,7 +58,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
       const ev = cur.ev
       if (ev.event.type === 'LlmResponseEvent') {
         const resp: LlmResponseEvent = ev.event
-        const provider = resp.answer.llm.groupName
+        const provider = resp.answer.llm.jbai // WAS GROUPNAME
         const model = resp.answer.llm.name
         const inputTokens = resp.answer.inputTokens ?? 0
         const outputTokens = resp.answer.outputTokens ?? 0

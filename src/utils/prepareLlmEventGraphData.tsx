@@ -26,7 +26,7 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 
   // Extract unique providers
-  const providers = [...new Set(llmEvents.map(event => event.event.answer.llm.groupName))].sort()
+  const providers = [...new Set(llmEvents.map(event => event.event.answer.llm.jbai))].sort()   // WAS GROUPNAME
 
   // Use the actual timestamps from the event data
   const eventTimes = llmEvents.map(event => event.timestamp)

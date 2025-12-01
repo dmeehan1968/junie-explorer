@@ -1,5 +1,6 @@
 /** @jsxImportSource @kitajs/html */
 
+import { AgentType } from "../schema/agentType"
 import { test, expect } from './processedEvents.dsl.js'
 
 // Tests grouped by feature/prop per guidelines
@@ -22,7 +23,6 @@ test.describe('ProcessedEvents', () => {
           ],
           tools: [],
         },
-        modelParameters: { model: { isSummarizer: false } },
       } as any
 
       await messageTrajectories.setEvents(messageTrajectories.withRequest(req))
@@ -120,7 +120,7 @@ test.describe('ProcessedEvents', () => {
 
   test.describe('Filtering behavior', () => {
     test('filters out summarizer LlmRequestEvent but includes summarizer LlmResponseEvent', async ({ messageTrajectories }) => {
-      const reqSummarizer = messageTrajectories.withRequest({ modelParameters: { model: { isSummarizer: true } } as any })
+      const reqSummarizer = messageTrajectories.withRequest({ chat: { system: 'You are a task step summarizer', tools: [] } as any })
       const summarizerRes = messageTrajectories.withSummarizerResponse('S')
       const events = [ ...reqSummarizer, ...summarizerRes ]
       await messageTrajectories.setEvents(events)

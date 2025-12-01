@@ -8,33 +8,48 @@ import type { EventRecord } from "../schema/eventRecord"
 import type { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent"
 import type { LlmResponseEvent } from "../schema/llmResponseEvent"
 
+import { AgentType } from "../schema/agentType"
+
 // Minimal LLM factory
 const llm = (overrides: Partial<any> = {}) => ({
   jbai: 'OpenAI-4.1',
-  isSummarizer: false,
   capabilities: { inputPrice: 0, outputPrice: 0, cacheInputPrice: 0, cacheCreateInputPrice: 0, webSearchPrice: 0 },
   ...overrides,
 })
 
 // Minimal Request/Response builders
-const requestEvent = (overrides: Partial<LlmRequestEvent> = {}): LlmRequestEvent => ({
-  type: 'LlmRequestEvent',
-  id: overrides.id ?? 'req-1',
-  chat: {
-    system: 'You are helpful',
+const requestEvent = (overrides: Partial<LlmRequestEvent> = {}): LlmRequestEvent => {
+  const chat = {
+    system: '## ENVIRONMENT',
     messages: [],
     tools: [],
     ...overrides['chat' as keyof LlmRequestEvent] as any,
-  },
-  modelParameters: {
-    model: llm(),
-    reasoning_effort: 'medium',
-    prompt_cache_enabled: false,
-    ...overrides['modelParameters' as keyof LlmRequestEvent] as any,
-  },
-  attemptNumber: 1,
-  ...overrides,
-})
+  }
+  
+  let agentType: AgentType
+  if (/^## ENVIRONMENT/.test(chat.system)) {
+    agentType = AgentType.Assistant
+  } else if (/^You are a programming task description summarizer|You are a task (step|trace) summarizer|You are a chat response title creator|^Your task is to summarize/.test(chat.system)) {
+    agentType = AgentType.TaskSummarizer
+  } else {
+    agentType = AgentType.Assistant // Default for tests
+  }
+  (chat as any).agentType = agentType
+
+  return {
+    type: 'LlmRequestEvent',
+    id: overrides.id ?? 'req-1',
+    chat,
+    modelParameters: {
+      model: llm(),
+      reasoning_effort: 'medium',
+      prompt_cache_enabled: false,
+      ...overrides['modelParameters' as keyof LlmRequestEvent] as any,
+    },
+    attemptNumber: 1,
+    ...overrides,
+  }
+}
 
 const responseContentChoice = (content: string) => ({
   type: 'com.intellij.ml.llm.matterhorn.llm.AIContentAnswerChoice',
@@ -103,11 +118,13 @@ export class MessageTrajectoriesDSL {
   empty() { return [] as EventRecord[] }
   withRequest(overrides: Partial<LlmRequestEvent> = {}) { return [asRecord(requestEvent(overrides))] }
   withSummarizerResponse(content: string) {
-    return [asRecord(responseEvent({ answer: { llm: llm({ isSummarizer: true }), contentChoices: [responseContentChoice(content)] } as any }))]
+    const req = requestEvent({ id: 's-1', chat: { system: 'You are a task step summarizer', tools: [], messages: [] } as any })
+    const res = responseEvent({ id: 's-1', answer: { llm: llm(), contentChoices: [responseContentChoice(content)] } as any })
+    return [asRecord(req), asRecord(res)]
   }
   withAssistantResponse(opts: { id?: string, content?: string, time?: number, reasoning?: string, webSearchCount?: number }) {
-    const req = requestEvent({ id: opts.id ?? 'x', modelParameters: { model: llm({ isSummarizer: false }), reasoning_effort: opts.reasoning ?? 'medium', prompt_cache_enabled: false } as any })
-    const res = responseEvent({ id: req.id, answer: { llm: llm({ isSummarizer: false }), time: opts.time ?? 500, contentChoices: opts.content !== undefined ? [responseContentChoice(opts.content)] : [], webSearchCount: opts.webSearchCount ?? 0 } as any })
+    const req = requestEvent({ id: opts.id ?? 'x', modelParameters: { model: llm(), reasoning_effort: opts.reasoning ?? 'medium', prompt_cache_enabled: false } as any })
+    const res = responseEvent({ id: req.id, answer: { llm: llm(), time: opts.time ?? 500, contentChoices: opts.content !== undefined ? [responseContentChoice(opts.content)] : [], webSearchCount: opts.webSearchCount ?? 0 } as any })
     return [asRecord(req), asRecord(res)]
   }
   withAssistantToolUse(opts: { usages: any[] }) {

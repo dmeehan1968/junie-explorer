@@ -1,4 +1,5 @@
 import * as z from "zod"
+import { AgentType } from "./agentType"
 import { AssistantChatMessageWithToolUses } from "./assistantChatMessageWithToolUses"
 import { ChatMessage } from "./chatMessage"
 import { LLM } from "./LLM"
@@ -21,6 +22,27 @@ export const LlmRequestEvent = z.looseObject({
     messages: MatterhornMessage.array(),
     tools: Tools,
     cacheUserGroupID: z.string().optional(),
+  }).transform(chat => {
+    let agentType: AgentType
+
+    if (/^(## ENVIRONMENT|You are a programming expert|$)/.test(chat.system)) {
+      agentType = AgentType.Assistant
+    } else if (/^(You are a programming task description summarizer|You are a task ((step|trace) )?summarizer|You are a chat response title creator|^Your task is to summarize)/.test(chat.system)) {
+      agentType = AgentType.TaskSummarizer
+    } else if (/^(You are Memory Extractor|You are an \*\*Execution trajectory reflection utility\*\*|You are a \*\*User-reflection utility\*\*)/.test(chat.system)) {
+      agentType = AgentType.Memorizer
+    } else if (/^You are an \*\*Error-analysis utility\*\*/.test(chat.system)) {
+      agentType = AgentType.ErrorAnalyzer
+    } else if (/^You are a language (identifier|identification) utility/.test(chat.system)) {
+      agentType = AgentType.LanguageIdentifier
+    } else {
+      throw new Error(`Unknown agent type for system prompt: ${chat.system.substring(0, 50)}...`)
+    }
+
+    return {
+      ...chat,
+      agentType,
+    }
   }),
   modelParameters: z.looseObject({
     model: LLM,

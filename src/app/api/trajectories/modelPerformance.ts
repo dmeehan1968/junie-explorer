@@ -38,7 +38,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
       const currentEvent = sortedEvents[i]
 
       if (currentEvent.event.type === 'LlmResponseEvent') {
-        const provider = currentEvent.event.answer.llm.groupName
+        const provider = currentEvent.event.answer.llm.jbai   // WAS GROUPNAME
         const model = currentEvent.event.answer.llm.name
         const latency = currentEvent.event.answer.time ?? 0
         const outputTokens = currentEvent.event.answer.outputTokens ?? 0

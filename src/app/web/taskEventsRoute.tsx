@@ -64,7 +64,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
             event: {
               type: e.event.type,
               answer: {
-                llm: { provider: e.event.answer.llm.groupName },
+                llm: { provider: e.event.answer.llm.jbai },    // WAS GROUPNAME
                 cost: e.event.answer.cost,
                 inputTokens: e.event.answer.inputTokens,
                 outputTokens: e.event.answer.outputTokens,
