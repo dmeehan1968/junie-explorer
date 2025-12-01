@@ -4,7 +4,12 @@ import { getPreviousRequestRecord } from "./getPreviousRequestRecord"
 import { TrajectoryEventRecord } from "./getTrajectoryEventRecords"
 import { MessageDecorator } from "./messageDecorator"
 
-export function getMessageDiffs(current: FilteredEvent, previousEventRecords: TrajectoryEventRecord[], klass: string) {
+export function getMessageDiffs(current: TrajectoryEventRecord, previousEventRecords: TrajectoryEventRecord[], klass: string) {
+
+  if (current.event.type !== 'LlmRequestEvent') {
+    return <></>
+  }
+
   const previous = getPreviousRequestRecord(previousEventRecords, event => !event.modelParameters.model.isSummarizer && event.id !== current.event.id)
 
   if (previous) {
