@@ -2,6 +2,7 @@
 // discriminate and then transform them.  So this is a two part process, transform them into common formats
 // and then use a discriminated union to parse them so that the output type narrows correctly.
 import * as z from "zod"
+import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
@@ -94,6 +95,9 @@ export const LLMTransformer = z.any().transform(data => {
   }
   if (AnthropicSonnet45.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return AnthropicSonnet45.parse(data)
+  }
+  if (AnthropicClaude45Opus.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return AnthropicClaude45Opus.parse(data)
   }
   if (AutoSelectedLlm.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
     return AutoSelectedLlm.parse({

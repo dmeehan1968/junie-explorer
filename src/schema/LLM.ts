@@ -20,6 +20,7 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AnthropicSonnet37,
   AnthropicSonnet4,
   AnthropicSonnet45,
+  AnthropicClaude45Opus,
   Gemini3Pro,
   AutoSelectedLlm,
 ]).parse(data)).transform((({ inputPrice, outputPrice, cacheInputPrice, cacheCreateInputPrice, capabilities, ...data }) => ({
