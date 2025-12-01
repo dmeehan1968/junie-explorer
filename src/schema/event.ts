@@ -22,6 +22,7 @@ import { LlmResponseEvent } from "./llmResponseEvent"
 import { LongDelayDetected } from "./longDelayDetected"
 import { McpInitFinished } from "./mcpInitFinished"
 import { McpInitStarted } from "./mcpInitStarted"
+import { MemoryReflectionCompletedEvent } from "./memoryReflectionCompletedEvent"
 import { PairedGroupEventFinished } from "./pairedGroupEventFinished"
 import { PairedGroupEventStarted } from "./pairedGroupEventStarted"
 import { PlanUpdatedEvent } from "./planUpdatedEvent"
@@ -71,5 +72,6 @@ export const Event = z.discriminatedUnion('type', [
   SerializableEventSerializationError,
   PairedGroupEventStarted,
   PairedGroupEventFinished,
+  MemoryReflectionCompletedEvent,
 ])
 export type Event = z.infer<typeof Event>
