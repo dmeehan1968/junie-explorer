@@ -1,13 +1,11 @@
 import fs from "fs-extra"
 import path from "node:path"
+import publicFiles from "./bun/public"
 import { getMaxConcurrency } from "./getMaxConcurrency"
-import { LoadEventsInput } from "./workers/loadEventsInput"
-import { LoadEventsOutput } from "./workers/loadEventsOutput"
-import { WorkerPool } from "./workers/WorkerPool"
-import { StatsCollector } from "./stats/StatsCollector"
 import {
   addSummaryMetrics,
-  AgentState, initialisedSummaryMetrics,
+  AgentState,
+  initialisedSummaryMetrics,
   JuniePlan,
   JunieTaskContext,
   JunieTaskSchema,
@@ -16,15 +14,14 @@ import {
   SummaryMetrics,
 } from "./schema.js"
 import { AgentType } from "./schema/agentType"
-import { AutoSelectedLlm } from "./schema/AutoSelectedLlm"
 import { EventRecord } from "./schema/eventRecord"
-import { Event } from "./schema/event"
-import { LlmResponseEvent } from "./schema/llmResponseEvent"
 import { LlmRequestEvent } from "./schema/llmRequestEvent"
-import { OpenAI51 } from "./schema/openAI51"
+import { StatsCollector } from "./stats/StatsCollector"
 import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
-import publicFiles from "./bun/public"
+import { LoadEventsInput } from "./workers/loadEventsInput"
+import { LoadEventsOutput } from "./workers/loadEventsOutput"
+import { WorkerPool } from "./workers/WorkerPool"
 
 export class Task {
   public id: string = ''
@@ -44,7 +41,9 @@ export class Task {
   private _eventTypes: Promise<string[]> | undefined = undefined
 
   // Static worker pool for loading events
-  private static _workerPool: WorkerPool<{ eventsFilePath: string }, { events: EventRecord[] }> | null | undefined = undefined
+  private static _workerPool: WorkerPool<{ eventsFilePath: string }, {
+    events: EventRecord[]
+  }> | null | undefined = undefined
   private static _statsCollector: StatsCollector | null = null
 
   public static setStatsCollector(statsCollector: StatsCollector) {
@@ -290,26 +289,26 @@ export class Task {
     //   }
     // }
     //
-    // // Rebuild providers set from non-summarizer LlmRequestEvent models
-    // {
-    //   const unique = new Map<string, { provider: string; name?: string; jbai?: string }>()
-    //   adjustedEvents
-    //     .filter(r => r.event.type === LlmRequestEvent.shape.type.value)
-    //     .map(r => r.event as LlmRequestEvent)
-    //     .filter(e => !e.modelParameters?.model?.isSummarizer)
-    //     .forEach(e => {
-    //       const provider = (e.modelParameters?.model as any)?.provider as string | undefined
-    //       const name = (e.modelParameters?.model as any)?.name as string | undefined
-    //       const jbai = (e.modelParameters?.model as any)?.jbai as string | undefined
-    //       if (provider) {
-    //         const key = `${provider}|${name ?? ''}|${jbai ?? ''}`
-    //         if (!unique.has(key)) {
-    //           unique.set(key, { provider, name, jbai })
-    //         }
-    //       }
-    //     })
-    //   this.assistantProviders = new Set(unique.values())
-    // }
+    // Rebuild providers set from non-summarizer LlmRequestEvent models
+    {
+      const unique = new Map<string, { provider: string; name?: string; jbai?: string }>()
+      events
+        .filter(r => r.event.type === LlmRequestEvent.shape.type.value)
+        .map(r => r.event as LlmRequestEvent)
+        .filter(e => e.chat.agentType === AgentType.Assistant)
+        .forEach(e => {
+          const provider = (e.modelParameters?.model as any)?.provider as string | undefined
+          const name = (e.modelParameters?.model as any)?.name as string | undefined
+          const jbai = (e.modelParameters?.model as any)?.jbai as string | undefined
+          if (provider) {
+            const key = `${provider}|${name ?? ''}|${jbai ?? ''}`
+            if (!unique.has(key)) {
+              unique.set(key, { provider, name, jbai })
+            }
+          }
+        })
+      this.assistantProviders = new Set(unique.values())
+    }
     //
     // return adjustedEvents
     return events
