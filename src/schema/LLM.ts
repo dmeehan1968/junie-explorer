@@ -3,7 +3,7 @@ import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
-import { AutoSelectedLlm } from "./AutoSelectedLlm"
+import { openAI5 } from "./openAI5"
 import { Gemini3Pro } from "./Gemini3Pro"
 import { LLMTransformer } from "./LLMTransformer"
 import { OpenAI41 } from "./openAI41"
@@ -23,7 +23,7 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AnthropicSonnet45,
   AnthropicClaude45Opus,
   Gemini3Pro,
-  AutoSelectedLlm,
+  openAI5,
 ]).parse(data)).transform((({ inputPrice, outputPrice, cacheInputPrice, cacheCreateInputPrice, capabilities, ...data }) => ({
   ...data,
   capabilities: {
