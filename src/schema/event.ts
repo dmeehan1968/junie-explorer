@@ -22,6 +22,7 @@ import { LlmResponseEvent } from "./llmResponseEvent"
 import { LongDelayDetected } from "./longDelayDetected"
 import { McpInitFinished } from "./mcpInitFinished"
 import { McpInitStarted } from "./mcpInitStarted"
+import { MemoryExtractedEvent } from "./memoryExtractedEvent"
 import { MemoryReflectionCompletedEvent } from "./memoryReflectionCompletedEvent"
 import { PairedGroupEventFinished } from "./pairedGroupEventFinished"
 import { PairedGroupEventStarted } from "./pairedGroupEventStarted"
@@ -73,5 +74,6 @@ export const Event = z.discriminatedUnion('type', [
   PairedGroupEventStarted,
   PairedGroupEventFinished,
   MemoryReflectionCompletedEvent,
+  MemoryExtractedEvent,
 ])
 export type Event = z.infer<typeof Event>
