@@ -14,7 +14,7 @@ test.describe('Project Selection Storage', () => {
     
     // Get first row
     const rows = await projectTable.getAllRows();
-    if (rows.length === 0) test.skip('No projects found to test');
+    if (rows.length === 0) throw new Error('No projects found to test');
     const firstRow = rows[0];
 
     // Select the first project
@@ -42,7 +42,7 @@ test.describe('Project Selection Storage', () => {
     await page.evaluate(() => localStorage.clear());
     
     const rows = await projectTable.getAllRows();
-    if (rows.length === 0) test.skip('No projects found to test');
+    if (rows.length === 0) throw new Error('No projects found to test');
     const firstRow = rows[0];
     const projectName = await firstRow.getNameText();
     
@@ -69,7 +69,7 @@ test.describe('Project Selection Storage', () => {
 
     // Get rows
     const rows = await projectTable.getAllRows();
-    if (rows.length < 2) test.skip('Need at least 2 projects to test unselected state');
+    if (rows.length < 2) throw new Error('Need at least 2 projects to test unselected state');
 
     const firstRow = rows[0];
     const secondRow = rows[1];
