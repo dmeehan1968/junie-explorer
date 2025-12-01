@@ -14,6 +14,7 @@ import {
   SummaryMetrics,
 } from "./schema.js"
 import { AgentType } from "./schema/agentType"
+import { Event } from "./schema/event"
 import { EventRecord } from "./schema/eventRecord"
 import { LlmRequestEvent } from "./schema/llmRequestEvent"
 import { LlmResponseEvent } from "./schema/llmResponseEvent"
@@ -253,45 +254,45 @@ export class Task {
       }
     }
 
-    // const isGpt5AssistantEvent = (event: Event): event is LlmResponseEvent =>
-    //   event.type === LlmResponseEvent.shape.type.value
-    //   && [...AutoSelectedLlm.shape.jbai.options, OpenAI51.shape.jbai.value].includes(event.answer.llm.jbai as never)
-    //
-    // const adjustedEvents = events.map((record, index) => {
-    //   // GPT-5 cacheCreateInputTokens is not provided needs to be calculated, so that its the difference
-    //   // in cacheInputTokens since the previous event.  However, its not consistent and sometimes gives a lower
-    //   // figure, and then pops back up to roughly where it should be on the next event.
-    //   if (isGpt5AssistantEvent(record.event)) {
-    //     // find the previous response event of the same time
-    //     const previousEvent = events
-    //       .slice(0, index)
-    //       .reverse()    // in-place, but the slice has created a copy so no unintended side effect
-    //       .find(previous => isGpt5AssistantEvent(previous.event))
-    //
-    //     if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
-    //       // next line is a bit of a kludge so we can use cacheCreateInputTokens in the same way as Sonnet and still get
-    //       // them costed correctly.
-    //       record.event.answer.cacheCreateInputTokens = Math.max(0, record.event.answer.cacheInputTokens - previousEvent.event.answer.cacheInputTokens - previousEvent.event.answer.cacheCreateInputTokens)
-    //       record.event.answer.cacheInputTokens = Math.max(record.event.answer.cacheInputTokens - record.event.answer.cacheCreateInputTokens)
-    //     } else {
-    //       record.event.answer.cacheCreateInputTokens = record.event.answer.cacheInputTokens
-    //       record.event.answer.cacheInputTokens = 0
-    //     }
-    //   }
-    //   return record
-    // })
-    //
-    // // Even then, there's an anomaly on the last event that would turn it negative and is likely a total of input
-    // // tokens for the session.
-    // const lastResponse = [...adjustedEvents]      // shallow copy
-    //   .reverse()                                  // in place on shallow copy
-    //   .find(record => isGpt5AssistantEvent(record.event))
-    // if (lastResponse) {
-    //   if (lastResponse.event.type === LlmResponseEvent.shape.type.value) {
-    //     lastResponse.event.answer.inputTokens = 0
-    //   }
-    // }
-    //
+    const isGpt5ResponseEvent = (event: Event): event is LlmResponseEvent =>
+      event.type === LlmResponseEvent.shape.type.value
+      && [...openAI5.shape.jbai.options, OpenAI51.shape.jbai.value].includes(event.answer.llm.jbai as never)
+
+    const adjustedEvents = events.map((record, index) => {
+      // GPT-5 cacheCreateInputTokens is not provided needs to be calculated, so that its the difference
+      // in cacheInputTokens since the previous event.  However, its not consistent and sometimes gives a lower
+      // figure, and then pops back up to roughly where it should be on the next event.
+      if (isGpt5ResponseEvent(record.event)) {
+        // find the previous response event of the same time
+        const previousEvent = events
+          .slice(0, index)
+          .reverse()    // in-place, but the slice has created a copy so no unintended side effect
+          .find(previous => isGpt5ResponseEvent(previous.event))
+
+        if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
+          // next line is a bit of a kludge so we can use cacheCreateInputTokens in the same way as Sonnet and still get
+          // them costed correctly.
+          record.event.answer.cacheCreateInputTokens = Math.max(0, record.event.answer.cacheInputTokens - previousEvent.event.answer.cacheInputTokens - previousEvent.event.answer.cacheCreateInputTokens)
+          record.event.answer.cacheInputTokens = Math.max(record.event.answer.cacheInputTokens - record.event.answer.cacheCreateInputTokens)
+        } else {
+          record.event.answer.cacheCreateInputTokens = record.event.answer.cacheInputTokens
+          record.event.answer.cacheInputTokens = 0
+        }
+      }
+      return record
+    })
+
+    // Even then, there's an anomaly on the last event that would turn it negative and is likely a total of input
+    // tokens for the session.
+    const lastResponse = [...adjustedEvents]      // shallow copy
+      .reverse()                                  // in place on shallow copy
+      .find(record => isGpt5ResponseEvent(record.event))
+    if (lastResponse) {
+      if (lastResponse.event.type === LlmResponseEvent.shape.type.value) {
+        lastResponse.event.answer.inputTokens = 0
+      }
+    }
+
     // Rebuild providers set from non-summarizer LlmRequestEvent models
     {
       const unique = new Map<string, { provider: string; name?: string; jbai?: string }>()
