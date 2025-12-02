@@ -78,7 +78,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
 
             } else {
 
-              messages.push(getMessageDiffs(current, records.slice(), klass))
+              messages.push(...getMessageDiffs(current, records.slice(), klass))
 
             }
 

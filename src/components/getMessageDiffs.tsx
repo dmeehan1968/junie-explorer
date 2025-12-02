@@ -7,7 +7,7 @@ import { MessageDecorator } from "./messageDecorator"
 export function getMessageDiffs({
   event: current,
   timestamp,
-}: TrajectoryEventRecord, previousEventRecords: TrajectoryEventRecord[], klass: string) {
+}: TrajectoryEventRecord, previousEventRecords: TrajectoryEventRecord[], klass: string): JSX.Element[] {
 
   const getMarkup = (messagesDiff: ChangeObject<string>[], timestamp: Date, label: string, klass: string) => {
     const commonStyle = 'border-l-4 pl-4'
@@ -56,7 +56,7 @@ export function getMessageDiffs({
   }
 
   if (current.type !== 'LlmRequestEvent') {
-    return <></>
+    return []
   }
 
   const previous = isRequestEvent(current.previousRequest) ? current.previousRequest : undefined
@@ -78,9 +78,9 @@ export function getMessageDiffs({
 
     markup.push(getMarkup(messagesDiff, timestamp, 'Message History (diff)', klass))
 
-    return <>{markup}</>
+    return markup
 
   }
 
-  return <></>
+  return []
 }

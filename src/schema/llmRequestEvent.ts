@@ -64,7 +64,7 @@ export const LlmRequestEvent = z.looseObject({
 export type LlmRequestEvent = z.infer<typeof LlmRequestEvent>
 
 export const isRequestEvent = (event: any): event is LlmRequestEvent => {
-  if (typeof event !== 'object') return false
+  if (event === null || typeof event !== 'object') return false
   if (!('type' in event)) return false
   return event.type === 'LlmRequestEvent'
 }

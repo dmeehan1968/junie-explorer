@@ -38,3 +38,23 @@
     "NEW INSTRUCTION": "WHEN renaming a UI selection token THEN search repository for old token and update defaults, comparisons, and labels"
 }
 
+[2025-12-02 14:10] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "open MessageTrajectoriesSection,open getTrajectoryEventRecords,inspect TrajectoriesView early",
+    "MISSING STEPS": "group failures by error,enumerate failing test titles,narrow tests with precise grep",
+    "BOTTLENECK": "Dove into multiple components before triaging and grouping failures by shared error.",
+    "PROJECT NOTE": "KitaJSX requires string/element children; getMessageDiffs can return objects causing child errors.",
+    "NEW INSTRUCTION": "WHEN multiple failures share identical error text THEN group them and inspect shared code path"
+}
+
+[2025-12-02 14:19] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "edit code, update tests",
+    "MISSING STEPS": "run tests, triage failures, report findings",
+    "BOTTLENECK": "Did not honor diagnosis-only task and skipped running tests before changes.",
+    "PROJECT NOTE": "DSL requestEvent override can clobber computed chat.agentType; exclude chat from overrides.",
+    "NEW INSTRUCTION": "WHEN task or issue says do not make changes THEN run tests, analyze failures, and report findings"
+}
+

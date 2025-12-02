@@ -37,6 +37,8 @@ const requestEvent = (overrides: Partial<LlmRequestEvent> = {}): LlmRequestEvent
   }
   (chat as any).agentType = agentType
 
+  const { chat: _ignoredChat, ...restOverrides } = overrides as any
+
   return {
     type: 'LlmRequestEvent',
     id: overrides.id ?? 'req-1',
@@ -48,7 +50,7 @@ const requestEvent = (overrides: Partial<LlmRequestEvent> = {}): LlmRequestEvent
       ...overrides['modelParameters' as keyof LlmRequestEvent] as any,
     },
     attemptNumber: 1,
-    ...overrides,
+    ...restOverrides,
   }
 }
 
@@ -137,6 +139,7 @@ export class MessageTrajectoriesDSL {
     const res = responseEvent({
       id: 's-1',
       answer: { llm: llm(), contentChoices: [responseContentChoice(content)] } as any,
+      requestEvent: req,
     })
     return [asRecord(req), asRecord(res)]
   }
@@ -164,6 +167,7 @@ export class MessageTrajectoriesDSL {
         contentChoices: opts.content !== undefined ? [responseContentChoice(opts.content)] : [],
         webSearchCount: opts.webSearchCount ?? 0,
       } as any,
+      requestEvent: req,
     })
     return [asRecord(req), asRecord(res)]
   }
@@ -173,6 +177,7 @@ export class MessageTrajectoriesDSL {
     const res = responseEvent({
       id: 'tu-1',
       answer: { llm: llm(), contentChoices: [responseToolUseChoice(opts.usages)] } as any,
+      requestEvent: req,
     })
     return [asRecord(req), asRecord(res)]
   }
