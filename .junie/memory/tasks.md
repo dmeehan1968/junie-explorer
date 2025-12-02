@@ -28,3 +28,13 @@
     "NEW INSTRUCTION": "WHEN README exists for project overview THEN get file structure, open README and package manifest, then summarize"
 }
 
+[2025-12-02 14:01] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project",
+    "BOTTLENECK": "Inconsistent sentinel values ('both' vs 'all') across files risk lingering mismatches.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN renaming a UI selection token THEN search repository for old token and update defaults, comparisons, and labels"
+}
+

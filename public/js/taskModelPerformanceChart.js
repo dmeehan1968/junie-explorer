@@ -29,7 +29,7 @@ class ModelPerformanceChart {
     this.providers = [];
     this.visibleProviders = new Set();
     this.metricMode = 'both'; // 'both' | 'latency' | 'tps'
-    this.selectedProvider = 'both'; // 'both' or provider name
+    this.selectedProvider = 'all'; // 'all' or provider name
     this.chart = null;
 
     // Flag from DOM: whether tokens/sec metrics should be shown
@@ -106,7 +106,7 @@ class ModelPerformanceChart {
     
     const setSelection = (value) => {
       this.selectedProvider = value;
-      if (value === 'both') {
+      if (value === 'all') {
         this.visibleProviders = new Set(this.providers);
       } else {
         this.visibleProviders = new Set([value]);
@@ -141,7 +141,7 @@ class ModelPerformanceChart {
     });
     
     // Initialize selection
-    setSelection(this.selectedProvider || 'both');
+    setSelection(this.selectedProvider || 'all');
   }
   
   createChart() {

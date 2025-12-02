@@ -18,7 +18,7 @@
     this.colors = ['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6','#06b6d4','#f97316','#84cc16','#ec4899','#6366f1']
     this.providers = []
     this.visibleProviders = new Set()
-    this.selectedProvider = 'both'
+    this.selectedProvider = 'all'
     this.chart = null
     this.load()
   }
@@ -49,7 +49,7 @@
     var self = this
     function setSelection(value){
       self.selectedProvider = value
-      self.visibleProviders = value === 'allBtn' ? new Set(self.providers) : new Set([value])
+      self.visibleProviders = value === 'all' ? new Set(self.providers) : new Set([value])
       buttons.forEach(function(b){
         var active = b.getAttribute('data-value') === value
         b.classList.toggle('btn-primary', active)
