@@ -46,7 +46,7 @@ export const EventsTable = ({ events }: EventsTableProps) => {
               const { requestEvent, ...response } = value
               return response
             } else if (isRequestEvent(value)) {
-              const { previousEvent, ...request } = value
+              const { previousRequest, ...request } = value
               return request
             }
             return value

@@ -38,3 +38,13 @@
     "NEW INSTRUCTION": "WHEN calling isRequestEvent with unknown input THEN ensure null-and-object guard before 'type' check"
 }
 
+[2025-12-02 14:27] - Updated by Junie - Error analysis
+{
+    "TYPE": "logic bug",
+    "TOOL": "-",
+    "ERROR": "JSON replacer doesn't remove previousRequest field",
+    "ROOT CAUSE": "eventsTable.tsx strips previousEvent instead of previousRequest, leaving circular refs via requestEvent/previousRequest chain.",
+    "PROJECT NOTE": "Update src/components/eventsTable.tsx replacer to delete response.requestEvent and request.previousRequest before stringify.",
+    "NEW INSTRUCTION": "WHEN creating JSON replacer for events THEN remove requestEvent and previousRequest properties"
+}
+

@@ -14,3 +14,11 @@
     "NEW INSTRUCTION": "WHEN task requests investigating failing tests THEN run tests, analyze failures, map to recent changes, report findings, no code changes"
 }
 
+[2025-12-02 14:27] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "events serialization",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN serializing or rendering event objects THEN omit requestEvent and previousRequest to avoid cycles"
+}
+

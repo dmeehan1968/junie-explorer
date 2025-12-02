@@ -58,3 +58,13 @@
     "NEW INSTRUCTION": "WHEN task or issue says do not make changes THEN run tests, analyze failures, and report findings"
 }
 
+[2025-12-02 14:29] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "sanitize events, run tests",
+    "BOTTLENECK": "Wrong field pruned in JSON replacer left circular references intact.",
+    "PROJECT NOTE": "In eventsTable.tsx replacer, replace previousEvent with previousRequest when pruning.",
+    "NEW INSTRUCTION": "WHEN preparing JSON for event rendering THEN omit requestEvent and previousRequest fields"
+}
+
