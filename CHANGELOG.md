@@ -5,6 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2025-12-02
+
+### Added
+- Add `AnthropicClaude45Opus` support in LLM schema and transformer (da84763)
+- Add `AgentType` enum and schema, refactor logic to use `AgentType` for event categorization (f6a5492)
+- Add `MemoryExtractedEvent` to schema definitions (689f8ca)
+- Add `MemoryReflectionCompletedEvent` to schema definitions (92a1609)
+- Add `Gemini3Pro` model support (f4f2bbf)
+- Add `CODE` as a valid type in `JunieTaskContext` schema (5999342)
+- Add tooltips for assistant provider icons in `IssueRow` (71b59d6)
+- Add message diffs to the trajectories view to see message history corruptions (4f1d38d)
+- Add Cumulative Cost Dataset to LLM Event Graph (adb3fb9)
+- Add e2e tests for project selection storage using cookies (96505ab)
+- Add literal `provider` field to LLM schema definitions to override string (29044d7)
+- Add `.idea/junie.xml` for IntelliJ project configuration (bcdd4ea)
+
+### Changed
+- Switch to stream-based rendering to support Suspense (c459581)
+- Persist project selection using cookies instead of local storage (2ec61b5)
+- Update UI provider selection to use "all" instead of "both" (5160d2a)
+- Restore model grouping by refactoring `AgentType` handling and implement `makeGroupName` utility (87b5b4f)
+- Calculate request/previousRequest during loading and remove `getPreviousRequestRecord` (9d87a56)
+- Refactor `getPreviousRequestRecord` and restore GPT-5 token calculation logic (c9564f3)
+- Refactor `AutoSelectedLlm` to `openAI5` across the schema and transformer (b1bbe8e)
+- Restore calculation of assistantProviders (88155f9)
+- Update `getMessageDiffs` to handle `LlmRequestEvent` types only (b9973b9)
+- Refactor summary metrics initialization and aggregation to remove duplication and introduce costs per token type (0dd5477)
+- Refactor `processedEvents.tsx` to improve variable clarity (b6edcf3)
+- Update dependencies and lock file (2513fa1, 827b034)
+- Refactor test files for naming convention alignment (477cd15)
+- Update `.junie/guidelines.md` with file renaming best practice (aa31b5a)
+- Update release guidelines for clarity and strict adherence (5bca23e)
+- Update log message for skipped JetBrains projects (63bcb55)
+
+### Fixed
+- Fix load events worker not being bundled into Bun SFE (8748c0a)
+- Fix ghost interactions in theme switcher dropdown (0d0be87)
+- Fix cache token exclusion for OpenAI51, and refine cache and cache create for all OpenAI (b0ac599)
+- Handle missing `JetBrains` instance in `homeRoutes` (0c11edd)
+- Fix checkbox rendering in `projectTable.tsx` (6365dcc)
+- Handle type guards, fix null checks, and refine `getMessageDiffs` rendering (b234973)
+- Fix styles and improve table rendering in `projectTable.tsx` (8c8ecea)
+
+### Removed
+- Remove 'Show raw JSON' toggles and related functionality (af41433)
+- Remove circular references during event serialization (cacb2c0)
+- Prune circular references during event serialization (f92fbc1)
+- Remove unused JetBrains reference in `JunieExplorer` and update `entityLookupMiddleware` (0e105b5)
+- Remove commented-out code in `Project.ts` (f32a327)
+- Remove `.js` extensions from imports for modern module compatibility (9b6af6e)
+- Remove obsolete `test:cucumber` script from package.json (16b324f)
+- Remove erroneous await for project metrics (0baca65)
+- Disable Junie semantic search (48d1fdc)
+
+### Schema
+- Make `observations` optional in `agentStateUpdatedEvent` schema (28094d7)
+- Update `schema.ts` to add default values for `isDeclined` and `plan` (b6eaaca)
+
+### UI
+- Add `tabular-nums` class to project table for better numeric alignment (1f16c47)
+- Throw errors when preconditions for tests are not met in `projectSelectionStorage.e2e.ts` (e02ca6c)
+
 ## [3.4.1] - 2025-11-14
 
 ### Added
