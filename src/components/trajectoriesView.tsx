@@ -31,7 +31,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
         const messages: JSX.Element[] = []
 
         if (current.event.type === 'LlmRequestEvent') {
-          if (current.event.chat.agentType === AgentType.Assistant) {
+          if (current.event.chat.agentType === AgentType.enum.Agent) {
             if (!didOutputInitialContext) {
 
               messages.push(<Divider id="history">Start of Context/History</Divider>)
@@ -90,7 +90,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
           // const requestRecord = getPreviousRequestRecord(trajectoryEvents.slice(0, index), (event, timestamp) => event.id === current.event.id)
           const requestEvent = current.event.requestEvent
 
-          if (requestEvent?.chat.agentType === AgentType.TaskSummarizer) {
+          if (requestEvent?.chat.agentType === AgentType.enum.TaskSummarizer) {
             for (const choice of current.event.answer.contentChoices) {
               if (choice.content) {
                 messages.push(
@@ -104,7 +104,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
                 )
               }
             }
-          } else if (requestEvent?.chat.agentType === AgentType.Assistant) {
+          } else if (requestEvent?.chat.agentType === AgentType.enum.Agent) {
             const latency = current.event.answer.time
 
             if (current.event.answer.webSearchCount > 0) {

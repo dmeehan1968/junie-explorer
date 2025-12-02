@@ -23,7 +23,7 @@ export const ModelPerformanceSection = ({ hasMetrics }: { hasMetrics: boolean })
                 <div id="model-performance-metric-toggle" class="join">
                   {hasMetrics ? (
                     <>
-                      <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">Both</button>
+                      <button class="btn btn-sm join-item btn-primary" data-metric="both" aria-pressed="true">All</button>
                       <button class="btn btn-sm join-item" data-metric="latency" aria-pressed="false">Latency</button>
                       <button class="btn btn-sm join-item" data-metric="tps" aria-pressed="false">Tokens/sec</button>
                     </>

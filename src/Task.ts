@@ -310,7 +310,7 @@ export class Task {
       events
         .filter(r => r.event.type === LlmRequestEvent.shape.type.value)
         .map(r => r.event as LlmRequestEvent)
-        .filter(e => e.chat.agentType === AgentType.Assistant)
+        .filter(e => e.chat.agentType === AgentType.enum.Agent)
         .forEach(e => {
           const provider = (e.modelParameters?.model as any)?.provider as string | undefined
           const name = (e.modelParameters?.model as any)?.name as string | undefined

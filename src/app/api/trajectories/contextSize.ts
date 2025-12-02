@@ -1,4 +1,5 @@
 import express from "express"
+import * as repl from "node:repl"
 import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware"
 import { AppRequest, AppResponse } from "../../types"
 import { LlmRequestEvent } from "../../../schema/llmRequestEvent"
@@ -6,6 +7,10 @@ import { LlmResponseEvent } from "../../../schema/llmResponseEvent"
 import { AIContentAnswerChoice } from "../../../schema/AIContentAnswerChoice"
 import { AIToolUseAnswerChoice } from "../../../schema/AIToolUseAnswerChoice"
 import { EventRecord } from "../../../schema/eventRecord"
+
+export const makeGroupName = (response: LlmResponseEvent) => {
+  return `${response.requestEvent?.chat.agentType ?? 'Unknown'} (${response.answer.llm.jbai})`
+}
 
 const router = express.Router({ mergeParams: true })
 
@@ -58,7 +63,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
       const ev = cur.ev
       if (ev.event.type === 'LlmResponseEvent') {
         const resp: LlmResponseEvent = ev.event
-        const provider = resp.answer.llm.jbai // WAS GROUPNAME
+        const provider = makeGroupName(resp)
         const model = resp.answer.llm.name
         const inputTokens = resp.answer.inputTokens ?? 0
         const outputTokens = resp.answer.outputTokens ?? 0

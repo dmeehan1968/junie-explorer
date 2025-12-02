@@ -130,9 +130,9 @@ class ModelPerformanceChart {
       return btn;
     };
     
-    const bothBtn = makeButton('Both', 'both');
-    container.appendChild(bothBtn);
-    buttons.push(bothBtn);
+    const allBtn = makeButton('All', 'all');
+    container.appendChild(allBtn);
+    buttons.push(allBtn);
     
     this.providers.forEach((provider) => {
       const btn = makeButton(provider, provider);

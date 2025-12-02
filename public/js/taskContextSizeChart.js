@@ -49,7 +49,7 @@
     var self = this
     function setSelection(value){
       self.selectedProvider = value
-      self.visibleProviders = value === 'both' ? new Set(self.providers) : new Set([value])
+      self.visibleProviders = value === 'allBtn' ? new Set(self.providers) : new Set([value])
       buttons.forEach(function(b){
         var active = b.getAttribute('data-value') === value
         b.classList.toggle('btn-primary', active)
@@ -67,10 +67,10 @@
       btn.addEventListener('click', function(){ setSelection(value) })
       return btn
     }
-    var both = makeBtn('Both', 'both')
-    container.appendChild(both); buttons.push(both)
+    var allBtn = makeBtn('All', 'all')
+    container.appendChild(allBtn); buttons.push(allBtn)
     this.providers.forEach(function(p){ var b = makeBtn(p, p); container.appendChild(b); buttons.push(b) })
-    setSelection(this.selectedProvider || 'both')
+    setSelection(this.selectedProvider || 'all')
   }
   ContextSizeChart.prototype.createChart = function(){
     if (!this.data || !this.data.contextData){ this.showError('No context data'); return }

@@ -3,7 +3,6 @@ import { AgentType } from "./agentType"
 import { AssistantChatMessageWithToolUses } from "./assistantChatMessageWithToolUses"
 import { ChatMessage } from "./chatMessage"
 import { LLM } from "./LLM"
-import { LlmResponseEvent } from "./llmResponseEvent"
 import { MultiPartChatMessage } from "./multiPartChatMessage"
 import { Tools } from "./tools"
 import { UserChatMessageWithToolResults } from "./userChatMessageWithToolResults"
@@ -27,15 +26,15 @@ export const LlmRequestEvent = z.looseObject({
     let agentType: AgentType
 
     if (/^(## ENVIRONMENT|You are a programming expert|$)/.test(chat.system)) {
-      agentType = AgentType.Assistant
+      agentType = AgentType.enum.Agent
     } else if (/^(You are a programming task description summarizer|You are a task ((step|trace) )?summarizer|You are a chat response title creator|^Your task is to summarize)/.test(chat.system)) {
-      agentType = AgentType.TaskSummarizer
+      agentType = AgentType.enum.TaskSummarizer
     } else if (/^(You are Memory Extractor|You are an \*\*Execution trajectory reflection utility\*\*|You are a \*\*User-reflection utility\*\*)/.test(chat.system)) {
-      agentType = AgentType.Memorizer
+      agentType = AgentType.enum.Memorizer
     } else if (/^You are an \*\*Error-analysis utility\*\*/.test(chat.system)) {
-      agentType = AgentType.ErrorAnalyzer
+      agentType = AgentType.enum.ErrorAnalyzer
     } else if (/^You are a language (identifier|identification) utility/.test(chat.system)) {
-      agentType = AgentType.LanguageIdentifier
+      agentType = AgentType.enum.LanguageIdentifier
     } else {
       throw new Error(`Unknown agent type for system prompt: ${chat.system.substring(0, 50)}...`)
     }
@@ -60,7 +59,7 @@ export const LlmRequestEvent = z.looseObject({
   }),
   attemptNumber: z.number(),
   id: z.string(),
-  previousRequest: z.looseObject({ type: z.literal('LlmRequestEvent') }).optional()
+  previousRequest: z.looseObject({ type: z.literal('LlmRequestEvent') }).optional(),
 })
 export type LlmRequestEvent = z.infer<typeof LlmRequestEvent>
 

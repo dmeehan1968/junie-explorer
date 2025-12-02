@@ -46,7 +46,7 @@ export class ModelPerformanceDSL {
   get content() { return this.page.locator('.collapsible-content') }
   get providerFilters() { return this.page.locator('#model-performance-provider-filters') }
   get metricToggle() { return this.page.locator('#model-performance-metric-toggle') }
-  get bothButton() { return this.page.locator('#model-performance-metric-toggle button[data-metric="both"]') }
+  get allButton() { return this.page.locator('#model-performance-metric-toggle button[data-metric="both"]') }
   get latencyButton() { return this.page.locator('#model-performance-metric-toggle button[data-metric="latency"]') }
   get tpsButton() { return this.page.locator('#model-performance-metric-toggle button[data-metric="tps"]') }
   get canvas() { return this.page.locator('#model-performance-chart') }

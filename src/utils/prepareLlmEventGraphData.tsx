@@ -1,4 +1,5 @@
 // Function to prepare data for the LLM events metrics over time graph
+import { makeGroupName } from "../app/api/trajectories/contextSize"
 import { EventRecord } from "../schema/eventRecord"
 import { LlmResponseEvent } from "../schema/llmResponseEvent"
 
@@ -26,7 +27,7 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
   }
 
   // Extract unique providers
-  const providers = [...new Set(llmEvents.map(event => event.event.answer.llm.jbai))].sort()   // WAS GROUPNAME
+  const providers = [...new Set(llmEvents.map(event => makeGroupName(event.event)))].sort()
 
   // Use the actual timestamps from the event data
   const eventTimes = llmEvents.map(event => event.timestamp)

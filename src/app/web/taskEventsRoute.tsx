@@ -19,6 +19,7 @@ import { VersionBanner } from '../../components/versionBanner.js'
 import { LlmResponseEvent } from "../../schema/llmResponseEvent"
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest"
 import { prepareLlmEventGraphData } from "../../utils/prepareLlmEventGraphData"
+import { makeGroupName } from "../api/trajectories/contextSize"
 import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware"
 import { AppRequest, AppResponse } from "../types"
 
@@ -64,7 +65,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
             event: {
               type: e.event.type,
               answer: {
-                llm: { provider: e.event.answer.llm.jbai },    // WAS GROUPNAME
+                llm: { provider: makeGroupName(e.event) },
                 cost: e.event.answer.cost,
                 inputTokens: e.event.answer.inputTokens,
                 outputTokens: e.event.answer.outputTokens,

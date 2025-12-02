@@ -1,14 +1,15 @@
 /** @jsxImportSource @kitajs/html */
 
-import { test as base, Page } from "@playwright/test"
-export { expect } from "@playwright/test"
-import { wrapHtml } from "../utils/wrapHtml"
-import { MessageTrajectoriesSection } from "./messageTrajectoriesSection"
-import type { EventRecord } from "../schema/eventRecord"
-import type { LlmRequestEvent, MatterhornMessage } from "../schema/llmRequestEvent"
-import type { LlmResponseEvent } from "../schema/llmResponseEvent"
+import { Page, test as base } from "@playwright/test"
 
 import { AgentType } from "../schema/agentType"
+import type { EventRecord } from "../schema/eventRecord"
+import type { LlmRequestEvent } from "../schema/llmRequestEvent"
+import type { LlmResponseEvent } from "../schema/llmResponseEvent"
+import { wrapHtml } from "../utils/wrapHtml"
+import { MessageTrajectoriesSection } from "./messageTrajectoriesSection"
+
+export { expect } from "@playwright/test"
 
 // Minimal LLM factory
 const llm = (overrides: Partial<any> = {}) => ({
@@ -25,14 +26,14 @@ const requestEvent = (overrides: Partial<LlmRequestEvent> = {}): LlmRequestEvent
     tools: [],
     ...overrides['chat' as keyof LlmRequestEvent] as any,
   }
-  
+
   let agentType: AgentType
   if (/^## ENVIRONMENT/.test(chat.system)) {
-    agentType = AgentType.Assistant
+    agentType = AgentType.enum.Agent
   } else if (/^You are a programming task description summarizer|You are a task (step|trace) summarizer|You are a chat response title creator|^Your task is to summarize/.test(chat.system)) {
-    agentType = AgentType.TaskSummarizer
+    agentType = AgentType.enum.TaskSummarizer
   } else {
-    agentType = AgentType.Assistant // Default for tests
+    agentType = AgentType.enum.Agent // Default for tests
   }
   (chat as any).agentType = agentType
 
@@ -58,7 +59,11 @@ const responseContentChoice = (content: string) => ({
 
 const responseToolUseChoice = (usages: any[]) => ({
   type: 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice',
-  usages: usages.map(u => ({ id: u.id ?? Math.random().toString(), toolName: u.name, toolParams: { rawJsonObject: u.input?.rawJsonObject ?? u.params ?? {} } })),
+  usages: usages.map(u => ({
+    id: u.id ?? Math.random().toString(),
+    toolName: u.name,
+    toolParams: { rawJsonObject: u.input?.rawJsonObject ?? u.params ?? {} },
+  })),
 })
 
 const responseEvent = (overrides: Partial<LlmResponseEvent> = {}): LlmResponseEvent => ({
@@ -97,7 +102,8 @@ const DefaultProps: MessageTrajectoriesProps = {
 }
 
 export class MessageTrajectoriesDSL {
-  private constructor(private readonly page: Page, private props: MessageTrajectoriesProps) {}
+  private constructor(private readonly page: Page, private props: MessageTrajectoriesProps) {
+  }
 
   static async create(page: Page, props: Partial<MessageTrajectoriesProps> = {}) {
     const merged = { ...DefaultProps, ...props }
@@ -115,50 +121,131 @@ export class MessageTrajectoriesDSL {
   }
 
   // Builders to compose event arrays
-  empty() { return [] as EventRecord[] }
-  withRequest(overrides: Partial<LlmRequestEvent> = {}) { return [asRecord(requestEvent(overrides))] }
+  empty() {
+    return [] as EventRecord[]
+  }
+
+  withRequest(overrides: Partial<LlmRequestEvent> = {}) {
+    return [asRecord(requestEvent(overrides))]
+  }
+
   withSummarizerResponse(content: string) {
-    const req = requestEvent({ id: 's-1', chat: { system: 'You are a task step summarizer', tools: [], messages: [] } as any })
-    const res = responseEvent({ id: 's-1', answer: { llm: llm(), contentChoices: [responseContentChoice(content)] } as any })
+    const req = requestEvent({
+      id: 's-1',
+      chat: { system: 'You are a task step summarizer', tools: [], messages: [] } as any,
+    })
+    const res = responseEvent({
+      id: 's-1',
+      answer: { llm: llm(), contentChoices: [responseContentChoice(content)] } as any,
+    })
     return [asRecord(req), asRecord(res)]
   }
-  withAssistantResponse(opts: { id?: string, content?: string, time?: number, reasoning?: string, webSearchCount?: number }) {
-    const req = requestEvent({ id: opts.id ?? 'x', modelParameters: { model: llm(), reasoning_effort: opts.reasoning ?? 'medium', prompt_cache_enabled: false } as any })
-    const res = responseEvent({ id: req.id, answer: { llm: llm(), time: opts.time ?? 500, contentChoices: opts.content !== undefined ? [responseContentChoice(opts.content)] : [], webSearchCount: opts.webSearchCount ?? 0 } as any })
+
+  withAssistantResponse(opts: {
+    id?: string,
+    content?: string,
+    time?: number,
+    reasoning?: string,
+    webSearchCount?: number
+  }) {
+    const req = requestEvent({
+      id: opts.id ?? 'x',
+      modelParameters: {
+        model: llm(),
+        reasoning_effort: opts.reasoning ?? 'medium',
+        prompt_cache_enabled: false,
+      } as any,
+    })
+    const res = responseEvent({
+      id: req.id,
+      answer: {
+        llm: llm(),
+        time: opts.time ?? 500,
+        contentChoices: opts.content !== undefined ? [responseContentChoice(opts.content)] : [],
+        webSearchCount: opts.webSearchCount ?? 0,
+      } as any,
+    })
     return [asRecord(req), asRecord(res)]
   }
+
   withAssistantToolUse(opts: { usages: any[] }) {
     const req = requestEvent({ id: 'tu-1' })
-    const res = responseEvent({ id: 'tu-1', answer: { llm: llm(), contentChoices: [responseToolUseChoice(opts.usages)] } as any })
+    const res = responseEvent({
+      id: 'tu-1',
+      answer: { llm: llm(), contentChoices: [responseToolUseChoice(opts.usages)] } as any,
+    })
     return [asRecord(req), asRecord(res)]
   }
-  withToolResult(text: string) { return [asRecord(agentActionFinished(text))] }
-  withToolError(message?: string) { return [asRecord(buildFailed(message))] }
+
+  withToolResult(text: string) {
+    return [asRecord(agentActionFinished(text))]
+  }
+
+  withToolError(message?: string) {
+    return [asRecord(buildFailed(message))]
+  }
 
   // Convenience prop setters
-  async setEvents(events: EventRecord[]) { await this.setProps({ events }) }
+  async setEvents(events: EventRecord[]) {
+    await this.setProps({ events })
+  }
 
   // Locators
-  get section() { return this.page.getByTestId('message-trajectories') }
-  get noEvents() { return this.page.getByTestId('no-events-message') }
+  get section() {
+    return this.page.getByTestId('message-trajectories')
+  }
 
-  get systemMessage() { return this.page.getByTestId('system-message').locator('..') }
-  get userTools() { return this.page.getByTestId('user-tools').locator('..') }
-  get chatMessages() { return this.page.getByTestId(/(user|assistant)-chat/).locator('..') }
+  get noEvents() {
+    return this.page.getByTestId('no-events-message')
+  }
 
-  get dividerHistory() { return this.page.locator('#history') }
-  get dividerCurrent() { return this.page.locator('#current-session') }
+  get systemMessage() {
+    return this.page.getByTestId('system-message').locator('..')
+  }
 
-  get summarizerAssistant() { return this.page.getByTestId('summarizer-assistant').locator('..') }
-  get webSearchAssistant() { return this.page.getByTestId('web-search-assistant').locator('..') }
-  get chatAssistant() { return this.page.getByTestId('chat-assistant').locator('..') }
-  get toolUse() { return this.page.getByTestId('tool-use').locator('..') }
-  get toolResult() { return this.page.getByTestId('tool-result').locator('..') }
-  get toolError() { return this.page.getByTestId('tool-error').locator('..') }
+  get userTools() {
+    return this.page.getByTestId('user-tools').locator('..')
+  }
+
+  get chatMessages() {
+    return this.page.getByTestId(/(user|assistant)-chat/).locator('..')
+  }
+
+  get dividerHistory() {
+    return this.page.locator('#history')
+  }
+
+  get dividerCurrent() {
+    return this.page.locator('#current-session')
+  }
+
+  get summarizerAssistant() {
+    return this.page.getByTestId('summarizer-assistant').locator('..')
+  }
+
+  get webSearchAssistant() {
+    return this.page.getByTestId('web-search-assistant').locator('..')
+  }
+
+  get chatAssistant() {
+    return this.page.getByTestId('chat-assistant').locator('..')
+  }
+
+  get toolUse() {
+    return this.page.getByTestId('tool-use').locator('..')
+  }
+
+  get toolResult() {
+    return this.page.getByTestId('tool-result').locator('..')
+  }
+
+  get toolError() {
+    return this.page.getByTestId('tool-error').locator('..')
+  }
 }
 
 export const test = base.extend<{ messageTrajectories: MessageTrajectoriesDSL }>({
   messageTrajectories: async ({ page }, use) => {
     await use(await MessageTrajectoriesDSL.create(page))
-  }
+  },
 })

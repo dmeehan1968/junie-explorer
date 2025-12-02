@@ -28,7 +28,7 @@ test.describe('ModelPerformanceSection', () => {
     test('does not show metric toggle buttons when false and data flag reflects false', async ({ modelPerformance }) => {
       await modelPerformance.setHasMetrics(false)
       await expect(modelPerformance.metricToggle).toHaveCount(1)
-      await expect(modelPerformance.bothButton).toHaveCount(0)
+      await expect(modelPerformance.allButton).toHaveCount(0)
       await expect(modelPerformance.latencyButton).toHaveCount(0)
       await expect(modelPerformance.tpsButton).toHaveCount(0)
       await expect(modelPerformance.section).toHaveAttribute('data-has-metrics', 'false')
@@ -36,15 +36,15 @@ test.describe('ModelPerformanceSection', () => {
 
     test('shows metric toggle buttons when true with correct labels and aria states; data flag reflects true', async ({ modelPerformance }) => {
       await modelPerformance.setHasMetrics(true)
-      await expect(modelPerformance.bothButton).toHaveCount(1)
+      await expect(modelPerformance.allButton).toHaveCount(1)
       await expect(modelPerformance.latencyButton).toHaveCount(1)
       await expect(modelPerformance.tpsButton).toHaveCount(1)
 
-      await expect(modelPerformance.bothButton).toHaveText(/Both/i)
+      await expect(modelPerformance.allButton).toHaveText(/All/i)
       await expect(modelPerformance.latencyButton).toHaveText(/Latency/i)
       await expect(modelPerformance.tpsButton).toHaveText(/Tokens\/sec/i)
 
-      await expect(modelPerformance.bothButton).toHaveAttribute('aria-pressed', 'true')
+      await expect(modelPerformance.allButton).toHaveAttribute('aria-pressed', 'true')
       await expect(modelPerformance.latencyButton).toHaveAttribute('aria-pressed', 'false')
       await expect(modelPerformance.tpsButton).toHaveAttribute('aria-pressed', 'false')
 
