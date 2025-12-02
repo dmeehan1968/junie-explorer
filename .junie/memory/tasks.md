@@ -78,3 +78,13 @@
     "NEW INSTRUCTION": "WHEN task requests investigating failing tests THEN run failing tests before editing code"
 }
 
+[2025-12-02 15:22] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "get approval",
+    "MISSING STEPS": "remove dsl locators,delete client script file,remove orphan utility,run type check",
+    "BOTTLENECK": "Orphaned references and tests were not fully removed after code deletion.",
+    "PROJECT NOTE": "taskCard.dsl.ts still references jsonButton/jsonViewer; pruneEventLinks may be unused after task.ts removal.",
+    "NEW INSTRUCTION": "WHEN removing a feature across routes THEN search repo and delete related UI, routes, scripts, DSL, and tests"
+}
+

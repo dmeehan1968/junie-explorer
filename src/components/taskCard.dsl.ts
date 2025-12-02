@@ -71,15 +71,6 @@ export class TaskCardDSL {
     return this.tabGroup.locator('input[aria-label="Events"]')
   }
 
-  // JSON toggle
-  get jsonButton(): Locator {
-    return this.page.getByTestId('json-button')
-  }
-
-  get jsonViewer(): Locator {
-    return this.page.getByTestId('json-viewer')
-  }
-
   get downloadButton(): Locator {
     return this.page.getByTestId('download-btn')
   }

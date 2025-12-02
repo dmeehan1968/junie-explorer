@@ -215,7 +215,6 @@ junie-explorer/
 │   │   ├── taskEventFilters.js              # Filter task events by type/source in UI
 │   │   ├── taskEventLlmChart.js             # Plot LLM‑related task event metrics
 │   │   ├── taskModelPerformanceChart.js     # Show per‑model performance series
-│   │   ├── taskRawData.js                   # Utilities for exporting/inspecting raw task data
 │   │   ├── themeSwitcher.js                 # Toggle light/dark themes and persist choice
 │   │   └── trajectoryToggle.js              # Toggle visibility of trajectory blocks
 │   └── version.txt                          # Version banner content (build artefact; do not edit)
@@ -225,7 +224,6 @@ junie-explorer/
 │   │   │   ├── events/                      # Event‑centric API endpoints (LLM/tool events)
 │   │   │   │   ├── download.ts              # Download event data
 │   │   │   │   ├── index.ts                 # Register event sub‑routes
-│   │   │   │   ├── task.ts                  # Task events endpoint
 │   │   │   │   └── timeline.ts              # Chronological sequence of events for a task/issue
 │   │   │   ├── projects.ts                  # GET project metrics/graph data by grouping
 │   │   │   ├── stats.ts                     # Live runtime stats/time‑series endpoints

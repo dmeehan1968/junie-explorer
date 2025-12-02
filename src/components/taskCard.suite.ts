@@ -99,20 +99,5 @@ export function defineTaskCardSuite({
         await expect(taskCard.description).toHaveText(/\S/)
       })
     })
-
-    test.describe("JSON Toggle (client-side)", () => {
-      test("should toggle the JSON viewer visibility and button text", async ({ taskCard }) => {
-        await expect(taskCard.jsonButton).toBeVisible()
-        await expect(taskCard.jsonViewer).toBeHidden()
-
-        await taskCard.jsonButton.click()
-        await expect(taskCard.jsonViewer).toBeVisible()
-        await expect(taskCard.jsonButton).toHaveText("Hide Raw JSON")
-
-        await taskCard.jsonButton.click()
-        await expect(taskCard.jsonViewer).toBeHidden()
-        await expect(taskCard.jsonButton).toHaveText("Show Raw JSON")
-      })
-    })
   })
 }

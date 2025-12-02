@@ -48,16 +48,12 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
       <AppHead title={`${project.name} ${issue.name} ${task.id} Trajectories`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
-        <link rel="stylesheet" href={"https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.css"}/>
-        <script src={"https://code.jquery.com/jquery-3.6.0.min.js"}></script>
-        <script src={"https://cdn.jsdelivr.net/npm/jquery.json-viewer@1.5.0/json-viewer/jquery.json-viewer.js"}></script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/collapsibleSections.js"></script>
         <script src="/js/taskActionChart.js"></script>
         <script src="/js/taskModelPerformanceChart.js"></script>
         <script src="/js/taskContextSizeChart.js"></script>
         <script src="/js/trajectoryToggle.js"></script>
-        <script src="/js/taskRawData.js"></script>
         <script src="/js/imageModal.js"></script>
       </AppHead>
       <AppBody>

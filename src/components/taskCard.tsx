@@ -18,7 +18,6 @@ export interface TaskCardProps {
   title?: string
   issueTitle?: string
   showLinks?: boolean
-  showJsonToggle?: boolean
   actionsHtml?: Children
   tasksCount?: number
   tasksDescriptions?: string[]
@@ -106,9 +105,8 @@ export const TaskCard: Component<TaskCardProps> = async ({
   title, 
   issueTitle, 
   showLinks = true, 
-  showJsonToggle = true, 
   actionsHtml, 
-  tasksCount, 
+  tasksCount,
   tasksDescriptions, 
   currentTab 
 }) => {
@@ -173,26 +171,6 @@ export const TaskCard: Component<TaskCardProps> = async ({
                 onclick={`window.location.href = '/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/events'`}
               />
             </div>
-            <Conditional condition={showJsonToggle}>
-              <button 
-                class="btn btn-primary btn-sm flex-1 min-w-0 toggle-raw-data" 
-                style="max-width:25%" 
-                data-task={encodeURIComponent(String(taskIndex))} 
-                data-testid="json-button"
-              >
-                Show Raw JSON
-              </button>
-            </Conditional>
-          </div>
-        </Conditional>
-        
-        <Conditional condition={showJsonToggle}>
-          <div 
-            id={`raw-data-${encodeURIComponent(String(taskIndex))}`} 
-            class="mt-4 p-4 bg-base-300 rounded-lg font-mono border border-base-300 hidden" 
-            data-testid="json-viewer"
-          >
-            <div id={`json-renderer-${encodeURIComponent(String(taskIndex))}`} class="text-sm"></div>
           </div>
         </Conditional>
       </div>
