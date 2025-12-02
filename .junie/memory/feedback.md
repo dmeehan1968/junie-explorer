@@ -22,3 +22,11 @@
     "NEW INSTRUCTION": "WHEN serializing or rendering event objects THEN omit requestEvent and previousRequest to avoid cycles"
 }
 
+[2025-12-02 14:46] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "events serialization",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN preparing event objects for API or JSON viewer THEN delete requestEvent and previousRequest before serializing or rendering"
+}
+

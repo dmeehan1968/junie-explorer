@@ -68,3 +68,13 @@
     "NEW INSTRUCTION": "WHEN preparing JSON for event rendering THEN omit requestEvent and previousRequest fields"
 }
 
+[2025-12-02 14:48] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "create utility,modify API,start server",
+    "MISSING STEPS": "run tests,analyze failure logs,inspect client toggle logic,verify API payload size,reproduce endpoint response",
+    "BOTTLENECK": "Speculative server-side changes were made before reproducing and diagnosing the failing tests.",
+    "PROJECT NOTE": "If pruning is needed, ensure both events and trajectories payloads are pruned in the task API response.",
+    "NEW INSTRUCTION": "WHEN task requests investigating failing tests THEN run failing tests before editing code"
+}
+

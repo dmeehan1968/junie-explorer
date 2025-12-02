@@ -48,3 +48,23 @@
     "NEW INSTRUCTION": "WHEN creating JSON replacer for events THEN remove requestEvent and previousRequest properties"
 }
 
+[2025-12-02 14:40] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "get_file_structure",
+    "ERROR": "Could not display file structure for TSX file",
+    "ROOT CAUSE": "The file-structure tool doesn't support or failed to parse TSX content.",
+    "PROJECT NOTE": "For src/components/*.tsx files, use open_entire_file to inspect component code.",
+    "NEW INSTRUCTION": "WHEN get_file_structure returns unsupported or parsing failed THEN open_entire_file for the same path"
+}
+
+[2025-12-02 14:43] - Updated by Junie - Error analysis
+{
+    "TYPE": "env/setup",
+    "TOOL": "bash",
+    "ERROR": "Server curl produced no response/output",
+    "ROOT CAUSE": "Server was backgrounded without readiness check; curl ran before server was ready.",
+    "PROJECT NOTE": "The app listens on port 3000 via `bun src/index.ts`. Ensure the server is accepting connections before hitting `/api/...` endpoints.",
+    "NEW INSTRUCTION": "WHEN launching server to query APIs THEN wait for ready log or retry until 200"
+}
+

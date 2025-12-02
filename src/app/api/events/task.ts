@@ -1,6 +1,7 @@
 import express from "express"
 import { entityLookupMiddleware } from "../../middleware/entityLookupMiddleware"
 import { AppRequest, AppResponse } from "../../types"
+import { pruneEventLinks } from "../../../utils/pruneEventLinks"
 
 const router = express.Router({ mergeParams: true })
 
@@ -19,7 +20,7 @@ router.get('/api/project/:projectName/issue/:issueId/task/:taskId', async (req: 
       isDeclined: task!.isDeclined,
       plan: task!.plan,
       eventsFile: task!.eventsFile,
-      events: await task!.events,
+      events: pruneEventLinks(await task!.events),
       trajectoriesFile: task!.trajectoriesFile,
       steps: task!.steps,
       metrics: await task!.metrics,
