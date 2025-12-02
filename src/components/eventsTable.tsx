@@ -1,6 +1,8 @@
 /** @jsxImportSource @kitajs/html */
 
 import { EventRecord } from "../schema/eventRecord"
+import { LlmRequestEvent, isRequestEvent } from "../schema/llmRequestEvent"
+import { LlmResponseEvent, isResponseEvent } from "../schema/llmResponseEvent"
 import { escapeHtml } from "../utils/escapeHtml"
 
 interface EventsTableProps {
@@ -39,6 +41,16 @@ export const EventsTable = ({ events }: EventsTableProps) => {
             cost += eventRecord.event.answer.cost
           }
 
+          const replacer = (key: string, value: any) => {
+            if (isResponseEvent(value)) {
+              const { requestEvent, ...response } = value
+              return response
+            } else if (isRequestEvent(value)) {
+              const { previousEvent, ...request } = value
+              return request
+            }
+            return value
+          }
           return (
             <tr data-testid={`event-row-${index}`} class="text-base-content">
               <td class="text-left whitespace-nowrap w-fit">{timestampDisplay}</td>
@@ -50,7 +62,7 @@ export const EventsTable = ({ events }: EventsTableProps) => {
               <td class="text-left max-w-2xl">
                 <div
                   class="max-h-48 overflow-auto bg-base-200 text-base-content p-2 rounded font-mono text-xs whitespace-pre break-all">
-                  {escapeHtml(JSON.stringify(eventRecord.event, null, 2))}
+                  {escapeHtml(JSON.stringify(eventRecord.event, replacer, 2))}
                 </div>
               </td>
               <td class="text-right whitespace-nowrap w-fit">

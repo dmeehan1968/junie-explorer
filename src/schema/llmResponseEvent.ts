@@ -2,6 +2,7 @@ import * as z from "zod"
 import { AIContentAnswerChoice } from "./AIContentAnswerChoice"
 import { AIToolUseAnswerChoice } from "./AIToolUseAnswerChoice"
 import { LLM } from "./LLM"
+import { LlmRequestEvent } from "./llmRequestEvent"
 
 export const ContentAnswer = z.discriminatedUnion('type', [AIContentAnswerChoice, AIToolUseAnswerChoice])
 export type ContentAnswer = z.infer<typeof ContentAnswer>
@@ -66,5 +67,11 @@ export const LlmResponseEvent = z.looseObject({
       ].filter(v => v !== undefined).length,
     }
   }),
+  requestEvent: LlmRequestEvent.optional(),   // will be filled in later
 })
 export type LlmResponseEvent = z.infer<typeof LlmResponseEvent>
+
+export const isResponseEvent = (event: any): event is LlmResponseEvent => {
+  if (typeof event !== 'object') return false
+  return event.type === 'LlmResponseEvent'
+}

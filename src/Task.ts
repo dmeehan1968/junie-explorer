@@ -16,8 +16,8 @@ import {
 import { AgentType } from "./schema/agentType"
 import { Event } from "./schema/event"
 import { EventRecord } from "./schema/eventRecord"
-import { LlmRequestEvent } from "./schema/llmRequestEvent"
-import { LlmResponseEvent } from "./schema/llmResponseEvent"
+import { isRequestEvent, LlmRequestEvent } from "./schema/llmRequestEvent"
+import { isResponseEvent, LlmResponseEvent } from "./schema/llmResponseEvent"
 import { openAI5 } from "./schema/openAI5"
 import { OpenAI51 } from "./schema/openAI51"
 import { StatsCollector } from "./stats/StatsCollector"
@@ -254,6 +254,16 @@ export class Task {
       }
     }
 
+    // match LlmResponseEvent to their LlmRequestEvents
+    for (let index=0 ; index < events.length ; index++) {
+      const event = events[index].event
+      if (event.type === 'LlmResponseEvent') {
+        event.requestEvent = events.slice(0, index).reverse().find(previous => isRequestEvent(previous.event) && previous.event.id === event.id)?.event as LlmRequestEvent
+      } else if (event.type === 'LlmRequestEvent') {
+        event.previousRequest = events.slice(0, index).reverse().find(previous => isRequestEvent(previous.event) && previous.event.modelParameters.model.jbai === event.modelParameters.model.jbai)?.event as LlmRequestEvent
+      }
+    }
+
     const isGpt5ResponseEvent = (event: Event): event is LlmResponseEvent =>
       event.type === LlmResponseEvent.shape.type.value
       && [...openAI5.shape.jbai.options, OpenAI51.shape.jbai.value].includes(event.answer.llm.jbai as never)
@@ -267,7 +277,8 @@ export class Task {
         const previousEvent = events
           .slice(0, index)
           .reverse()    // in-place, but the slice has created a copy so no unintended side effect
-          .find(previous => isGpt5ResponseEvent(previous.event))
+          .find(previous =>   // find matching model request
+            isResponseEvent(previous.event) && isResponseEvent(record.event) && previous.event.answer.llm.jbai === record.event.answer.llm.jbai)
 
         if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
           // next line is a bit of a kludge so we can use cacheCreateInputTokens in the same way as Sonnet and still get

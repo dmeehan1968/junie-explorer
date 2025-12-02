@@ -3,6 +3,7 @@ import { AgentType } from "./agentType"
 import { AssistantChatMessageWithToolUses } from "./assistantChatMessageWithToolUses"
 import { ChatMessage } from "./chatMessage"
 import { LLM } from "./LLM"
+import { LlmResponseEvent } from "./llmResponseEvent"
 import { MultiPartChatMessage } from "./multiPartChatMessage"
 import { Tools } from "./tools"
 import { UserChatMessageWithToolResults } from "./userChatMessageWithToolResults"
@@ -59,5 +60,12 @@ export const LlmRequestEvent = z.looseObject({
   }),
   attemptNumber: z.number(),
   id: z.string(),
+  previousRequest: z.looseObject({ type: z.literal('LlmRequestEvent') }).optional()
 })
 export type LlmRequestEvent = z.infer<typeof LlmRequestEvent>
+
+export const isRequestEvent = (event: any): event is LlmRequestEvent => {
+  if (typeof event !== 'object') return false
+  if (!('type' in event)) return false
+  return event.type === 'LlmRequestEvent'
+}

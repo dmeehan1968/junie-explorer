@@ -6,7 +6,6 @@ import { escapeHtml } from "../utils/escapeHtml"
 import { ChatMessageDecorator } from "./chatMessageDecorator"
 import { Divider } from "./divider"
 import { getMessageDiffs } from "./getMessageDiffs"
-import { getPreviousRequestRecord } from "./getPreviousRequestRecord"
 import { getTrajectoryEventRecords } from "./getTrajectoryEventRecords"
 import { MessageDecorator } from "./messageDecorator"
 import { ToolCallDecorator } from "./toolCallDecorator"
@@ -32,60 +31,66 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
         const messages: JSX.Element[] = []
 
         if (current.event.type === 'LlmRequestEvent') {
-          if (!didOutputInitialContext) {
+          if (current.event.chat.agentType === AgentType.Assistant) {
+            if (!didOutputInitialContext) {
 
-            messages.push(<Divider id="history">Start of Context/History</Divider>)
+              messages.push(<Divider id="history">Start of Context/History</Divider>)
 
-            messages.push(
-              <MessageDecorator
-                klass={klass}
-                testId="system-message"
-                left={true}
-                label="System Message"
-                content={escapeHtml(current.event.chat.system)}
-              />,
-            )
+              messages.push(
+                <MessageDecorator
+                  klass={klass}
+                  testId="system-message"
+                  left={true}
+                  label="System Message"
+                  content={escapeHtml(current.event.chat.system)}
+                />,
+              )
 
-            messages.push(
-              <MessageDecorator
-                klass={klass}
-                testId="user-tools"
-                left={true}
-                label="Tools"
-                content={
-                  current.event.chat.tools.length ? (
-                    <>
-                      {current.event.chat.tools.map((tool) => (
-                        <ToolDecorator tool={tool}/>
-                      ))}
-                    </>
-                  ) : (
-                    'No tools listed'
-                  )
-                }
-              />,
-            )
+              messages.push(
+                <MessageDecorator
+                  klass={klass}
+                  testId="user-tools"
+                  left={true}
+                  label="Tools"
+                  content={
+                    current.event.chat.tools.length ? (
+                      <>
+                        {current.event.chat.tools.map((tool) => (
+                          <ToolDecorator tool={tool}/>
+                        ))}
+                      </>
+                    ) : (
+                      'No tools listed'
+                    )
+                  }
+                />,
+              )
 
-            messages.push(
-              ...current.event.chat.messages.map((message) => (
-                <ChatMessageDecorator klass={klass} message={message}/>
-              )).filter(Boolean),
-            )
+              messages.push(
+                ...current.event.chat.messages.map((message) => (
+                  <ChatMessageDecorator klass={klass} message={message}/>
+                )).filter(Boolean),
+              )
 
-            messages.push(<Divider id="current-session">Current Session</Divider>)
+              messages.push(<Divider id="current-session">Current Session</Divider>)
 
-            didOutputInitialContext = true
+              didOutputInitialContext = true
+
+            } else {
+
+              messages.push(getMessageDiffs(current, records.slice(), klass))
+
+            }
 
           } else {
-
-            messages.push(getMessageDiffs(current, records.slice(0, index), klass))
-
+            // skip non-assistant messages (for now)
           }
         } else if (current.event.type === 'LlmResponseEvent') {
 
-          const requestRecord = getPreviousRequestRecord(trajectoryEvents.slice(0, index), event => event.id === current.event.id)
+          // const requestRecord = getPreviousRequestRecord(trajectoryEvents.slice(0, index), (event, timestamp) => event.id === current.event.id)
+          const requestEvent = current.event.requestEvent
 
-          if (requestRecord?.event.chat.agentType === AgentType.TaskSummarizer) {
+          if (requestEvent?.chat.agentType === AgentType.TaskSummarizer) {
             for (const choice of current.event.answer.contentChoices) {
               if (choice.content) {
                 messages.push(
@@ -99,7 +104,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
                 )
               }
             }
-          } else {
+          } else if (requestEvent?.chat.agentType === AgentType.Assistant) {
             const latency = current.event.answer.time
 
             if (current.event.answer.webSearchCount > 0) {
@@ -122,7 +127,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
                       klass={klass}
                       testId="chat-assistant"
                       left={false}
-                      label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${requestRecord?.event.modelParameters.reasoning_effort}</span>`}
+                      label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${requestEvent?.modelParameters.reasoning_effort}</span>`}
                       content={escapeHtml(choice.content)}
                     />,
                   )

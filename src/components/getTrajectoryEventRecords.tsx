@@ -13,7 +13,7 @@ export interface TrajectoryEventRecord {
 export function getTrajectoryEventRecords(events: EventRecord[]) {
   return events.filter((record: EventRecord): record is TrajectoryEventRecord => {
     return (
-      (record.event.type === 'LlmRequestEvent' && record.event.chat.agentType === AgentType.Assistant)
+      (record.event.type === 'LlmRequestEvent')
       || (record.event.type === 'LlmResponseEvent')
       || record.event.type === 'AgentActionExecutionFinished'
       || record.event.type === 'ActionRequestBuildingFailed'
