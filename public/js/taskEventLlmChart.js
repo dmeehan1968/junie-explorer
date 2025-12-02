@@ -21,18 +21,50 @@ let llmChart = null;
 let originalChartData = null;
 let selectedProvidersSet = new Set();
 let selectedProvider = 'all';
+let selectedMetricType = 'cost'; // 'cost' or 'tokens'
+
+// Function to update dataset visibility based on selected metric type
+function updateDatasetVisibility() {
+  if (!llmChart || !originalChartData) return;
+
+  llmChart.data.datasets.forEach((dataset, index) => {
+    const group = originalChartData.datasets[index]?.group;
+    if (group === 'cost') {
+      dataset.hidden = selectedMetricType !== 'cost';
+    } else if (group === 'tokens') {
+      dataset.hidden = selectedMetricType !== 'tokens';
+    } else if (group === 'legacy') {
+      dataset.hidden = true; // Always hide legacy datasets
+    }
+  });
+
+  // Update Y-axis visibility and labels
+  if (llmChart.options.scales.y) {
+    llmChart.options.scales.y.display = selectedMetricType === 'cost';
+    llmChart.options.scales.y.title.text = 'Cost ($)';
+  }
+  if (llmChart.options.scales.y1) {
+    llmChart.options.scales.y1.display = selectedMetricType === 'tokens';
+    llmChart.options.scales.y1.title.text = 'Tokens';
+    llmChart.options.scales.y1.position = 'left'; // Move to left when tokens is selected
+  }
+
+  llmChart.update();
+}
 
 // Function to filter chart data based on selected providers
 function filterChartData(selectedProviders) {
-
   const llmEventsEl = document.getElementById('llmEvents');
   const llmEvents = llmEventsEl ? JSON.parse(llmEventsEl.textContent) : null;
+  
+  if (!llmEvents) return originalChartData;
+  
   // Convert ISO string back to Date object
   llmEvents.forEach(event => {
     event.timestamp = new Date(event.timestamp);
   });
 
-  if (!originalChartData || !llmEvents) return originalChartData;
+  if (!originalChartData) return originalChartData;
   
   // Filter events based on selected providers
   const filteredEvents = llmEvents.filter(event => {
@@ -51,82 +83,17 @@ function filterChartData(selectedProviders) {
     };
   }
   
-  // Recreate datasets with filtered data
-  const costData = filteredEvents.map(event => ({
-    x: event.timestamp.toISOString(),
-    y: event.event.answer.cost,
-  }));
-
-  let cumulativeCost = 0;
-  const cumulativeCostData = filteredEvents.map(event => {
-    cumulativeCost += event.event.answer.cost;
-    return {
-      x: event.timestamp.toISOString(),
-      y: cumulativeCost
-    };
-  });
-  
-  const inputTokenData = filteredEvents.map(event => ({
-    x: event.timestamp.toISOString(),
-    y: event.event.answer.inputTokens,
-  }));
-
-  const outputTokenData = filteredEvents.map(event => ({
-    x: event.timestamp.toISOString(),
-    y: event.event.answer.outputTokens,
-  }));
-
-  const cacheTokenData = filteredEvents.map(event => ({
-    x: event.timestamp.toISOString(),
-    y: event.event.answer.cacheInputTokens,
-  }));
-
-  const cacheCreateTokenData = filteredEvents.map(event => ({
-    x: event.timestamp.toISOString(),
-    y: event.event.answer.cacheCreateInputTokens,
-  }));
-
-  const combinedTokenData = filteredEvents.map(event => ({
-    x: event.timestamp.toISOString(),
-    y: event.event.answer.inputTokens
-      + event.event.answer.outputTokens
-      + event.event.answer.cacheInputTokens
-      + event.event.answer.cacheCreateInputTokens,
-  }));
+  // Return filtered data - the datasets structure matches originalChartData
+  // We need to filter each dataset's data based on the filtered events' timestamps
+  const filteredTimestamps = new Set(filteredEvents.map(e => e.timestamp.toISOString()));
   
   return {
     ...originalChartData,
     labels: filteredEvents.map(event => event.timestamp.toISOString()),
-    datasets: [
-      {
-        ...originalChartData.datasets[0],
-        data: costData
-      },
-      {
-        ...originalChartData.datasets[1],
-        data: cumulativeCostData
-      },
-      {
-        ...originalChartData.datasets[2],
-        data: inputTokenData
-      },
-      {
-        ...originalChartData.datasets[3],
-        data: outputTokenData
-      },
-      {
-        ...originalChartData.datasets[4],
-        data: cacheTokenData
-      },
-      {
-        ...originalChartData.datasets[5],
-        data: cacheCreateTokenData
-      },
-      {
-        ...originalChartData.datasets[6],
-        data: combinedTokenData
-      }
-    ]
+    datasets: originalChartData.datasets.map(dataset => ({
+      ...dataset,
+      data: dataset.data.filter(point => filteredTimestamps.has(point.x))
+    }))
   };
 }
 
@@ -143,7 +110,28 @@ function updateChart() {
 
   selectedProvidersSet = new Set(selectedProviders);
   llmChart.data = filterChartData(selectedProviders);
-  llmChart.update();
+  
+  // Reapply visibility based on metric type after filtering
+  updateDatasetVisibility();
+}
+
+// Function to set metric type and update UI
+function setMetricType(type) {
+  selectedMetricType = type;
+  
+  // Update button states
+  const toggleContainer = document.getElementById('metric-type-toggle');
+  if (toggleContainer) {
+    const buttons = toggleContainer.querySelectorAll('button');
+    buttons.forEach(btn => {
+      const value = btn.getAttribute('data-value');
+      const active = value === type;
+      btn.classList.toggle('btn-primary', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
+  }
+  
+  updateDatasetVisibility();
 }
 
 // Initialize the LLM metrics graph when the page loads
@@ -188,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
             pointHoverRadius: 6,
             pointHitRadius: 10,
             borderWidth: 2,
-            yAxisID: dataset.yAxisID
+            yAxisID: dataset.yAxisID,
+            hidden: dataset.hidden
           }))
         },
         options: {
@@ -243,8 +232,8 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             y1: {
               type: 'linear',
-              display: true,
-              position: 'right',
+              display: false,
+              position: 'left',
               title: {
                 display: true,
                 text: 'Tokens'
@@ -265,7 +254,18 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             legend: {
               display: true,
-              position: 'top'
+              position: 'top',
+              labels: {
+                filter: function(legendItem, chartData) {
+                  // Only show legend items for the currently selected metric type
+                  const dataset = chartData.datasets[legendItem.datasetIndex];
+                  const group = originalChartData.datasets[legendItem.datasetIndex]?.group;
+                  if (group === 'legacy') return false;
+                  if (selectedMetricType === 'cost' && group === 'tokens') return false;
+                  if (selectedMetricType === 'tokens' && group === 'cost') return false;
+                  return true;
+                }
+              }
             },
             tooltip: {
               mode: 'index',
@@ -278,7 +278,20 @@ document.addEventListener('DOMContentLoaded', function() {
       // Create the chart
       llmChart = new Chart(ctx, config);
 
-      
+      // Initialize metric type toggle
+      const metricToggleContainer = document.getElementById('metric-type-toggle');
+      if (metricToggleContainer) {
+        const buttons = metricToggleContainer.querySelectorAll('button');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const value = btn.getAttribute('data-value');
+            if (value) {
+              setMetricType(value);
+            }
+          });
+        });
+      }
+
       // Build provider filter button group (exclusive: All or one provider)
       const providerFiltersContainer = document.getElementById('llm-provider-filters');
       if (providerFiltersContainer && originalChartData && Array.isArray(originalChartData.providers)) {

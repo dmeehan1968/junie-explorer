@@ -61,6 +61,18 @@ export class EventMetricsSectionDSL {
     return this.page.getByTestId('llm-provider-filters')
   }
 
+  get metricTypeToggle() {
+    return this.page.getByTestId('metric-type-toggle')
+  }
+
+  get costButton() {
+    return this.metricTypeToggle.getByRole('button', { name: 'Cost' })
+  }
+
+  get tokensButton() {
+    return this.metricTypeToggle.getByRole('button', { name: 'Tokens' })
+  }
+
   get canvas() {
     return this.page.locator('#llmMetricsChart')
   }

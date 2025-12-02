@@ -77,12 +77,33 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
     stepSize = Math.max(1, Math.floor(dateRange / (YEAR * MIN_LABELS)))
   }
 
-  // Create datasets for cost and token breakdowns
-  const costData = llmEvents.map(event => ({
+  // Create datasets for cost breakdown
+  const inputTokenCostData = llmEvents.map(event => ({
     x: event.timestamp.toISOString(),
-    y: event.event.answer.cost,
+    y: event.event.answer.inputTokenCost ?? 0,
   }))
 
+  const outputTokenCostData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.outputTokenCost ?? 0,
+  }))
+
+  const cacheInputTokenCostData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.cacheInputTokenCost ?? 0,
+  }))
+
+  const cacheCreateInputTokenCostData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.cacheCreateInputTokenCost ?? 0,
+  }))
+
+  const webSearchCostData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.webSearchCost ?? 0,
+  }))
+
+  // Create datasets for token counts
   const inputTokenData = llmEvents.map(event => ({
     x: event.timestamp.toISOString(),
     y: event.event.answer.inputTokens ?? 0,
@@ -103,11 +124,16 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
     return { x: event.timestamp.toISOString(), y: ans.cacheCreateInputTokens ?? 0 }
   })
 
-  const combinedTokenData = llmEvents.map(event => {
-    const ans = event.event.answer
-    const total = (ans.inputTokens ?? 0) + (ans.outputTokens ?? 0) + (ans.cacheCreateInputTokens ?? 0)
-    return { x: event.timestamp.toISOString(), y: total }
-  })
+  const webSearchCountData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.webSearchCount ?? 0,
+  }))
+
+  // Legacy datasets (kept for backward compatibility)
+  const costData = llmEvents.map(event => ({
+    x: event.timestamp.toISOString(),
+    y: event.event.answer.cost,
+  }))
 
   let cumulativeCost = 0
   const cumulativeCostData = llmEvents.map(event => {
@@ -115,74 +141,153 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
     return { x: event.timestamp.toISOString(), y: cumulativeCost }
   })
 
+  const combinedTokenData = llmEvents.map(event => {
+    const ans = event.event.answer
+    const total = (ans.inputTokens ?? 0) + (ans.outputTokens ?? 0) + (ans.cacheCreateInputTokens ?? 0)
+    return { x: event.timestamp.toISOString(), y: total }
+  })
+
   const datasets = [
+    // Cost breakdown datasets (visible by default)
     {
-      label: 'Cost',
-      data: costData,
+      label: 'Input Token Cost',
+      data: inputTokenCostData,
       borderColor: 'rgb(54, 162, 235)',
       backgroundColor: 'rgba(54, 162, 235, 0.5)',
       fill: false,
       tension: 0.1,
       yAxisID: 'y',
+      group: 'cost',
     },
     {
-      label: 'Cumulative Cost',
-      data: cumulativeCostData,
+      label: 'Output Token Cost',
+      data: outputTokenCostData,
       borderColor: 'rgb(255, 159, 64)',
       backgroundColor: 'rgba(255, 159, 64, 0.5)',
       fill: false,
       tension: 0.1,
       yAxisID: 'y',
-      hidden: true,
+      group: 'cost',
     },
     {
-      label: 'Input Tokens',
-      data: inputTokenData,
+      label: 'Cache Input Token Cost',
+      data: cacheInputTokenCostData,
       borderColor: 'rgb(75, 192, 192)',
       backgroundColor: 'rgba(75, 192, 192, 0.5)',
       fill: false,
       tension: 0.1,
+      yAxisID: 'y',
+      group: 'cost',
+    },
+    {
+      label: 'Cache Create Input Token Cost',
+      data: cacheCreateInputTokenCostData,
+      borderColor: 'rgb(153, 102, 255)',
+      backgroundColor: 'rgba(153, 102, 255, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y',
+      group: 'cost',
+    },
+    {
+      label: 'Web Search Cost',
+      data: webSearchCostData,
+      borderColor: 'rgb(255, 99, 132)',
+      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y',
+      group: 'cost',
+    },
+    // Token count datasets (hidden by default)
+    {
+      label: 'Input Tokens',
+      data: inputTokenData,
+      borderColor: 'rgb(54, 162, 235)',
+      backgroundColor: 'rgba(54, 162, 235, 0.5)',
+      fill: false,
+      tension: 0.1,
       yAxisID: 'y1',
+      group: 'tokens',
       hidden: true,
     },
     {
       label: 'Output Tokens',
       data: outputTokenData,
-      borderColor: 'rgb(255, 205, 86)',
-      backgroundColor: 'rgba(255, 205, 86, 0.5)',
+      borderColor: 'rgb(255, 159, 64)',
+      backgroundColor: 'rgba(255, 159, 64, 0.5)',
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',
+      group: 'tokens',
       hidden: true,
     },
     {
       label: 'Cache Tokens',
       data: cacheTokenData,
-      borderColor: 'rgb(153, 102, 255)',
-      backgroundColor: 'rgba(153, 102, 255, 0.5)',
+      borderColor: 'rgb(75, 192, 192)',
+      backgroundColor: 'rgba(75, 192, 192, 0.5)',
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',
+      group: 'tokens',
       hidden: true,
     },
     {
       label: 'Cache Create Tokens',
       data: cacheCreateTokenData,
-      borderColor: 'rgb(186, 85, 211)',
-      backgroundColor: 'rgba(186, 85, 211, 0.5)',
+      borderColor: 'rgb(153, 102, 255)',
+      backgroundColor: 'rgba(153, 102, 255, 0.5)',
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',
+      group: 'tokens',
       hidden: true,
     },
     {
-      label: 'Tokens (Combined)',
-      data: combinedTokenData,
+      label: 'Web Search Count',
+      data: webSearchCountData,
       borderColor: 'rgb(255, 99, 132)',
       backgroundColor: 'rgba(255, 99, 132, 0.5)',
       fill: false,
       tension: 0.1,
       yAxisID: 'y1',
+      group: 'tokens',
+      hidden: true,
+    },
+    // Legacy datasets (kept for backward compatibility, hidden by default)
+    {
+      label: 'Cost',
+      data: costData,
+      borderColor: 'rgb(100, 100, 100)',
+      backgroundColor: 'rgba(100, 100, 100, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y',
+      group: 'legacy',
+      hidden: true,
+    },
+    {
+      label: 'Cumulative Cost',
+      data: cumulativeCostData,
+      borderColor: 'rgb(150, 150, 150)',
+      backgroundColor: 'rgba(150, 150, 150, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y',
+      group: 'legacy',
+      hidden: true,
+    },
+    {
+      label: 'Tokens (Combined)',
+      data: combinedTokenData,
+      borderColor: 'rgb(200, 200, 200)',
+      backgroundColor: 'rgba(200, 200, 200, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1',
+      group: 'legacy',
+      hidden: true,
     },
   ]
 

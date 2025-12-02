@@ -88,3 +88,23 @@
     "NEW INSTRUCTION": "WHEN removing a feature across routes THEN search repo and delete related UI, routes, scripts, DSL, and tests"
 }
 
+[2025-12-02 15:57] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "install dependencies",
+    "MISSING STEPS": "push changes, push tags",
+    "BOTTLENECK": "Release was not pushed to remote.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN release commit and tag exist locally THEN push branch and tags to origin"
+}
+
+[2025-12-02 17:30] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "summary and confirmation, documentation",
+    "MISSING STEPS": "implement toggle UI, update datasets, update chart logic, run tests, manual verify",
+    "BOTTLENECK": "Work stalled after adding tests without implementing the feature or running tests.",
+    "PROJECT NOTE": "Datasets are built in prepareLlmEventGraphData; chart logic is in public/js/taskEventLlmChart.js; add cost breakdown and webSearch metrics, exclude overall cost.",
+    "NEW INSTRUCTION": "WHEN adding a cost/tokens toggle THEN implement UI, update datasets and chart logic, then run the test suite"
+}
+

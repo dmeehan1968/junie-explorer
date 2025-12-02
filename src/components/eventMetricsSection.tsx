@@ -15,6 +15,10 @@ export const EventMetricsSection = ({ hasMetrics }: { hasMetrics: boolean }) => 
         <div class="mb-4">
           <div class="flex flex-col gap-3">
             <div class="flex items-center gap-3 flex-wrap justify-between">
+              <div id="metric-type-toggle" class="join" data-testid="metric-type-toggle">
+                <button type="button" class="btn btn-sm join-item btn-primary" aria-pressed="true" data-value="cost">Cost</button>
+                <button type="button" class="btn btn-sm join-item" aria-pressed="false" data-value="tokens">Tokens</button>
+              </div>
               <div id="llm-provider-filters" class="join flex flex-wrap" data-testid="llm-provider-filters">
                 {/* Provider buttons will be populated by JavaScript */}
               </div>

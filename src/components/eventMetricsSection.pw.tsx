@@ -32,5 +32,16 @@ test.describe('EventMetricsSection', () => {
     test('renders chart canvas element with correct id', async ({ eventMetrics }) => {
       await expect(eventMetrics.canvas).toHaveCount(1)
     })
+
+    test('renders metric type toggle with Cost and Tokens buttons', async ({ eventMetrics }) => {
+      await expect(eventMetrics.metricTypeToggle).toBeVisible()
+      await expect(eventMetrics.costButton).toBeVisible()
+      await expect(eventMetrics.tokensButton).toBeVisible()
+    })
+
+    test('Cost button is active by default', async ({ eventMetrics }) => {
+      await expect(eventMetrics.costButton).toHaveAttribute('aria-pressed', 'true')
+      await expect(eventMetrics.tokensButton).toHaveAttribute('aria-pressed', 'false')
+    })
   })
 })
