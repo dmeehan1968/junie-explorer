@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { determineAgentType } from "../utils/determineAgentType"
+import { detectAgentType } from "./agentType"
 import { AssistantChatMessageWithToolUses } from "./assistantChatMessageWithToolUses"
 import { ChatMessage } from "./chatMessage"
 import { LLM } from "./LLM"
@@ -25,7 +25,7 @@ export const LlmRequestEvent = z.looseObject({
   }).transform(chat => {
     return {
       ...chat,
-      agentType: determineAgentType(chat.system),
+      agentType: detectAgentType(chat.system),
     }
   }),
   modelParameters: z.looseObject({

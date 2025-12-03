@@ -35,7 +35,7 @@ const AGENT_TYPE_PATTERNS: Record<AgentType, RegExp[]> = {
   ],
 } as const
 
-export function determineAgentType(systemPrompt: string): AgentType {
+export function detectAgentType(systemPrompt: string): AgentType {
 
   for (const [agentType, patterns] of Object.entries(AGENT_TYPE_PATTERNS)) {
     if (patterns.some(pattern => pattern.test(systemPrompt))) {
