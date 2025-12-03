@@ -88,3 +88,13 @@
     "NEW INSTRUCTION": "WHEN toggling metric type THEN show selected-group datasets and keep only cumulative hidden"
 }
 
+[2025-12-03 13:41] - Updated by Junie - Error analysis
+{
+    "TYPE": "invalid args",
+    "TOOL": "open",
+    "ERROR": "Path not found; opened unintended file instead",
+    "ROOT CAUSE": "An incorrect file path (public/js/projectSelection.js) was requested that doesn't exist in the repo.",
+    "PROJECT NOTE": "Frontend files are primarily under src/components; verify paths before opening and prefer searching for filenames first.",
+    "NEW INSTRUCTION": "WHEN open reports path not found THEN search repo for filename and open the found path"
+}
+

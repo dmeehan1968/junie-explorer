@@ -106,6 +106,8 @@ The Project Metrics Chart on the home page has been enhanced to support:
 - **Series Toggling**: Users can switch between viewing metrics aggregated by Project or broken down by Model.
 - **Data Source**: Model breakdown data is derived from `LlmResponseEvent` metrics.
 - **API Support**: The `/api/projects/graph` endpoint accepts a `breakdown=model` parameter to return detailed datasets.
+- **Loading State**: A loading indicator is displayed during data fetches (with 200ms delay).
+- **Improved Visualization**: Better rendering of 'week' based groupings and ensures legends are visible for model-based views even for single projects.
 
 ### Worker Bundling
 

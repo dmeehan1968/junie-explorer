@@ -168,3 +168,13 @@
     "NEW INSTRUCTION": "WHEN request is to explain or design, not implement THEN propose high-level plan, API shape, and UI changes only"
 }
 
+[2025-12-03 13:47] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "update docs",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Snapshot updates were required after visual changes to the chart.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN chart visuals change THEN run E2E with --update-snapshots after verifying diffs"
+}
+

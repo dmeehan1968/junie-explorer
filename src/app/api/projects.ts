@@ -71,12 +71,12 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
       if (date > maxDate) maxDate = date
 
       if (breakdownByModel) {
-        const metricsByJbai = await issue.metricsByJbai
-        for (const [jbai, metrics] of Object.entries(metricsByJbai)) {
+        const metricsByModel = await issue.metricsByModel
+        for (const [model, metrics] of Object.entries(metricsByModel)) {
           // Use model name as key
-          const key = jbai
+          const key = model
           if (!seriesLabels[key]) {
-            seriesLabels[key] = jbai
+            seriesLabels[key] = model
             // Generate a consistent color for this Model
             let hash = 0;
             for (let i = 0; i < key.length; i++) {

@@ -211,13 +211,19 @@ async function loadProjectMetricsChart() {
     return;
   }
 
-  // Make sure the container is in the DOM but hidden initially if it was hidden before
+  // Show graph container immediately so loader can be seen
   if (graphContainer.classList.contains('hidden')) {
-    // Keep it hidden but in the DOM
+    graphContainer.classList.remove('hidden');
+    graphContainer.classList.add('visible');
     graphContainer.style.display = 'block';
+  }
 
-    // Trigger reflow to ensure the transition works
-    void graphContainer.offsetWidth;
+  const loader = document.getElementById('chart-loader');
+  let loadingTimeout;
+  if (loader) {
+    loadingTimeout = setTimeout(() => {
+      loader.classList.remove('hidden');
+    }, 200);
   }
 
   try {
@@ -228,12 +234,11 @@ async function loadProjectMetricsChart() {
 
     // Create or update the chart
     createProjectsChart(graphData);
-
-    // Show graph container with animation
-    graphContainer.classList.remove('hidden');
-    graphContainer.classList.add('visible');
   } catch (error) {
     console.error('Error loading graph data:', error);
+  } finally {
+    if (loadingTimeout) clearTimeout(loadingTimeout);
+    if (loader) loader.classList.add('hidden');
   }
 }
 
@@ -277,14 +282,14 @@ function createProjectsChart(graphData) {
     }
   }
 
+  // Choose tooltip/date formats based on time unit
+  const unit = graphData.timeUnit || 'day';
+
   // Convert datasets to stacked bars (single main stack on primary axis)
   filteredDatasets = filteredDatasets.map(ds => Object.assign({}, ds, {
     type: 'bar',
     stack: 'main'
   }));
-
-  // Choose tooltip/date formats based on time unit
-  const unit = graphData.timeUnit || 'day';
   const tooltipFormat = unit === 'hour' ? 'MMM d, yyyy HH:00' : (unit === 'month' ? 'MMM yyyy' : (unit === 'year' ? 'yyyy' : 'MMM d, yyyy'));
 
   // Create chart configuration
@@ -376,7 +381,7 @@ function createProjectsChart(graphData) {
           }
         },
         legend: {
-          display: graphData.projectNames && graphData.projectNames.length > 1,
+          display: viewOption === 'model' || (graphData.projectNames && graphData.projectNames.length > 1),
           position: 'bottom',
           labels: {
             usePointStyle: true,

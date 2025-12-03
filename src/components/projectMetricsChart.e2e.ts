@@ -36,6 +36,11 @@ test.describe('ProjectMetricsChart', () => {
       await expect(projectMetricsChart.radioButton('Model')).toBeChecked()
     })
 
+    test('should show chart with View by Model', async ({ projectMetricsChart }) => {
+      await projectMetricsChart.radioButton('Model').check()
+      await expect(projectMetricsChart.container).toHaveScreenshot({ animations: "disabled" })
+    })
+
     for (const displayBy of ['Cost', 'Tokens']) {
       test.describe.parallel(`Display By ${displayBy}`, async () => {
         for (const groupBy of ['Auto', 'Hour', 'Day', 'Week', 'Month']) {
@@ -49,6 +54,24 @@ test.describe('ProjectMetricsChart', () => {
         }
       })
     }
+  })
+
+  test('should show loading indicator during slow fetch', async ({ page, projectTable, projectMetricsChart }) => {
+    // Intercept API call and delay it by 1000ms
+    await page.route('**/api/projects/graph*', async route => {
+      await new Promise(f => setTimeout(f, 1000));
+      await route.continue();
+    });
+
+    // Select a project to trigger load
+    await projectTable.selectRow(1);
+
+    // Check if loader is visible. It should appear after 200ms.
+    const loader = page.locator('#chart-loader');
+    await expect(loader).toBeVisible({ timeout: 2000 });
+
+    // Check if loader is hidden after load completes
+    await expect(loader).toBeHidden({ timeout: 5000 });
   })
 
 })

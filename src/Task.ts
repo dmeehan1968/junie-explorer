@@ -37,7 +37,7 @@ export class Task {
   public assistantProviders: Set<{ provider: string; name?: string; jbai?: string }> = new Set()
   readonly _steps: Map<number, Step> = new Map()
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
-  private _metricsByJbai: Promise<Record<string, SummaryMetrics>> | undefined = undefined
+  private _metricsByModel: Promise<Record<string, SummaryMetrics>> | undefined = undefined
   private _previousTasksInfo?: PreviousTasksInfo | null
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
@@ -117,7 +117,7 @@ export class Task {
 
   reload() {
     this._metrics = undefined
-    this._metricsByJbai = undefined
+    this._metricsByModel = undefined
     this._previousTasksInfo = undefined
     this._finalAgentState = undefined
     this._sessionHistory = undefined
@@ -169,10 +169,10 @@ export class Task {
     return this._metrics
   }
 
-  get metricsByJbai(): Promise<Record<string, SummaryMetrics>> {
-    this._metricsByJbai ??= new Promise(async (resolve) => {
+  get metricsByModel(): Promise<Record<string, SummaryMetrics>> {
+    this._metricsByModel ??= new Promise(async (resolve) => {
 
-      const metricsByJbai: Record<string, SummaryMetrics> = {}
+      const metricsByModel: Record<string, SummaryMetrics> = {}
 
       // metrics needs to load events, but not retain them
       // but if metrics are already loaded (retained), then just use them
@@ -182,11 +182,11 @@ export class Task {
 
       for (const event of events) {
         if (event.event.type === 'LlmResponseEvent') {
-          const jbai = event.event.answer.llm.jbai ?? 'Unknown'
-          if (!metricsByJbai[jbai]) {
-            metricsByJbai[jbai] = initialisedSummaryMetrics()
+          const model = event.event.answer.llm.jbai ?? 'Unknown'
+          if (!metricsByModel[model]) {
+            metricsByModel[model] = initialisedSummaryMetrics()
           }
-          addSummaryMetrics(metricsByJbai[jbai], {
+          addSummaryMetrics(metricsByModel[model], {
             cost: event.event.answer.cost,
             inputTokens: event.event.answer.inputTokens,
             inputTokenCost: event.event.answer.inputTokenCost,
@@ -206,11 +206,11 @@ export class Task {
         events.splice(0)
       }
 
-      return resolve(metricsByJbai)
+      return resolve(metricsByModel)
 
     })
 
-    return this._metricsByJbai
+    return this._metricsByModel
   }
 
   get steps() {
