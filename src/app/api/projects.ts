@@ -56,13 +56,14 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
   let maxDate = new Date(0)
 
   // Process each project's issues
-  for (const project of projects) {
+  await Promise.all(projects.map(async (project) => {
     // Generate base color for project
     const projectIndex = projects.indexOf(project)
     const hue = (projectIndex * 137) % 360
     const projectBaseColor = `hsl(${hue}, 70%, 60%)`
 
-    for (const [, issue] of await project.issues) {
+    const issues = await project.issues
+    await Promise.all(Array.from(issues.values()).map(async (issue) => {
       const date = new Date(issue.created)
       const day = date.toISOString().split('T')[0] // YYYY-MM-DD format
       const hourKey = date.toISOString().slice(0, 13) + ':00' // YYYY-MM-DDTHH:00 in UTC
@@ -78,11 +79,11 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
           if (!seriesLabels[key]) {
             seriesLabels[key] = model
             // Generate a consistent color for this Model
-            let hash = 0;
-            for (let i = 0; i < key.length; i++) {
-              hash = key.charCodeAt(i) + ((hash << 5) - hash);
+            let hash = 0
+            for (let i = 0 ; i < key.length ; i++) {
+              hash = key.charCodeAt(i) + ((hash << 5) - hash)
             }
-            const keyHue = Math.abs(hash % 360);
+            const keyHue = Math.abs(hash % 360)
             seriesColors[key] = `hsl(${keyHue}, 70%, 60%)`
           }
           updateBuckets(key, day, hourKey, metrics)
@@ -91,13 +92,13 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
         const metrics = await issue.metrics
         const key = project.name
         if (!seriesLabels[key]) {
-            seriesLabels[key] = project.name
-            seriesColors[key] = projectBaseColor
+          seriesLabels[key] = project.name
+          seriesColors[key] = projectBaseColor
         }
         updateBuckets(key, day, hourKey, metrics)
       }
-    }
-  }
+    }))
+  }))
 
   // Determine the appropriate time unit based on the date range
   let timeUnit: string = 'day' // default

@@ -77,8 +77,11 @@ export class Issue {
   get metricsByModel(): Promise<Record<string, SummaryMetrics>> {
     this._metricsByModel ??= new Promise(async (resolve) => {
       const metricsByModel: Record<string, SummaryMetrics> = {}
-      for (const [_, task] of await this.tasks) {
-        const taskMetricsByModel = await task.metricsByModel
+      const tasks = [...(await this.tasks).values()]
+      const taskMetricsByModelPromises = tasks.map(task => task.metricsByModel)
+      const allTaskMetricsByModel = await Promise.all(taskMetricsByModelPromises)
+
+      for (const taskMetricsByModel of allTaskMetricsByModel) {
         for (const [model, metrics] of Object.entries(taskMetricsByModel)) {
           if (!metricsByModel[model]) {
             metricsByModel[model] = initialisedSummaryMetrics()
