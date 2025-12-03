@@ -81,71 +81,53 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
               messages.push(...getMessageDiffs(current, records.slice(), klass))
 
             }
-
-          } else {
-            // skip non-assistant messages (for now)
           }
         } else if (current.event.type === 'LlmResponseEvent') {
 
-          // const requestRecord = getPreviousRequestRecord(trajectoryEvents.slice(0, index), (event, timestamp) => event.id === current.event.id)
           const requestEvent = current.event.requestEvent
 
-          if (requestEvent?.chat.agentType === AgentType.enum.TaskSummarizer) {
-            for (const choice of current.event.answer.contentChoices) {
+          if (current.event.answer.webSearchCount > 0) {
+            messages.push(
+              <MessageDecorator
+                klass={klass}
+                testId="web-search-assistant"
+                left={false}
+                label={`Web Search`}
+                content={escapeHtml(`Count: ${current.event.answer.webSearchCount}`)}
+              />,
+            )
+          }
+
+          for (const choice of current.event.answer.contentChoices) {
+            if (choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIContentAnswerChoice') {
               if (choice.content) {
                 messages.push(
                   <MessageDecorator
                     klass={klass}
-                    testId="summarizer-assistant"
+                    testId="chat-assistant"
                     left={false}
-                    label="Summary"
+                    label={<div class="flex gap-2">{requestEvent?.chat.agentType}
+                      <span class="text-primary-content/50">
+                        {(current.event.answer.time / 1000).toFixed(2)}s/${requestEvent?.modelParameters.reasoning_effort}
+                      </span>
+                    </div>}
                     content={escapeHtml(choice.content)}
                   />,
                 )
               }
-            }
-          } else if (requestEvent?.chat.agentType === AgentType.enum.Agent) {
-            const latency = current.event.answer.time
-
-            if (current.event.answer.webSearchCount > 0) {
-              messages.push(
-                <MessageDecorator
-                  klass={klass}
-                  testId="web-search-assistant"
-                  left={false}
-                  label={`Web Search`}
-                  content={escapeHtml(`Count: ${current.event.answer.webSearchCount}`)}
-                />,
-              )
-            }
-
-            for (const choice of current.event.answer.contentChoices) {
-              if (choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIContentAnswerChoice') {
-                if (choice.content) {
-                  messages.push(
-                    <MessageDecorator
-                      klass={klass}
-                      testId="chat-assistant"
-                      left={false}
-                      label={`Model Response <span class="text-primary-content/50">${(latency / 1000).toFixed(2)}s/${requestEvent?.modelParameters.reasoning_effort}</span>`}
-                      content={escapeHtml(choice.content)}
-                    />,
-                  )
-                }
-              } else if (choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice') {
-                for (const tool of choice.usages) {
-                  messages.push(
-                    <ToolCallDecorator
-                      klass={klass}
-                      testId="tool-use"
-                      tool={{
-                        name: tool.toolName,
-                        params: tool.toolParams.rawJsonObject,
-                        label: 'Tool Request',
-                      }}
-                    />,
-                  )
-                }
+            } else if (choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIToolUseAnswerChoice') {
+              for (const tool of choice.usages) {
+                messages.push(
+                  <ToolCallDecorator
+                    klass={klass}
+                    testId="tool-use"
+                    tool={{
+                      name: tool.toolName,
+                      params: tool.toolParams.rawJsonObject,
+                      label: `${requestEvent?.chat.agentType} Tool Request`,
+                    }}
+                  />,
+                )
               }
             }
           }
@@ -155,7 +137,10 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
               klass={klass}
               testId="tool-result"
               left={true}
-              label="Tool Result"
+              label={<div class="flex gap-2">
+                <div class="font-mono">{current.event.actionToExecute.name}</div>
+                <div>Result</div>
+              </div>}
               content={escapeHtml(current.event.result.text)}
             />,
           )
