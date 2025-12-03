@@ -178,3 +178,83 @@
     "NEW INSTRUCTION": "WHEN chart visuals change THEN run E2E with --update-snapshots after verifying diffs"
 }
 
+[2025-12-03 18:21] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "run tests, submit changes",
+    "BOTTLENECK": "Post-change tests were not executed to verify the new DOM and behavior.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN DOM or selector changes are applied THEN run all related e2e test suites"
+}
+
+[2025-12-03 18:38] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "run tests, manual verify UI",
+    "BOTTLENECK": "Changes were not validated after refactor.",
+    "PROJECT NOTE": "Ensure tabs-lifted visually connects with bg-base-200; adjust borders if needed.",
+    "NEW INSTRUCTION": "WHEN modifying UI layout or moving components THEN run affected E2E tests and fix regressions"
+}
+
+[2025-12-03 18:45] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project, review code",
+    "BOTTLENECK": "Jumped to search-replace without validating current class structure.",
+    "PROJECT NOTE": "Use DaisyUI --tab-border-color and Tailwind text-lg in TaskCard tabs; avoid editing public/app.css.",
+    "NEW INSTRUCTION": "WHEN modifying TaskCard tab appearance THEN inspect taskCard.tsx, then adjust classes and CSS variables only"
+}
+
+[2025-12-03 19:19] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "clarify requirements,add tests,update README,present summary,refactor",
+    "MISSING STEPS": "open file,implement UI changes,wire tab state,run app,verify visually,submit",
+    "BOTTLENECK": "Excessive planning and questions delayed straightforward UI implementation.",
+    "PROJECT NOTE": "Reuse ToggleComponent pattern from MessageDecorator and DaisyUI tabs connected to the card header in TaskCard.",
+    "NEW INSTRUCTION": "WHEN UI change is fully specified THEN edit target component immediately and verify visually"
+}
+
+[2025-12-03 19:27] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "ask_user, update docs",
+    "MISSING STEPS": "open entire file, implement feature, update test dsl, run tests",
+    "BOTTLENECK": "Tests were authored before inspecting the full TaskCard source to align selectors and structure.",
+    "PROJECT NOTE": "Expose stable data-testids for the tabs header and description toggle to match DSL/tests.",
+    "NEW INSTRUCTION": "WHEN starting TaskCard UI change THEN open_entire_file taskCard.tsx and related components"
+}
+
+[2025-12-03 19:33] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "adjust tabs styling, position toggle overlay, manual verify UI",
+    "BOTTLENECK": "Insufficient visual styling details for tab states and toggle placement.",
+    "PROJECT NOTE": "ToggleComponent needs explicit top-right positioning; tabs need per-item borders and contrasting backgrounds beyond tabs-boxed.",
+    "NEW INSTRUCTION": "WHEN tabs render as a single full-width block THEN apply per-tab borders, distinct active/inactive backgrounds, and top-right toggle positioning"
+}
+
+[2025-12-03 19:36] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "adjust tab styling, separate tab containers, overlay toggle icon, verify toggle visibility",
+    "BOTTLENECK": "Visual requirements were not translated into specific per-tab styling and toggle positioning.",
+    "PROJECT NOTE": "Reuse ToggleComponent placement from MessageDecorator (absolute top-right) and use Expand/Collapse icons; render tabs as individual bordered buttons with distinct active/inactive backgrounds.",
+    "NEW INSTRUCTION": "WHEN rendering Trajectories/Events tabs above card THEN style each as separate bordered tabs with active/inactive backgrounds"
+}
+
+[2025-12-03 19:40] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "adjust description toggle, update README, run type checker",
+    "MISSING STEPS": "align tab borders with card, remove active tab bottom border, add tests",
+    "BOTTLENECK": "Tab style choice didn’t enforce active-tab bottom border removal.",
+    "PROJECT NOTE": "DaisyUI tabs-lifted supports attached tabs with no bottom border for active.",
+    "NEW INSTRUCTION": "WHEN tabs must blend into card THEN switch to tabs-lifted; sync tab rounded/border classes with card."
+}
+

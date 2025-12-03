@@ -64,11 +64,11 @@ export class TaskCardDSL {
   }
 
   get trajectoriesTab(): Locator {
-    return this.tabGroup.locator('input[aria-label="Trajectories"]')
+    return this.tabGroup.locator('[aria-label="Trajectories"]')
   }
 
   get eventsTab(): Locator {
-    return this.tabGroup.locator('input[aria-label="Events"]')
+    return this.tabGroup.locator('[aria-label="Events"]')
   }
 
   get downloadButton(): Locator {

@@ -78,3 +78,67 @@
     "NEW INSTRUCTION": "WHEN view-option changes or project selection changes THEN refetch graph with breakdown and rebuild chart datasets"
 }
 
+[2025-12-03 18:36] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "UI layout",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN implementing TaskCard tabs THEN render connected tabs as a top-attached card header, not inside body"
+}
+
+[2025-12-03 18:40] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "UI styling",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN rendering TaskCard tabs THEN increase tab text size and match card rounded gray border"
+}
+
+[2025-12-03 18:42] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI styling",
+    "ERROR": "Tabs small text and mismatched border",
+    "NEW INSTRUCTION": "WHEN rendering TaskCard tabs THEN increase tab text size and apply rounded gray card border"
+}
+
+[2025-12-03 19:20] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "UI layout",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN updating TaskCard UI THEN use DaisyUI top-attached tabs and 200px description with ToggleComponent expand/collapse"
+}
+
+[2025-12-03 19:32] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI styling",
+    "ERROR": "Tabs share full-width container; no distinct active/inactive styles",
+    "NEW INSTRUCTION": "WHEN rendering TaskCard tabs THEN render individually bordered tabs with distinct active/inactive backgrounds"
+}
+
+[2025-12-03 19:33] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI styling",
+    "ERROR": "Tabs merged; expand/collapse icon not visible",
+    "NEW INSTRUCTION": "WHEN rendering TaskCard description THEN position ToggleComponent top-right overlay above content"
+}
+
+[2025-12-03 19:38] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "UI styling",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN rendering TaskCard tabs THEN apply rounded corners and card border; remove bottom border for active tabs"
+}
+
+[2025-12-03 19:39] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI styling",
+    "ERROR": "Tabs lack card-matching borders; active tabs still show bottom border",
+    "NEW INSTRUCTION": "WHEN rendering TaskCard tabs THEN Apply rounded corners and matching card borders; remove bottom border on active tabs"
+}
+

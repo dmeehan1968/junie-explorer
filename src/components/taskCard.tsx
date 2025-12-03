@@ -3,6 +3,9 @@ import { marked } from 'marked'
 import { formatSeconds } from '../utils/timeUtils.js'
 import { SummaryMetrics } from '../schema.js'
 import { Conditional } from './conditional.js'
+import { ToggleComponent } from './toggleComponent.js'
+import { ExpandIcon } from './expandIcon.js'
+import { CollapseIcon } from './collapseIcon.js'
 
 export interface TaskCardProps {
   projectName: string
@@ -113,10 +116,40 @@ export const TaskCard: Component<TaskCardProps> = async ({
   const computedTitle = title ?? issueTitle ?? (Number(taskIndex) === 0 ? 'Initial Request' : `Follow up ${taskIndex}`)
   const created = new Date(task.created)
   const metrics = await task.metrics
+  const basePath = `/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}`
 
   return (
-    <div class="card bg-base-200 shadow-md border border-base-300 hover:shadow-lg transition-all duration-300" data-testid="task-item">
-      <div class="card-body">
+    <>
+      <Conditional condition={showLinks}>
+        <div
+          class="tabs tabs-boxed tabs-lg mb-0 flex gap-2 justify-start"
+          data-testid="task-tab-group"
+        >
+          <button
+            class={`tab text-lg font-bold border border-base-300 border-b-0 rounded-t-xl ${currentTab === 'trajectories'
+              ? 'tab-active bg-base-200 text-primary'
+              : 'bg-base-100 text-base-content/70'
+            }`}
+            aria-label="Trajectories"
+            onclick={`window.location.href = '${basePath}/trajectories'`}
+          >
+            Trajectories
+          </button>
+          <button
+            class={`tab text-lg font-bold border border-base-300 border-b-0 rounded-t-xl ${currentTab === 'events' || !currentTab
+              ? 'tab-active bg-base-200 text-primary'
+              : 'bg-base-100 text-base-content/70'
+            }`}
+            aria-label="Events"
+            onclick={`window.location.href = '${basePath}/events'`}
+          >
+            Events
+          </button>
+        </div>
+      </Conditional>
+
+      <div class="card bg-base-200 shadow-md border border-base-300 rounded-t-none hover:shadow-lg transition-all duration-300" data-testid="task-item">
+        <div class="card-body">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-xl font-bold text-primary">{computedTitle}</h3>
           <Conditional condition={!!actionsHtml}>
@@ -142,38 +175,26 @@ export const TaskCard: Component<TaskCardProps> = async ({
         </Conditional>
         
         <Conditional condition={!!task.context.description}>
-          <div class="prose prose-sm max-w-none mb-4 p-4 bg-base-300 rounded-lg" data-testid="task-description">
-            {marked(task.context.description!)}
+          <div class="relative mb-4">
+            <ToggleComponent
+              expandIcon={<ExpandIcon />}
+              collapseIcon={<CollapseIcon />}
+              testId="task-description-toggle"
+            />
+            <div
+              class="prose prose-sm max-w-none p-4 bg-base-300 rounded-lg content-wrapper max-h-[200px] overflow-auto transition-all duration-300 ease-in-out"
+              data-testid="task-description"
+            >
+              {marked(task.context.description!)}
+            </div>
           </div>
         </Conditional>
         
         <div data-testid="task-details">
           <StepTotalsTable summaryData={metrics} />
         </div>
-        
-        <Conditional condition={showLinks}>
-          <div class="flex flex-wrap gap-2 mt-4">
-            <div class="join flex-1 min-w-0" data-testid="task-tab-group">
-              <input 
-                class="btn btn-sm join-item w-1/2" 
-                name="view" 
-                type="radio" 
-                checked={currentTab === 'trajectories'}
-                aria-label="Trajectories" 
-                onclick={`window.location.href = '/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/trajectories'`}
-              />
-              <input 
-                class="btn btn-sm join-item w-1/2" 
-                name="view" 
-                type="radio" 
-                checked={currentTab === 'events' || !currentTab}
-                aria-label="Events" 
-                onclick={`window.location.href = '/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(String(taskIndex))}/events'`}
-              />
-            </div>
-          </div>
-        </Conditional>
       </div>
     </div>
+    </>
   )
 }
