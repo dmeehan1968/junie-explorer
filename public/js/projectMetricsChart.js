@@ -168,9 +168,7 @@ function handleDisplayOptionChange(radio) {
   localStorage.setItem('junie-explorer-displayOption', displayOption);
 
   // Reload the graph with the new display option
-  if (projectsChart) {
-    loadProjectMetricsChart();
-  }
+  loadProjectMetricsChart();
 }
 
 // Handle group option change (Auto, Hour, Day, Week, Month)
@@ -178,9 +176,7 @@ function handleGroupOptionChange(radio) {
   const allowed = ['auto', 'hour', 'day', 'week', 'month'];
   groupOption = allowed.includes(radio.value) ? radio.value : 'auto';
   localStorage.setItem('junie-explorer-groupOption', groupOption);
-  if (projectsChart) {
-    loadProjectMetricsChart();
-  }
+  loadProjectMetricsChart();
 }
 
 // Handle view option change (Project, Model)
@@ -188,9 +184,7 @@ function handleViewOptionChange(radio) {
   const allowed = ['project', 'model'];
   viewOption = allowed.includes(radio.value) ? radio.value : 'project';
   localStorage.setItem('junie-explorer-viewOption', viewOption);
-  if (projectsChart) {
-    loadProjectMetricsChart();
-  }
+  loadProjectMetricsChart();
 }
 
 // Load and display the graph for selected projects
@@ -317,6 +311,7 @@ function createProjectsChart(graphData) {
         x: {
           type: 'time',
           stacked: true,
+          offset: true,
           time: {
             unit: graphData.timeUnit || 'day',
             stepSize: graphData.stepSize || 1,

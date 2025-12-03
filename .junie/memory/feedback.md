@@ -70,3 +70,11 @@
     "NEW INSTRUCTION": "WHEN view option equals model THEN aggregate by model across selected projects; do not include project in series"
 }
 
+[2025-12-03 13:18] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "charts interaction",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN view-option changes or project selection changes THEN refetch graph with breakdown and rebuild chart datasets"
+}
+

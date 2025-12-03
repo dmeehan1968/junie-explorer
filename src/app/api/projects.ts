@@ -211,7 +211,11 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
   Object.values(issuesByDay).forEach(dayData => Object.keys(dayData).forEach(k => allSeriesKeys.add(k)))
   Object.values(issuesByHour).forEach(hourData => Object.keys(hourData).forEach(k => allSeriesKeys.add(k)))
   
-  const sortedSeriesKeys = Array.from(allSeriesKeys).sort()
+  const sortedSeriesKeys = Array.from(allSeriesKeys).sort((a, b) => {
+    const labelA = seriesLabels[a] || a
+    const labelB = seriesLabels[b] || b
+    return labelA.localeCompare(labelB, undefined, { sensitivity: 'base' })
+  })
 
   // Create datasets for cost
   const costDatasets: Array<{

@@ -6,6 +6,15 @@ export const ProjectMetricsChartOptions: Component = () => {
   return (
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-6" id="project-chart-display">
       <div class="flex gap-2 items-center">
+        <div class="">Series:</div>
+        <div class="join">
+          <input class="join-item btn btn-sm" type="radio" id="view-project" value="project" name="view-option"
+                 aria-label="Project" onchange="handleViewOptionChange(this)" checked/>
+          <input class="join-item btn btn-sm" type="radio" id="view-model" value="model" name="view-option"
+                 aria-label="Model" onchange="handleViewOptionChange(this)"/>
+        </div>
+      </div>
+      <div class="flex gap-2 items-center">
         <div class="">Show:</div>
         <div class="join">
           <input class="join-item btn btn-sm" type="radio" id="display-cost" value="cost" name="display-option"
@@ -27,15 +36,6 @@ export const ProjectMetricsChartOptions: Component = () => {
                  aria-label="Week" onchange="handleGroupOptionChange(this)"/>
           <input class="join-item btn btn-sm" type="radio" id="group-month" value="month" name="group-option"
                  aria-label="Month" onchange="handleGroupOptionChange(this)"/>
-        </div>
-      </div>
-      <div class="flex gap-2 items-center">
-        <div class="">View:</div>
-        <div class="join">
-          <input class="join-item btn btn-sm" type="radio" id="view-project" value="project" name="view-option"
-                 aria-label="Project" onchange="handleViewOptionChange(this)" checked/>
-          <input class="join-item btn btn-sm" type="radio" id="view-model" value="model" name="view-option"
-                 aria-label="Model" onchange="handleViewOptionChange(this)"/>
         </div>
       </div>
     </div>

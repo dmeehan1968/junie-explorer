@@ -103,7 +103,7 @@ This refactor removes the server-side method that previously injected `window.ch
 ### Project Metrics Chart
 
 The Project Metrics Chart on the home page has been enhanced to support:
-- **View Toggling**: Users can switch between viewing metrics aggregated by Project or broken down by Model.
+- **Series Toggling**: Users can switch between viewing metrics aggregated by Project or broken down by Model.
 - **Data Source**: Model breakdown data is derived from `LlmResponseEvent` metrics.
 - **API Support**: The `/api/projects/graph` endpoint accepts a `breakdown=model` parameter to return detailed datasets.
 
