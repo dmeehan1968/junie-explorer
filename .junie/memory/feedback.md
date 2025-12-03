@@ -30,3 +30,11 @@
     "NEW INSTRUCTION": "WHEN preparing event objects for API or JSON viewer THEN delete requestEvent and previousRequest before serializing or rendering"
 }
 
+[2025-12-02 17:34] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "charts metrics",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN preparing chart datasets THEN add cumulative cost and cumulative tokens datasets"
+}
+

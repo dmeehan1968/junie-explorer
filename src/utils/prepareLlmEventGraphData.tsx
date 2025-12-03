@@ -129,6 +129,26 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
     y: event.event.answer.webSearchCount ?? 0,
   }))
 
+  // Cumulative cost data (sum of all individual cost types)
+  let cumulativeCostSum = 0
+  const cumulativeCostBreakdownData = llmEvents.map(event => {
+    const ans = event.event.answer
+    const eventCost = (ans.inputTokenCost ?? 0) + (ans.outputTokenCost ?? 0) +
+      (ans.cacheInputTokenCost ?? 0) + (ans.cacheCreateInputTokenCost ?? 0) + (ans.webSearchCost ?? 0)
+    cumulativeCostSum += eventCost
+    return { x: event.timestamp.toISOString(), y: cumulativeCostSum }
+  })
+
+  // Cumulative tokens data (sum of all token types)
+  let cumulativeTokensSum = 0
+  const cumulativeTokensData = llmEvents.map(event => {
+    const ans = event.event.answer
+    const eventTokens = (ans.inputTokens ?? 0) + (ans.outputTokens ?? 0) +
+      (ans.cacheInputTokens ?? 0) + (ans.cacheCreateInputTokens ?? 0) + (ans.webSearchCount ?? 0)
+    cumulativeTokensSum += eventTokens
+    return { x: event.timestamp.toISOString(), y: cumulativeTokensSum }
+  })
+
   // Legacy datasets (kept for backward compatibility)
   const costData = llmEvents.map(event => ({
     x: event.timestamp.toISOString(),
@@ -199,6 +219,17 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
       yAxisID: 'y',
       group: 'cost',
     },
+    {
+      label: 'Cumulative Cost',
+      data: cumulativeCostBreakdownData,
+      borderColor: 'rgb(50, 50, 50)',
+      backgroundColor: 'rgba(50, 50, 50, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y',
+      group: 'cost',
+      borderDash: [5, 5],
+    },
     // Token count datasets (hidden by default)
     {
       label: 'Input Tokens',
@@ -254,6 +285,18 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
       yAxisID: 'y1',
       group: 'tokens',
       hidden: true,
+    },
+    {
+      label: 'Cumulative Tokens',
+      data: cumulativeTokensData,
+      borderColor: 'rgb(50, 50, 50)',
+      backgroundColor: 'rgba(50, 50, 50, 0.5)',
+      fill: false,
+      tension: 0.1,
+      yAxisID: 'y1',
+      group: 'tokens',
+      hidden: true,
+      borderDash: [5, 5],
     },
     // Legacy datasets (kept for backward compatibility, hidden by default)
     {

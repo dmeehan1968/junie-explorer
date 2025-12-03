@@ -25,7 +25,7 @@ describe("prepareLlmEventGraphData", () => {
     },
   } as any)
 
-  test("should generate correct datasets including cumulative cost", () => {
+  test("should generate correct legacy datasets including cumulative cost", () => {
     const events: EventRecord[] = [
       createEvent("2023-01-01T10:00:00Z", { cost: 0.01 }),
       createEvent("2023-01-01T10:01:00Z", { cost: 0.02 }),
@@ -33,10 +33,10 @@ describe("prepareLlmEventGraphData", () => {
 
     const result = prepareLlmEventGraphData(events)
 
-    const cumulativeCostDataset = result.datasets.find(d => d.label === "Cumulative Cost")
-    expect(cumulativeCostDataset).toBeDefined()
-    expect(cumulativeCostDataset?.hidden).toBe(true)
-    expect(cumulativeCostDataset?.data).toEqual([
+    const legacyCumulativeCostDataset = result.datasets.find(d => d.label === "Cumulative Cost" && d.group === "legacy")
+    expect(legacyCumulativeCostDataset).toBeDefined()
+    expect(legacyCumulativeCostDataset?.hidden).toBe(true)
+    expect(legacyCumulativeCostDataset?.data).toEqual([
       { x: "2023-01-01T10:00:00.000Z", y: 0.01 },
       { x: "2023-01-01T10:01:00.000Z", y: 0.03 }, // 0.01 + 0.02
     ])
@@ -132,5 +132,71 @@ describe("prepareLlmEventGraphData", () => {
     tokenDatasets.forEach(dataset => {
       expect(dataset.hidden).toBe(true)
     })
+  })
+
+  test("should include Cumulative Cost in cost group with correct accumulated values", () => {
+    const events: EventRecord[] = [
+      createEvent("2023-01-01T10:00:00Z", {
+        inputTokenCost: 0.005,
+        outputTokenCost: 0.003,
+        cacheInputTokenCost: 0.001,
+        cacheCreateInputTokenCost: 0.0005,
+        webSearchCost: 0.0015,
+      }),
+      createEvent("2023-01-01T10:01:00Z", {
+        inputTokenCost: 0.010,
+        outputTokenCost: 0.006,
+        cacheInputTokenCost: 0.002,
+        cacheCreateInputTokenCost: 0.001,
+        webSearchCost: 0.003,
+      }),
+    ]
+
+    const result = prepareLlmEventGraphData(events)
+
+    const cumulativeCostDataset = result.datasets.find(d => d.label === "Cumulative Cost" && d.group === "cost")
+    expect(cumulativeCostDataset).toBeDefined()
+    expect(cumulativeCostDataset?.group).toBe("cost")
+    expect(cumulativeCostDataset?.yAxisID).toBe("y")
+    expect(cumulativeCostDataset?.hidden).toBeFalsy()
+    expect(cumulativeCostDataset?.borderDash).toEqual([5, 5])
+
+    // First event: 0.005 + 0.003 + 0.001 + 0.0005 + 0.0015 = 0.011
+    // Second event: 0.011 + 0.010 + 0.006 + 0.002 + 0.001 + 0.003 = 0.033
+    expect(cumulativeCostDataset?.data[0].y).toBeCloseTo(0.011, 6)
+    expect(cumulativeCostDataset?.data[1].y).toBeCloseTo(0.033, 6)
+  })
+
+  test("should include Cumulative Tokens in tokens group with correct accumulated values", () => {
+    const events: EventRecord[] = [
+      createEvent("2023-01-01T10:00:00Z", {
+        inputTokens: 100,
+        outputTokens: 50,
+        cacheInputTokens: 10,
+        cacheCreateInputTokens: 5,
+        webSearchCount: 2,
+      }),
+      createEvent("2023-01-01T10:01:00Z", {
+        inputTokens: 200,
+        outputTokens: 100,
+        cacheInputTokens: 20,
+        cacheCreateInputTokens: 10,
+        webSearchCount: 3,
+      }),
+    ]
+
+    const result = prepareLlmEventGraphData(events)
+
+    const cumulativeTokensDataset = result.datasets.find(d => d.label === "Cumulative Tokens" && d.group === "tokens")
+    expect(cumulativeTokensDataset).toBeDefined()
+    expect(cumulativeTokensDataset?.group).toBe("tokens")
+    expect(cumulativeTokensDataset?.yAxisID).toBe("y1")
+    expect(cumulativeTokensDataset?.hidden).toBe(true)
+    expect(cumulativeTokensDataset?.borderDash).toEqual([5, 5])
+
+    // First event: 100 + 50 + 10 + 5 + 2 = 167
+    // Second event: 167 + 200 + 100 + 20 + 10 + 3 = 500
+    expect(cumulativeTokensDataset?.data[0].y).toBe(167)
+    expect(cumulativeTokensDataset?.data[1].y).toBe(500)
   })
 })
