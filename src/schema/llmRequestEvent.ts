@@ -25,7 +25,7 @@ export const LlmRequestEvent = z.looseObject({
   }).transform(chat => {
     let agentType: AgentType
 
-    if (/^(## ENVIRONMENT|You are a programming expert|$)/.test(chat.system)) {
+    if (/^(## ENVIRONMENT|You are a programming expert|SETTING: Your role is a coding assistant|$)/.test(chat.system)) {
       agentType = AgentType.enum.Agent
     } else if (/^(You are a programming task description summarizer|You are a task ((step|trace) )?summarizer|You are a chat response title creator|^Your task is to summarize)/.test(chat.system)) {
       agentType = AgentType.enum.TaskSummarizer
