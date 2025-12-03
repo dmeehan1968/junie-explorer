@@ -148,3 +148,13 @@
     "NEW INSTRUCTION": "WHEN toggling metric type THEN unhide selected-group datasets except those marked cumulative"
 }
 
+[2025-12-03 12:00] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "verify findings, open file fully, broaden search, cross-check identifiers",
+    "BOTTLENECK": "Claimed usages without confirming any references beyond the schema file.",
+    "PROJECT NOTE": "Search found only the schema file; actual cross-references were not evidenced.",
+    "NEW INSTRUCTION": "WHEN search returns only defining file THEN broaden queries and confirm usages before summarizing"
+}
+

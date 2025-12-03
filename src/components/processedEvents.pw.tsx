@@ -77,7 +77,7 @@ test.describe('ProcessedEvents', () => {
       await messageTrajectories.setEvents(events)
       await expect(messageTrajectories.chatAssistant).toHaveCount(1)
       // label includes time in seconds with two decimals and reasoning effort
-      await expect(messageTrajectories.chatAssistant.locator('h3')).toContainText('1.25s/medium')
+      await expect(messageTrajectories.chatAssistant.locator('h3')).toContainText('1.25s/reasoning medium')
       await expect(messageTrajectories.chatAssistant).toContainText('Answer')
     })
 

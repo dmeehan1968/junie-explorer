@@ -225,7 +225,7 @@ export class MessageTrajectoriesDSL {
   }
 
   get summarizerAssistant() {
-    return this.page.getByTestId('summarizer-assistant').locator('..')
+    return this.page.getByTestId('chat-TaskSummarizer').locator('..')
   }
 
   get webSearchAssistant() {
@@ -233,7 +233,7 @@ export class MessageTrajectoriesDSL {
   }
 
   get chatAssistant() {
-    return this.page.getByTestId('chat-assistant').locator('..')
+    return this.page.getByTestId('chat-Agent').locator('..')
   }
 
   get toolUse() {

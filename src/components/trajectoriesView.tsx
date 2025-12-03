@@ -86,13 +86,23 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
 
           const requestEvent = current.event.requestEvent
 
+          const getLabelMarkupFor = (label: string) => {
+            return (
+              <div class="flex gap-2">{requestEvent?.chat.agentType} {label}
+                <span class="text-primary-content/50">
+                {(current.event.answer.time / 1000).toFixed(2)}s/reasoning {requestEvent?.modelParameters.reasoning_effort ?? 'default'}
+              </span>
+              </div>
+            )
+          }
+
           if (current.event.answer.webSearchCount > 0) {
             messages.push(
               <MessageDecorator
                 klass={klass}
                 testId="web-search-assistant"
                 left={false}
-                label={`Web Search`}
+                label={getLabelMarkupFor('Web Search')}
                 content={escapeHtml(`Count: ${current.event.answer.webSearchCount}`)}
               />,
             )
@@ -104,13 +114,9 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
                 messages.push(
                   <MessageDecorator
                     klass={klass}
-                    testId="chat-assistant"
+                    testId={`chat-${requestEvent?.chat.agentType}`}
                     left={false}
-                    label={<div class="flex gap-2">{requestEvent?.chat.agentType}
-                      <span class="text-primary-content/50">
-                        {(current.event.answer.time / 1000).toFixed(2)}s/${requestEvent?.modelParameters.reasoning_effort}
-                      </span>
-                    </div>}
+                    label={getLabelMarkupFor('')}
                     content={escapeHtml(choice.content)}
                   />,
                 )
@@ -124,7 +130,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
                     tool={{
                       name: tool.toolName,
                       params: tool.toolParams.rawJsonObject,
-                      label: `${requestEvent?.chat.agentType} Tool Request`,
+                      label: getLabelMarkupFor('Tool Request'),
                     }}
                   />,
                 )
