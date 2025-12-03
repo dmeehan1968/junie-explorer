@@ -62,3 +62,11 @@
     "NEW INSTRUCTION": "WHEN cost/token view toggle is clicked THEN keep non-cumulative datasets visible and cumulative hidden"
 }
 
+[2025-12-03 13:05] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "charts metrics",
+    "ERROR": "Toggle mislabeled; selected-project filter ignored; series split by project+model",
+    "NEW INSTRUCTION": "WHEN view option equals model THEN aggregate by model across selected projects; do not include project in series"
+}
+

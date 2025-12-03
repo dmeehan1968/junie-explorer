@@ -11,6 +11,7 @@ export class Issue {
   public error?: any
   private _tasks: Promise<Map<string, Task>> | undefined = undefined
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
+  private _metricsByJbai: Promise<Record<string, SummaryMetrics>> | undefined = undefined
 
   constructor(public readonly logPath: string) {
     this.init()
@@ -32,6 +33,7 @@ export class Issue {
   reload() {
     this._tasks = undefined
     this._metrics = undefined
+    this._metricsByJbai = undefined
     this.init()
   }
 
@@ -70,6 +72,23 @@ export class Issue {
     })
 
     return this._metrics
+  }
+
+  get metricsByJbai(): Promise<Record<string, SummaryMetrics>> {
+    this._metricsByJbai ??= new Promise(async (resolve) => {
+      const metricsByJbai: Record<string, SummaryMetrics> = {}
+      for (const [_, task] of await this.tasks) {
+        const taskMetricsByJbai = await task.metricsByJbai
+        for (const [jbai, metrics] of Object.entries(taskMetricsByJbai)) {
+          if (!metricsByJbai[jbai]) {
+            metricsByJbai[jbai] = initialisedSummaryMetrics()
+          }
+          addSummaryMetrics(metricsByJbai[jbai], metrics)
+        }
+      }
+      resolve(metricsByJbai)
+    })
+    return this._metricsByJbai
   }
 
   async getTaskById(id: string) {

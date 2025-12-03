@@ -29,6 +29,15 @@ export const ProjectMetricsChartOptions: Component = () => {
                  aria-label="Month" onchange="handleGroupOptionChange(this)"/>
         </div>
       </div>
+      <div class="flex gap-2 items-center">
+        <div class="">View:</div>
+        <div class="join">
+          <input class="join-item btn btn-sm" type="radio" id="view-project" value="project" name="view-option"
+                 aria-label="Project" onchange="handleViewOptionChange(this)" checked/>
+          <input class="join-item btn btn-sm" type="radio" id="view-model" value="model" name="view-option"
+                 aria-label="Model" onchange="handleViewOptionChange(this)"/>
+        </div>
+      </div>
     </div>
   )
 }

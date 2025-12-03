@@ -158,3 +158,13 @@
     "NEW INSTRUCTION": "WHEN search returns only defining file THEN broaden queries and confirm usages before summarizing"
 }
 
+[2025-12-03 13:02] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "apply code changes,add tests,update documentation,run build",
+    "MISSING STEPS": "confirm requirements,design data contract,design toggle UX,plan filtering by selection,consider performance,cite file touchpoints",
+    "BOTTLENECK": "Misread an explanatory request as an implementation task.",
+    "PROJECT NOTE": "Graph data comes from /api/projects/graph; jbai in LlmResponseEvent.answer.llm.jbai.",
+    "NEW INSTRUCTION": "WHEN request is to explain or design, not implement THEN propose high-level plan, API shape, and UI changes only"
+}
+

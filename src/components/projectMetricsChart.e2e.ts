@@ -31,6 +31,11 @@ test.describe('ProjectMetricsChart', () => {
       await projectMetricsChart.radioButton('Auto').isChecked()
     })
 
+    test('should have View by Model option', async ({ projectMetricsChart }) => {
+      await projectMetricsChart.radioButton('Model').check()
+      await expect(projectMetricsChart.radioButton('Model')).toBeChecked()
+    })
+
     for (const displayBy of ['Cost', 'Tokens']) {
       test.describe.parallel(`Display By ${displayBy}`, async () => {
         for (const groupBy of ['Auto', 'Hour', 'Day', 'Week', 'Month']) {

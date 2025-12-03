@@ -100,6 +100,13 @@ The front-end script `public/js/issueCostChart.js` reads the project id from the
 
 This refactor removes the server-side method that previously injected `window.chartData` on the project page.
 
+### Project Metrics Chart
+
+The Project Metrics Chart on the home page has been enhanced to support:
+- **View Toggling**: Users can switch between viewing metrics aggregated by Project or broken down by Model.
+- **Data Source**: Model breakdown data is derived from `LlmResponseEvent` metrics.
+- **API Support**: The `/api/projects/graph` endpoint accepts a `breakdown=model` parameter to return detailed datasets.
+
 ### Worker Bundling
 
 For the application to work correctly as a single-file executable, web workers must be bundled and embedded into the application.

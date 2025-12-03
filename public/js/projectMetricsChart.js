@@ -3,6 +3,7 @@ let selectedProjects = {};
 let projectsChart = null;
 let displayOption = 'cost'; // Default display option (cost, tokens)
 let groupOption = 'auto'; // Grouping option for x-axis (auto, hour, day, week, month)
+let viewOption = 'project'; // View option (project, model)
 
 // Helper to get cookie
 function getCookie(name) {
@@ -51,6 +52,21 @@ function initializeProjectSelection() {
     groupOption = allowed.includes(storedGroupOption) ? storedGroupOption : 'auto';
     const groupRadio = document.querySelector(`input[name="group-option"][value="${groupOption}"]`);
     if (groupRadio) groupRadio.checked = true;
+  }
+
+  // Initialize view option from local storage or default to 'project'
+  const storedViewOption = localStorage.getItem('junie-explorer-viewOption');
+  if (storedViewOption) {
+    // Map legacy 'jbai' to 'model'
+    if (storedViewOption === 'jbai') {
+      viewOption = 'model';
+      localStorage.setItem('junie-explorer-viewOption', 'model');
+    } else {
+      const allowed = ['project', 'model'];
+      viewOption = allowed.includes(storedViewOption) ? storedViewOption : 'project';
+    }
+    const viewRadio = document.querySelector(`input[name="view-option"][value="${viewOption}"]`);
+    if (viewRadio) viewRadio.checked = true;
   }
 
   // Set initial state of graph container if present
@@ -167,6 +183,16 @@ function handleGroupOptionChange(radio) {
   }
 }
 
+// Handle view option change (Project, Model)
+function handleViewOptionChange(radio) {
+  const allowed = ['project', 'model'];
+  viewOption = allowed.includes(radio.value) ? radio.value : 'project';
+  localStorage.setItem('junie-explorer-viewOption', viewOption);
+  if (projectsChart) {
+    loadProjectMetricsChart();
+  }
+}
+
 // Load and display the graph for selected projects
 async function loadProjectMetricsChart() {
   const graphContainer = document.getElementById('project-metrics-chart');
@@ -202,7 +228,8 @@ async function loadProjectMetricsChart() {
 
   try {
     // Fetch graph data for selected projects
-    const response = await fetch('/api/projects/graph?names=' + selectedProjectNames.join(',') + '&group=' + encodeURIComponent(groupOption));
+    const breakdownParam = viewOption === 'model' ? '&breakdown=model' : '';
+    const response = await fetch('/api/projects/graph?names=' + selectedProjectNames.join(',') + '&group=' + encodeURIComponent(groupOption) + breakdownParam);
     const graphData = await response.json();
 
     // Create or update the chart

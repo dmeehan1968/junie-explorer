@@ -1,11 +1,12 @@
 import express from "express"
+import { SummaryMetrics } from "../../schema"
 import { Project } from "../../Project"
 import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
 
 // Function to prepare data for the projects graph
-async function prepareProjectsGraphData(projects: Project[], requestedGroup?: string): Promise<{
+async function prepareProjectsGraphData(projects: Project[], requestedGroup?: string, breakdownByModel: boolean = false): Promise<{
   datasets: Array<{
     label: string;
     data: Array<{ x: string; y: number }>;
@@ -20,16 +21,35 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
   stepSize: number;
   projectNames: string[];
 }> {
-  // Group issues by day and project, and also by hour for finer grouping when requested
+  // Group issues by day and key (project or model), and also by hour for finer grouping when requested
   const issuesByDay: Record<string, Record<string, { cost: number; tokens: number }>> = {}
   const issuesByHour: Record<string, Record<string, { cost: number; tokens: number }>> = {}
-  const projectColors: Record<string, string> = {}
+  const seriesColors: Record<string, string> = {}
+  const seriesLabels: Record<string, string> = {}
 
-  // Generate a color for each project
-  projects.forEach((project, index) => {
-    const hue = (index * 137) % 360 // Use golden ratio to spread colors
-    projectColors[project.name] = `hsl(${hue}, 70%, 60%)`
-  })
+  // Helper to update buckets
+  const updateBuckets = (key: string, day: string, hourKey: string, metrics: SummaryMetrics) => {
+    // Init day bucket
+    if (!issuesByDay[day]) {
+      issuesByDay[day] = {}
+    }
+    if (!issuesByDay[day][key]) {
+      issuesByDay[day][key] = { cost: 0, tokens: 0 }
+    }
+    // Init hour bucket
+    if (!issuesByHour[hourKey]) {
+      issuesByHour[hourKey] = {}
+    }
+    if (!issuesByHour[hourKey][key]) {
+      issuesByHour[hourKey][key] = { cost: 0, tokens: 0 }
+    }
+    // Aggregate into day
+    issuesByDay[day][key].cost += metrics.cost
+    issuesByDay[day][key].tokens += metrics.inputTokens + metrics.outputTokens
+    // Aggregate into hour
+    issuesByHour[hourKey][key].cost += metrics.cost
+    issuesByHour[hourKey][key].tokens += metrics.inputTokens + metrics.outputTokens
+  }
 
   // Find min and max dates across all projects
   let minDate = new Date()
@@ -37,6 +57,11 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
 
   // Process each project's issues
   for (const project of projects) {
+    // Generate base color for project
+    const projectIndex = projects.indexOf(project)
+    const hue = (projectIndex * 137) % 360
+    const projectBaseColor = `hsl(${hue}, 70%, 60%)`
+
     for (const [, issue] of await project.issues) {
       const date = new Date(issue.created)
       const day = date.toISOString().split('T')[0] // YYYY-MM-DD format
@@ -45,29 +70,32 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
       if (date < minDate) minDate = date
       if (date > maxDate) maxDate = date
 
-      // Init day bucket
-      if (!issuesByDay[day]) {
-        issuesByDay[day] = {}
+      if (breakdownByModel) {
+        const metricsByJbai = await issue.metricsByJbai
+        for (const [jbai, metrics] of Object.entries(metricsByJbai)) {
+          // Use model name as key
+          const key = jbai
+          if (!seriesLabels[key]) {
+            seriesLabels[key] = jbai
+            // Generate a consistent color for this Model
+            let hash = 0;
+            for (let i = 0; i < key.length; i++) {
+              hash = key.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const keyHue = Math.abs(hash % 360);
+            seriesColors[key] = `hsl(${keyHue}, 70%, 60%)`
+          }
+          updateBuckets(key, day, hourKey, metrics)
+        }
+      } else {
+        const metrics = await issue.metrics
+        const key = project.name
+        if (!seriesLabels[key]) {
+            seriesLabels[key] = project.name
+            seriesColors[key] = projectBaseColor
+        }
+        updateBuckets(key, day, hourKey, metrics)
       }
-      if (!issuesByDay[day][project.name]) {
-        issuesByDay[day][project.name] = { cost: 0, tokens: 0 }
-      }
-
-      // Init hour bucket
-      if (!issuesByHour[hourKey]) {
-        issuesByHour[hourKey] = {}
-      }
-      if (!issuesByHour[hourKey][project.name]) {
-        issuesByHour[hourKey][project.name] = { cost: 0, tokens: 0 }
-      }
-
-      const metrics = await issue.metrics
-      // Aggregate into day
-      issuesByDay[day][project.name].cost += metrics.cost
-      issuesByDay[day][project.name].tokens += metrics.inputTokens + metrics.outputTokens
-      // Aggregate into hour
-      issuesByHour[hourKey][project.name].cost += metrics.cost
-      issuesByHour[hourKey][project.name].tokens += metrics.inputTokens + metrics.outputTokens
     }
   }
 
@@ -142,7 +170,7 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
   function groupDataByTimeUnit(
     byDay: Record<string, Record<string, { cost: number; tokens: number }>>,
     byHour: Record<string, Record<string, { cost: number; tokens: number }>>,
-    projectName: string,
+    key: string,
     timeUnit: string,
     metricType: 'cost' | 'tokens',
   ): Array<{ x: string; y: number }> {
@@ -152,7 +180,7 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
       Object.keys(byHour)
         .sort()
         .forEach(hourKey => {
-          const value = byHour[hourKey][projectName]?.[metricType] || 0
+          const value = byHour[hourKey][key]?.[metricType] || 0
           if (value > 0) {
             groupedData[hourKey] = (groupedData[hourKey] || 0) + value
           }
@@ -161,7 +189,7 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
       Object.keys(byDay)
         .sort() // Sort days in chronological order
         .forEach(day => {
-          const value = byDay[day][projectName]?.[metricType] || 0
+          const value = byDay[day][key]?.[metricType] || 0
           if (value > 0) {
             const timeUnitKey = formatDateByTimeUnit(day, timeUnit)
             groupedData[timeUnitKey] = (groupedData[timeUnitKey] || 0) + value
@@ -178,6 +206,13 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
       }))
   }
 
+  // Collect all unique series keys
+  const allSeriesKeys = new Set<string>()
+  Object.values(issuesByDay).forEach(dayData => Object.keys(dayData).forEach(k => allSeriesKeys.add(k)))
+  Object.values(issuesByHour).forEach(hourData => Object.keys(hourData).forEach(k => allSeriesKeys.add(k)))
+  
+  const sortedSeriesKeys = Array.from(allSeriesKeys).sort()
+
   // Create datasets for cost
   const costDatasets: Array<{
     label: string;
@@ -187,14 +222,14 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
     fill: boolean;
     tension: number;
     yAxisID: string;
-  }> = projects.map(project => {
-    const data = groupDataByTimeUnit(issuesByDay, issuesByHour, project.name, timeUnit, 'cost')
+  }> = sortedSeriesKeys.map(key => {
+    const data = groupDataByTimeUnit(issuesByDay, issuesByHour, key, timeUnit, 'cost')
 
     return {
-      label: `${project.name} (Cost)`,
+      label: `${seriesLabels[key]} (Cost)`,
       data: data,
-      borderColor: projectColors[project.name],
-      backgroundColor: projectColors[project.name],
+      borderColor: seriesColors[key],
+      backgroundColor: seriesColors[key],
       fill: false,
       tension: 0.1,
       yAxisID: 'y',
@@ -211,14 +246,14 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
     fill: boolean;
     tension: number;
     yAxisID: string;
-  }> = projects.map(project => {
-    const data = groupDataByTimeUnit(issuesByDay, issuesByHour, project.name, timeUnit, 'tokens')
+  }> = sortedSeriesKeys.map(key => {
+    const data = groupDataByTimeUnit(issuesByDay, issuesByHour, key, timeUnit, 'tokens')
 
     return {
-      label: `${project.name} (Tokens)`,
+      label: `${seriesLabels[key]} (Tokens)`,
       data: data,
-      borderColor: projectColors[project.name],
-      backgroundColor: projectColors[project.name],
+      borderColor: seriesColors[key],
+      backgroundColor: seriesColors[key],
       borderDash: [5, 5],
       fill: false,
       tension: 0.1,
@@ -256,9 +291,10 @@ router.get('/api/projects', async (req: AppRequest, res: AppResponse) => {
 // API endpoint to get graph data for selected projects
 router.get('/api/projects/graph', async (req: AppRequest, res: AppResponse) => {
   try {
-    const { names, group } = req.query
+    const { names, group, breakdown } = req.query
     const projectNames: string[] = names ? (names as string).split(',') : []
     const requestedGroup: string | undefined = typeof group === 'string' ? group : undefined
+    const breakdownByModel: boolean = breakdown === 'model'
     const allProjects: Project[] = Array.from((await req.jetBrains?.projects ?? []).values())
 
     // Filter projects by name if names are provided
@@ -281,7 +317,7 @@ router.get('/api/projects/graph', async (req: AppRequest, res: AppResponse) => {
       timeUnit: string;
       stepSize: number;
       projectNames: string[];
-    } = await prepareProjectsGraphData(projects, requestedGroup)
+    } = await prepareProjectsGraphData(projects, requestedGroup, breakdownByModel)
 
     res.json(graphData)
   } catch (error) {

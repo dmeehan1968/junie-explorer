@@ -37,6 +37,7 @@ export class Task {
   public assistantProviders: Set<{ provider: string; name?: string; jbai?: string }> = new Set()
   readonly _steps: Map<number, Step> = new Map()
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
+  private _metricsByJbai: Promise<Record<string, SummaryMetrics>> | undefined = undefined
   private _previousTasksInfo?: PreviousTasksInfo | null
   private _finalAgentState?: AgentState | null
   private _sessionHistory?: SessionHistory | null
@@ -116,6 +117,7 @@ export class Task {
 
   reload() {
     this._metrics = undefined
+    this._metricsByJbai = undefined
     this._previousTasksInfo = undefined
     this._finalAgentState = undefined
     this._sessionHistory = undefined
@@ -165,6 +167,50 @@ export class Task {
     })
 
     return this._metrics
+  }
+
+  get metricsByJbai(): Promise<Record<string, SummaryMetrics>> {
+    this._metricsByJbai ??= new Promise(async (resolve) => {
+
+      const metricsByJbai: Record<string, SummaryMetrics> = {}
+
+      // metrics needs to load events, but not retain them
+      // but if metrics are already loaded (retained), then just use them
+      // avoid using the events getter so we can discard them
+
+      const events = this._events ? await this._events : await this.loadEvents()
+
+      for (const event of events) {
+        if (event.event.type === 'LlmResponseEvent') {
+          const jbai = event.event.answer.llm.jbai ?? 'Unknown'
+          if (!metricsByJbai[jbai]) {
+            metricsByJbai[jbai] = initialisedSummaryMetrics()
+          }
+          addSummaryMetrics(metricsByJbai[jbai], {
+            cost: event.event.answer.cost,
+            inputTokens: event.event.answer.inputTokens,
+            inputTokenCost: event.event.answer.inputTokenCost,
+            outputTokens: event.event.answer.outputTokens,
+            outputTokenCost: event.event.answer.outputTokenCost,
+            cacheTokens: event.event.answer.cacheCreateInputTokens,
+            cacheTokenCost: event.event.answer.cacheCreateInputTokenCost,
+            webSearchCount: event.event.answer.webSearchCount,
+            webSearchCost: event.event.answer.webSearchCost,
+            time: event.event.answer.time,
+            metricCount: event.event.answer.metricCount,
+          })
+        }
+      }
+
+      if (!this._events) {
+        events.splice(0)
+      }
+
+      return resolve(metricsByJbai)
+
+    })
+
+    return this._metricsByJbai
   }
 
   get steps() {
