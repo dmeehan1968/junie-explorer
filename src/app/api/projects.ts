@@ -231,7 +231,7 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
     const data = groupDataByTimeUnit(issuesByDay, issuesByHour, key, timeUnit, 'cost')
 
     return {
-      label: `${seriesLabels[key]} (Cost)`,
+      label: seriesLabels[key],
       data: data,
       borderColor: seriesColors[key],
       backgroundColor: seriesColors[key],
@@ -255,7 +255,7 @@ async function prepareProjectsGraphData(projects: Project[], requestedGroup?: st
     const data = groupDataByTimeUnit(issuesByDay, issuesByHour, key, timeUnit, 'tokens')
 
     return {
-      label: `${seriesLabels[key]} (Tokens)`,
+      label: seriesLabels[key],
       data: data,
       borderColor: seriesColors[key],
       backgroundColor: seriesColors[key],
