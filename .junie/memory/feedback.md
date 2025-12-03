@@ -38,3 +38,11 @@
     "NEW INSTRUCTION": "WHEN preparing chart datasets THEN add cumulative cost and cumulative tokens datasets"
 }
 
+[2025-12-03 09:08] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "charts metrics",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN calculating cumulative tokens dataset THEN sum inputTokens, outputTokens, cacheCreateInputTokens only"
+}
+

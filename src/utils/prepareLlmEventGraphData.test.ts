@@ -167,7 +167,7 @@ describe("prepareLlmEventGraphData", () => {
     expect(cumulativeCostDataset?.data[1].y).toBeCloseTo(0.033, 6)
   })
 
-  test("should include Cumulative Tokens in tokens group with correct accumulated values", () => {
+  test("should include Cumulative Tokens in tokens group with correct accumulated values (excluding cacheInputTokens)", () => {
     const events: EventRecord[] = [
       createEvent("2023-01-01T10:00:00Z", {
         inputTokens: 100,
@@ -194,9 +194,10 @@ describe("prepareLlmEventGraphData", () => {
     expect(cumulativeTokensDataset?.hidden).toBe(true)
     expect(cumulativeTokensDataset?.borderDash).toEqual([5, 5])
 
-    // First event: 100 + 50 + 10 + 5 + 2 = 167
-    // Second event: 167 + 200 + 100 + 20 + 10 + 3 = 500
-    expect(cumulativeTokensDataset?.data[0].y).toBe(167)
-    expect(cumulativeTokensDataset?.data[1].y).toBe(500)
+    // Cumulative tokens excludes cacheInputTokens but includes cacheCreateInputTokens
+    // First event: 100 + 50 + 5 + 2 = 157 (excludes cacheInputTokens: 10)
+    // Second event: 157 + 200 + 100 + 10 + 3 = 470 (excludes cacheInputTokens: 20)
+    expect(cumulativeTokensDataset?.data[0].y).toBe(157)
+    expect(cumulativeTokensDataset?.data[1].y).toBe(470)
   })
 })

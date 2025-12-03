@@ -108,3 +108,13 @@
     "NEW INSTRUCTION": "WHEN adding a cost/tokens toggle THEN implement UI, update datasets and chart logic, then run the test suite"
 }
 
+[2025-12-03 09:10] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project,locate aggregation logic,update data prep,run tests,manually verify chart",
+    "BOTTLENECK": "Aggregation logic for cumulative tokens was not targeted or adjusted.",
+    "PROJECT NOTE": "prepareLlmEventGraphData likely computes cumulative series; exclude cacheInputTokens there while keeping cacheCreateInputTokens.",
+    "NEW INSTRUCTION": "WHEN cumulative token aggregation includes cacheInputTokens THEN modify prepareLlmEventGraphData to omit it"
+}
+

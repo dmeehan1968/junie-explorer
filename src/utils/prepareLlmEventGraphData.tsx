@@ -139,12 +139,12 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
     return { x: event.timestamp.toISOString(), y: cumulativeCostSum }
   })
 
-  // Cumulative tokens data (sum of all token types)
+  // Cumulative tokens data (sum of token types, excluding cacheInputTokens)
   let cumulativeTokensSum = 0
   const cumulativeTokensData = llmEvents.map(event => {
     const ans = event.event.answer
     const eventTokens = (ans.inputTokens ?? 0) + (ans.outputTokens ?? 0) +
-      (ans.cacheInputTokens ?? 0) + (ans.cacheCreateInputTokens ?? 0) + (ans.webSearchCount ?? 0)
+      (ans.cacheCreateInputTokens ?? 0) + (ans.webSearchCount ?? 0)
     cumulativeTokensSum += eventTokens
     return { x: event.timestamp.toISOString(), y: cumulativeTokensSum }
   })
