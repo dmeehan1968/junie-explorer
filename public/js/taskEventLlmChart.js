@@ -28,11 +28,17 @@ function updateDatasetVisibility() {
   if (!llmChart || !originalChartData) return;
 
   llmChart.data.datasets.forEach((dataset, index) => {
-    const group = originalChartData.datasets[index]?.group;
+    const originalDataset = originalChartData.datasets[index];
+    const group = originalDataset?.group;
+    // Cumulative series are identified by having borderDash property (dashed lines)
+    const isCumulativeSeries = Array.isArray(originalDataset?.borderDash) && originalDataset.borderDash.length > 0;
+    
     if (group === 'cost') {
-      dataset.hidden = selectedMetricType !== 'cost';
+      // If cumulative series, keep it hidden; otherwise show/hide based on selected metric type
+      dataset.hidden = isCumulativeSeries || selectedMetricType !== 'cost';
     } else if (group === 'tokens') {
-      dataset.hidden = selectedMetricType !== 'tokens';
+      // If cumulative series, keep it hidden; otherwise show/hide based on selected metric type
+      dataset.hidden = isCumulativeSeries || selectedMetricType !== 'tokens';
     } else if (group === 'legacy') {
       dataset.hidden = true; // Always hide legacy datasets
     }
@@ -298,9 +304,10 @@ document.addEventListener('DOMContentLoaded', function() {
         providerFiltersContainer.innerHTML = '';
         const providers = originalChartData.providers;
 
-        // Initialize selection to 'all'
-        selectedProvider = 'all';
-        selectedProvidersSet = new Set(providers);
+        // Initialize selection to first 'Agent*' provider, or 'all' if none found
+        const agentProvider = providers.find(p => p.startsWith('Agent'));
+        selectedProvider = agentProvider || 'all';
+        selectedProvidersSet = agentProvider ? new Set([agentProvider]) : new Set(providers);
 
         const buttons = [];
 

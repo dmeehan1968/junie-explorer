@@ -46,3 +46,19 @@
     "NEW INSTRUCTION": "WHEN calculating cumulative tokens dataset THEN sum inputTokens, outputTokens, cacheCreateInputTokens only"
 }
 
+[2025-12-03 11:34] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "charts metrics",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN cost/token view toggle is clicked THEN preserve dataset hidden states; do not auto-enable Cumulative Cost dataset"
+}
+
+[2025-12-03 11:36] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "charts metrics",
+    "ERROR": "Toggle hides all series",
+    "NEW INSTRUCTION": "WHEN cost/token view toggle is clicked THEN keep non-cumulative datasets visible and cumulative hidden"
+}
+

@@ -229,6 +229,7 @@ export function prepareLlmEventGraphData(events: EventRecord[]): {
       yAxisID: 'y',
       group: 'cost',
       borderDash: [5, 5],
+      hidden: true,
     },
     // Token count datasets (hidden by default)
     {

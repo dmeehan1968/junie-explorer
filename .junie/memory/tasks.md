@@ -118,3 +118,33 @@
     "NEW INSTRUCTION": "WHEN cumulative token aggregation includes cacheInputTokens THEN modify prepareLlmEventGraphData to omit it"
 }
 
+[2025-12-03 11:22] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "summary and confirmation",
+    "MISSING STEPS": "add tests",
+    "BOTTLENECK": "Client-side provider default selection lacks automated tests.",
+    "PROJECT NOTE": "Cumulative Tokens was already hidden; only Cumulative Cost needed hiding.",
+    "NEW INSTRUCTION": "WHEN modifying provider default selection THEN add a test for Agent-first and all fallback"
+}
+
+[2025-12-03 11:34] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project, update chart logic, run app, verify behavior",
+    "BOTTLENECK": "Metric toggle logic overwrote series default hidden state.",
+    "PROJECT NOTE": "updateDatasetVisibility should respect originalChartData.datasets[i].hidden so cumulative cost stays hidden.",
+    "NEW INSTRUCTION": "WHEN metric toggle updates dataset visibility THEN Preserve each dataset's initial hidden state unless user toggles legend."
+}
+
+[2025-12-03 11:37] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project, update toggle logic, add tests, run app",
+    "BOTTLENECK": "Treated all originally hidden datasets as permanently hidden, including non-cumulative tokens.",
+    "PROJECT NOTE": "Token datasets are hidden by default in prepareLlmEventGraphData.tsx; mark cumulative explicitly and override hidden on toggle.",
+    "NEW INSTRUCTION": "WHEN toggling metric type THEN unhide selected-group datasets except those marked cumulative"
+}
+

@@ -68,3 +68,23 @@
     "NEW INSTRUCTION": "WHEN launching server to query APIs THEN wait for ready log or retry until 200"
 }
 
+[2025-12-03 11:20] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Test expected hidden true but got undefined",
+    "ROOT CAUSE": "Cumulative Cost dataset lacks a hidden property in prepareLlmEventGraphData.tsx.",
+    "PROJECT NOTE": "Add `hidden: true` to the 'Cumulative Cost' dataset in src/utils/prepareLlmEventGraphData.tsx alongside its other properties.",
+    "NEW INSTRUCTION": "WHEN changing default series visibility THEN set the hidden flag in dataset definitions"
+}
+
+[2025-12-03 11:36] - Updated by Junie - Error analysis
+{
+    "TYPE": "logic bug",
+    "TOOL": "-",
+    "ERROR": "Toggle preserves hidden flags, hiding all token series",
+    "ROOT CAUSE": "updateDatasetVisibility keeps original hidden state for tokens, which are default hidden, instead of only keeping cumulative hidden.",
+    "PROJECT NOTE": "In src/utils/prepareLlmEventGraphData.tsx, remove hidden: true from non-cumulative token datasets; in public/js/taskEventLlmChart.js, only persist hidden for cumulative datasets when toggling.",
+    "NEW INSTRUCTION": "WHEN toggling metric type THEN show selected-group datasets and keep only cumulative hidden"
+}
+

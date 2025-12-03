@@ -158,7 +158,7 @@ describe("prepareLlmEventGraphData", () => {
     expect(cumulativeCostDataset).toBeDefined()
     expect(cumulativeCostDataset?.group).toBe("cost")
     expect(cumulativeCostDataset?.yAxisID).toBe("y")
-    expect(cumulativeCostDataset?.hidden).toBeFalsy()
+    expect(cumulativeCostDataset?.hidden).toBe(true)
     expect(cumulativeCostDataset?.borderDash).toEqual([5, 5])
 
     // First event: 0.005 + 0.003 + 0.001 + 0.0005 + 0.0015 = 0.011
