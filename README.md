@@ -341,17 +341,17 @@ The files are organized in the following hierarchical structure:
 
 ```
 JetBrains/
-├── <IDE Name>/ (e.g., WebStorm, IntelliJIdea)
-│   └── projects/
-│       └── <Project Name>/
-│           └── matterhorn/
-│               └── .matterhorn/
-│                   ├── issues/
-│                   │   ├── chain-<issueId>.json (issue metadata)
-│                   │   └── chain-<issueId>/
-│                   │       └── task-<index>.json (task metadata)
-│                   └── <taskArtifactPath>/
-│                       └── step_<number>.<type> (step data files)
+└── <IDE Name>/
+    └── projects/
+        └── <Project Name>/
+            └── matterhorn/
+                └── .matterhorn/
+                    ├── events/
+                    │   └── <issueId> <taskId>-events.jsonl
+                    └── issues/
+                        ├── chain-<issueId>.json
+                        └── chain-<issueId>/
+                            └── task-<index>.json
 ```
 
 When loading the application state, the system:

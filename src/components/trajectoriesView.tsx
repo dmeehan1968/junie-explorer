@@ -143,10 +143,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
               klass={klass}
               testId="tool-result"
               left={true}
-              label={<div class="flex gap-2">
-                <div class="font-mono">{current.event.actionToExecute.name}</div>
-                <div>Result</div>
-              </div>}
+              label={<div class="font-mono">{current.event.actionToExecute.name} Result</div>}
               content={escapeHtml(current.event.result.text)}
             />,
           )
