@@ -268,3 +268,33 @@
     "NEW INSTRUCTION": "WHEN changing loadEvents output used by worker THEN update worker to forward errors first"
 }
 
+[2025-12-05 16:13] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "search project",
+    "BOTTLENECK": "Internal `.parse()` calls inside `.transform()` cause exceptions during safe parsing.",
+    "PROJECT NOTE": "LLM.ts also calls discriminatedUnion(...).parse inside a transform; prefer pipe or safeParse with ctx.addIssue.",
+    "NEW INSTRUCTION": "WHEN investigating safeParse throwing in schema parsing THEN search project for '.transform' containing '.parse' and inspect offending schemas"
+}
+
+[2025-12-05 16:19] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project, refactor LLM.ts, add tests, run tests, update loadEvents, run build",
+    "BOTTLENECK": "Only partially refactored schemas; other parse-in-transform sites left unchanged.",
+    "PROJECT NOTE": "LLM.ts still calls discriminatedUnion(...).parse inside a transform; refactor to pipe or safeParse with ctx.addIssue.",
+    "NEW INSTRUCTION": "WHEN a Zod transform calls .parse internally THEN use safeParse and propagate issues via ctx.addIssue"
+}
+
+[2025-12-05 16:34] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Hidden .parse calls inside transforms bypassed safeParse and caused uncaught errors.",
+    "PROJECT NOTE": "Prefer propagating errors via ctx.addIssue in all schema transforms; .pipe can simplify composition later.",
+    "NEW INSTRUCTION": "WHEN a transform contains schema.parse calls THEN replace with safeParse and add issues via ctx"
+}
+

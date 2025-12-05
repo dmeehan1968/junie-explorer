@@ -25,39 +25,17 @@ export async function loadEvents(eventsFile: string): Promise<LoadEventsOutput> 
           })
           return undefined
         }
-        try {
-          // For some reason safeParse throws if errors occur deep in the schema, so we catch and rethrow as a generic error
-          const { success, data, error } = EventRecord.safeParse(json)
-          if (success) {
-            return data
-          }
-          errors.push({
-            eventsFile,
-            lineNumber,
-            message: error.issues[0]?.message ?? 'Event parse error',
-            path: (error.issues[0]?.path ?? []).filter(p => typeof p === 'string' || typeof p === 'number') as (string | number)[],
-            json,
-          })
-        } catch (error: any) {
-          if (error instanceof ZodError) {
-            errors.push({
-              eventsFile,
-              lineNumber,
-              message: error.issues[0]?.message ?? 'Event parse error',
-              path: (error.issues[0]?.path ?? []).filter(p => typeof p === 'string' || typeof p === 'number') as (string | number)[],
-              json,
-            })
-          } else {
-            errors.push({
-              eventsFile,
-              lineNumber,
-              message: error instanceof Error ? error.message : String(error),
-              path: ['unknown'],
-              json: line
-            })
-          }
-
+        const { success, data, error } = EventRecord.safeParse(json)
+        if (success) {
+          return data
         }
+        errors.push({
+          eventsFile,
+          lineNumber,
+          message: error.issues[0]?.message ?? 'Event parse error',
+          path: (error.issues[0]?.path ?? []).filter(p => typeof p === 'string' || typeof p === 'number') as (string | number)[],
+          json,
+        })
         return undefined
       })
       .filter((event): event is EventRecord => !!event)

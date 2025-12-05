@@ -14,10 +14,27 @@ import { OpenAI4oMini } from "./openAI4oMini"
 import { OpenAI51 } from "./openAI51"
 import { OpenAIo3 } from "./openAIo3"
 
-export const LLMTransformer = z.any().transform(data => {
+function safeParseOrAddIssues<T extends z.ZodTypeAny>(
+  schema: T,
+  data: unknown,
+  ctx: z.RefinementCtx
+): z.infer<T> | typeof z.NEVER {
+  const result = schema.safeParse(data)
+  if (!result.success) {
+    result.error.issues.forEach(issue => ctx.addIssue({
+      code: 'custom',
+      message: issue.message,
+      path: issue.path,
+    }))
+    return z.NEVER
+  }
+  return result.data
+}
+
+export const LLMTransformer = z.any().transform((data, ctx) => {
   if (!('jbai' in data) && !('capabilities' in data)) {
     if (/4o-mini/i.test(data.name)) {
-      return OpenAI4oMini.parse({
+      return safeParseOrAddIssues(OpenAI4oMini, {
         jbai: 'openai-gpt-4o-mini',
         name: data.name,
         provider: data.provider,
@@ -26,9 +43,9 @@ export const LLMTransformer = z.any().transform(data => {
           outputPrice: data.outputPrice ?? 0,
           cacheInputPrice: data.cacheInputPrice ?? 0,
         },
-      })
+      }, ctx)
     }
-    return AnthropicSonnet37.parse({
+    return safeParseOrAddIssues(AnthropicSonnet37, {
       jbai: 'anthropic-claude-3.7-sonnet',
       name: data.name,
       provider: data.provider,
@@ -40,10 +57,10 @@ export const LLMTransformer = z.any().transform(data => {
         vision: data.vision,
         supportsAssistantMessageResuming: data.supportsAssistantMessageResuming ?? false,
       },
-    })
+    }, ctx)
   }
   if (OpenAI4oMini.shape.jbai.value === data.jbai && !('capabilities' in data)) {
-    return OpenAI4oMini.parse({
+    return safeParseOrAddIssues(OpenAI4oMini, {
       name: data.name,
       provider: data.provider,
       jbai: 'openai-gpt-4o-mini',
@@ -52,31 +69,31 @@ export const LLMTransformer = z.any().transform(data => {
         outputPrice: data.outputPrice ?? 0,
         cacheInputPrice: data.cacheInputPrice ?? 0,
       },
-    })
+    }, ctx)
   }
   if (OpenAIo3.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return OpenAIo3.parse(data)
+    return safeParseOrAddIssues(OpenAIo3, data, ctx)
   }
   if (OpenAI4oMini.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return OpenAI4oMini.parse(data)
+    return safeParseOrAddIssues(OpenAI4oMini, data, ctx)
   }
   if (OpenAI41Mini.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return OpenAI41Mini.parse(data)
+    return safeParseOrAddIssues(OpenAI41Mini, data, ctx)
   }
   if (OpenAI41.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return OpenAI41.parse(data)
+    return safeParseOrAddIssues(OpenAI41, data, ctx)
   }
   if (OpenAI51.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return OpenAI51.parse(data)
+    return safeParseOrAddIssues(OpenAI51, data, ctx)
   }
   if (Gemini3Pro.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return Gemini3Pro.parse(data)
+    return safeParseOrAddIssues(Gemini3Pro, data, ctx)
   }
   if (AnthropicSonnet37.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return AnthropicSonnet37.parse(data)
+    return safeParseOrAddIssues(AnthropicSonnet37, data, ctx)
   }
   if (AnthropicSonnet37.shape.jbai.value === data.jbai && !('capabilities' in data)) {
-    return AnthropicSonnet37.parse({
+    return safeParseOrAddIssues(AnthropicSonnet37, {
       name: data.name,
       provider: data.provider,
       jbai: 'anthropic-claude-3.7-sonnet',
@@ -88,19 +105,19 @@ export const LLMTransformer = z.any().transform(data => {
         vision: data.vision,
         supportsAssistantMessageResuming: data.supportsAssistantMessageResuming ?? false,
       },
-    })
+    }, ctx)
   }
   if (AnthropicSonnet4.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return AnthropicSonnet4.parse(data)
+    return safeParseOrAddIssues(AnthropicSonnet4, data, ctx)
   }
   if (AnthropicSonnet45.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return AnthropicSonnet45.parse(data)
+    return safeParseOrAddIssues(AnthropicSonnet45, data, ctx)
   }
   if (AnthropicClaude45Opus.shape.jbai.value === data.jbai && 'capabilities' in data) {
-    return AnthropicClaude45Opus.parse(data)
+    return safeParseOrAddIssues(AnthropicClaude45Opus, data, ctx)
   }
   if (openAI5.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
-    return openAI5.parse({
+    return safeParseOrAddIssues(openAI5, {
       name: data.name,
       provider: data.provider,
       jbai: data.jbai,
@@ -109,8 +126,11 @@ export const LLMTransformer = z.any().transform(data => {
         outputPrice: data.capabilities.outputPrice ?? 0,
         cacheInputPrice: data.capabilities.cacheInputPrice ?? 0,
       }
-    })
+    }, ctx)
   }
-  console.error(data)
-  return {}
+  ctx.addIssue({
+    code: 'custom',
+    message: `Unknown LLM format: ${JSON.stringify(data)}`,
+  })
+  return z.NEVER
 })

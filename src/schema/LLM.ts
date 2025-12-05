@@ -12,7 +12,7 @@ import { OpenAI4oMini } from "./openAI4oMini"
 import { OpenAI51 } from "./openAI51"
 import { OpenAIo3 } from "./openAIo3"
 
-export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai', [
+const LLMDiscriminatedUnion = z.discriminatedUnion('jbai', [
   OpenAIo3,
   OpenAI4oMini,
   OpenAI41Mini,
@@ -24,7 +24,20 @@ export const LLM = LLMTransformer.transform(data => z.discriminatedUnion('jbai',
   AnthropicClaude45Opus,
   Gemini3Pro,
   openAI5,
-]).parse(data)).transform((({ inputPrice, outputPrice, cacheInputPrice, cacheCreateInputPrice, capabilities, ...data }) => ({
+])
+
+export const LLM = LLMTransformer.transform((data, ctx) => {
+  const result = LLMDiscriminatedUnion.safeParse(data)
+  if (!result.success) {
+    result.error.issues.forEach(issue => ctx.addIssue({
+      code: 'custom',
+      message: issue.message,
+      path: issue.path,
+    }))
+    return z.NEVER
+  }
+  return result.data
+}).transform((({ inputPrice, outputPrice, cacheInputPrice, cacheCreateInputPrice, capabilities, ...data }) => ({
   ...data,
   capabilities: {
     ...capabilities,

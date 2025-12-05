@@ -308,13 +308,7 @@ export class Task {
 
     // Log any parse errors using the standard format
     for (const err of errors) {
-      console.log('EventParserError:', JSON.stringify({
-        eventsFile: err.eventsFile,
-        lineNumber: err.lineNumber,
-        message: err.message,
-        path: err.path,
-        json: err.json,
-      }, null, 2))
+      console.log('EventParserError', err)
     }
 
     // match LlmResponseEvent to their LlmRequestEvents

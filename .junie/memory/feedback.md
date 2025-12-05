@@ -158,3 +158,19 @@
     "NEW INSTRUCTION": "WHEN errors occur in Task.loadEvents THEN log error, propagate EventParserErrors-like details, do not return events with errors"
 }
 
+[2025-12-05 16:15] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "schema validation",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN safeParse throws in loadEvents THEN audit schema refinements/transforms for thrown errors and replace with ctx.addIssue"
+}
+
+[2025-12-05 16:33] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "tests fixing",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN task requests running tests and fixing errors THEN run tests, fix failures, rerun, summarize changes"
+}
+

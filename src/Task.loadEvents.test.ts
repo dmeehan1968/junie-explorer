@@ -53,11 +53,10 @@ describe('Task.loadEvents logging', () => {
       expect(events.length).toBe(1)
       expect(events[0].event.type).toBe('McpInitStarted')
 
-      const errorLogs = logs.filter(args => args[0] === 'EventParserError:')
+      const errorLogs = logs.filter(args => args[0] === 'EventParserError')
       expect(errorLogs.length).toBe(2)
-      // Validate structure of the JSON string payload
-      for (const [, payload] of errorLogs) {
-        const obj = JSON.parse(payload)
+      // Validate structure of the error object payload
+      for (const [, obj] of errorLogs) {
         expect(obj).toHaveProperty('eventsFile')
         expect(obj).toHaveProperty('lineNumber')
         expect(obj).toHaveProperty('message')
