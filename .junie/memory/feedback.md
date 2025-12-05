@@ -142,3 +142,19 @@
     "NEW INSTRUCTION": "WHEN rendering TaskCard tabs THEN Apply rounded corners and matching card borders; remove bottom border on active tabs"
 }
 
+[2025-12-05 15:24] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "error handling",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN handling errors in loadEvents THEN propagate EventParserErrors-like details to caller, not only console.log"
+}
+
+[2025-12-05 15:38] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "error handling",
+    "ERROR": "Mixed success/error return and missing propagation while logging required",
+    "NEW INSTRUCTION": "WHEN errors occur in Task.loadEvents THEN log error, propagate EventParserErrors-like details, do not return events with errors"
+}
+

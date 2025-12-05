@@ -1,45 +1,70 @@
 import fs from "fs-extra"
+import { ZodError } from "zod"
 import { EventRecord } from "../schema/eventRecord"
-import { UnknownEventRecord } from "../schema/unknownEventRecord"
+import { EventParserError, LoadEventsOutput } from "./loadEventsOutput"
 
-export async function loadEvents(eventsFile: string) {
+export async function loadEvents(eventsFile: string): Promise<LoadEventsOutput> {
   if (fs.existsSync(eventsFile)) {
     const content = fs.readFileSync(eventsFile, 'utf-8')
+    const errors: EventParserError[] = []
     const events = content
       .split('\n')
       .filter(json => json.trim())
-      .map((line, lineNumber) => {
+      .map((line, lineIndex) => {
+        const lineNumber = lineIndex // maintain same indexing as before
         let json: any
         try {
           json = JSON.parse(line)
-        } catch (error) {
-          return {
-            timestamp: new Date(),
-            event: {
-              type: 'jsonError',
-              data: line,
-            },
+        } catch (e) {
+          errors.push({
+            eventsFile,
+            lineNumber,
+            message: 'JSON parse error',
+            path: [],
+            json: line,
+          })
+          return undefined
+        }
+        try {
+          // For some reason safeParse throws if errors occur deep in the schema, so we catch and rethrow as a generic error
+          const { success, data, error } = EventRecord.safeParse(json)
+          if (success) {
+            return data
           }
-        }
-        const { success, data, error } = EventRecord.safeParse(json)
-        if (success) {
-          return data
-        }
-        console.log('EventParserError:', JSON.stringify({
-          eventsFile,
-          lineNumber,
-          message: error.issues[0].message,
-          path: error.issues[0].path,
-          json,
-        }, null, 2))
-        return UnknownEventRecord.transform(record => ({ ...record, parseError: error })).parse(json)
+          errors.push({
+            eventsFile,
+            lineNumber,
+            message: error.issues[0]?.message ?? 'Event parse error',
+            path: (error.issues[0]?.path ?? []).filter(p => typeof p === 'string' || typeof p === 'number') as (string | number)[],
+            json,
+          })
+        } catch (error: any) {
+          if (error instanceof ZodError) {
+            errors.push({
+              eventsFile,
+              lineNumber,
+              message: error.issues[0]?.message ?? 'Event parse error',
+              path: (error.issues[0]?.path ?? []).filter(p => typeof p === 'string' || typeof p === 'number') as (string | number)[],
+              json,
+            })
+          } else {
+            errors.push({
+              eventsFile,
+              lineNumber,
+              message: error instanceof Error ? error.message : String(error),
+              path: ['unknown'],
+              json: line
+            })
+          }
 
+        }
+        return undefined
       })
       .filter((event): event is EventRecord => !!event)
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
 
-    return { events }
+    return { events, errors }
   }
 
-  return { events: [] }
+  return { events: [], errors: [] }
 }

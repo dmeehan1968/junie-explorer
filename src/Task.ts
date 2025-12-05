@@ -47,9 +47,7 @@ export class Task {
   private _eventTypes: Promise<string[]> | undefined = undefined
 
   // Static worker pool for loading events
-  private static _workerPool: WorkerPool<{ eventsFilePath: string }, {
-    events: EventRecord[]
-  }> | null | undefined = undefined
+  private static _workerPool: WorkerPool<{ eventsFilePath: string }, LoadEventsOutput> | null | undefined = undefined
   private static _statsCollector: StatsCollector | null = null
 
   public static setStatsCollector(statsCollector: StatsCollector) {
@@ -283,6 +281,7 @@ export class Task {
 
   private async loadEvents() {
     let events: EventRecord[] = []
+    let errors: { eventsFile: string; lineNumber: number; message: string; path: (string | number)[]; json: unknown }[] = []
 
     try {
       if (Task.workerPool) {
@@ -290,16 +289,32 @@ export class Task {
           eventsFilePath: this.eventsFile,
         })
         events = result.events
+        errors = (result as unknown as LoadEventsOutput).errors ?? []
       } else {
-        events = (await loadEvents(this.eventsFile)).events
+        const output = await loadEvents(this.eventsFile)
+        events = output.events
+        errors = output.errors
       }
     } catch (error) {
       console.log('Error loading events with worker pool from:', this.eventsFile)
       console.log(error)
       // Fallback to original implementation if worker fails
       if (error instanceof WorkerExecutionError && Task.workerPool) {
-        events = (await loadEvents(this.eventsFile)).events
+        const output = await loadEvents(this.eventsFile)
+        events = output.events
+        errors = output.errors
       }
+    }
+
+    // Log any parse errors using the standard format
+    for (const err of errors) {
+      console.log('EventParserError:', JSON.stringify({
+        eventsFile: err.eventsFile,
+        lineNumber: err.lineNumber,
+        message: err.message,
+        path: err.path,
+        json: err.json,
+      }, null, 2))
     }
 
     // match LlmResponseEvent to their LlmRequestEvents

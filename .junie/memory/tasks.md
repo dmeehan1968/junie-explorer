@@ -258,3 +258,13 @@
     "NEW INSTRUCTION": "WHEN tabs must blend into card THEN switch to tabs-lifted; sync tab rounded/border classes with card."
 }
 
+[2025-12-05 15:41] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "update README",
+    "MISSING STEPS": "add tests, run tests, update worker",
+    "BOTTLENECK": "Tests were not added before implementation, risking regressions.",
+    "PROJECT NOTE": "Worker pool result must include errors; ensure loadEventsWorker forwards them.",
+    "NEW INSTRUCTION": "WHEN changing loadEvents output used by worker THEN update worker to forward errors first"
+}
+
