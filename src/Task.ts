@@ -25,6 +25,7 @@ import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
 import { LoadEventsInput } from "./workers/loadEventsInput"
 import { LoadEventsOutput } from "./workers/loadEventsOutput"
+import { WorkerExecutionError } from "./workers/WorkerExecutionError"
 import { WorkerPool } from "./workers/WorkerPool"
 
 export class Task {
@@ -293,9 +294,10 @@ export class Task {
         events = (await loadEvents(this.eventsFile)).events
       }
     } catch (error) {
-      console.error('Error loading events with worker pool:', error)
+      console.log('Error loading events with worker pool from:', this.eventsFile)
+      console.log(error)
       // Fallback to original implementation if worker fails
-      if (Task.workerPool) {
+      if (error instanceof WorkerExecutionError && Task.workerPool) {
         events = (await loadEvents(this.eventsFile)).events
       }
     }
