@@ -58,7 +58,7 @@ export type AgentObservation = z.infer<typeof AgentObservation>
 
 export const AgentState = z.looseObject({
   issue: AgentIssue,
-  observations: AgentObservation.nullish().array(),
+  observations: AgentObservation.nullish().array().nullish(),
   ideInitialState: z.looseObject({
     content: z.string(),
     kind: z.enum(['User']),
