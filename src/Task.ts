@@ -316,9 +316,15 @@ export class Task {
     for (let index=0 ; index < events.length ; index++) {
       const event = events[index].event
       if (event.type === 'LlmResponseEvent') {
-        event.requestEvent = events.slice(0, index).reverse().find(previous => isRequestEvent(previous.event) && previous.event.id === event.id)?.event as LlmRequestEvent
+        event.requestEvent = events.slice(0, index).reverse().find(previous =>
+          isRequestEvent(previous.event)
+          && previous.event.id === event.id
+        )?.event as LlmRequestEvent
       } else if (event.type === 'LlmRequestEvent') {
-        event.previousRequest = events.slice(0, index).reverse().find(previous => isRequestEvent(previous.event) && previous.event.modelParameters.model.jbai === event.modelParameters.model.jbai)?.event as LlmRequestEvent
+        event.previousRequest = events.slice(0, index).reverse().find(previous =>
+          isRequestEvent(previous.event)
+          && previous.event.modelParameters.model.jbai === event.modelParameters.model.jbai
+        )?.event as LlmRequestEvent
       }
     }
 
