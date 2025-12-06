@@ -76,6 +76,6 @@ export const Event = z.discriminatedUnion('type', [
   PairedGroupEventFinished,
   MemoryReflectionCompletedEvent,
   MemoryExtractedEvent,
-  // MemoryCompactedEvent,
+  MemoryCompactedEvent,
 ])
 export type Event = z.infer<typeof Event>
