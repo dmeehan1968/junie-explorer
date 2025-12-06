@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0] - 2025-12-06
+
+### Added
+- Add `OpenAI51CodexMax` schema and refactor `OpenAI5` exports (7334d62)
+- Add GitHub Actions workflow for Junie (22509a0)
+- Add `.junie` workflow (6c2f42c)
+- Add loading state and improve model-based metric visualization (f4db67a)
+- Add series sorting, UI improvements, and chart reload refinements (13c5bca)
+- Add "View by Model" toggle and update dataset breakdown for metrics chart (0d2c2c0)
+- Add `MemoryCompactedEvent` to schema and event definitions (7c58227)
+- Add `MemoryCompactor` to `AgentType` (3ae213c)
+- Add cumulative cost and token datasets to event charts (941832d)
+
+### Changed
+- Refactor schema parsing to handle errors with `ctx.addIssue` (e85025d)
+- Propagate event parsing errors and report in `Task.loadEvents` (4498e70)
+- Update `AgentState.observations` schema definition (75979eb)
+- Update TaskCard UI and functionality (a5972d3)
+- Optimize metrics fetching and improve async handling for projects and issues (7a36132)
+- Update E2E test snapshots for metrics chart view modes (d993406)
+- Enhance `trajectoriesView` rendering and refine reasoning effort handling (8aad6a3)
+- Enhance Event Metrics chart with detailed cost/token breakdown (c719723)
+- Refactor `trajectoriesView` rendering and simplify message handling (36ef79b)
+- Refactor/Update `AgentType` detection logic in `llmRequestEvent` schema (b4665fb, f1c7ddd, 25273e8)
+- Remove "(Cost)" and "(Tokens)" suffixes from series labels in project metrics chart (bc617ac)
+- Update README and simplify label rendering (f7b97dc)
+
+### Fixed
+- Reinstate `MemoryCompactedEvent` in event schema (5486223)
+- Handle `WorkerExecutionError` during event loading in Task (9451d88)
+- Preserve cumulative dataset hidden states and improve provider default selection (2f4cdfe)
+- Exclude `cacheInputTokens` from cumulative tokens dataset (f0f4459)
+
 ## [3.5.0] - 2025-12-02
 
 ### Added
