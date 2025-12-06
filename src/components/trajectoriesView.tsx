@@ -33,7 +33,7 @@ export const TrajectoriesView = ({
 
   return (
     <>
-      {trajectoryEvents.map((current, index, records) => {
+      {trajectoryEvents.map((current) => {
         const messages: JSX.Element[] = []
 
         if (current.event.type === 'LlmRequestEvent') {
@@ -84,7 +84,7 @@ export const TrajectoriesView = ({
 
             } else {
 
-              messages.push(...getMessageDiffs(current, records.slice(), klass, showAllDiffs))
+              messages.push(...getMessageDiffs(current, klass, showAllDiffs))
 
             }
           }

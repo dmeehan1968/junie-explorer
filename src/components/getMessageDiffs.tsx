@@ -7,7 +7,7 @@ import { MessageDecorator } from "./messageDecorator"
 export function getMessageDiffs({
   event: current,
   timestamp,
-}: TrajectoryEventRecord, previousEventRecords: TrajectoryEventRecord[], klass: string, showAllDiffs: boolean = false): JSX.Element[] {
+}: TrajectoryEventRecord, klass: string, showAllDiffs: boolean = false): JSX.Element[] {
 
   const getMarkup = (messagesDiff: ChangeObject<string>[], timestamp: Date, label: string, klass: string) => {
     const commonStyle = 'border-l-4 pl-4'
@@ -59,7 +59,9 @@ export function getMessageDiffs({
     return []
   }
 
-  const previous = isRequestEvent(current.previousRequest) ? current.previousRequest : undefined
+  const previous = isRequestEvent(current.previousRequest) && current.previousRequest.chat.agentType === current.chat.agentType
+    ? current.previousRequest
+    : undefined
 
   if (previous) {
 
