@@ -4,7 +4,6 @@ import { AppBody } from "../../components/appBody"
 import { AppHead } from "../../components/appHead"
 import { AppHeader } from "../../components/appHeader"
 import { Breadcrumb } from '../../components/breadcrumb.js'
-import { Conditional } from "../../components/conditional"
 import { EventFilters } from "../../components/eventFilters"
 import { EventMetricsSection } from "../../components/eventMetricsSection"
 import { EventsTable } from "../../components/eventsTable"
@@ -16,10 +15,7 @@ import { StatsButton } from '../../components/statsButton.js'
 import { TaskCard } from '../../components/taskCard.js'
 import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
-import { LlmResponseEvent } from "../../schema/llmResponseEvent"
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest"
-import { prepareLlmEventGraphData } from "../../utils/prepareLlmEventGraphData"
-import { makeGroupName } from "../api/trajectories/contextSize"
 import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware"
 import { AppRequest, AppResponse } from "../types"
 
@@ -40,11 +36,9 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
 
     // Get events for the task
     const events = await task.events
-    let cost = 0
 
-    // Prepare LLM event graph data
-    const llmChartData = prepareLlmEventGraphData(events)
-
+    // Build the chart data API URL for client-side fetching
+    const chartDataApiUrl = `/api/project/${encodeURIComponent(project.name)}/issue/${encodeURIComponent(issue.id)}/task/${encodeURIComponent(task.index)}/events/chart-data`
 
     // Generate JSX page
     const eventTypes = await task.eventTypes
@@ -55,26 +49,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/events', async (req:
       <AppHead title={`${project.name} ${issue.name} ${task.id} Events`}>
         <script src={"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"}></script>
         <script src={"https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"}></script>
-        <Conditional condition={hasMetrics}>
-          <script type="application/json" id="llmChartData">{JSON.stringify(llmChartData)}</script>
-          <script type="application/json" id="llmEvents">{JSON.stringify(events.filter((e): e is {
-            event: LlmResponseEvent,
-            timestamp: Date
-          } => e.event.type === 'LlmResponseEvent').map(e => ({
-            timestamp: e.timestamp.toISOString(),
-            event: {
-              type: e.event.type,
-              answer: {
-                llm: { provider: makeGroupName(e.event) },
-                cost: e.event.answer.cost,
-                inputTokens: e.event.answer.inputTokens,
-                outputTokens: e.event.answer.outputTokens,
-                cacheInputTokens: e.event.answer.cacheInputTokens,
-                cacheCreateInputTokens: e.event.answer.cacheCreateInputTokens,
-              },
-            },
-          })))}</script>
-        </Conditional>
+        <script id="chartDataConfig" type="application/json">{JSON.stringify({ apiUrl: chartDataApiUrl, hasMetrics })}</script>
         <script src="/js/themeSwitcher.js"></script>
         <script src="/js/taskEventChart.js"></script>
         <script src="/js/taskEventLlmChart.js"></script>

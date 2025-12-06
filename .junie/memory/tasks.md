@@ -378,3 +378,23 @@
     "NEW INSTRUCTION": "WHEN visibility depends on multiple options THEN create updateAgentDropdownVisibility and call in init and all change handlers"
 }
 
+[2025-12-06 17:19] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "inspect eventMetricsSection",
+    "MISSING STEPS": "verify data ids",
+    "BOTTLENECK": "Looked at presentation component before confirming server embedding and client consumption.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN chart data flow is requested THEN open route embedding JSON and client chart initializer before components"
+}
+
+[2025-12-06 17:28] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "register api router,complete api handler,update server route to remove embedded json,implement client fetch,show loading indicator,handle fetch errors,validate end-to-end,add tests",
+    "BOTTLENECK": "New API route was created incompletely and not wired into the events router.",
+    "PROJECT NOTE": "Follow the timeline.ts pattern: use entityLookupMiddleware, mount under /api/... and export router; then add router.use('/', chartData) in src/app/api/events/index.ts.",
+    "NEW INSTRUCTION": "WHEN creating a new API route file THEN add it to events/index and verify the path."
+}
+

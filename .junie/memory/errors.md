@@ -118,3 +118,13 @@
     "NEW INSTRUCTION": "WHEN task scope is tests-only THEN skip global tsc and run Playwright tests only"
 }
 
+[2025-12-06 17:24] - Updated by Junie - Error analysis
+{
+    "TYPE": "invalid args",
+    "TOOL": "open_entire_file",
+    "ERROR": "File not found at path",
+    "ROOT CAUSE": "Tried to open a non-existent API file without verifying its presence or location.",
+    "PROJECT NOTE": "Events API routes live under src/app/api/events and are wired in index.ts (currently timeline and download). Add new routes there and verify filenames before opening.",
+    "NEW INSTRUCTION": "WHEN open_entire_file returns path does not exist THEN list directory and open an existing candidate"
+}
+

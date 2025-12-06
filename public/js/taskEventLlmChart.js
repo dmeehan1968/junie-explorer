@@ -19,9 +19,62 @@ window._locale = {
 // Global variables for chart management
 let llmChart = null;
 let originalChartData = null;
+let llmEventsData = null;
 let selectedProvidersSet = new Set();
 let selectedProvider = 'all';
 let selectedMetricType = 'cost'; // 'cost' or 'tokens'
+
+// UI element references
+function getLoadingElement() {
+  return document.getElementById('llmMetricsLoading');
+}
+
+function getErrorElement() {
+  return document.getElementById('llmMetricsError');
+}
+
+function getErrorMessageElement() {
+  return document.getElementById('llmMetricsErrorMessage');
+}
+
+function getChartElement() {
+  return document.getElementById('llmMetricsChart');
+}
+
+// Show loading state
+function showLoading() {
+  const loading = getLoadingElement();
+  const error = getErrorElement();
+  const chart = getChartElement();
+  
+  if (loading) loading.classList.remove('hidden');
+  if (error) error.classList.add('hidden');
+  if (chart) chart.classList.add('hidden');
+}
+
+// Show error state
+function showError(message) {
+  const loading = getLoadingElement();
+  const error = getErrorElement();
+  const errorMessage = getErrorMessageElement();
+  const chart = getChartElement();
+  
+  if (loading) loading.classList.add('hidden');
+  if (error) error.classList.remove('hidden');
+  if (errorMessage) errorMessage.textContent = message || 'Failed to load chart data';
+  if (chart) chart.classList.add('hidden');
+}
+
+// Show chart (hide loading and error)
+function showChart() {
+  const loading = getLoadingElement();
+  const error = getErrorElement();
+  const chart = getChartElement();
+  
+  if (loading) loading.classList.add('hidden');
+  if (error) error.classList.add('hidden');
+  if (chart) chart.classList.remove('hidden');
+}
 
 // Function to update dataset visibility based on selected metric type
 function updateDatasetVisibility() {
@@ -60,15 +113,13 @@ function updateDatasetVisibility() {
 
 // Function to filter chart data based on selected providers
 function filterChartData(selectedProviders) {
-  const llmEventsEl = document.getElementById('llmEvents');
-  const llmEvents = llmEventsEl ? JSON.parse(llmEventsEl.textContent) : null;
-  
-  if (!llmEvents) return originalChartData;
+  if (!llmEventsData) return originalChartData;
   
   // Convert ISO string back to Date object
-  llmEvents.forEach(event => {
-    event.timestamp = new Date(event.timestamp);
-  });
+  const llmEvents = llmEventsData.map(event => ({
+    ...event,
+    timestamp: new Date(event.timestamp)
+  }));
 
   if (!originalChartData) return originalChartData;
   
@@ -140,226 +191,282 @@ function setMetricType(type) {
   updateDatasetVisibility();
 }
 
+// Function to create the chart with fetched data
+function createChart(chartData) {
+  const chartElement = getChartElement();
+  if (!chartElement) {
+    console.log('No LLM chart element found - chart will not be initialized');
+    return;
+  }
+
+  const ctx = chartElement.getContext('2d');
+  originalChartData = chartData;
+  const timeUnit = chartData.timeUnit;
+  const stepSize = chartData.stepSize;
+
+  // Create chart configuration
+  const config = {
+    type: 'line',
+    data: {
+      labels: chartData.labels,
+      datasets: chartData.datasets.map(dataset => ({
+        label: dataset.label,
+        data: dataset.data,
+        borderColor: dataset.borderColor,
+        backgroundColor: dataset.backgroundColor,
+        fill: false,
+        tension: 0.1,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHitRadius: 10,
+        borderWidth: 2,
+        yAxisID: dataset.yAxisID,
+        hidden: dataset.hidden
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      elements: {
+        point: {
+          radius: 4,
+          hitRadius: 10,
+          hoverRadius: 6
+        },
+        line: {
+          tension: 0.1
+        }
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: timeUnit,
+            stepSize: stepSize,
+            displayFormats: {
+              second: 'HH:mm:ss',
+              minute: 'HH:mm',
+              hour: 'HH:mm',
+              day: 'MMM d',
+              week: 'MMM d',
+              month: 'MMM yyyy',
+              year: 'yyyy'
+            },
+            tooltipFormat: 'MMM d, yyyy HH:mm:ss'
+          },
+          title: {
+            display: true,
+            text: 'Time'
+          },
+          adapters: {
+            date: {
+              locale: window._locale
+            }
+          }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          title: {
+            display: true,
+            text: 'Cost ($)'
+          },
+          beginAtZero: true
+        },
+        y1: {
+          type: 'linear',
+          display: false,
+          position: 'left',
+          title: {
+            display: true,
+            text: 'Tokens'
+          },
+          beginAtZero: true,
+          grid: {
+            drawOnChartArea: false
+          }
+        }
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Event Metrics',
+          font: {
+            size: 16
+          }
+        },
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            filter: function(legendItem, chartData) {
+              // Only show legend items for the currently selected metric type
+              const dataset = chartData.datasets[legendItem.datasetIndex];
+              const group = originalChartData.datasets[legendItem.datasetIndex]?.group;
+              if (group === 'legacy') return false;
+              if (selectedMetricType === 'cost' && group === 'tokens') return false;
+              if (selectedMetricType === 'tokens' && group === 'cost') return false;
+              return true;
+            }
+          }
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      }
+    }
+  };
+
+  // Create the chart
+  llmChart = new Chart(ctx, config);
+
+  // Initialize metric type toggle
+  const metricToggleContainer = document.getElementById('metric-type-toggle');
+  if (metricToggleContainer) {
+    const buttons = metricToggleContainer.querySelectorAll('button');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const value = btn.getAttribute('data-value');
+        if (value) {
+          setMetricType(value);
+        }
+      });
+    });
+  }
+
+  // Build provider filter button group (exclusive: All or one provider)
+  const providerFiltersContainer = document.getElementById('llm-provider-filters');
+  if (providerFiltersContainer && originalChartData && Array.isArray(originalChartData.providers)) {
+    providerFiltersContainer.innerHTML = '';
+    const providers = originalChartData.providers;
+
+    // Initialize selection to first 'Assistant*' provider, or 'all' if none found
+    const agentProvider = providers.find(p => p.startsWith('Assistant'));
+    selectedProvider = agentProvider || 'all';
+    selectedProvidersSet = agentProvider ? new Set([agentProvider]) : new Set(providers);
+
+    const buttons = [];
+
+    const makeBtn = (label, value) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm join-item';
+      btn.setAttribute('data-value', value);
+      btn.setAttribute('aria-pressed', 'false');
+      btn.textContent = label;
+      return btn;
+    };
+
+    const refreshButtons = () => {
+      buttons.forEach(btn => {
+        const value = btn.getAttribute('data-value');
+        const active = value === selectedProvider;
+        btn.classList.toggle('btn-primary', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+    };
+
+    const setSelection = (value) => {
+      selectedProvider = value;
+      if (value === 'all') {
+        selectedProvidersSet = new Set(providers);
+      } else {
+        selectedProvidersSet = new Set([value]);
+      }
+      refreshButtons();
+      updateChart();
+    };
+
+    const allBtn = makeBtn('All', 'all');
+    allBtn.addEventListener('click', () => setSelection('all'));
+    providerFiltersContainer.appendChild(allBtn);
+    buttons.push(allBtn);
+
+    providers.forEach(provider => {
+      const pBtn = makeBtn(provider, provider);
+      pBtn.addEventListener('click', () => setSelection(provider));
+      providerFiltersContainer.appendChild(pBtn);
+      buttons.push(pBtn);
+    });
+
+    // Initialize UI state and chart
+    refreshButtons();
+    updateChart();
+  }
+
+  // Show the chart
+  showChart();
+}
+
+// Fetch chart data from API
+async function fetchChartData(apiUrl) {
+  showLoading();
+  
+  try {
+    const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.llmChartData) {
+      throw new Error('Invalid response: missing chart data');
+    }
+    
+    // Store the events data globally for filtering
+    llmEventsData = data.llmEvents || [];
+    
+    // Create the chart with the fetched data
+    createChart(data.llmChartData);
+    
+  } catch (error) {
+    console.error('Error fetching chart data:', error);
+    showError(error.message || 'Failed to load chart data');
+  }
+}
+
 // Initialize the LLM metrics graph when the page loads
 document.addEventListener('DOMContentLoaded', function() {
   // Add a small delay to ensure all scripts are loaded
   setTimeout(function() {
     try {
-      const chartElement = document.getElementById('llmMetricsChart');
+      const chartElement = getChartElement();
       // Only initialize the chart if the element exists (i.e., there are LLM events)
       if (!chartElement) {
         console.log('No LLM chart element found - chart will not be initialized');
         return;
       }
 
-      // Check if llmChartData exists (it won't if there are no LLM events)
-      const chartDataEl = document.getElementById('llmChartData');
-      const chartData = chartDataEl ? JSON.parse(chartDataEl.textContent) : null;
-      if (!chartData) {
-        console.log('No LLM chart data available - chart will not be initialized');
+      // Get the config from the embedded JSON
+      const configEl = document.getElementById('chartDataConfig');
+      const config = configEl ? JSON.parse(configEl.textContent) : null;
+      
+      if (!config) {
+        console.log('No chart config available - chart will not be initialized');
         return;
       }
-
-      const ctx = chartElement.getContext('2d');
-      // Use a global variable to avoid JSON parsing issues
-      originalChartData = chartData;
-      const timeUnit = chartData.timeUnit;
-      const stepSize = chartData.stepSize;
-
-      // Create chart configuration
-      const config = {
-        type: 'line',
-        data: {
-          labels: chartData.labels,
-          datasets: chartData.datasets.map(dataset => ({
-            label: dataset.label,
-            data: dataset.data,
-            borderColor: dataset.borderColor,
-            backgroundColor: dataset.backgroundColor,
-            fill: false,
-            tension: 0.1,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            pointHitRadius: 10,
-            borderWidth: 2,
-            yAxisID: dataset.yAxisID,
-            hidden: dataset.hidden
-          }))
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          elements: {
-            point: {
-              radius: 4,
-              hitRadius: 10,
-              hoverRadius: 6
-            },
-            line: {
-              tension: 0.1
-            }
-          },
-          scales: {
-            x: {
-              type: 'time',
-              time: {
-                unit: timeUnit,
-                stepSize: stepSize,
-                displayFormats: {
-                  second: 'HH:mm:ss',
-                  minute: 'HH:mm',
-                  hour: 'HH:mm',
-                  day: 'MMM d',
-                  week: 'MMM d',
-                  month: 'MMM yyyy',
-                  year: 'yyyy'
-                },
-                tooltipFormat: 'MMM d, yyyy HH:mm:ss'
-              },
-              title: {
-                display: true,
-                text: 'Time'
-              },
-              adapters: {
-                date: {
-                  locale: window._locale
-                }
-              }
-            },
-            y: {
-              type: 'linear',
-              display: true,
-              position: 'left',
-              title: {
-                display: true,
-                text: 'Cost ($)'
-              },
-              beginAtZero: true
-            },
-            y1: {
-              type: 'linear',
-              display: false,
-              position: 'left',
-              title: {
-                display: true,
-                text: 'Tokens'
-              },
-              beginAtZero: true,
-              grid: {
-                drawOnChartArea: false
-              }
-            }
-          },
-          plugins: {
-            title: {
-              display: true,
-              text: 'Event Metrics',
-              font: {
-                size: 16
-              }
-            },
-            legend: {
-              display: true,
-              position: 'top',
-              labels: {
-                filter: function(legendItem, chartData) {
-                  // Only show legend items for the currently selected metric type
-                  const dataset = chartData.datasets[legendItem.datasetIndex];
-                  const group = originalChartData.datasets[legendItem.datasetIndex]?.group;
-                  if (group === 'legacy') return false;
-                  if (selectedMetricType === 'cost' && group === 'tokens') return false;
-                  if (selectedMetricType === 'tokens' && group === 'cost') return false;
-                  return true;
-                }
-              }
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false
-            }
-          }
-        }
-      };
-
-      // Create the chart
-      llmChart = new Chart(ctx, config);
-
-      // Initialize metric type toggle
-      const metricToggleContainer = document.getElementById('metric-type-toggle');
-      if (metricToggleContainer) {
-        const buttons = metricToggleContainer.querySelectorAll('button');
-        buttons.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const value = btn.getAttribute('data-value');
-            if (value) {
-              setMetricType(value);
-            }
-          });
-        });
+      
+      // Check if there are metrics to display
+      if (!config.hasMetrics) {
+        console.log('No metrics available - chart will not be initialized');
+        return;
       }
-
-      // Build provider filter button group (exclusive: All or one provider)
-      const providerFiltersContainer = document.getElementById('llm-provider-filters');
-      if (providerFiltersContainer && originalChartData && Array.isArray(originalChartData.providers)) {
-        providerFiltersContainer.innerHTML = '';
-        const providers = originalChartData.providers;
-
-        // Initialize selection to first 'Assistant*' provider, or 'all' if none found
-        const agentProvider = providers.find(p => p.startsWith('Assistant'));
-        selectedProvider = agentProvider || 'all';
-        selectedProvidersSet = agentProvider ? new Set([agentProvider]) : new Set(providers);
-
-        const buttons = [];
-
-        const makeBtn = (label, value) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'btn btn-sm join-item';
-          btn.setAttribute('data-value', value);
-          btn.setAttribute('aria-pressed', 'false');
-          btn.textContent = label;
-          return btn;
-        };
-
-        const refreshButtons = () => {
-          buttons.forEach(btn => {
-            const value = btn.getAttribute('data-value');
-            const active = value === selectedProvider;
-            btn.classList.toggle('btn-primary', active);
-            btn.setAttribute('aria-pressed', String(active));
-          });
-        };
-
-        const setSelection = (value) => {
-          selectedProvider = value;
-          if (value === 'all') {
-            selectedProvidersSet = new Set(providers);
-          } else {
-            selectedProvidersSet = new Set([value]);
-          }
-          refreshButtons();
-          updateChart();
-        };
-
-        const allBtn = makeBtn('All', 'all');
-        allBtn.addEventListener('click', () => setSelection('all'));
-        providerFiltersContainer.appendChild(allBtn);
-        buttons.push(allBtn);
-
-        providers.forEach(provider => {
-          const pBtn = makeBtn(provider, provider);
-          pBtn.addEventListener('click', () => setSelection(provider));
-          providerFiltersContainer.appendChild(pBtn);
-          buttons.push(pBtn);
-        });
-
-        // Initialize UI state and chart
-        refreshButtons();
-        updateChart();
+      
+      // Fetch chart data from the API
+      if (config.apiUrl) {
+        fetchChartData(config.apiUrl);
+      } else {
+        console.log('No API URL configured - chart will not be initialized');
+        showError('Chart configuration error');
       }
       
     } catch (error) {
-      console.error('Error creating LLM chart:', error);
+      console.error('Error initializing LLM chart:', error);
+      showError('Failed to initialize chart');
     }
   }, 100); // 100ms delay
 });

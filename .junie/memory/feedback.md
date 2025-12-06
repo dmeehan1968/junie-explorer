@@ -206,3 +206,11 @@
     "NEW INSTRUCTION": "WHEN display option equals tps THEN render TPS datasets as line series"
 }
 
+[2025-12-06 17:23] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "data flow",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN user asks server-to-client data flow THEN Trace handlers and client consumption; summarize endpoints, payload shape, and props."
+}
+
