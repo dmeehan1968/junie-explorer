@@ -1,10 +1,10 @@
 import * as z from "zod"
 
-export const AgentType = z.enum(['Agent', 'TaskSummarizer', 'Memorizer', 'ErrorAnalyzer', 'LanguageIdentifier', 'MemoryCompactor'])
+export const AgentType = z.enum(['Assistant', 'TaskSummarizer', 'Memorizer', 'ErrorAnalyzer', 'LanguageIdentifier', 'MemoryCompactor'])
 export type AgentType = z.infer<typeof AgentType>
 
 const AGENT_TYPE_PATTERNS: Record<AgentType, RegExp[]> = {
-  [AgentType.enum.Agent]: [
+  [AgentType.enum.Assistant]: [
     /^## ENVIRONMENT/,
     /^You are a programming expert/,
     /^SETTING: Your role is a coding assistant/,
@@ -43,6 +43,6 @@ export function detectAgentType(systemPrompt: string): AgentType {
     }
   }
 
-  console.error(`Unknown agent type for system prompt: "${systemPrompt.substring(0, 100)}"..., Defaulting to Agent.`)
-  return AgentType.enum.Agent
+  console.error(`Unknown agent type for system prompt: "${systemPrompt.substring(0, 100)}"..., Defaulting to Assistant.`)
+  return AgentType.enum.Assistant
 }

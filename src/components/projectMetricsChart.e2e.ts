@@ -106,14 +106,14 @@ test.describe('ProjectMetricsChart', () => {
 
       test('should default agent type to Agent', async ({ projectMetricsChart }) => {
         await projectMetricsChart.radioButton('TPS').check()
-        await expect(projectMetricsChart.agentTypeDropdown).toHaveValue('Agent')
+        await expect(projectMetricsChart.agentTypeDropdown).toHaveValue('Assistant')
       })
 
       test('should have all agent type options', async ({ projectMetricsChart }) => {
         await projectMetricsChart.radioButton('TPS').check()
         const options = projectMetricsChart.agentTypeDropdown.locator('option')
         await expect(options).toHaveCount(6)
-        await expect(options.nth(0)).toHaveText('Agent')
+        await expect(options.nth(0)).toHaveText('Assistant')
         await expect(options.nth(1)).toHaveText('TaskSummarizer')
         await expect(options.nth(2)).toHaveText('Memorizer')
         await expect(options.nth(3)).toHaveText('ErrorAnalyzer')

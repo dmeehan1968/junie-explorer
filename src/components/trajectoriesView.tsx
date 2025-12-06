@@ -37,7 +37,7 @@ export const TrajectoriesView = ({
         const messages: JSX.Element[] = []
 
         if (current.event.type === 'LlmRequestEvent') {
-          if (current.event.chat.agentType === AgentType.enum.Agent) {
+          if (current.event.chat.agentType === AgentType.enum.Assistant) {
             if (!didOutputInitialContext) {
 
               messages.push(<Divider id="history">Start of Context/History</Divider>)

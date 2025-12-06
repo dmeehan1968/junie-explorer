@@ -300,7 +300,7 @@ async function prepareAgentTypeGraphData(projects: Project[], requestedGroup?: s
 
   // Assign colors to agent types
   const agentTypeColors: Record<string, string> = {
-    'Agent': 'hsl(210, 70%, 60%)',
+    'Assistant': 'hsl(210, 70%, 60%)',
     'TaskSummarizer': 'hsl(30, 70%, 60%)',
     'Memorizer': 'hsl(120, 70%, 60%)',
     'ErrorAnalyzer': 'hsl(0, 70%, 60%)',
@@ -324,7 +324,7 @@ async function prepareAgentTypeGraphData(projects: Project[], requestedGroup?: s
             if (isResponseEvent(eventRecord.event)) {
               const responseEvent = eventRecord.event
               const requestEvent = responseEvent.requestEvent
-              const agentType = requestEvent?.chat.agentType ?? 'Agent'
+              const agentType = requestEvent?.chat.agentType ?? 'Assistant'
 
               const cost = responseEvent.answer.cost ?? 0
               const inputTokens = responseEvent.answer.inputTokens ?? 0
@@ -500,7 +500,7 @@ async function prepareAgentTypeGraphData(projects: Project[], requestedGroup?: s
 }
 
 // Function to prepare TPS (Tokens Per Second) data for the projects graph
-async function prepareTpsGraphData(projects: Project[], requestedGroup?: string, breakdownByModel: boolean = false, breakdownByAgentType: boolean = false, agentType: AgentType = 'Agent'): Promise<{
+async function prepareTpsGraphData(projects: Project[], requestedGroup?: string, breakdownByModel: boolean = false, breakdownByAgentType: boolean = false, agentType: AgentType = 'Assistant'): Promise<{
   datasets: Array<{
     label: string;
     data: Array<{ x: string; y: number }>;
@@ -522,7 +522,7 @@ async function prepareTpsGraphData(projects: Project[], requestedGroup?: string,
 
   // Assign colors to agent types
   const agentTypeColors: Record<string, string> = {
-    'Agent': 'hsl(210, 70%, 60%)',
+    'Assistant': 'hsl(210, 70%, 60%)',
     'TaskSummarizer': 'hsl(30, 70%, 60%)',
     'Memorizer': 'hsl(120, 70%, 60%)',
     'ErrorAnalyzer': 'hsl(0, 70%, 60%)',
@@ -549,7 +549,7 @@ async function prepareTpsGraphData(projects: Project[], requestedGroup?: string,
             if (isResponseEvent(eventRecord.event)) {
               const responseEvent = eventRecord.event
               const requestEvent = responseEvent.requestEvent
-              const eventAgentType = requestEvent?.chat.agentType ?? 'Agent'
+              const eventAgentType = requestEvent?.chat.agentType ?? 'Assistant'
 
               // For non-agentType breakdown, filter by the selected agent type
               if (!breakdownByAgentType && eventAgentType !== agentType) {
@@ -769,7 +769,7 @@ router.get('/api/projects/graph', async (req: AppRequest, res: AppResponse) => {
     const displayOption: string = typeof display === 'string' ? display : 'cost'
     const agentTypeParam: AgentType = typeof agentType === 'string' && AgentType.safeParse(agentType).success
       ? agentType as AgentType
-      : 'Agent'
+      : 'Assistant'
     const allProjects: Project[] = Array.from((await req.jetBrains?.projects ?? []).values())
 
     // Filter projects by name if names are provided

@@ -29,11 +29,11 @@ const requestEvent = (overrides: Partial<LlmRequestEvent> = {}): LlmRequestEvent
 
   let agentType: AgentType
   if (/^## ENVIRONMENT/.test(chat.system)) {
-    agentType = AgentType.enum.Agent
+    agentType = AgentType.enum.Assistant
   } else if (/^You are a programming task description summarizer|You are a task (step|trace) summarizer|You are a chat response title creator|^Your task is to summarize/.test(chat.system)) {
     agentType = AgentType.enum.TaskSummarizer
   } else {
-    agentType = AgentType.enum.Agent // Default for tests
+    agentType = AgentType.enum.Assistant // Default for tests
   }
   (chat as any).agentType = agentType
 

@@ -4,7 +4,7 @@ let projectsChart = null;
 let displayOption = 'cost'; // Default display option (cost, tokens, tps)
 let groupOption = 'auto'; // Grouping option for x-axis (auto, hour, day, week, month)
 let viewOption = 'project'; // View option (project, model)
-let agentTypeOption = 'Agent'; // Agent type option for TPS display
+let agentTypeOption = 'Assistant'; // Agent type option for TPS display
 
 // Helper to get cookie
 function getCookie(name) {
@@ -47,7 +47,7 @@ function initializeProjectSelection() {
     if (radio) radio.checked = true;
   }
 
-  // Initialize agent type option from local storage or default to 'Agent'
+  // Initialize agent type option from local storage or default to 'Assistant'
   const storedAgentTypeOption = localStorage.getItem('junie-explorer-agentTypeOption');
   if (storedAgentTypeOption) {
     agentTypeOption = storedAgentTypeOption;

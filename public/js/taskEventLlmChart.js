@@ -304,8 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
         providerFiltersContainer.innerHTML = '';
         const providers = originalChartData.providers;
 
-        // Initialize selection to first 'Agent*' provider, or 'all' if none found
-        const agentProvider = providers.find(p => p.startsWith('Agent'));
+        // Initialize selection to first 'Assistant*' provider, or 'all' if none found
+        const agentProvider = providers.find(p => p.startsWith('Assistant'));
         selectedProvider = agentProvider || 'all';
         selectedProvidersSet = agentProvider ? new Set([agentProvider]) : new Set(providers);
 
