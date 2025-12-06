@@ -7,7 +7,7 @@ import { MessageDecorator } from "./messageDecorator"
 export function getMessageDiffs({
   event: current,
   timestamp,
-}: TrajectoryEventRecord, previousEventRecords: TrajectoryEventRecord[], klass: string): JSX.Element[] {
+}: TrajectoryEventRecord, previousEventRecords: TrajectoryEventRecord[], klass: string, showAllDiffs: boolean = false): JSX.Element[] {
 
   const getMarkup = (messagesDiff: ChangeObject<string>[], timestamp: Date, label: string, klass: string) => {
     const commonStyle = 'border-l-4 pl-4'
@@ -71,9 +71,13 @@ export function getMessageDiffs({
     // number of messages to rewind the current history to match the previous history
     const rewind = current.modelParameters.model.provider === 'Anthropic' ? 3 : 2
 
+    const currentMessagesForDiff = showAllDiffs
+      ? current.chat.messages
+      : current.chat.messages.slice(0, -rewind) // remove tool use and result
+
     const messagesDiff = diffJson(
       JSON.stringify(previous.chat.messages, null, 2),
-      JSON.stringify(current.chat.messages.slice(0, -rewind), null, 2), // remove tool use and result
+      JSON.stringify(currentMessagesForDiff, null, 2),
     )
 
     markup.push(getMarkup(messagesDiff, timestamp, 'Message History (diff)', klass))

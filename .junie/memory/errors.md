@@ -98,3 +98,13 @@
     "NEW INSTRUCTION": "WHEN open reports path not found THEN search repo for filename and open the found path"
 }
 
+[2025-12-06 09:41] - Updated by Junie - Error analysis
+{
+    "TYPE": "env/setup",
+    "TOOL": "bash",
+    "ERROR": "bun install ran outside repo; package.json not found",
+    "ROOT CAUSE": "The command was executed from the home directory instead of the repository root.",
+    "PROJECT NOTE": "Run release commands from the repo root (junie-explorer) so package.json is visible.",
+    "NEW INSTRUCTION": "WHEN package manager reports no package.json THEN cd to repository root and rerun the command"
+}
+

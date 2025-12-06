@@ -12,6 +12,14 @@ export class MessageTrajectoriesSectionDSL {
     return this.page.getByRole('heading', { name: 'Message Trajectories' })
   }
 
+  get showAllDiffsToggle() {
+    return this.page.getByTestId('show-all-diffs-toggle')
+  }
+
+  get showAllDiffsCheckbox() {
+    return this.showAllDiffsToggle.getByRole('checkbox')
+  }
+
   get systemMessage() {
     return this.page.getByTestId('system-message').locator('..')
   }

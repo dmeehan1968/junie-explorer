@@ -174,3 +174,11 @@
     "NEW INSTRUCTION": "WHEN task requests running tests and fixing errors THEN run tests, fix failures, rerun, summarize changes"
 }
 
+[2025-12-06 10:41] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "UI toggle",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN Show All Diffs toggle is enabled THEN skip slice(0, -rewind) in getMessageDiffs"
+}
+

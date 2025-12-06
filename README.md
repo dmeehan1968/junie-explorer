@@ -15,6 +15,7 @@ all projects across IDE's found on the system.
 - Provides metrics and statistics for issues and tasks
 - Task cards provide top-attached tabs for switching between **Trajectories** and **Events**, visually connected to the card header
 - Task descriptions are constrained to a readable height (around 200px) with an expand/collapse toggle for long content
+- Trajectories view includes a **Show All Diffs** toggle that controls whether message diffs include all messages or respect the model-specific `rewind` trimming
 - Includes a refresh button to update the data
 - Responsive web interface
 - Persists selected projects via cookies (migrated from local storage)
@@ -141,6 +142,21 @@ bun run dev
 This will start the server using `bunx`, which runs the TypeScript code without the need for transpiling.
 
 ## Testing
+
+Before running the Playwright test suite for the first time on a machine, you **must install the browser binaries** that Playwright uses. After installing dependencies with `bun install`, run:
+
+```bash
+bun run playwright:install
+```
+
+This is equivalent to `npx playwright install` and will download the required browsers. If you see an error similar to:
+
+```text
+browserType.launch: Executable doesn't exist at .../chrome-headless-shell
+```
+
+it usually means the Playwright browsers have not been installed yet; rerun the command above.
+
 To test the application functionality using Playwright (Component and E2E tests):
 ```bash
 bun run test

@@ -43,6 +43,19 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
     const tasksCount = (await issue.tasks).size
     const tasksDescriptions = [...(await issue.tasks).values()].map(t => t?.context?.description ?? '')
 
+    const url = new URL(req.originalUrl ?? req.url, 'http://localhost')
+    const showAllDiffsParam = url.searchParams.get('showAllDiffs')
+    const showAllDiffs = showAllDiffsParam === '1'
+
+    const toggledUrl = new URL(url)
+    if (showAllDiffs) {
+      toggledUrl.searchParams.delete('showAllDiffs')
+    } else {
+      toggledUrl.searchParams.set('showAllDiffs', '1')
+    }
+
+    const toggleHref = `${toggledUrl.pathname}${toggledUrl.search}`
+
     // Generate JSX page
     const page = async (rid: number | string) => <HtmlPage cookies={req.cookies}>
       <AppHead title={`${project.name} ${issue.name} ${task.id} Trajectories`}>
@@ -89,7 +102,7 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
         <ActionTimelineSection hasActionEvents={hasActionEvents} actionCount={actionCount} />
         <ModelPerformanceSection hasMetrics={hasMetrics} />
         <ContextSizeSection showIncludeAllTasks={tasksCount > 1} />
-        <MessageTrajectoriesSection events={events} />
+        <MessageTrajectoriesSection events={events} showAllDiffs={showAllDiffs} toggleHref={toggleHref} />
       </AppBody>
       <ImageModal />
     </HtmlPage>

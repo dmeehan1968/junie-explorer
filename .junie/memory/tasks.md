@@ -298,3 +298,33 @@
     "NEW INSTRUCTION": "WHEN a transform contains schema.parse calls THEN replace with safeParse and add issues via ctx"
 }
 
+[2025-12-06 09:42] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "overcomplex changelog edit, run install in wrong directory",
+    "MISSING STEPS": "run tests, run build, push changes",
+    "BOTTLENECK": "Changelog generation via a long perl one-liner stalled and was aborted.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN preparing a release THEN run tests and build from repo root before tagging"
+}
+
+[2025-12-06 10:40] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "add tests,update docs,seek confirmation,design persistence questions",
+    "MISSING STEPS": "locate getMessageDiffs,implement toggle,wire query param,thread flag to TrajectoriesView,modify getMessageDiffs,manual verify",
+    "BOTTLENECK": "Asked for confirmation and planned extensive tests instead of implementing the minimal change.",
+    "PROJECT NOTE": "Search for getMessageDiffs and add the toggle inline in MessageTrajectoriesSection; pass a showAllDiffs flag into TrajectoriesView.",
+    "NEW INSTRUCTION": "WHEN MessageTrajectoriesSection and TrajectoriesView are located THEN insert inline 'Show All Diffs' toggle and thread flag to getMessageDiffs"
+}
+
+[2025-12-06 10:45] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "add tests,wire route params,update getMessageDiffs,run tests",
+    "BOTTLENECK": "UI changes began before locating and adapting getMessageDiffs and route plumbing.",
+    "PROJECT NOTE": "getMessageDiffs is likely within trajectoriesView.tsx; route taskTrajectoriesRoute.tsx should parse a showAllDiffs query param and pass it into MessageTrajectoriesSection/TrajectoriesView.",
+    "NEW INSTRUCTION": "WHEN a UI toggle changes diff computation THEN add failing e2e test and locate data function first"
+}
+

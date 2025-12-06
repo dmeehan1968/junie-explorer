@@ -11,7 +11,13 @@ import { MessageDecorator } from "./messageDecorator"
 import { ToolCallDecorator } from "./toolCallDecorator"
 import { ToolDecorator } from "./toolDecorator"
 
-export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
+export const TrajectoriesView = ({
+  events,
+  showAllDiffs = false,
+}: {
+  events: EventRecord[],
+  showAllDiffs?: boolean,
+}) => {
   if (events.length === 0) {
     return (
       <div class="p-4 text-center text-base-content/70" data-testid="no-events-message">
@@ -78,7 +84,7 @@ export const TrajectoriesView = ({ events }: { events: EventRecord[] }) => {
 
             } else {
 
-              messages.push(...getMessageDiffs(current, records.slice(), klass))
+              messages.push(...getMessageDiffs(current, records.slice(), klass, showAllDiffs))
 
             }
           }
