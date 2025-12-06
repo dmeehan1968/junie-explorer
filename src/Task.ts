@@ -331,17 +331,17 @@ export class Task {
       // in cacheInputTokens since the previous event.  However, its not consistent and sometimes gives a lower
       // figure, and then pops back up to roughly where it should be on the next event.
       if (isGpt5ResponseEvent(record.event)) {
-        // find the previous response event of the same time
-        const previousEvent = events
-          .slice(0, index)
-          .reverse()    // in-place, but the slice has created a copy so no unintended side effect
-          .find(previous =>   // find matching model request
+
+        const previousResponse = events
+          .slice(0, index)    // shallow copy from past
+          .reverse()                // so we search backwards, most efficient
+          .find(previous =>         // find the previous response event for the same model
             isResponseEvent(previous.event) && isResponseEvent(record.event) && previous.event.answer.llm.jbai === record.event.answer.llm.jbai)
 
-        if (previousEvent && previousEvent.event.type === LlmResponseEvent.shape.type.value) {
+        if (previousResponse && previousResponse.event.type === LlmResponseEvent.shape.type.value) {
           // next line is a bit of a kludge so we can use cacheCreateInputTokens in the same way as Sonnet and still get
           // them costed correctly.
-          record.event.answer.cacheCreateInputTokens = Math.max(0, record.event.answer.cacheInputTokens - previousEvent.event.answer.cacheInputTokens - previousEvent.event.answer.cacheCreateInputTokens)
+          record.event.answer.cacheCreateInputTokens = Math.max(0, record.event.answer.cacheInputTokens - previousResponse.event.answer.cacheInputTokens - previousResponse.event.answer.cacheCreateInputTokens)
           record.event.answer.cacheInputTokens = Math.max(record.event.answer.cacheInputTokens - record.event.answer.cacheCreateInputTokens)
         } else {
           record.event.answer.cacheCreateInputTokens = record.event.answer.cacheInputTokens
