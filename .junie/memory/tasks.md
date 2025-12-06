@@ -328,3 +328,13 @@
     "NEW INSTRUCTION": "WHEN a UI toggle changes diff computation THEN add failing e2e test and locate data function first"
 }
 
+[2025-12-06 10:54] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "ask user to confirm scope,design tests before reading failures,update README,run type checking",
+    "MISSING STEPS": "run tests,open failing tests,update tests,rerun tests,submit",
+    "BOTTLENECK": "No failing output gathered; planning proceeded without executing or inspecting tests.",
+    "PROJECT NOTE": "Review src/components/taskCard.dsl.ts for current DSL expectations and selectors.",
+    "NEW INSTRUCTION": "WHEN task mentions failing tests THEN run related tests and open failing test files first"
+}
+

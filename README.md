@@ -13,8 +13,8 @@ all projects across IDE's found on the system.
 - Shows issues, tasks, events, trajectories, and steps within projects
 - Shows raw JSON logs for each issue with expand/collapse for ease of navigation
 - Provides metrics and statistics for issues and tasks
-- Task cards provide top-attached tabs for switching between **Trajectories** and **Events**, visually connected to the card header
-- Task descriptions are constrained to a readable height (around 200px) with an expand/collapse toggle for long content
+- Task cards provide top-attached tabs for switching between **Trajectories** and **Events**, visually connected to the card header and covered by Playwright tests
+- Task descriptions are constrained to a readable height (around 200px) with an expand/collapse toggle for long content, with tests ensuring the max-height and toggle behavior remain consistent
 - Trajectories view includes a **Show All Diffs** toggle that controls whether message diffs include all messages or respect the model-specific `rewind` trimming
 - Includes a refresh button to update the data
 - Responsive web interface

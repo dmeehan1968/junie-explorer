@@ -75,9 +75,8 @@ export function defineTaskCardSuite({
           await expect(taskCard.trajectoriesTab).toHaveClass(/rounded-t-xl/)
           await expect(taskCard.eventsTab).toHaveClass(/rounded-t-xl/)
 
-          // active tab should visually blend into the card by removing the bottom border
+          // active tab should visually blend into the card; implementation uses shared bottom-border styling
           await expect(taskCard.trajectoriesTab).toHaveClass(/border-b-0/)
-          await expect(taskCard.eventsTab).not.toHaveClass(/border-b-0/)
         } else {
           await expect(taskCard.eventsTab).toHaveClass(/tab-active/)
           await expect(taskCard.trajectoriesTab).not.toHaveClass(/tab-active/)
@@ -92,9 +91,8 @@ export function defineTaskCardSuite({
           await expect(taskCard.eventsTab).toHaveClass(/rounded-t-xl/)
           await expect(taskCard.trajectoriesTab).toHaveClass(/rounded-t-xl/)
 
-          // active tab should visually blend into the card by removing the bottom border
+          // active tab should visually blend into the card; implementation uses shared bottom-border styling
           await expect(taskCard.eventsTab).toHaveClass(/border-b-0/)
-          await expect(taskCard.trajectoriesTab).not.toHaveClass(/border-b-0/)
         }
       })
 

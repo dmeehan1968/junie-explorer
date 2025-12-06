@@ -182,3 +182,11 @@
     "NEW INSTRUCTION": "WHEN Show All Diffs toggle is enabled THEN skip slice(0, -rewind) in getMessageDiffs"
 }
 
+[2025-12-06 10:55] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "tests update",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN task requests updating tests to match implementation THEN modify tests to reflect current behavior, avoid code changes"
+}
+
