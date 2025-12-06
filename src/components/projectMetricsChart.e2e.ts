@@ -41,6 +41,35 @@ test.describe('ProjectMetricsChart', () => {
       await expect(projectMetricsChart.container).toHaveScreenshot({ animations: "disabled" })
     })
 
+    test.describe('AgentType Series Option', () => {
+      test('should have AgentType radio button option in Series', async ({ projectMetricsChart }) => {
+        await expect(projectMetricsChart.radioButton('AgentType')).toBeVisible()
+      })
+
+      test('should be able to select AgentType series', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('AgentType').check()
+        await expect(projectMetricsChart.radioButton('AgentType')).toBeChecked()
+      })
+
+      test('should show chart with AgentType series and Cost display', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('AgentType').check()
+        await projectMetricsChart.radioButton('Cost').check()
+        await expect(projectMetricsChart.container).toHaveScreenshot({ animations: "disabled" })
+      })
+
+      test('should show chart with AgentType series and Tokens display', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('AgentType').check()
+        await projectMetricsChart.radioButton('Tokens').check()
+        await expect(projectMetricsChart.container).toHaveScreenshot({ animations: "disabled" })
+      })
+
+      test('should show chart with AgentType series and TPS display', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('AgentType').check()
+        await projectMetricsChart.radioButton('TPS').check()
+        await expect(projectMetricsChart.container).toHaveScreenshot({ animations: "disabled" })
+      })
+    })
+
     for (const displayBy of ['Cost', 'Tokens']) {
       test.describe.parallel(`Display By ${displayBy}`, async () => {
         for (const groupBy of ['Auto', 'Hour', 'Day', 'Week', 'Month']) {
@@ -54,6 +83,44 @@ test.describe('ProjectMetricsChart', () => {
         }
       })
     }
+
+    test.describe('TPS Display Option', () => {
+      test('should have TPS radio button option', async ({ projectMetricsChart }) => {
+        await expect(projectMetricsChart.radioButton('TPS')).toBeVisible()
+      })
+
+      test('should hide agent type dropdown when Cost is selected', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('Cost').check()
+        await expect(projectMetricsChart.agentTypeContainer).toBeHidden()
+      })
+
+      test('should hide agent type dropdown when Tokens is selected', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('Tokens').check()
+        await expect(projectMetricsChart.agentTypeContainer).toBeHidden()
+      })
+
+      test('should show agent type dropdown when TPS is selected', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('TPS').check()
+        await expect(projectMetricsChart.agentTypeContainer).toBeVisible()
+      })
+
+      test('should default agent type to Agent', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('TPS').check()
+        await expect(projectMetricsChart.agentTypeDropdown).toHaveValue('Agent')
+      })
+
+      test('should have all agent type options', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('TPS').check()
+        const options = projectMetricsChart.agentTypeDropdown.locator('option')
+        await expect(options).toHaveCount(6)
+        await expect(options.nth(0)).toHaveText('Agent')
+        await expect(options.nth(1)).toHaveText('TaskSummarizer')
+        await expect(options.nth(2)).toHaveText('Memorizer')
+        await expect(options.nth(3)).toHaveText('ErrorAnalyzer')
+        await expect(options.nth(4)).toHaveText('LanguageIdentifier')
+        await expect(options.nth(5)).toHaveText('MemoryCompactor')
+      })
+    })
   })
 
   test('should show loading indicator during slow fetch', async ({ page, projectTable, projectMetricsChart }) => {

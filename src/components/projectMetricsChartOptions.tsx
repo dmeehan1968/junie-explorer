@@ -1,8 +1,10 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Component, Html } from "@kitajs/html"
+import { AgentType } from "../schema/agentType"
 
 export const ProjectMetricsChartOptions: Component = () => {
+  const agentTypes = AgentType.options
   return (
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:gap-6" id="project-chart-display">
       <div class="flex gap-2 items-center">
@@ -12,6 +14,8 @@ export const ProjectMetricsChartOptions: Component = () => {
                  aria-label="Project" onchange="handleViewOptionChange(this)" checked/>
           <input class="join-item btn btn-sm" type="radio" id="view-model" value="model" name="view-option"
                  aria-label="Model" onchange="handleViewOptionChange(this)"/>
+          <input class="join-item btn btn-sm" type="radio" id="view-agentType" value="agentType" name="view-option"
+                 aria-label="AgentType" onchange="handleViewOptionChange(this)"/>
         </div>
       </div>
       <div class="flex gap-2 items-center">
@@ -21,7 +25,17 @@ export const ProjectMetricsChartOptions: Component = () => {
                  aria-label="Cost" onchange="handleDisplayOptionChange(this)" checked/>
           <input class="join-item btn btn-sm" type="radio" id="display-tokens" value="tokens" name="display-option"
                  aria-label="Tokens" onchange="handleDisplayOptionChange(this)"/>
+          <input class="join-item btn btn-sm" type="radio" id="display-tps" value="tps" name="display-option"
+                 aria-label="TPS" onchange="handleDisplayOptionChange(this)"/>
         </div>
+      </div>
+      <div class="flex gap-2 items-center hidden" id="agent-type-container">
+        <div class="">Agent:</div>
+        <select id="agent-type-select" class="select select-sm select-bordered" onchange="handleAgentTypeChange(this)">
+          {agentTypes.map(agentType => (
+            <option value={agentType}>{agentType}</option>
+          ))}
+        </select>
       </div>
       <div class="flex gap-2 items-center">
         <div class="">Group:</div>

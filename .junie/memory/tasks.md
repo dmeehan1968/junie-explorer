@@ -348,3 +348,23 @@
     "NEW INSTRUCTION": "WHEN task is tests-only alignment THEN skip type-check and docs updates"
 }
 
+[2025-12-06 16:20] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "present plan to user,implementation using TDD,documentation",
+    "MISSING STEPS": "verify time metric availability,define TPS dataset shape in API,wire agentType request/response params",
+    "BOTTLENECK": "Too much upfront planning and confirmation delayed implementation.",
+    "PROJECT NOTE": "Use AgentType enum from src/schema/agentType.ts for dropdown values.",
+    "NEW INSTRUCTION": "WHEN adding TPS feature THEN verify time field exists and define API TPS dataset before UI"
+}
+
+[2025-12-06 16:31] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "submit",
+    "MISSING STEPS": "add AgentType series, update API, wire data, add tests, run app",
+    "BOTTLENECK": "AgentType series and aggregations were not implemented before submission.",
+    "PROJECT NOTE": "Series controls show only Project/Model; AgentType radio is missing and backend grouping for cost/tokens by agent type is absent.",
+    "NEW INSTRUCTION": "WHEN adding a new chart series dimension THEN add UI toggle, backend aggregation, and dataset wiring"
+}
+

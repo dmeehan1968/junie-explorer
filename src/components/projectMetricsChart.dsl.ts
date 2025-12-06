@@ -17,6 +17,14 @@ export class ProjectMetricsChartDSL {
     return this.page.locator('#project-metrics-chart')
   }
 
+  get agentTypeDropdown() {
+    return this.page.locator('#agent-type-select')
+  }
+
+  get agentTypeContainer() {
+    return this.page.locator('#agent-type-container')
+  }
+
 }
 
 export const test = base.extend<{ projectMetricsChart: ProjectMetricsChartDSL }>({

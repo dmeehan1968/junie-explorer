@@ -1,9 +1,10 @@
 // Global variables for project selection
 let selectedProjects = {};
 let projectsChart = null;
-let displayOption = 'cost'; // Default display option (cost, tokens)
+let displayOption = 'cost'; // Default display option (cost, tokens, tps)
 let groupOption = 'auto'; // Grouping option for x-axis (auto, hour, day, week, month)
 let viewOption = 'project'; // View option (project, model)
+let agentTypeOption = 'Agent'; // Agent type option for TPS display
 
 // Helper to get cookie
 function getCookie(name) {
@@ -36,13 +37,32 @@ function initializeProjectSelection() {
   // Initialize display option from local storage or default to 'cost'
   if (storedDisplayOption) {
     // Coerce legacy 'both' value to 'cost'
-    displayOption = storedDisplayOption === 'both' ? 'cost' : storedDisplayOption;
+    const allowed = ['cost', 'tokens', 'tps'];
+    displayOption = storedDisplayOption === 'both' ? 'cost' : (allowed.includes(storedDisplayOption) ? storedDisplayOption : 'cost');
     // Persist coerced value if it changed
     if (displayOption !== storedDisplayOption) {
       localStorage.setItem('junie-explorer-displayOption', displayOption);
     }
     const radio = document.querySelector(`input[name="display-option"][value="${displayOption}"]`);
     if (radio) radio.checked = true;
+  }
+
+  // Initialize agent type option from local storage or default to 'Agent'
+  const storedAgentTypeOption = localStorage.getItem('junie-explorer-agentTypeOption');
+  if (storedAgentTypeOption) {
+    agentTypeOption = storedAgentTypeOption;
+    const agentTypeSelect = document.getElementById('agent-type-select');
+    if (agentTypeSelect) agentTypeSelect.value = agentTypeOption;
+  }
+
+  // Show/hide agent type dropdown based on display option
+  const agentTypeContainer = document.getElementById('agent-type-container');
+  if (agentTypeContainer) {
+    if (displayOption === 'tps') {
+      agentTypeContainer.classList.remove('hidden');
+    } else {
+      agentTypeContainer.classList.add('hidden');
+    }
   }
 
   // Initialize group option from local storage or default to 'auto'
@@ -160,14 +180,32 @@ function updateSelectAllCheckbox() {
   }
 }
 
-// Handle display option change (Cost, Tokens)
+// Handle display option change (Cost, Tokens, TPS)
 function handleDisplayOptionChange(radio) {
-  displayOption = radio.value === 'tokens' ? 'tokens' : 'cost'; // default to 'cost' for any unexpected value
+  const allowed = ['cost', 'tokens', 'tps'];
+  displayOption = allowed.includes(radio.value) ? radio.value : 'cost'; // default to 'cost' for any unexpected value
 
   // Save to local storage
   localStorage.setItem('junie-explorer-displayOption', displayOption);
 
+  // Show/hide agent type dropdown based on display option
+  const agentTypeContainer = document.getElementById('agent-type-container');
+  if (agentTypeContainer) {
+    if (displayOption === 'tps') {
+      agentTypeContainer.classList.remove('hidden');
+    } else {
+      agentTypeContainer.classList.add('hidden');
+    }
+  }
+
   // Reload the graph with the new display option
+  loadProjectMetricsChart();
+}
+
+// Handle agent type change
+function handleAgentTypeChange(select) {
+  agentTypeOption = select.value;
+  localStorage.setItem('junie-explorer-agentTypeOption', agentTypeOption);
   loadProjectMetricsChart();
 }
 
@@ -179,9 +217,9 @@ function handleGroupOptionChange(radio) {
   loadProjectMetricsChart();
 }
 
-// Handle view option change (Project, Model)
+// Handle view option change (Project, Model, AgentType)
 function handleViewOptionChange(radio) {
-  const allowed = ['project', 'model'];
+  const allowed = ['project', 'model', 'agentType'];
   viewOption = allowed.includes(radio.value) ? radio.value : 'project';
   localStorage.setItem('junie-explorer-viewOption', viewOption);
   loadProjectMetricsChart();
@@ -228,8 +266,10 @@ async function loadProjectMetricsChart() {
 
   try {
     // Fetch graph data for selected projects
-    const breakdownParam = viewOption === 'model' ? '&breakdown=model' : '';
-    const response = await fetch('/api/projects/graph?names=' + selectedProjectNames.join(',') + '&group=' + encodeURIComponent(groupOption) + breakdownParam);
+    const breakdownParam = viewOption === 'model' ? '&breakdown=model' : (viewOption === 'agentType' ? '&breakdown=agentType' : '');
+    const displayParam = '&display=' + encodeURIComponent(displayOption);
+    const agentTypeParam = displayOption === 'tps' ? '&agentType=' + encodeURIComponent(agentTypeOption) : '';
+    const response = await fetch('/api/projects/graph?names=' + selectedProjectNames.join(',') + '&group=' + encodeURIComponent(groupOption) + breakdownParam + displayParam + agentTypeParam);
     const graphData = await response.json();
 
     // Create or update the chart
@@ -272,7 +312,10 @@ function createProjectsChart(graphData) {
   // Filter datasets based on the selected display option
   let filteredDatasets = [];
   if (graphData.datasets) {
-    if (displayOption === 'tokens') {
+    if (displayOption === 'tps') {
+      // TPS datasets are already on the y axis
+      filteredDatasets = graphData.datasets.filter(dataset => dataset.yAxisID === 'y');
+    } else if (displayOption === 'tokens') {
       // Move token datasets to the primary axis (y)
       filteredDatasets = graphData.datasets
         .filter(dataset => dataset.yAxisID === 'y1')
@@ -285,11 +328,17 @@ function createProjectsChart(graphData) {
   // Choose tooltip/date formats based on time unit
   const unit = graphData.timeUnit || 'day';
 
-  // Convert datasets to stacked bars (single main stack on primary axis)
-  filteredDatasets = filteredDatasets.map(ds => Object.assign({}, ds, {
-    type: 'bar',
-    stack: 'main'
-  }));
+  // Convert datasets to bars (stacked for cost/tokens) or lines (for TPS)
+  if (displayOption === 'tps') {
+    filteredDatasets = filteredDatasets.map(ds => Object.assign({}, ds, {
+      type: 'line'
+    }));
+  } else {
+    filteredDatasets = filteredDatasets.map(ds => Object.assign({}, ds, {
+      type: 'bar',
+      stack: 'main'
+    }));
+  }
   const tooltipFormat = unit === 'hour' ? 'MMM d, yyyy HH:00' : (unit === 'month' ? 'MMM yyyy' : (unit === 'year' ? 'yyyy' : 'MMM d, yyyy'));
 
   // Create chart configuration
@@ -315,7 +364,7 @@ function createProjectsChart(graphData) {
       scales: {
         x: {
           type: 'time',
-          stacked: true,
+          stacked: displayOption !== 'tps',
           offset: true,
           time: {
             unit: graphData.timeUnit || 'day',
@@ -341,16 +390,19 @@ function createProjectsChart(graphData) {
         },
         y: {
           position: 'left',
-          stacked: true,
+          stacked: displayOption !== 'tps',
           title: {
             display: true,
-            text: displayOption === 'tokens' ? 'Tokens' : 'Cost ($)'
+            text: displayOption === 'tps' ? 'TPS (tokens/sec)' : (displayOption === 'tokens' ? 'Tokens' : 'Cost ($)')
           },
           beginAtZero: true,
           display: true,
           ticks: {
             callback: function(value) {
               const n = Number(value);
+              if (displayOption === 'tps') {
+                return n.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+              }
               if (displayOption === 'tokens') {
                 return n.toLocaleString();
               }
@@ -381,7 +433,7 @@ function createProjectsChart(graphData) {
           }
         },
         legend: {
-          display: viewOption === 'model' || (graphData.projectNames && graphData.projectNames.length > 1),
+          display: viewOption === 'model' || viewOption === 'agentType' || (graphData.projectNames && graphData.projectNames.length > 1),
           position: 'bottom',
           labels: {
             usePointStyle: true,

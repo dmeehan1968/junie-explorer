@@ -106,11 +106,18 @@ This refactor removes the server-side method that previously injected `window.ch
 ### Project Metrics Chart
 
 The Project Metrics Chart on the home page has been enhanced to support:
-- **Series Toggling**: Users can switch between viewing metrics aggregated by Project or broken down by Model.
-- **Data Source**: Model breakdown data is derived from `LlmResponseEvent` metrics.
-- **API Support**: The `/api/projects/graph` endpoint accepts a `breakdown=model` parameter to return detailed datasets.
+- **Series Toggling**: Users can switch between viewing metrics aggregated by Project, broken down by Model, or broken down by AgentType.
+- **Display Options**: Users can switch between Cost, Tokens, and TPS (Tokens Per Second) views.
+- **AgentType Series**: When AgentType is selected as the series, the chart shows cost/tokens/TPS split between different agent types (Agent, TaskSummarizer, Memorizer, ErrorAnalyzer, LanguageIdentifier, MemoryCompactor). This aggregates data from LLM response events grouped by the agent type detected from the request's system prompt.
+- **TPS (Tokens Per Second)**: When TPS is selected as the display option, the chart displays as a line chart (instead of bar chart) and an Agent Type dropdown appears allowing filtering by agent type. TPS is calculated as `outputTokens / (time / 1000)` from LLM response events.
+- **Data Source**: Model and AgentType breakdown data is derived from `LlmResponseEvent` metrics.
+- **API Support**: The `/api/projects/graph` endpoint accepts:
+  - `breakdown=model` parameter to return detailed datasets by model
+  - `breakdown=agentType` parameter to return detailed datasets by agent type
+  - `display=tps` parameter to return TPS data instead of cost/tokens
+  - `agentType=<type>` parameter to filter TPS data by agent type (defaults to 'Agent', only used when breakdown is not agentType)
 - **Loading State**: A loading indicator is displayed during data fetches (with 200ms delay).
-- **Improved Visualization**: Better rendering of 'week' based groupings and ensures legends are visible for model-based views even for single projects.
+- **Improved Visualization**: Better rendering of 'week' based groupings and ensures legends are visible for model-based and agent type views even for single projects.
 
 ### Worker Bundling
 

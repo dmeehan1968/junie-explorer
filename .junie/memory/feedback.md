@@ -190,3 +190,19 @@
     "NEW INSTRUCTION": "WHEN task requests updating tests to match implementation THEN modify tests to reflect current behavior, avoid code changes"
 }
 
+[2025-12-06 16:23] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "charts metrics",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN view option equals agent type THEN aggregate datasets by agent type across selected projects; exclude project from series"
+}
+
+[2025-12-06 16:43] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "charts rendering",
+    "ERROR": "TPS uses bar chart",
+    "NEW INSTRUCTION": "WHEN display option equals tps THEN render TPS datasets as line series"
+}
+
