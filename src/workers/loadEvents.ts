@@ -1,5 +1,4 @@
 import fs from "fs-extra"
-import { ZodError } from "zod"
 import { EventRecord } from "../schema/eventRecord"
 import { EventParserError, LoadEventsOutput } from "./loadEventsOutput"
 
@@ -10,8 +9,7 @@ export async function loadEvents(eventsFile: string): Promise<LoadEventsOutput> 
     const events = content
       .split('\n')
       .filter(json => json.trim())
-      .map((line, lineIndex) => {
-        const lineNumber = lineIndex // maintain same indexing as before
+      .map((line, lineNumber) => {
         let json: any
         try {
           json = JSON.parse(line)
