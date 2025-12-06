@@ -6,12 +6,13 @@ import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
-import { openAI5 } from "./openAI5"
+import { OpenAI5 } from "./openAI5"
 import { Gemini3Pro } from "./Gemini3Pro"
 import { OpenAI41 } from "./openAI41"
 import { OpenAI41Mini } from "./openAI41Mini"
 import { OpenAI4oMini } from "./openAI4oMini"
 import { OpenAI51 } from "./openAI51"
+import { OpenAI51CodexMax } from "./openAI51CodexMax"
 import { OpenAIo3 } from "./openAIo3"
 
 function safeParseOrAddIssues<T extends z.ZodTypeAny>(
@@ -86,6 +87,9 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   if (OpenAI51.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI51, data, ctx)
   }
+  if (OpenAI51CodexMax.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return safeParseOrAddIssues(OpenAI51CodexMax, data, ctx)
+  }
   if (Gemini3Pro.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(Gemini3Pro, data, ctx)
   }
@@ -116,8 +120,8 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   if (AnthropicClaude45Opus.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(AnthropicClaude45Opus, data, ctx)
   }
-  if (openAI5.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
-    return safeParseOrAddIssues(openAI5, {
+  if (OpenAI5.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
+    return safeParseOrAddIssues(OpenAI5, {
       name: data.name,
       provider: data.provider,
       jbai: data.jbai,

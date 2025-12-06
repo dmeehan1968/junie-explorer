@@ -3,13 +3,14 @@ import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
-import { openAI5 } from "./openAI5"
+import { OpenAI5 } from "./openAI5"
 import { Gemini3Pro } from "./Gemini3Pro"
 import { LLMTransformer } from "./LLMTransformer"
 import { OpenAI41 } from "./openAI41"
 import { OpenAI41Mini } from "./openAI41Mini"
 import { OpenAI4oMini } from "./openAI4oMini"
 import { OpenAI51 } from "./openAI51"
+import { OpenAI51CodexMax } from "./openAI51CodexMax"
 import { OpenAIo3 } from "./openAIo3"
 
 const LLMDiscriminatedUnion = z.discriminatedUnion('jbai', [
@@ -17,13 +18,14 @@ const LLMDiscriminatedUnion = z.discriminatedUnion('jbai', [
   OpenAI4oMini,
   OpenAI41Mini,
   OpenAI41,
+  OpenAI5,
   OpenAI51,
+  OpenAI51CodexMax,
   AnthropicSonnet37,
   AnthropicSonnet4,
   AnthropicSonnet45,
   AnthropicClaude45Opus,
   Gemini3Pro,
-  openAI5,
 ])
 
 export const LLM = LLMTransformer.transform((data, ctx) => {

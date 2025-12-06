@@ -18,8 +18,9 @@ import { Event } from "./schema/event"
 import { EventRecord } from "./schema/eventRecord"
 import { isRequestEvent, LlmRequestEvent } from "./schema/llmRequestEvent"
 import { isResponseEvent, LlmResponseEvent } from "./schema/llmResponseEvent"
-import { openAI5 } from "./schema/openAI5"
+import { OpenAI5 } from "./schema/openAI5"
 import { OpenAI51 } from "./schema/openAI51"
+import { OpenAI51CodexMax } from "./schema/openAI51CodexMax"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
@@ -323,7 +324,7 @@ export class Task {
 
     const isGpt5ResponseEvent = (event: Event): event is LlmResponseEvent =>
       event.type === LlmResponseEvent.shape.type.value
-      && [...openAI5.shape.jbai.options, OpenAI51.shape.jbai.value].includes(event.answer.llm.jbai as never)
+      && [...OpenAI5.shape.jbai.options, OpenAI51.shape.jbai.value, OpenAI51CodexMax.shape.jbai.value].includes(event.answer.llm.jbai as never)
 
     const adjustedEvents = events.map((record, index) => {
       // GPT-5 cacheCreateInputTokens is not provided needs to be calculated, so that its the difference
