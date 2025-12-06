@@ -108,3 +108,13 @@
     "NEW INSTRUCTION": "WHEN package manager reports no package.json THEN cd to repository root and rerun the command"
 }
 
+[2025-12-06 10:56] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "TypeScript errors in trajectoriesView.tsx during tsc --noEmit",
+    "ROOT CAUSE": "Global type-checking surfaced unrelated TS issues outside the TaskCard test scope.",
+    "PROJECT NOTE": "In src/components/trajectoriesView.tsx: current.event.answer is typed unknown (needs guard/cast) and getLabelMarkupFor returns Element where a string label is expected by toolCallDecorator; fix separately.",
+    "NEW INSTRUCTION": "WHEN task scope is tests-only THEN skip global tsc and run Playwright tests only"
+}
+

@@ -338,3 +338,13 @@
     "NEW INSTRUCTION": "WHEN task mentions failing tests THEN run related tests and open failing test files first"
 }
 
+[2025-12-06 10:56] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "ask user to confirm scope,run type check,update README",
+    "MISSING STEPS": "submit",
+    "BOTTLENECK": "Repo-wide type checking surfaced unrelated errors and distracted from the test-update task.",
+    "PROJECT NOTE": "TaskCard tabs share border-b-0 styling; tests should not expect it absent on inactive tab.",
+    "NEW INSTRUCTION": "WHEN task is tests-only alignment THEN skip type-check and docs updates"
+}
+
