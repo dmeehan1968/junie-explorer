@@ -68,6 +68,12 @@ test.describe('ProjectMetricsChart', () => {
         await projectMetricsChart.radioButton('TPS').check()
         await expect(projectMetricsChart.container).toHaveScreenshot({ animations: "disabled" })
       })
+
+      test('should hide agent type dropdown when AgentType series is selected', async ({ projectMetricsChart }) => {
+        await projectMetricsChart.radioButton('AgentType').check()
+        await projectMetricsChart.radioButton('TPS').check()
+        await expect(projectMetricsChart.agentTypeContainer).toBeHidden()
+      })
     })
 
     for (const displayBy of ['Cost', 'Tokens']) {

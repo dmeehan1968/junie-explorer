@@ -368,3 +368,13 @@
     "NEW INSTRUCTION": "WHEN adding a new chart series dimension THEN add UI toggle, backend aggregation, and dataset wiring"
 }
 
+[2025-12-06 17:12] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "ask clarification, add documentation",
+    "MISSING STEPS": "update view change handler, run tests, refactor to helper",
+    "BOTTLENECK": "Visibility logic is duplicated across handlers leading to missed conditions.",
+    "PROJECT NOTE": "Create a single updateAgentDropdownVisibility invoked in initialize, display change, and view change.",
+    "NEW INSTRUCTION": "WHEN visibility depends on multiple options THEN create updateAgentDropdownVisibility and call in init and all change handlers"
+}
+

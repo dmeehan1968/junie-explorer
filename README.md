@@ -109,7 +109,7 @@ The Project Metrics Chart on the home page has been enhanced to support:
 - **Series Toggling**: Users can switch between viewing metrics aggregated by Project, broken down by Model, or broken down by AgentType.
 - **Display Options**: Users can switch between Cost, Tokens, and TPS (Tokens Per Second) views.
 - **AgentType Series**: When AgentType is selected as the series, the chart shows cost/tokens/TPS split between different agent types (Assistant, TaskSummarizer, Memorizer, ErrorAnalyzer, LanguageIdentifier, MemoryCompactor). This aggregates data from LLM response events grouped by the agent type detected from the request's system prompt.
-- **TPS (Tokens Per Second)**: When TPS is selected as the display option, the chart displays as a line chart (instead of bar chart) and an Agent Type dropdown appears allowing filtering by agent type. TPS is calculated as `outputTokens / (time / 1000)` from LLM response events.
+- **TPS (Tokens Per Second)**: When TPS is selected as the display option, the chart displays as a line chart (instead of bar chart) and an Agent Type dropdown appears allowing filtering by agent type. The Agent dropdown is hidden when AgentType is selected as the series type, since the chart already shows all agent types. TPS is calculated as `outputTokens / (time / 1000)` from LLM response events.
 - **Data Source**: Model and AgentType breakdown data is derived from `LlmResponseEvent` metrics.
 - **API Support**: The `/api/projects/graph` endpoint accepts:
   - `breakdown=model` parameter to return detailed datasets by model

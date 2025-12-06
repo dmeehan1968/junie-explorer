@@ -55,10 +55,10 @@ function initializeProjectSelection() {
     if (agentTypeSelect) agentTypeSelect.value = agentTypeOption;
   }
 
-  // Show/hide agent type dropdown based on display option
+  // Show/hide agent type dropdown based on display option and view option
   const agentTypeContainer = document.getElementById('agent-type-container');
   if (agentTypeContainer) {
-    if (displayOption === 'tps') {
+    if (displayOption === 'tps' && viewOption !== 'agentType') {
       agentTypeContainer.classList.remove('hidden');
     } else {
       agentTypeContainer.classList.add('hidden');
@@ -188,10 +188,10 @@ function handleDisplayOptionChange(radio) {
   // Save to local storage
   localStorage.setItem('junie-explorer-displayOption', displayOption);
 
-  // Show/hide agent type dropdown based on display option
+  // Show/hide agent type dropdown based on display option and view option
   const agentTypeContainer = document.getElementById('agent-type-container');
   if (agentTypeContainer) {
-    if (displayOption === 'tps') {
+    if (displayOption === 'tps' && viewOption !== 'agentType') {
       agentTypeContainer.classList.remove('hidden');
     } else {
       agentTypeContainer.classList.add('hidden');
@@ -222,6 +222,17 @@ function handleViewOptionChange(radio) {
   const allowed = ['project', 'model', 'agentType'];
   viewOption = allowed.includes(radio.value) ? radio.value : 'project';
   localStorage.setItem('junie-explorer-viewOption', viewOption);
+
+  // Show/hide agent type dropdown based on display option and view option
+  const agentTypeContainer = document.getElementById('agent-type-container');
+  if (agentTypeContainer) {
+    if (displayOption === 'tps' && viewOption !== 'agentType') {
+      agentTypeContainer.classList.remove('hidden');
+    } else {
+      agentTypeContainer.classList.add('hidden');
+    }
+  }
+
   loadProjectMetricsChart();
 }
 
