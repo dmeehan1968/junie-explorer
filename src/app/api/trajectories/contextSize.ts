@@ -68,7 +68,8 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/con
         const inputTokens = resp.answer.inputTokens ?? 0
         const outputTokens = resp.answer.outputTokens ?? 0
         const cacheInputTokens = resp.answer.cacheInputTokens ?? 0
-        const contextSize = inputTokens + outputTokens + cacheInputTokens
+        const cacheCreateInputTokens = resp.answer.cacheCreateInputTokens ?? 0
+        const contextSize = inputTokens + outputTokens + cacheInputTokens + cacheCreateInputTokens
 
         // Find matching request for reasoning effort
         let reasoning: string | undefined = undefined

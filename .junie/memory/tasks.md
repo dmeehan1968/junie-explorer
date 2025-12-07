@@ -398,3 +398,73 @@
     "NEW INSTRUCTION": "WHEN creating a new API route file THEN add it to events/index and verify the path."
 }
 
+[2025-12-06 17:43] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "open full file, measure performance, audit error handling, cross-check usage, implement changes",
+    "BOTTLENECK": "Did not inspect full loadEvents due to truncated view and skipped profiling/error semantics.",
+    "PROJECT NOTE": "Task.loadEvents requires propagating EventParserErrors; align optimizations with this contract.",
+    "NEW INSTRUCTION": "WHEN file output indicates truncation THEN open full file and scroll to inspect completely"
+}
+
+[2025-12-06 17:54] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "optimize post-processing, run tests, add timing instrumentation, derive known types from schema",
+    "BOTTLENECK": "Post-processing in Task.loadEvents still performs O(n²) lookups.",
+    "PROJECT NOTE": "Avoid hardcoding KNOWN_EVENT_TYPES; derive from Event schema discriminant to prevent drift.",
+    "NEW INSTRUCTION": "WHEN post-processing matches paired events via scans THEN build lookup maps for O(1) matching"
+}
+
+[2025-12-06 17:59] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "use stream processing, measure performance, add tests",
+    "BOTTLENECK": "Reading entire JSONL into memory and full-schema validation per line.",
+    "PROJECT NOTE": "Implement line-by-line streaming in workers/loadEvents.ts to handle large events files.",
+    "NEW INSTRUCTION": "WHEN events file is read fully into memory THEN replace with line-by-line streaming using createReadStream and readline"
+}
+
+[2025-12-06 18:07] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "submit, add documentation",
+    "MISSING STEPS": "implement single-pass parsing, implement index maps, run tests, measure performance",
+    "BOTTLENECK": "Requested improvements were not implemented before submitting.",
+    "PROJECT NOTE": "Apply single-pass parsing in src/workers/loadEvents.ts and replace O(n²) lookups with maps in Task.loadEvents.",
+    "NEW INSTRUCTION": "WHEN task requests implementing specific improvements THEN implement changes and run tests before submit"
+}
+
+[2025-12-06 18:12] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "summarize plan to user, get approval",
+    "MISSING STEPS": "type check",
+    "BOTTLENECK": "Unnecessary user confirmation slowed execution.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN task description specifies concrete refactor for one function THEN skip confirmation; implement change, run tests, then type-check"
+}
+
+[2025-12-07 13:10] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "get file structure",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Looked at the route file before the API where the metric is computed.",
+    "PROJECT NOTE": "Context size is computed in src/app/api/trajectories/contextSize.ts, not the frontend.",
+    "NEW INSTRUCTION": "WHEN question targets chart computation details THEN open API endpoint code and extract formula"
+}
+
+[2025-12-07 13:15] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "run typecheck",
+    "MISSING STEPS": "run API tests, add tests, verify endpoint",
+    "BOTTLENECK": "Repo-wide typecheck errors obscured validation of the specific API change.",
+    "PROJECT NOTE": "UI tests exist for ContextSizeSection; no API tests cover context-size endpoint.",
+    "NEW INSTRUCTION": "WHEN modifying API endpoint calculation THEN add or update API tests and verify endpoint response locally"
+}
+

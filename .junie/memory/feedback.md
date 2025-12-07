@@ -214,3 +214,27 @@
     "NEW INSTRUCTION": "WHEN user asks server-to-client data flow THEN Trace handlers and client consumption; summarize endpoints, payload shape, and props."
 }
 
+[2025-12-06 17:52] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "performance analysis",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN user asks to improve loadEvents performance THEN profile loadEvents, report bottlenecks, propose targeted optimizations"
+}
+
+[2025-12-06 17:58] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "file streaming",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN implementing loadEvents file reading THEN use readline with createReadStream to parse and validate lines incrementally"
+}
+
+[2025-12-06 18:06] - Updated by Junie
+{
+    "TYPE": "new instructions",
+    "CATEGORY": "performance optimization",
+    "ERROR": "-",
+    "NEW INSTRUCTION": "WHEN task requests implementing improvements 5 and 6 THEN use single-pass parsing in loadEvents and map-based matching in Task.loadEvents"
+}
+
