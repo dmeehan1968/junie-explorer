@@ -3,6 +3,7 @@ import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
+import { OpenAI4o } from "./openAI4o"
 import { OpenAI5 } from "./openAI5"
 import { Gemini3Pro } from "./Gemini3Pro"
 import { LLMTransformer } from "./LLMTransformer"
@@ -17,6 +18,7 @@ const LLMDiscriminatedUnion = z.discriminatedUnion('jbai', [
   OpenAIo3,
   OpenAI4oMini,
   OpenAI41Mini,
+  OpenAI4o,
   OpenAI41,
   OpenAI5,
   OpenAI51,
