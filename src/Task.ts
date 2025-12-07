@@ -1,5 +1,6 @@
 import fs from "fs-extra"
 import path from "node:path"
+import * as util from "node:util"
 import publicFiles from "./bun/public"
 import { getMaxConcurrency } from "./getMaxConcurrency"
 import {
@@ -309,7 +310,7 @@ export class Task {
 
     // Log any parse errors using the standard format
     for (const err of errors) {
-      console.log('EventParserError', err)
+      console.log('EventParserError', util.inspect(err, { depth: null, colors: true }))
     }
 
     // match LlmResponseEvent to their LlmRequestEvents
