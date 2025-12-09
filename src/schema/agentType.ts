@@ -24,7 +24,7 @@ const AGENT_TYPE_PATTERNS: Record<AgentType, RegExp[]> = {
     /^You are a \*\*User-reflection utility\*\*/,
   ],
   [AgentType.enum.ErrorAnalyzer]: [
-    /^You are an \*\*Error-analysis utility\*\*/,
+    /^\s*You are an \*\*Error-analysis utility\*\*/,
   ],
   [AgentType.enum.LanguageIdentifier]: [
     /^You are a language identifier utility/,
