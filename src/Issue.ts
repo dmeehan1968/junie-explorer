@@ -4,6 +4,8 @@ import { addSummaryMetrics, initialisedSummaryMetrics, JunieChainSchema, Summary
 import { Task } from "./Task"
 
 export class Issue {
+  public readonly logPath: string | undefined
+  public readonly taskPath: string | undefined
   public id: string = ''
   public name: string = ''
   public created: Date = new Date()
@@ -13,12 +15,26 @@ export class Issue {
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
   private _metricsByModel: Promise<Record<string, SummaryMetrics>> | undefined = undefined
 
-  constructor(public readonly logPath: string) {
-    this.init()
+  constructor(logPath: string)
+  constructor(id: string, created: Date, state: string, task: Task)
 
+  constructor(logPathOrId: string, created?: Date, state?: string, task?: Task) {
+    if (created && state && task) {
+      this.id = this.name = logPathOrId
+      this.created = created
+      this.state = state
+      this._tasks = Promise.resolve(new Map([[this.id + ' 0', task]]))
+    } else {
+      this.logPath = logPathOrId
+      this.taskPath = path.join(this.logPath, '..', path.parse(this.logPath).name)
+      this.init()
+    }
   }
 
   private init() {
+    if (!this.logPath) {
+      return
+    }
     const issue = JunieChainSchema.safeParse(fs.readJsonSync(this.logPath))
     if (!issue.success) {
       throw new Error(`Error parsing JunieChain at ${this.logPath}: ${issue.error.message}`)
@@ -42,10 +58,12 @@ export class Issue {
 
       const tasks = new Map<string, Task>()
 
-      const taskPath = path.join(this.logPath, '..', path.parse(this.logPath).name)
+      if (!this.taskPath) {
+        return resolve(tasks)
+      }
 
-      if (fs.existsSync(taskPath)) {
-        fs.globSync(path.join(taskPath, 'task-*.json'))
+      if (fs.existsSync(this.taskPath)) {
+        fs.globSync(path.join(this.taskPath, 'task-*.json'))
           .map(path => new Task(path))
           .sort((a, b) => a.created.getTime() - b.created.getTime())
           .forEach(task => tasks.set(task.id, task))

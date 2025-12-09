@@ -3,6 +3,7 @@ import path from "node:path"
 import { Issue } from "./Issue"
 import { Logger } from "./jetbrains"
 import { addSummaryMetrics, initialisedSummaryMetrics, SummaryMetrics } from "./schema"
+import { Task } from "./Task"
 
 export class Project {
   readonly logPaths: string[] = []
@@ -35,6 +36,23 @@ export class Project {
         fs.globSync(path.join(root, 'chain-*.json'))
           .map(path => new Issue(path))
           .sort((a, b) => a.name.localeCompare(b.name))
+          .forEach(issue => issues.set(issue.id, issue))
+
+        const eventsPath = path.join(logPath, 'events')
+
+        if (!fs.existsSync(eventsPath)) {
+          continue
+        }
+        const eventsRegex = /(?<id>[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})-events\.jsonl$/i
+
+        fs.globSync(path.join(eventsPath, '*-events.jsonl'))
+          .filter(path => eventsRegex.test(path))
+          .map(path => {
+            console.log('AIA task', path)
+            const created = fs.statSync(path).mtime
+            const id = path.match(eventsRegex)?.groups?.id ?? ''
+            return new Issue(id, created, 'Unknown', new Task(id, created, path))
+          })
           .forEach(issue => issues.set(issue.id, issue))
       }
 

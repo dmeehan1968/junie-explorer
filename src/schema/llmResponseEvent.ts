@@ -26,9 +26,11 @@ export const LlmResponseEvent = z.looseObject({
       cacheInputTokens: z.number().int().optional(),
       cacheCreateInputTokens: z.number().int().optional(),
       webSearchCount: z.number().int().optional(),
-    }).default(() => ({})),
+    }).nullish().transform(v => v ?? {}),
   }).transform(({ inputTokens = 0, outputTokens = 0, cacheInputTokens = 0, cacheCreateInputTokens = 0, webSearchCount = 0, ...answer }) => {
     const million = 1_000_000
+
+    // NB: Junie in AIA no longer outputs token metrics
 
     webSearchCount ||= answer.usage.webSearchCount || 0
 
@@ -46,7 +48,8 @@ export const LlmResponseEvent = z.looseObject({
 
     return {
       ...answer,
-      cost,
+      // if our calculated cost is non-zero, use that, otherwise use Junie's.
+      cost: cost ? cost : answer.cost ?? 0,
       inputTokens,
       inputTokenCost,
       outputTokens,

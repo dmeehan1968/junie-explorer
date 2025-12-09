@@ -31,6 +31,8 @@ import { WorkerExecutionError } from "./workers/WorkerExecutionError"
 import { WorkerPool } from "./workers/WorkerPool"
 
 export class Task {
+  public readonly logPath: string | undefined
+  private readonly eventsFile: string
   public id: string = ''
   public index: number = 0
   public created: Date = new Date()
@@ -102,12 +104,23 @@ export class Task {
     return this._workerPool
   }
 
-  constructor(public readonly logPath: string) {
-    this.init()
+  constructor(logPath: string)
+  constructor(id: string, created: Date, eventsFile: string)
+  constructor(logPathOrId: string, created?: Date, eventsFile?: string) {
+    if (created && eventsFile) {
+      this.id = '0'
+      this.created = created
+      this.eventsFile = eventsFile
+    } else {
+      this.logPath = logPathOrId
+      this.init()
+      this.eventsFile = path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
+    }
   }
 
   private init() {
     const task = this.load()
+    if (!task) return
     this.id = task.id
     this.index = task.index
     this.created = task.created
@@ -219,6 +232,10 @@ export class Task {
       return this._steps
     }
 
+    if (!this.logPath) {
+      return this._steps
+    }
+
     const stepPath = path.resolve(this.logPath, '../../..', this.id)
     if (!fs.existsSync(stepPath)) {
       return this._steps
@@ -241,6 +258,10 @@ export class Task {
   }
 
   private load() {
+    if (!this.logPath) {
+      return
+    }
+
     const task = JunieTaskSchema.safeParse(fs.readJsonSync(this.logPath))
 
     if (!task.success) {
@@ -253,6 +274,7 @@ export class Task {
   private lazyload() {
     if (this._previousTasksInfo === undefined || this._finalAgentState === undefined && this._sessionHistory === undefined && this._patch === undefined) {
       const task = this.load()
+      if (!task) return this
       this._previousTasksInfo = task.previousTasksInfo
       this._finalAgentState = task.finalAgentState
       this._sessionHistory = task.sessionHistory
@@ -275,10 +297,6 @@ export class Task {
 
   get patch() {
     return this.lazyload()._patch!
-  }
-
-  get eventsFile() {
-    return path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
   }
 
   private async loadEvents() {
@@ -408,6 +426,7 @@ export class Task {
   }
 
   get trajectoriesFile() {
+    if (!this.logPath) return undefined
     return path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
   }
 
