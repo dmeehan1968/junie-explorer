@@ -37,9 +37,35 @@ export class IssueSearchDSL {
     return this.page.locator('tr[data-issue-id]')
   }
 
+  get regexToggle() {
+    return this.page.locator('[data-testid="regex-toggle"]')
+  }
+
+  get regexLabel() {
+    return this.page.locator('[data-testid="regex-label"]')
+  }
+
   async search(query: string) {
     await this.searchInput.fill(query)
     await this.searchInput.press('Enter')
+  }
+
+  async enableRegex() {
+    const isChecked = await this.regexToggle.isChecked()
+    if (!isChecked) {
+      await this.regexToggle.click()
+    }
+  }
+
+  async disableRegex() {
+    const isChecked = await this.regexToggle.isChecked()
+    if (isChecked) {
+      await this.regexToggle.click()
+    }
+  }
+
+  async isRegexEnabled() {
+    return this.regexToggle.isChecked()
   }
 
   async clearSearch() {

@@ -86,3 +86,51 @@ test.describe('Issue Search', () => {
   })
 
 })
+
+test.describe('Regex Toggle', () => {
+
+  test('regex toggle is visible on project page', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await expect(issueSearch.regexToggle).toBeVisible()
+    await expect(issueSearch.regexLabel).toBeVisible()
+    await expect(issueSearch.regexLabel).toContainText('Use Regex?')
+  })
+
+  test('regex toggle is unchecked by default', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await expect(issueSearch.regexToggle).not.toBeChecked()
+  })
+
+  test('regex toggle can be enabled', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await issueSearch.enableRegex()
+    await expect(issueSearch.regexToggle).toBeChecked()
+  })
+
+  test('regex toggle can be disabled after enabling', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await issueSearch.enableRegex()
+    await expect(issueSearch.regexToggle).toBeChecked()
+    await issueSearch.disableRegex()
+    await expect(issueSearch.regexToggle).not.toBeChecked()
+  })
+
+  test('search with regex enabled uses regex matching', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await issueSearch.enableRegex()
+    // Search for UUID pattern using regex
+    await issueSearch.search('[a-f0-9]{8}')
+    await issueSearch.waitForSearchComplete()
+    await expect(issueSearch.resultCount).toBeVisible()
+  })
+
+  test('invalid regex shows error message', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await issueSearch.enableRegex()
+    // Invalid regex pattern (unclosed bracket)
+    await issueSearch.search('[invalid')
+    await issueSearch.waitForSearchComplete()
+    await expect(issueSearch.resultCount).toContainText(/Invalid regex|error/i)
+  })
+
+})

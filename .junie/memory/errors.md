@@ -128,3 +128,13 @@
     "NEW INSTRUCTION": "WHEN open_entire_file returns path does not exist THEN list directory and open an existing candidate"
 }
 
+[2025-12-10 11:34] - Updated by Junie - Error analysis
+{
+    "TYPE": "invalid args",
+    "TOOL": "bash",
+    "ERROR": "bun test --grep didn't match any test files",
+    "ROOT CAUSE": "Used a grep pattern that Bun interpreted as no-matching test files, so nothing ran.",
+    "PROJECT NOTE": "Target tests by file path (e.g., src/app/api/search.test.ts) or ensure --grep matches describe/test titles.",
+    "NEW INSTRUCTION": "WHEN bun test outputs 'did not match any test files' THEN run the specific test file path"
+}
+

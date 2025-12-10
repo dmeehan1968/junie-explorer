@@ -20,6 +20,15 @@ export const IssueSearch = ({ projectName }: { projectName: string }) => (
         ✕
       </button>
     </div>
+    <label class="flex items-center gap-1 cursor-pointer" data-testid="regex-label">
+      <input
+        type="checkbox"
+        id="regexToggle"
+        class="checkbox checkbox-sm"
+        data-testid="regex-toggle"
+      />
+      <span class="text-sm">Use Regex?</span>
+    </label>
     <span
       id="searchResultCount"
       class="text-sm text-base-content/70 hidden"

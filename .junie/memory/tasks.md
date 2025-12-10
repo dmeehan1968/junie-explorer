@@ -498,3 +498,13 @@
     "NEW INSTRUCTION": "WHEN architecture choice (server vs client) is undecided THEN summarize defaults and ask user to confirm before drafting spec"
 }
 
+[2025-12-10 11:44] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "summary and confirmation",
+    "MISSING STEPS": "implement backend regex flag handling,add 400 error handling for invalid regex,update API response to include regex field,implement UI regex toggle,update frontend to pass regex flag",
+    "BOTTLENECK": "Using bun test grep filter that matched no files delayed feedback.",
+    "PROJECT NOTE": "Tests spin up a real Bun server; API must return status 400 with { error } for invalid regex and include a boolean regex field in success responses.",
+    "NEW INSTRUCTION": "WHEN bun test reports no matching files THEN run bun test on the specific test file path"
+}
+

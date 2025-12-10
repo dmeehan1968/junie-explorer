@@ -3,13 +3,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearBtn = document.getElementById('clearSearchBtn')
   const resultCount = document.getElementById('searchResultCount')
   const loadingSpinner = document.getElementById('searchLoading')
+  const regexToggle = document.getElementById('regexToggle')
 
   if (!searchInput) return
 
   const projectName = searchInput.dataset.projectName
   const STORAGE_KEY = `issueSearch_${projectName}`
+  const REGEX_STORAGE_KEY = `issueSearchRegex_${projectName}`
 
   const savedSearch = sessionStorage.getItem(STORAGE_KEY)
+  const savedRegex = sessionStorage.getItem(REGEX_STORAGE_KEY)
+
+  if (savedRegex === 'true' && regexToggle) {
+    regexToggle.checked = true
+  }
+
   if (savedSearch) {
     searchInput.value = savedSearch
     performSearch(savedSearch)
@@ -26,6 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('input', () => {
     clearBtn.classList.toggle('hidden', !searchInput.value)
   })
+
+  if (regexToggle) {
+    regexToggle.addEventListener('change', () => {
+      sessionStorage.setItem(REGEX_STORAGE_KEY, regexToggle.checked.toString())
+      const query = searchInput.value.trim()
+      if (query) {
+        performSearch(query)
+      }
+    })
+  }
 
   clearBtn.addEventListener('click', () => {
     searchInput.value = ''
@@ -46,10 +64,18 @@ document.addEventListener('DOMContentLoaded', () => {
     clearBtn.classList.toggle('hidden', !query)
 
     try {
-      const response = await fetch(`/api/projects/${encodeURIComponent(projectName)}/search?q=${encodeURIComponent(query)}`)
+      const useRegex = regexToggle?.checked || false
+      const url = `/api/projects/${encodeURIComponent(projectName)}/search?q=${encodeURIComponent(query)}&regex=${useRegex}`
+      const response = await fetch(url)
       const data = await response.json()
 
       clearHighlights()
+
+      if (data.error) {
+        resultCount.textContent = data.error
+        resultCount.classList.remove('hidden')
+        return
+      }
 
       if (data.matchingIssueIds && data.matchingIssueIds.length > 0) {
         data.matchingIssueIds.forEach(issueId => {
