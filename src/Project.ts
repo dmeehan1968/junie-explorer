@@ -48,7 +48,6 @@ export class Project {
         fs.globSync(path.join(eventsPath, '*-events.jsonl'))
           .filter(path => eventsRegex.test(path))
           .map(path => {
-            console.log('AIA task', path)
             const created = fs.statSync(path).mtime
             const id = path.match(eventsRegex)?.groups?.id ?? ''
             return new Issue(id, created, 'Unknown', new Task(id, created, path))
