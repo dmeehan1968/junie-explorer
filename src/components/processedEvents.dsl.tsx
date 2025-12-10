@@ -233,7 +233,7 @@ export class MessageTrajectoriesDSL {
   }
 
   get chatAssistant() {
-    return this.page.getByTestId('chat-Agent').locator('..')
+    return this.page.getByTestId('chat-Assistant').locator('..')
   }
 
   get toolUse() {

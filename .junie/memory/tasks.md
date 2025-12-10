@@ -508,3 +508,43 @@
     "NEW INSTRUCTION": "WHEN bun test reports no matching files THEN run bun test on the specific test file path"
 }
 
+[2025-12-10 12:05] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "open file without locating target function,duplicate doc searches",
+    "MISSING STEPS": "inspect implementation,verify recommendation against codebase patterns",
+    "BOTTLENECK": "Advice was given without locating and reading the actual function implementation.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN giving repository-specific coding guidance THEN open and inspect the relevant function first"
+}
+
+[2025-12-10 12:13] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "search external docs,propose effect-ts solution",
+    "MISSING STEPS": "confirm tech stack,scan project,inspect worker-based loading,analyze abortability constraints",
+    "BOTTLENECK": "Assumed Effect-ts and recommended unusable APIs before verifying the codebase and constraints.",
+    "PROJECT NOTE": "task.events loads via WorkerPool and cannot be aborted; prefer early-compute short-circuit with shared flag and Promise.race.",
+    "NEW INSTRUCTION": "WHEN proposing approach for project code THEN open key files to verify stack and constraints"
+}
+
+[2025-12-10 12:49] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "search external docs,propose effect-ts solution",
+    "MISSING STEPS": "confirm tech stack,open search implementation,review worker pool behavior",
+    "BOTTLENECK": "Early incorrect assumption about Effect-ts led to misdirected solution path.",
+    "PROJECT NOTE": "Worker-loaded events cannot be aborted; prefer cooperative short-circuit with shared flag and race.",
+    "NEW INSTRUCTION": "WHEN tech stack or abortability is uncertain THEN ask_user to confirm constraints before proposing approach"
+}
+
+[2025-12-10 12:52] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "run unit tests with grep",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Started with bun test grep that matched no files before switching to Playwright.",
+    "PROJECT NOTE": "TrajectoriesView uses data-testid `chat-${agentType}` where agentType is 'Assistant'; DSL should match 'chat-Assistant', not 'chat-Agent'.",
+    "NEW INSTRUCTION": "WHEN bun test reports 'did not match any test files' THEN run the specific Playwright test file"
+}
+
