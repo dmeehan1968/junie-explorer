@@ -89,6 +89,41 @@ test.describe('Issue Search', () => {
     expect(parseFloat(disabledOpacity)).toBeLessThan(parseFloat(enabledOpacity))
   })
 
+  test('result count is hidden while search is in progress', async ({ issueSearch, page }) => {
+    await issueSearch.navigateTo()
+    
+    // First, perform a search to get a result count displayed
+    await issueSearch.search('test')
+    await issueSearch.waitForSearchComplete()
+    await expect(issueSearch.resultCount).toBeVisible()
+    
+    // Now start another search and check that result count is hidden during search
+    await issueSearch.searchInput.fill('another')
+    
+    // Set up to capture whether result count was hidden during search
+    await page.evaluate(() => {
+      const resultCount = document.getElementById('searchResultCount')
+      if (resultCount) {
+        (window as any).__resultCountWasHiddenDuringSearch = resultCount.classList.contains('hidden')
+      }
+    })
+    
+    await issueSearch.submitButton.click()
+    
+    // Check immediately after click that result count is hidden
+    const wasHiddenDuringSearch = await page.evaluate(() => {
+      const resultCount = document.getElementById('searchResultCount')
+      return resultCount?.classList.contains('hidden')
+    })
+    
+    expect(wasHiddenDuringSearch).toBe(true)
+    
+    await issueSearch.waitForSearchComplete()
+    
+    // After search completes, result count should be visible again
+    await expect(issueSearch.resultCount).toBeVisible()
+  })
+
   test('clear button is hidden when search input is empty', async ({ issueSearch }) => {
     await issueSearch.navigateTo()
     await expect(issueSearch.clearButton).toBeHidden()

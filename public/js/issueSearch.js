@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadingSpinner.classList.remove('hidden')
+    resultCount.classList.add('hidden')
     clearBtn.classList.toggle('hidden', !query)
     if (submitBtn) {
       submitBtn.disabled = true
