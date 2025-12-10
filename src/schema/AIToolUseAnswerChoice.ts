@@ -5,7 +5,7 @@ import { ToolParams } from "./toolParams"
 export const ToolUseAnswer = z.object({
   toolId: z.string().nullable(),
   toolName: z.string(),
-  toolParams: ToolParams,
+  toolParams: ToolParams.optional(),
 })
 export type ToolUseAnswer = z.infer<typeof ToolUseAnswer>
 

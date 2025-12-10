@@ -50,7 +50,7 @@ export class Project {
           .map(path => {
             const created = fs.statSync(path).mtime
             const id = path.match(eventsRegex)?.groups?.id ?? ''
-            return new Issue(id, created, 'Unknown', new Task(id, created, path))
+            return new Issue(id, created, new Task(id, created, path))
           })
           .forEach(issue => issues.set(issue.id, issue))
       }

@@ -16,14 +16,25 @@ export class Issue {
   private _metricsByModel: Promise<Record<string, SummaryMetrics>> | undefined = undefined
 
   constructor(logPath: string)
-  constructor(id: string, created: Date, state: string, task: Task)
+  constructor(id: string, created: Date, task: Task)
 
-  constructor(logPathOrId: string, created?: Date, state?: string, task?: Task) {
-    if (created && state && task) {
+  constructor(logPathOrId: string, created?: Date, task?: Task) {
+    if (created && task) {
       this.id = this.name = logPathOrId
       this.created = created
-      this.state = state
+      this.state = 'Running'
       this._tasks = Promise.resolve(new Map([[this.id + ' 0', task]]))
+      void new Promise(async resolve => {
+        const records = await task.events
+        records.forEach(record => {
+          if (record.event.type === 'TaskSummaryCreatedEvent') {
+            this.name = record.event.taskSummary
+          } else if (record.event.type === 'TaskResultCreatedEvent') {
+            this.state = record.event.taskResult.state.isFinished ? 'Finished' : 'Stopped'
+          }
+        })
+        resolve(undefined)
+      })
     } else {
       this.logPath = logPathOrId
       this.taskPath = path.join(this.logPath, '..', path.parse(this.logPath).name)

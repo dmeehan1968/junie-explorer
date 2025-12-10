@@ -137,7 +137,7 @@ export const TrajectoriesView = ({
                     testId="tool-use"
                     tool={{
                       name: tool.toolName,
-                      params: tool.toolParams.rawJsonObject,
+                      params: tool.toolParams?.rawJsonObject ?? {},
                       label: getLabelMarkupFor('Tool Request'),
                     }}
                   />,
