@@ -38,3 +38,13 @@
   visibility: hidden;
   pointer-events: none;
 }
+
+/* Issue search highlight */
+.issue-row-highlight {
+  background-color: oklch(94.5% 0.129 99.526) !important; /* amber-200 */
+}
+
+:root[data-theme="dark"] .issue-row-highlight,
+[data-theme="dark"] .issue-row-highlight {
+  background-color: oklch(47.6% 0.114 61.907) !important; /* amber-700 */
+}

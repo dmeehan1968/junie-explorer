@@ -4,6 +4,7 @@ import { Project } from "../Project"
 import { formatElapsedTime, formatNumber, formatSeconds } from "../utils/timeUtils"
 import { Conditional } from "./conditional"
 import { IssueRow } from "./issueRow"
+import { IssueSearch } from "./issueSearch"
 
 const NoIssuesMessage = () => (
   <p class="p-4 text-center text-base-content/70" data-testid="no-issues-message">
@@ -32,6 +33,7 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
         <span class="font-bold text-base-content"
               data-testid="summary-elapsed-time">Elapsed Time: {formatElapsedTime(elapsedTimeSec)}</span>
       </div>
+      <IssueSearch projectName={project.name} />
       <div class="overflow-x-auto">
         <Conditional condition={!project.hasMetrics}>
           <div class="bg-base-content/10 p-4 rounded mb-4">
@@ -149,6 +151,7 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
           </div>
         </div>
       </div>
+      <script src="/js/issueSearch.js"></script>
     </div>
   )
 }

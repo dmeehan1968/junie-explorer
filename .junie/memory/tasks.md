@@ -468,3 +468,33 @@
     "NEW INSTRUCTION": "WHEN modifying API endpoint calculation THEN add or update API tests and verify endpoint response locally"
 }
 
+[2025-12-09 16:44] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "ask_user",
+    "MISSING STEPS": "open Task.loadEvents fully, analyze loadEvents worker, summarize findings, answer",
+    "BOTTLENECK": "Waited for user confirmation instead of providing the explanation.",
+    "PROJECT NOTE": "Key logic resides in src/workers/loadEvents.ts and Task.loadEvents within src/Task.ts.",
+    "NEW INSTRUCTION": "WHEN CURRENT_TASK asks to explain code behavior THEN read relevant files and answer directly"
+}
+
+[2025-12-09 16:51] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "ask questions",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Unnecessary clarification round-trip delayed the explanation.",
+    "PROJECT NOTE": "Key logic resides in workers/loadEvents.ts and Task.loadEvents within Task.ts.",
+    "NEW INSTRUCTION": "WHEN explanation request about existing code behavior THEN scan relevant files and answer directly with concise summary"
+}
+
+[2025-12-10 10:47] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "inspect minor schema files, open unrelated files",
+    "MISSING STEPS": "confirm architecture choice, summarize assumptions",
+    "BOTTLENECK": "Server-side API choice was assumed without explicit user approval.",
+    "PROJECT NOTE": "issuesTable.tsx renders via Kitajs Html; plan client script hooks for row highlighting.",
+    "NEW INSTRUCTION": "WHEN architecture choice (server vs client) is undecided THEN summarize defaults and ask user to confirm before drafting spec"
+}
+

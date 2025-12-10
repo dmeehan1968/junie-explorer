@@ -11,6 +11,7 @@ import apiProjects from "./api/projects"
 import apiTrajectories from "./api/trajectories/index"
 import apiEvents from "./api/events/index"
 import apiStats from "./api/stats"
+import apiSearch from "./api/search"
 import { errorHandler } from "./middleware/errorHandler"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware"
 import { AppRequest, AppResponse } from "./types"
@@ -44,6 +45,7 @@ export class JunieExplorer {
     this.app.use('/', apiTrajectories)
     this.app.use('/', apiEvents)
     this.app.use('/', apiStats)
+    this.app.use('/', apiSearch)
 
     // error handling
     this.app.use(notFoundRouteHandler)
