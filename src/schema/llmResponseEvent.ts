@@ -20,6 +20,7 @@ export const LlmResponseEvent = z.looseObject({
     webSearchCount: z.number().int().optional(),
     time: z.number().optional(),
     cached: z.boolean().default(() => false),
+    cost: z.number().optional(),
     usage: z.looseObject({
       inputTokens: z.number().int().optional(),
       outputTokens: z.number().int().optional(),

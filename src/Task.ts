@@ -32,7 +32,7 @@ import { WorkerPool } from "./workers/WorkerPool"
 
 export class Task {
   public readonly logPath: string | undefined
-  private readonly eventsFile: string
+  public readonly eventsFile: string
   public id: string = ''
   public index: number = 0
   public created: Date = new Date()
