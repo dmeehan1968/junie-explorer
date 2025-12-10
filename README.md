@@ -14,6 +14,7 @@ all projects across IDE's found on the system.
 - Shows raw JSON logs for each issue with expand/collapse for ease of navigation
 - Provides metrics and statistics for issues and tasks
 - **Issue Search**: Search issues by content or UUID with optional regex support
+  - Press Enter or click the Search button to execute the search
   - Toggle regex mode to use regular expression patterns for advanced searching
   - Case-insensitive matching by default
   - Invalid regex patterns display a helpful error message

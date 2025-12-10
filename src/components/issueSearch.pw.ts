@@ -11,6 +11,84 @@ test.describe('Issue Search', () => {
     await expect(issueSearch.searchInput).toBeVisible()
   })
 
+  test('submit button is visible on project page', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await expect(issueSearch.submitButton).toBeVisible()
+  })
+
+  test('clicking submit button triggers search and shows results', async ({ issueSearch }) => {
+    await issueSearch.navigateTo()
+    await issueSearch.searchInput.fill('test')
+    await issueSearch.submitButton.click()
+    await issueSearch.waitForSearchComplete()
+    
+    await expect(issueSearch.resultCount).toBeVisible()
+  })
+
+  test('submit button is disabled while search is in progress', async ({ issueSearch, page }) => {
+    await issueSearch.navigateTo()
+    await issueSearch.searchInput.fill('test')
+    
+    // Track whether button was disabled during search
+    let wasDisabledDuringSearch = false
+    
+    // Set up a mutation observer to detect disabled state
+    await page.evaluate(() => {
+      const btn = document.getElementById('submitSearchBtn')
+      if (btn) {
+        const observer = new MutationObserver(() => {
+          if (btn.hasAttribute('disabled')) {
+            (window as any).__buttonWasDisabled = true
+          }
+        })
+        observer.observe(btn, { attributes: true, attributeFilter: ['disabled'] })
+      }
+    })
+    
+    await issueSearch.submitButton.click()
+    await issueSearch.waitForSearchComplete()
+    
+    // Check if button was disabled at some point during search
+    wasDisabledDuringSearch = await page.evaluate(() => (window as any).__buttonWasDisabled === true)
+    
+    expect(wasDisabledDuringSearch).toBe(true)
+    
+    // Button should be re-enabled after search completes
+    await expect(issueSearch.submitButton).toBeEnabled()
+  })
+
+  test('submit button has visual distinction when disabled', async ({ issueSearch, page }) => {
+    await issueSearch.navigateTo()
+    await issueSearch.searchInput.fill('test')
+    
+    // Get the button's opacity when enabled
+    const enabledOpacity = await issueSearch.submitButton.evaluate((btn) => {
+      return window.getComputedStyle(btn).opacity
+    })
+    
+    // Set up to capture disabled state opacity
+    await page.evaluate(() => {
+      const btn = document.getElementById('submitSearchBtn')
+      if (btn) {
+        const observer = new MutationObserver(() => {
+          if (btn.hasAttribute('disabled')) {
+            (window as any).__disabledOpacity = window.getComputedStyle(btn).opacity
+          }
+        })
+        observer.observe(btn, { attributes: true, attributeFilter: ['disabled'] })
+      }
+    })
+    
+    await issueSearch.submitButton.click()
+    await issueSearch.waitForSearchComplete()
+    
+    // Check that the disabled opacity was captured and is less than enabled opacity
+    const disabledOpacity = await page.evaluate(() => (window as any).__disabledOpacity)
+    
+    expect(disabledOpacity).toBeDefined()
+    expect(parseFloat(disabledOpacity)).toBeLessThan(parseFloat(enabledOpacity))
+  })
+
   test('clear button is hidden when search input is empty', async ({ issueSearch }) => {
     await issueSearch.navigateTo()
     await expect(issueSearch.clearButton).toBeHidden()

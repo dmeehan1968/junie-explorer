@@ -238,3 +238,11 @@
     "NEW INSTRUCTION": "WHEN task requests implementing improvements 5 and 6 THEN use single-pass parsing in loadEvents and map-based matching in Task.loadEvents"
 }
 
+[2025-12-10 15:15] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI styling",
+    "EXPECTATION": "The Search button should look visually different when disabled.",
+    "NEW INSTRUCTION": "WHEN Search button is disabled THEN add disabled attribute and btn-disabled class"
+}
+

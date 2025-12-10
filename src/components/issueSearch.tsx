@@ -20,6 +20,14 @@ export const IssueSearch = ({ projectName }: { projectName: string }) => (
         ✕
       </button>
     </div>
+    <button
+      id="submitSearchBtn"
+      class="btn btn-primary btn-sm disabled:opacity-50"
+      aria-label="Search"
+      data-testid="submit-search-btn"
+    >
+      Search
+    </button>
     <label class="flex items-center gap-1 cursor-pointer" data-testid="regex-label">
       <input
         type="checkbox"

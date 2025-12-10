@@ -21,6 +21,10 @@ export class IssueSearchDSL {
     return this.page.locator('[data-testid="clear-search-btn"]')
   }
 
+  get submitButton() {
+    return this.page.locator('[data-testid="submit-search-btn"]')
+  }
+
   get resultCount() {
     return this.page.locator('[data-testid="search-result-count"]')
   }

@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('issueSearchInput')
   const clearBtn = document.getElementById('clearSearchBtn')
+  const submitBtn = document.getElementById('submitSearchBtn')
   const resultCount = document.getElementById('searchResultCount')
   const loadingSpinner = document.getElementById('searchLoading')
   const regexToggle = document.getElementById('regexToggle')
@@ -23,13 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
     performSearch(savedSearch)
   }
 
+  async function triggerSearch() {
+    const query = searchInput.value.trim()
+    sessionStorage.setItem(STORAGE_KEY, query)
+    await performSearch(query)
+  }
+
   searchInput.addEventListener('keydown', async (e) => {
     if (e.key === 'Enter') {
-      const query = searchInput.value.trim()
-      sessionStorage.setItem(STORAGE_KEY, query)
-      await performSearch(query)
+      await triggerSearch()
     }
   })
+
+  if (submitBtn) {
+    submitBtn.addEventListener('click', triggerSearch)
+  }
 
   searchInput.addEventListener('input', () => {
     clearBtn.classList.toggle('hidden', !searchInput.value)
@@ -62,6 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadingSpinner.classList.remove('hidden')
     clearBtn.classList.toggle('hidden', !query)
+    if (submitBtn) {
+      submitBtn.disabled = true
+    }
 
     try {
       const useRegex = regexToggle?.checked || false
@@ -94,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
       resultCount.classList.remove('hidden')
     } finally {
       loadingSpinner.classList.add('hidden')
+      if (submitBtn) {
+        submitBtn.disabled = false
+      }
     }
   }
 

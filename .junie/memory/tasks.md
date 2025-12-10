@@ -548,3 +548,23 @@
     "NEW INSTRUCTION": "WHEN bun test reports 'did not match any test files' THEN run the specific Playwright test file"
 }
 
+[2025-12-10 14:57] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "confirm with user",
+    "MISSING STEPS": "update client logic,run full test suite,documentation",
+    "BOTTLENECK": "User confirmation delayed straightforward implementation.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN task is minor UI addition with obvious defaults THEN skip confirmation and implement component, client logic, and tests"
+}
+
+[2025-12-10 15:17] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "edit tests",
+    "MISSING STEPS": "update styles,review in browser,add visual test",
+    "BOTTLENECK": "No styling change was planned to reflect disabled state.",
+    "PROJECT NOTE": "Using DaisyUI/Tailwind: toggle btn-disabled or disabled:opacity-50 cursor-not-allowed when submit is disabled.",
+    "NEW INSTRUCTION": "WHEN control is disabled without visual feedback THEN toggle a disabled styling class on the control"
+}
+
