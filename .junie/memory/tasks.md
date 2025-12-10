@@ -568,3 +568,13 @@
     "NEW INSTRUCTION": "WHEN control is disabled without visual feedback THEN toggle a disabled styling class on the control"
 }
 
+[2025-12-10 15:29] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "refactor types in getTrajectoryEventRecords",
+    "MISSING STEPS": "run type checker, submit",
+    "BOTTLENECK": "Detoured into refactoring instead of using existing type guards.",
+    "PROJECT NOTE": "Schema modules export type guards (e.g., isResponseEvent); prefer them for narrowing.",
+    "NEW INSTRUCTION": "WHEN fixing union event access errors THEN apply exported type guard and re-run tsc"
+}
+

@@ -2,6 +2,7 @@
 
 import { AgentType } from "../schema/agentType"
 import { EventRecord } from "../schema/eventRecord"
+import { isResponseEvent } from "../schema/llmResponseEvent"
 import { escapeHtml } from "../utils/escapeHtml"
 import { ChatMessageDecorator } from "./chatMessageDecorator"
 import { Divider } from "./divider"
@@ -88,33 +89,34 @@ export const TrajectoriesView = ({
 
             }
           }
-        } else if (current.event.type === 'LlmResponseEvent') {
+        } else if (isResponseEvent(current.event)) {
 
           const requestEvent = current.event.requestEvent
+          const answer = current.event.answer
 
           const getLabelMarkupFor = (label: string) => {
             return (
               <div class="flex gap-2">{requestEvent?.chat.agentType} {label}
                 <span class="text-primary-content/50">
-                {(current.event.answer.time / 1000).toFixed(2)}s/reasoning {requestEvent?.modelParameters.reasoning_effort ?? 'default'}
+                {(answer.time / 1000).toFixed(2)}s/reasoning {requestEvent?.modelParameters.reasoning_effort ?? 'default'}
               </span>
               </div>
             )
           }
 
-          if (current.event.answer.webSearchCount > 0) {
+          if (answer.webSearchCount > 0) {
             messages.push(
               <MessageDecorator
                 klass={klass}
                 testId="web-search-assistant"
                 left={false}
                 label={getLabelMarkupFor('Web Search')}
-                content={escapeHtml(`Count: ${current.event.answer.webSearchCount}`)}
+                content={escapeHtml(`Count: ${answer.webSearchCount}`)}
               />,
             )
           }
 
-          for (const choice of current.event.answer.contentChoices) {
+          for (const choice of answer.contentChoices) {
             if (choice.type === 'com.intellij.ml.llm.matterhorn.llm.AIContentAnswerChoice') {
               if (choice.content) {
                 messages.push(

@@ -138,3 +138,13 @@
     "NEW INSTRUCTION": "WHEN bun test outputs 'did not match any test files' THEN run the specific test file path"
 }
 
+[2025-12-10 15:29] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "TypeScript errors persist in trajectoriesView.tsx",
+    "ROOT CAUSE": "A JSX Element is passed to a prop typed as string, and event.answer remains unknown without a proper type guard.",
+    "PROJECT NOTE": "Update src/components/toolCallDecorator.tsx to allow label: string | JSX.Element, and in src/components/trajectoriesView.tsx use isResponseEvent(current.event) to narrow before accessing answer.time.",
+    "NEW INSTRUCTION": "WHEN passing JSX to ToolCallDecorator label THEN change label type to string | JSX.Element"
+}
+

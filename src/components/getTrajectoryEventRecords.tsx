@@ -1,13 +1,13 @@
 import { ActionRequestBuildingFailed } from "../schema/actionRequestBuildingFailed"
 import { AgentActionExecutionFinished } from "../schema/agentActionExecutionFinished"
-import { AgentType } from "../schema/agentType"
 import { EventRecord } from "../schema/eventRecord"
 import { LlmRequestEvent } from "../schema/llmRequestEvent"
 import { LlmResponseEvent } from "../schema/llmResponseEvent"
 
-export interface TrajectoryEventRecord {
-  event: LlmRequestEvent | LlmResponseEvent | ActionRequestBuildingFailed | AgentActionExecutionFinished,
-  timestamp: Date
+export type TrajectoryEvent = LlmRequestEvent | LlmResponseEvent | ActionRequestBuildingFailed | AgentActionExecutionFinished
+
+export interface TrajectoryEventRecord extends Omit<EventRecord, 'event'> {
+  event: TrajectoryEvent
 }
 
 export function getTrajectoryEventRecords(events: EventRecord[]) {

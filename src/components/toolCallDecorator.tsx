@@ -8,7 +8,7 @@ import { ToggleComponent } from "./toggleComponent"
 export const ToolCallDecorator = ({ klass, testId, tool }: {
   klass: string,
   testId: string,
-  tool: { name: string, params: Record<string, any>, label: string }
+  tool: { name: string, params: Record<string, any>, label: string | JSX.Element }
 }) => {
   return (
     <div class="relative ml-48 mb-8" data-testid="tool-call">
