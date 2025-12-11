@@ -1,5 +1,4 @@
 // No Issues Message Component
-import { Html } from "@kitajs/html"
 import { Project } from "../Project"
 import { formatElapsedTime, formatNumber, formatSeconds } from "../utils/timeUtils"
 import { Conditional } from "./conditional"
@@ -33,7 +32,7 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
         <span class="font-bold text-base-content"
               data-testid="summary-elapsed-time">Elapsed Time: {formatElapsedTime(elapsedTimeSec)}</span>
       </div>
-      <IssueSearch projectName={project.name} />
+      <IssueSearch projectName={project.name}/>
       <div class="overflow-x-auto">
         <Conditional condition={!project.hasMetrics}>
           <div class="bg-base-content/10 p-4 rounded mb-4">
@@ -50,7 +49,7 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
         </Conditional>
         <table class="table table-zebra w-full bg-base-100" data-testid="issues-table">
           <thead>
-          <tr class="!bg-base-200">
+          <tr class="bg-base-200!">
             <Conditional condition={project.hasMetrics}>
               <th class="w-10 text-center align-middle">
                 <input type="checkbox" id="selectAllIssues" class="checkbox checkbox-sm"
@@ -70,7 +69,7 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
             <th class="text-left whitespace-nowrap">LLM</th>
             <th class="text-left whitespace-nowrap">Mode</th>
           </tr>
-          <tr class="!bg-base-200 font-bold text-base-content">
+          <tr class="bg-base-200! font-bold text-base-content">
             <Conditional condition={project.hasMetrics}>
               <td></td>
             </Conditional>
@@ -98,7 +97,7 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
           )))}
           </tbody>
           <tfoot>
-          <tr class="!bg-base-200 font-bold text-base-content">
+          <tr class="bg-base-200! font-bold text-base-content">
             <Conditional condition={project.hasMetrics}>
               <td></td>
             </Conditional>
