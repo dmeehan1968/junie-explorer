@@ -40,6 +40,10 @@ export class IssueRowDSL {
     return this.element.getByTestId('issue-assistant-providers')
   }
 
+  get agentCell() {
+    return this.element.getByTestId('issue-agent')
+  }
+
   // Checkbox (only when project.hasMetrics)
   get checkbox() {
     return this.element.locator('input.issue-select')

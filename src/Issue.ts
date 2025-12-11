@@ -11,6 +11,7 @@ export class Issue {
   public created: Date = new Date()
   public state: string = ''
   public error?: any
+  public readonly isAIA: boolean = false
   private _tasks: Promise<Map<string, Task>> | undefined = undefined
   private _metrics: Promise<SummaryMetrics> | undefined = undefined
   private _metricsByModel: Promise<Record<string, SummaryMetrics>> | undefined = undefined
@@ -20,6 +21,7 @@ export class Issue {
 
   constructor(logPathOrId: string, created?: Date, task?: Task) {
     if (created && task) {
+      this.isAIA = true
       this.id = this.name = logPathOrId
       this.created = created
       this.state = 'Running'

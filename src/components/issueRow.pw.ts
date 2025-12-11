@@ -23,4 +23,18 @@ test.describe('IssueRow', async () => {
     await expect(tooltips.first()).toHaveAttribute('data-tip')
     await expect(tooltips.first()).toHaveClass(/tooltip-left/)
   })
+
+  test('agent cell should display Junie icon for non-AIA issues', async ({ issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    expect(rows.length).toBeGreaterThan(0)
+    const firstRow = rows[0]
+    
+    const agentCell = firstRow.agentCell
+    await expect(agentCell).toBeVisible()
+    
+    // The icon should be visible with the Junie icon URL
+    const icon = agentCell.locator('[role="img"]')
+    await expect(icon).toBeVisible()
+    await expect(icon).toHaveAttribute('aria-label', 'Junie icon')
+  })
 })

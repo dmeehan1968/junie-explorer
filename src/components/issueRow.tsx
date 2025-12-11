@@ -156,6 +156,31 @@ export const IssueRow = async ({ issue, project, locale }: {
           </div>
         ) : '-'}
       </td>
+      <td
+        class="text-left whitespace-normal wrap-break-word align-middle py-3 px-2"
+        data-testid="issue-agent"
+        role="link"
+        tabindex="0"
+        onclick={`window.location.href='${href}'`}
+        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
+      >
+        {(() => {
+          const agentIcon = issue.isAIA
+            ? 'https://resources.jetbrains.com/storage/products/company/brand/logos/AI_icon.svg'
+            : 'https://resources.jetbrains.com/storage/products/company/brand/logos/Junie_icon.svg'
+          const agentName = issue.isAIA ? 'AI Assistant' : 'Junie'
+          return (
+            <div class="tooltip tooltip-left" data-tip={agentName}>
+              <img
+                class="h-4 w-4"
+                src={agentIcon}
+                role="img"
+                aria-label={`${agentName} icon`}
+              />
+            </div>
+          )
+        })()}
+      </td>
     </tr>
   )
 }
