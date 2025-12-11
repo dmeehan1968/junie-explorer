@@ -66,8 +66,8 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
             </Conditional>
             <th class="text-right whitespace-nowrap">Time</th>
             <th class="text-right whitespace-nowrap">Status</th>
-            <th class="text-left whitespace-nowrap">LLM</th>
-            <th class="text-left whitespace-nowrap">Mode</th>
+            <th class="text-center whitespace-nowrap">LLM</th>
+            <th class="text-center whitespace-nowrap">Mode</th>
           </tr>
           <tr class="bg-base-200! font-bold text-base-content">
             <Conditional condition={project.hasMetrics}>

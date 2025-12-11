@@ -598,3 +598,13 @@
     "NEW INSTRUCTION": "WHEN adding a new table column THEN implement the corresponding row cell with testid and sizing"
 }
 
+[2025-12-11 09:59] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "validate UI",
+    "BOTTLENECK": "No visual verification to confirm actual icon centering.",
+    "PROJECT NOTE": "Text centering does not affect flex children; use justify-center for flex.",
+    "NEW INSTRUCTION": "WHEN icons in a flex container need horizontal centering THEN add justify-center to the container, not just text-center"
+}
+

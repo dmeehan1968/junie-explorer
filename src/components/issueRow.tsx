@@ -129,7 +129,7 @@ export const IssueRow = async ({ issue, project, locale }: {
         <StatusBadge state={issue.state}/>
       </td>
       <td
-        class="text-left whitespace-normal wrap-break-word align-middle py-3 px-2"
+        class="text-center whitespace-normal wrap-break-word align-middle py-3 px-2"
         data-testid="issue-assistant-providers"
         role="link"
         tabindex="0"
@@ -137,7 +137,7 @@ export const IssueRow = async ({ issue, project, locale }: {
         onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         {assistantProviders.length ? (
-          <div class="flex items-center gap-2">
+          <div class="flex items-center justify-center gap-2">
             {assistantProviders.map(({ provider, jbaiTitles }) => {
               const fileName = encodeURIComponent(provider).replace(/%20/g, ' ')
               const src = `/icons/${fileName}.svg`
@@ -157,7 +157,7 @@ export const IssueRow = async ({ issue, project, locale }: {
         ) : '-'}
       </td>
       <td
-        class="text-left whitespace-normal wrap-break-word align-middle py-3 px-2"
+        class="text-center whitespace-normal wrap-break-word align-middle py-3 px-2"
         data-testid="issue-agent"
         role="link"
         tabindex="0"
