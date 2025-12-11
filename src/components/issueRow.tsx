@@ -44,7 +44,7 @@ export const IssueRow = async ({ issue, project, locale }: {
         </td>
       </Conditional>
       <td
-        class="text-left whitespace-normal break-words w-2/5 align-top py-3 px-2"
+        class="text-left whitespace-normal wrap-break-word w-2/5 align-top py-3 px-2"
         data-testid="issue-description"
         role="link"
         tabindex="0"
@@ -129,7 +129,7 @@ export const IssueRow = async ({ issue, project, locale }: {
         <StatusBadge state={issue.state}/>
       </td>
       <td
-        class="text-left whitespace-normal break-words align-middle py-3 px-2"
+        class="text-left whitespace-normal wrap-break-word align-middle py-3 px-2"
         data-testid="issue-assistant-providers"
         role="link"
         tabindex="0"
