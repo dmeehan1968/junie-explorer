@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0] - 2025-12-11
+
+### Added
+- Add issue search functionality with client-side and server-side integration (adecbba)
+- Add regex support for issue search functionality (8865f0f)
+- Add `Search` button for issue search and enhance submit behavior (0308131)
+- Add `OpenAI4o` schema and integrate into transformer logic (3a3c760, ee5b1bb)
+- Add AgentType chart series and TPS display support (a5dd354)
+- Add event metrics chart data API and integrate with client-side fetch (a6527a7)
+- Add "Show All Diffs" toggle to message trajectories (8f512c3)
+- Add Mode column and implement corresponding row cell with icons (e474b10)
+- Add support for optional `cost` field in schema and improve trajectory file handling (83adb93)
+- Add support for alternative constructors and enhance path handling in `Issue` and `Task` (8bcfad6)
+
+### Changed
+- Update AgentType default and references to "Assistant" instead of "Agent" (cbc1722)
+- Refactor `Task.ts` event matching logic (dc524b7)
+- Refactor `Task.ts` response event matching logic (e866a12)
+- Refactor `OpenAI51` and `OpenAI51CodexMax` schema inheritance (ced2f58)
+- Refactor event line mapping logic in `loadEvents.ts` (f7cacea)
+- Refactor event handling and type definitions in `trajectoriesView.tsx` and related components (930f68a)
+- Update Task constructor to modify ID initialization (f6e9f13)
+- Make Task.loadEvents public to allow AIA Issues to get event detail without caching events (9ae6ae7)
+- For AIA tasks, derive issue name and state from events (d2a3887)
+- Update CSS class usage and minor code cleanups in `issuesTable` (f3ea198)
+- Update CSS class in issue row to fix hover styling behavior (704156f)
+- Update CSS class for issue row to fix word wrapping behavior (c02ada1)
+- Center-align table headers and row cells in `issuesTable` and `issueRow` (9cb526d)
+- Hide AgentType dropdown when AgentType series is selected (2e7e745)
+- Update `chatAssistant` locator to match correct test data ID (e4edfd0)
+- Update regex pattern for `ErrorAnalyzer` AgentType in schema (c896d95)
+- Added `cacheCreateInputTokens` to the context size formula (37925e4)
+- Update taskCard tests and README (d0c8b4a)
+- Skip global type-checking for tests-only tasks (d42bc85)
+
+### Fixed
+- Fix erroneous system message diff across agent types, remove redundant argument (9c241db)
+- Hide result count during issue search execution (8e2fbd6)
+- Remove debug `console.log` statement from event path filtering (0490dcf)
+- Update error logging in `Task.ts` to improve readability (c357854)
+
 ## [3.6.0] - 2025-12-06
 
 ### Added
