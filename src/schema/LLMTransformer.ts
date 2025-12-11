@@ -13,6 +13,7 @@ import { OpenAI41 } from "./openAI41"
 import { OpenAI41Mini } from "./openAI41Mini"
 import { OpenAI4oMini } from "./openAI4oMini"
 import { OpenAI51 } from "./openAI51"
+import { OpenAI52 } from "./openAI52"
 import { OpenAI51CodexMax } from "./openAI51CodexMax"
 import { OpenAIo3 } from "./openAIo3"
 
@@ -90,6 +91,9 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   }
   if (OpenAI51.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI51, data, ctx)
+  }
+  if (OpenAI52.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return safeParseOrAddIssues(OpenAI52, data, ctx)
   }
   if (OpenAI51CodexMax.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI51CodexMax, data, ctx)

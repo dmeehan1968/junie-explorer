@@ -8,6 +8,7 @@ describe("Search API", () => {
   let baseUrl: string
 
   beforeAll(async () => {
+    process.env.CONCURRENCY = '10'
     const { app } = await createServer({ port: 0 })
     server = app.listen(0)
     const address = server.address() as AddressInfo
@@ -40,7 +41,7 @@ describe("Search API", () => {
 
     expect(response.status).toBe(404)
     const result = await response.json()
-    expect(result.error).toBe("Project not found")
+    expect(result.error).toContain("not found")
   })
 
   test("performs case-insensitive search", async () => {

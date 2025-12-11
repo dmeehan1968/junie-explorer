@@ -608,3 +608,13 @@
     "NEW INSTRUCTION": "WHEN icons in a flex container need horizontal centering THEN add justify-center to the container, not just text-center"
 }
 
+[2025-12-11 19:44] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "fix unrelated tests, documentation",
+    "MISSING STEPS": "add transformer tests, run typecheck",
+    "BOTTLENECK": "Scope creep into unrelated failures after test run.",
+    "PROJECT NOTE": "Ensure new jbai is added to both LLM union and transformer routing; update any guards consuming jbai.",
+    "NEW INSTRUCTION": "WHEN unrelated test failures appear after scoped changes THEN avoid out-of-scope edits and proceed"
+}
+

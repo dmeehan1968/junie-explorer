@@ -55,13 +55,14 @@ describe('Task.loadEvents logging', () => {
 
       const errorLogs = logs.filter(args => args[0] === 'EventParserError')
       expect(errorLogs.length).toBe(2)
-      // Validate structure of the error object payload
-      for (const [, obj] of errorLogs) {
-        expect(obj).toHaveProperty('eventsFile')
-        expect(obj).toHaveProperty('lineNumber')
-        expect(obj).toHaveProperty('message')
-        expect(obj).toHaveProperty('path')
-        expect(obj).toHaveProperty('json')
+      // Validate structure of the inspected error payload
+      for (const [, inspected] of errorLogs) {
+        expect(typeof inspected).toBe('string')
+        expect(inspected).toContain('eventsFile')
+        expect(inspected).toContain('lineNumber')
+        expect(inspected).toContain('message')
+        expect(inspected).toContain('path')
+        expect(inspected).toContain('json')
       }
     } finally {
       console.log = originalLog

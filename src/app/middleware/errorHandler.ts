@@ -3,7 +3,13 @@ import { themeAttributeForHtml } from "../../utils/themeCookie"
 import { AppError, AppRequest, AppResponse } from "../types"
 
 export function errorHandler(err: any, req: AppRequest, res: AppResponse, next: NextFunction) {
+  const isApiRequest = req.originalUrl?.startsWith('/api/') || req.path?.startsWith('/api/')
+
   if (err instanceof AppError) {
+    if (isApiRequest) {
+      return res.status(err.status).json({ error: err.message })
+    }
+
     return res.status(err.status).send(`
         <!DOCTYPE html>
         <html lang="en" ${themeAttributeForHtml(req.headers.cookie)}>
@@ -30,5 +36,10 @@ export function errorHandler(err: any, req: AppRequest, res: AppResponse, next: 
         </html>`)
   }
   console.error(err)
+
+  if (isApiRequest) {
+    return res.status(500).json({ error: 'Internal Server Error' })
+  }
+
   res.status(500).send('Internal Server Error')
 }

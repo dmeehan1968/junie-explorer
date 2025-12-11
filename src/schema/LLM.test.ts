@@ -108,5 +108,24 @@ describe("LLM schema", () => {
         expect(result.data.jbai).toBe("openai-gpt-4o-mini")
       }
     })
+
+    test("should successfully parse valid OpenAI 5.2 data", () => {
+      const validData = {
+        jbai: "openai-gpt-5-2",
+        name: "GPT-5.2",
+        provider: "OpenAI",
+        capabilities: {
+          inputPrice: 0,
+          outputPrice: 0,
+          cacheInputPrice: 0,
+        },
+      }
+
+      const result = LLM.safeParse(validData)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.jbai).toBe("openai-gpt-5-2")
+      }
+    })
   })
 })

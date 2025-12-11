@@ -148,3 +148,13 @@
     "NEW INSTRUCTION": "WHEN passing JSX to ToolCallDecorator label THEN change label type to string | JSX.Element"
 }
 
+[2025-12-11 19:34] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Unknown LLM format for openai-gpt-5-2",
+    "ROOT CAUSE": "The new OpenAI52 model wasn't added to the LLM union and transformer, causing parse failure.",
+    "PROJECT NOTE": "Add OpenAI52 to src/schema/LLM.ts union, src/schema/LLMTransformer.ts routing, and src/Task.ts isGpt5ResponseEvent.",
+    "NEW INSTRUCTION": "WHEN adding a new LLM schema THEN register it in LLM union and LLMTransformer"
+}
+
