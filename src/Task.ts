@@ -108,7 +108,7 @@ export class Task {
   constructor(id: string, created: Date, eventsFile: string)
   constructor(logPathOrId: string, created?: Date, eventsFile?: string) {
     if (created && eventsFile) {
-      this.id = '0'
+      this.id = logPathOrId + ' 0'
       this.created = created
       this.eventsFile = eventsFile
     } else {
