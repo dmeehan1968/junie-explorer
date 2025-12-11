@@ -25,7 +25,7 @@ export class Issue {
       this.state = 'Running'
       this._tasks = Promise.resolve(new Map([[this.id + ' 0', task]]))
       void new Promise(async resolve => {
-        const records = await task.events
+        const records = await task.loadEvents() // load events without caching
         records.forEach(record => {
           if (record.event.type === 'TaskSummaryCreatedEvent') {
             this.name = record.event.taskSummary

@@ -299,7 +299,7 @@ export class Task {
     return this.lazyload()._patch!
   }
 
-  private async loadEvents() {
+  async loadEvents() {
     let events: EventRecord[] = []
     let errors: { eventsFile: string; lineNumber: number; message: string; path: (string | number)[]; json: unknown }[] = []
 
