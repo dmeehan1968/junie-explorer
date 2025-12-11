@@ -25,7 +25,7 @@ export const IssueRow = async ({ issue, project, locale }: {
   return (
     <tr
       data-issue-id={issue.id}
-      class="cursor-pointer hover:!bg-accent transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
+      class="cursor-pointer hover:bg-accent! transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
       <Conditional condition={project.hasMetrics}>
         <td class="text-center align-top py-3 px-2">
           <input
