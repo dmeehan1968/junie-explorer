@@ -1,6 +1,7 @@
 import { describe, expect, test, beforeAll, afterAll } from "bun:test"
 import { Server } from "http"
 import { AddressInfo } from "net"
+import os from "node:os"
 import { createServer } from "../../createServer"
 
 describe("Search API", () => {
@@ -8,7 +9,7 @@ describe("Search API", () => {
   let baseUrl: string
 
   beforeAll(async () => {
-    const { app } = await createServer({ port: 0, concurrency: 10, jetBrainsLogPath: "./fixtures" })
+    const { app } = await createServer({ port: 0, concurrency: 10, jetBrainsLogPath: "./fixtures", homeDir: os.tmpdir() })
     server = app.listen(0)
     const address = server.address() as AddressInfo
     baseUrl = `http://localhost:${address.port}`

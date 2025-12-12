@@ -8,10 +8,11 @@ import { formatNumber, formatSeconds } from "../utils/timeUtils"
 import { Conditional } from "./conditional"
 import { StatusBadge } from "./statusBadge"
 
-export const IssueRow = async ({ issue, project, locale }: {
+export const IssueRow = async ({ issue, project, locale, customDescription }: {
   issue: Issue,
   project: Project,
-  locale: string | undefined
+  locale: string | undefined,
+  customDescription?: string
 }) => {
   const tasks = await issue.tasks
   const hasTasks = tasks.size > 0
@@ -21,6 +22,7 @@ export const IssueRow = async ({ issue, project, locale }: {
   const metrics = await issue.metrics
   const assistantProvidersRaw = Array.from(await issue.assistantProviders)
   const assistantProviders = buildAssistantProviders(assistantProvidersRaw)
+  const displayName = customDescription || issue.name
 
   return (
     <tr
@@ -44,17 +46,36 @@ export const IssueRow = async ({ issue, project, locale }: {
         </td>
       </Conditional>
       <td
-        class="text-left whitespace-normal wrap-break-word w-2/5 align-top py-3 px-2"
+        class="text-left whitespace-normal wrap-break-word w-2/5 align-top py-3 px-2 group/desc"
         data-testid="issue-description"
-        role="link"
-        tabindex="0"
-        onclick={`window.location.href='${href}'`}
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
+        data-issue-description-editable="true"
+        data-issue-id={issue.id}
+        data-original-description={escapeHtml(issue.name)}
       >
-        <a class="font-bold text-primary" href={href} data-testid="issue-description-link">
-          {escapeHtml(issue.name)}
-        </a>
-        <span class="text-neutral/50">{tasks.size > 1 ? `(${tasks.size})` : ''}</span>
+        <div class="flex items-start gap-2">
+          <div class="flex-1">
+            <a
+              class="font-bold text-primary"
+              href={href}
+              data-testid="issue-description-link"
+              onclick="event.stopPropagation()"
+            >
+              {escapeHtml(displayName)}
+            </a>
+            <span class="text-neutral/50">{tasks.size > 1 ? ` (${tasks.size})` : ''}</span>
+          </div>
+          <button
+            type="button"
+            class="btn btn-ghost btn-xs opacity-0 group-hover/desc:opacity-100 transition-opacity"
+            data-testid="edit-description-btn"
+            aria-label="Edit description"
+            onclick="event.stopPropagation()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+        </div>
       </td>
       <td
         class="text-left whitespace-nowrap"

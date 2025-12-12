@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import os from "node:os"
 import { JetBrains } from "./jetbrains"
 import { createServer } from "./createServer"
 
@@ -11,6 +12,7 @@ describe("createServer", () => {
       const { port } = await createServer({
         preload: false,
         jetBrainsInstance: new JetBrains({ logPath: "./fixtures" }),
+        homeDir: os.tmpdir(),
       })
 
       expect(port).toBe(3000)

@@ -168,3 +168,23 @@
     "NEW INSTRUCTION": "WHEN createServer is called without port option THEN default to 3000 and ignore process.env"
 }
 
+[2025-12-12 10:18] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "Expected 200; API returned non-200 for PUT route",
+    "ROOT CAUSE": "The new issues API route is not registered in the server, so the request 404s.",
+    "PROJECT NOTE": "Add `app.use(apiIssues)` in src/app/junieExplorer.ts alongside existing api routes (apiSearch, apiStats) so /api/issues/:issueId/description is handled.",
+    "NEW INSTRUCTION": "WHEN adding a new API router THEN register it in junieExplorer with app.use"
+}
+
+[2025-12-12 11:24] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "Module './IssueDescriptionStore' not found by tests",
+    "ROOT CAUSE": "The test imports IssueDescriptionStore but the implementation file has not been created.",
+    "PROJECT NOTE": "Add src/services/IssueDescriptionStore.ts so imports from src/services/IssueDescriptionStore.test.ts resolve.",
+    "NEW INSTRUCTION": "WHEN bun test shows 'Cannot find module' for IssueDescriptionStore THEN create src/services/IssueDescriptionStore.ts with required API"
+}
+

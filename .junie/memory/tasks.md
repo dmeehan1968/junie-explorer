@@ -638,3 +638,13 @@
     "NEW INSTRUCTION": "WHEN removing multiple env variables THEN write one failing test per variable first"
 }
 
+[2025-12-12 11:34] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "documentation",
+    "MISSING STEPS": "pass homeDir into createServer, add API route, register API route, update issueRow for inline edit, add client-side handler with hover button and Escape cancel, server-side trim and empty-handling, integrate store into route, end-to-end test or manual validation",
+    "BOTTLENECK": "Work paused after partial store implementation without wiring UI and API end-to-end.",
+    "PROJECT NOTE": "Routes are registered in junieExplorer; add an /api/issues route module and pass homeDir there.",
+    "NEW INSTRUCTION": "WHEN feature spans UI and API THEN implement a minimal end-to-end vertical slice first"
+}
+

@@ -11,7 +11,11 @@ const NoIssuesMessage = () => (
   </p>
 )
 // Issues Table Component
-export const IssuesTable = async ({ project, locale }: { project: Project, locale: string | undefined }) => {
+export const IssuesTable = async ({ project, locale, customDescriptions = {} }: {
+  project: Project,
+  locale: string | undefined,
+  customDescriptions?: Record<string, string>
+}) => {
   const issuesCount = (await project.issues).size
 
   if (issuesCount === 0) {
@@ -93,7 +97,12 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
           </thead>
           <tbody>
           {await Promise.all(sortedIssues.map(async issue => (
-            <IssueRow issue={issue} project={project} locale={locale}/>
+            <IssueRow
+              issue={issue}
+              project={project}
+              locale={locale}
+              customDescription={customDescriptions[issue.id]}
+            />
           )))}
           </tbody>
           <tfoot>
@@ -154,6 +163,7 @@ export const IssuesTable = async ({ project, locale }: { project: Project, local
         </div>
       </div>
       <script src="/js/issueSearch.js"></script>
+      <script src="/js/issueDescriptionEdit.js"></script>
     </div>
   )
 }

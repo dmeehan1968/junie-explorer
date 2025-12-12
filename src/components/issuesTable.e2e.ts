@@ -78,9 +78,12 @@ test.describe('IssuesTable', async () => {
       const rows = await issuesTable.getAllRows()
       expect(rows.length).toBeGreaterThan(0)
       for (const row of rows) {
-        // Check that expected cells are visible and have onclick handlers to navigate to trajectories
+        // Check that expected cells are visible
         for(const cell of ["descriptionCell", "timestampCell", "inputTokensCell", "outputTokensCell", "cacheTokensCell", "costCell", "totalTimeCell", "statusCell", "assistantProvidersCell"] as (keyof IssueRowDSL)[]) {
           await expect((row[cell] as Locator)).toBeVisible()
+        }
+        // Check that non-description cells have onclick handlers to navigate to trajectories
+        for(const cell of ["timestampCell", "inputTokensCell", "outputTokensCell", "cacheTokensCell", "costCell", "totalTimeCell", "statusCell", "assistantProvidersCell"] as (keyof IssueRowDSL)[]) {
           await expect((row[cell] as Locator).getAttribute('onclick')).resolves.toMatch(/task\/0\/trajectories/)
         }
 

@@ -1,6 +1,7 @@
 import express, { Express, NextFunction, Router } from "express"
 import { Server } from "http"
 import { JetBrains } from "../jetbrains"
+import { IssueDescriptionStore } from "../services/IssueDescriptionStore"
 import refreshRoutes from "./web/refreshRoutes"
 import homeRoutes from "../app/web/homeRoutes"
 import projectRoutes from "../app/web/projectRoutes"
@@ -12,6 +13,7 @@ import apiTrajectories from "./api/trajectories/index"
 import apiEvents from "./api/events/index"
 import apiStats from "./api/stats"
 import apiSearch from "./api/search"
+import apiIssues from "./api/issues"
 import { errorHandler } from "./middleware/errorHandler"
 import { serveStaticsFromBunVfsMiddleware } from "./middleware/serveStaticsFromBunVfsMiddleware"
 import { AppRequest, AppResponse } from "./types"
@@ -21,14 +23,19 @@ import cookieParser from 'cookie-parser'
 export class JunieExplorer {
   private readonly app: Express
 
-  constructor(public readonly jetBrains: JetBrains) {
+  constructor(
+    public readonly jetBrains: JetBrains,
+    public readonly issueDescriptionStore: IssueDescriptionStore
+  ) {
 
     this.app = express()
 
     // middleware
     this.app.use(cookieParser())
+    this.app.use(express.json())
     this.app.use(async (req: AppRequest, res: AppResponse, next: NextFunction) => {
       req.jetBrains = jetBrains
+      req.issueDescriptionStore = issueDescriptionStore
       next()
     })
     this.app.use(serveStaticsFromBunVfsMiddleware)
@@ -46,6 +53,7 @@ export class JunieExplorer {
     this.app.use('/', apiEvents)
     this.app.use('/', apiStats)
     this.app.use('/', apiSearch)
+    this.app.use('/', apiIssues)
 
     // error handling
     this.app.use(notFoundRouteHandler)
