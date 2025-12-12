@@ -188,3 +188,13 @@
     "NEW INSTRUCTION": "WHEN bun test shows 'Cannot find module' for IssueDescriptionStore THEN create src/services/IssueDescriptionStore.ts with required API"
 }
 
+[2025-12-12 12:01] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "issueDescriptionStore property is undefined on JetBrains",
+    "ROOT CAUSE": "JetBrains class lacks an issueDescriptionStore member and constructor initialization.",
+    "PROJECT NOTE": "Add import for IssueDescriptionStore in src/jetbrains.ts and initialize this.issueDescriptionStore using existing home directory logic (e.g., os.homedir or current logPath/home derivation).",
+    "NEW INSTRUCTION": "WHEN jetBrains.issueDescriptionStore is undefined in tests THEN add and initialize property in JetBrains constructor"
+}
+

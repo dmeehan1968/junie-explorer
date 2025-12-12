@@ -270,3 +270,11 @@
     "NEW INSTRUCTION": "WHEN editing an issue description and override exists THEN prefill input with the overridden description"
 }
 
+[2025-12-12 11:56] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "dependency wiring",
+    "EXPECTATION": "issueDescriptionStore should be owned by the JetBrains instance, not passed per request.",
+    "NEW INSTRUCTION": "WHEN using issueDescriptionStore THEN access it via JetBrains and avoid req attribute"
+}
+

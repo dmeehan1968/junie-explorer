@@ -648,3 +648,13 @@
     "NEW INSTRUCTION": "WHEN feature spans UI and API THEN implement a minimal end-to-end vertical slice first"
 }
 
+[2025-12-12 12:05] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "summary and confirmation with user",
+    "MISSING STEPS": "scan project, update usages, run tests, run build",
+    "BOTTLENECK": "Assumed affected files without verifying actual usages across the codebase.",
+    "PROJECT NOTE": "Tests use Bun; no existing JetBrains tests, follow IssueDescriptionStore test style.",
+    "NEW INSTRUCTION": "WHEN refactoring dependency ownership across modules THEN run search_project to locate usages and plan updates"
+}
+

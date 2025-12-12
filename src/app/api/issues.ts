@@ -5,7 +5,7 @@ const router = Router()
 
 router.get("/api/issues/:issueId/description", async (req: AppRequest, res: AppResponse) => {
   const { issueId } = req.params
-  const store = req.issueDescriptionStore
+  const store = req.jetBrains?.issueDescriptionStore
 
   if (!store) {
     return res.status(500).json({ error: "Issue description store not available" })
@@ -18,7 +18,7 @@ router.get("/api/issues/:issueId/description", async (req: AppRequest, res: AppR
 router.put("/api/issues/:issueId/description", async (req: AppRequest, res: AppResponse) => {
   const { issueId } = req.params
   const { description } = req.body as { description?: string }
-  const store = req.issueDescriptionStore
+  const store = req.jetBrains?.issueDescriptionStore
 
   if (!store) {
     return res.status(500).json({ error: "Issue description store not available" })

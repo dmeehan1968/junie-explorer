@@ -1,6 +1,5 @@
 import { JunieExplorer } from "./app/junieExplorer"
 import { JetBrains } from "./jetbrains"
-import { IssueDescriptionStore } from "./services/IssueDescriptionStore"
 import { Task } from "./Task"
 
 export interface ServerOptions {
@@ -9,24 +8,22 @@ export interface ServerOptions {
   concurrency?: number
   port?: number
   preload?: boolean
-  homeDir: string
+  homeDir?: string
 }
 
 export async function createServer(options: ServerOptions) {
   const {
-    jetBrainsInstance = new JetBrains({ logPath: options.jetBrainsLogPath }),
+    jetBrainsInstance = new JetBrains({ logPath: options.jetBrainsLogPath, homeDir: options.homeDir }),
     concurrency,
     port: configuredPort,
     preload = true,
-    homeDir,
   } = options
 
   const port = configuredPort ?? 3000
 
   Task.setConfiguredConcurrency(concurrency)
 
-  const issueDescriptionStore = new IssueDescriptionStore(homeDir)
-  const app = new JunieExplorer(jetBrainsInstance, issueDescriptionStore)
+  const app = new JunieExplorer(jetBrainsInstance)
 
   // Initialize app state if requested
   if (preload) {

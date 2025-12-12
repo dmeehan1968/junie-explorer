@@ -7,6 +7,7 @@ import semver from "semver"
 import publicFiles from "./bun/public"
 import { Project } from "./Project"
 import { addSummaryMetrics, initialisedSummaryMetrics, SummaryMetrics } from "./schema"
+import { IssueDescriptionStore } from "./services/IssueDescriptionStore"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Task } from "./Task"
 
@@ -16,6 +17,7 @@ const __dirname = path.dirname(__filename)
 interface JetBrainsOptions {
   logPath?: string
   logger?: { log: (...message: any[]) => void }
+  homeDir?: string
 }
 
 export interface Logger {
@@ -36,6 +38,7 @@ export class JetBrains {
   private _metrics: Promise<SummaryMetrics> | undefined
   private _version?: Version
   public readonly statsCollector: StatsCollector
+  public readonly issueDescriptionStore: IssueDescriptionStore
 
   public hasMetrics: boolean = false
 
@@ -50,6 +53,7 @@ export class JetBrains {
     this._logPath = options.logPath
     this.logger = options.logger ?? console
     this.statsCollector = new StatsCollector()
+    this.issueDescriptionStore = new IssueDescriptionStore(options.homeDir ?? os.homedir())
     
     // Register stats collector with Task class for WorkerPool monitoring
     Task.setStatsCollector(this.statsCollector)

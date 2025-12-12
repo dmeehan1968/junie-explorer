@@ -4,7 +4,6 @@ import { z } from "zod"
 import { Issue } from "../Issue"
 import { JetBrains } from "../jetbrains"
 import { Project } from "../Project"
-import { IssueDescriptionStore } from "../services/IssueDescriptionStore"
 import { Task } from "../Task"
 
 interface AppLocals {
@@ -26,7 +25,6 @@ interface AppResBody {
 
 export type AppRequest = Request<AppParams, AppReqBody, AppResBody, core.Query, AppLocals> & {
   jetBrains?: JetBrains
-  issueDescriptionStore?: IssueDescriptionStore
   project?: Project
   issue?: Issue
   task?: Task

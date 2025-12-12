@@ -1,5 +1,4 @@
 import { Server } from "http"
-import os from "node:os"
 import process from "node:process"
 import { createServer } from "./createServer"
 
@@ -12,7 +11,6 @@ const { app, port: resolvedPort } = await createServer({
   port: Number.isFinite(port) ? port : undefined,
   jetBrainsLogPath: process.env.JETBRAINS_LOG_PATH,
   concurrency: Number.isFinite(concurrency) ? concurrency : undefined,
-  homeDir: os.homedir(),
 })
 
 app.listen(resolvedPort, (server: Server, host, port) => {

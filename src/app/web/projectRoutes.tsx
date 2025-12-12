@@ -40,15 +40,13 @@ export const projectRouteHandler = async (req: AppRequest, res: AppResponse) => 
   const locale = getLocaleFromRequest(req)
   
   try {
-    const { jetBrains, project, issueDescriptionStore } = req
+    const { jetBrains, project } = req
 
     if (!jetBrains || !project) {
       return res.status(404).send('Project not found')
     }
 
-    const customDescriptions = issueDescriptionStore
-      ? await issueDescriptionStore.getAllDescriptions()
-      : {}
+    const customDescriptions = await jetBrains.issueDescriptionStore.getAllDescriptions()
 
     const page = async (rid: number | string) => <HtmlPage cookies={req.cookies}>
       <AppHead title={`${project.name} Issues`}>

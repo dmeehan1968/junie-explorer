@@ -1,7 +1,6 @@
 import express, { Express, NextFunction, Router } from "express"
 import { Server } from "http"
 import { JetBrains } from "../jetbrains"
-import { IssueDescriptionStore } from "../services/IssueDescriptionStore"
 import refreshRoutes from "./web/refreshRoutes"
 import homeRoutes from "../app/web/homeRoutes"
 import projectRoutes from "../app/web/projectRoutes"
@@ -24,8 +23,7 @@ export class JunieExplorer {
   private readonly app: Express
 
   constructor(
-    public readonly jetBrains: JetBrains,
-    public readonly issueDescriptionStore: IssueDescriptionStore
+    public readonly jetBrains: JetBrains
   ) {
 
     this.app = express()
@@ -35,7 +33,6 @@ export class JunieExplorer {
     this.app.use(express.json())
     this.app.use(async (req: AppRequest, res: AppResponse, next: NextFunction) => {
       req.jetBrains = jetBrains
-      req.issueDescriptionStore = issueDescriptionStore
       next()
     })
     this.app.use(serveStaticsFromBunVfsMiddleware)
