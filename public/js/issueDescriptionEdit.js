@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startEditing() {
       isEditing = true
-      const currentText = descriptionLink.textContent.trim()
+      // Get fresh reference to description link (may have been rebuilt after previous edit)
+      const currentDescriptionLink = container.querySelector('[data-testid="issue-description-link"]')
+      const currentText = currentDescriptionLink ? currentDescriptionLink.textContent.trim() : originalDescription
 
       const input = document.createElement('input')
       input.type = 'text'
@@ -84,6 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (link) {
           link.textContent = displayDescription
         }
+
+        // Update the checkbox data-issue-name for compare modal
+        const row = container.closest('tr')
+        if (row) {
+          const checkbox = row.querySelector('.issue-select')
+          if (checkbox) {
+            checkbox.dataset.issueName = displayDescription
+          }
+        }
+
         reattachEventListeners()
       } catch (error) {
         console.error('Error saving description:', error)

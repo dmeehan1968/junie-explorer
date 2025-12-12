@@ -254,3 +254,19 @@
     "NEW INSTRUCTION": "WHEN starting server from tests THEN pass CONCURRENCY in env and assert startup log"
 }
 
+[2025-12-12 11:39] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "issue descriptions",
+    "EXPECTATION": "Compare view should show overridden descriptions; after clearing an override, the edit default should show the original description.",
+    "NEW INSTRUCTION": "WHEN rendering compare view or edit input THEN use override if exists else original"
+}
+
+[2025-12-12 11:45] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "issue descriptions",
+    "EXPECTATION": "When an override exists and is active, the edit field should show the overridden description, not the original.",
+    "NEW INSTRUCTION": "WHEN editing an issue description and override exists THEN prefill input with the overridden description"
+}
+
