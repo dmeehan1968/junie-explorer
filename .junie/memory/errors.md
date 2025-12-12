@@ -198,3 +198,13 @@
     "NEW INSTRUCTION": "WHEN jetBrains.issueDescriptionStore is undefined in tests THEN add and initialize property in JetBrains constructor"
 }
 
+[2025-12-12 12:13] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "New tests failed; removal on original name not implemented",
+    "ROOT CAUSE": "IssueDescriptionStore.setDescription lacks logic to accept originalName and delete when equal.",
+    "PROJECT NOTE": "Update setDescription(issueId, description, originalName?) to trim and delete when description is empty or equals originalName; adjust API/router later to pass Issue.name.",
+    "NEW INSTRUCTION": "WHEN setDescription receives originalName and trimmed equals originalName THEN delete the stored description"
+}
+

@@ -658,3 +658,13 @@
     "NEW INSTRUCTION": "WHEN refactoring dependency ownership across modules THEN run search_project to locate usages and plan updates"
 }
 
+[2025-12-12 12:14] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "examine Issue class",
+    "MISSING STEPS": "update client, update API tests, run full test suite",
+    "BOTTLENECK": "Original name not wired from UI to API end-to-end.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN adding a new API request field THEN update client to send it and test"
+}
+

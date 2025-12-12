@@ -60,6 +60,34 @@ describe("IssueDescriptionStore", () => {
       expect(result).toBeUndefined()
     })
 
+    test("removes the entry when description matches original name", async () => {
+      const originalName = "Original Issue Name"
+      await store.setDescription("issue-123", "Custom description", originalName)
+
+      await store.setDescription("issue-123", originalName, originalName)
+
+      const result = await store.getDescription("issue-123")
+      expect(result).toBeUndefined()
+    })
+
+    test("removes the entry when trimmed description matches original name", async () => {
+      const originalName = "Original Issue Name"
+      await store.setDescription("issue-123", "Custom description", originalName)
+
+      await store.setDescription("issue-123", "  Original Issue Name  ", originalName)
+
+      const result = await store.getDescription("issue-123")
+      expect(result).toBeUndefined()
+    })
+
+    test("keeps the entry when description differs from original name", async () => {
+      const originalName = "Original Issue Name"
+      await store.setDescription("issue-123", "Custom description", originalName)
+
+      const result = await store.getDescription("issue-123")
+      expect(result).toBe("Custom description")
+    })
+
     test("creates the .junie-explorer directory if it does not exist", async () => {
       await store.setDescription("issue-123", "New description")
 

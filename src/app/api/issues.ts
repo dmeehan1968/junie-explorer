@@ -17,7 +17,7 @@ router.get("/api/issues/:issueId/description", async (req: AppRequest, res: AppR
 
 router.put("/api/issues/:issueId/description", async (req: AppRequest, res: AppResponse) => {
   const { issueId } = req.params
-  const { description } = req.body as { description?: string }
+  const { description, originalName } = req.body as { description?: string; originalName?: string }
   const store = req.jetBrains?.issueDescriptionStore
 
   if (!store) {
@@ -28,7 +28,7 @@ router.put("/api/issues/:issueId/description", async (req: AppRequest, res: AppR
     return res.status(400).json({ error: "Description must be a string" })
   }
 
-  await store.setDescription(issueId!, description)
+  await store.setDescription(issueId!, description, originalName)
   const savedDescription = await store.getDescription(issueId!)
 
   res.json({ success: true, description: savedDescription })

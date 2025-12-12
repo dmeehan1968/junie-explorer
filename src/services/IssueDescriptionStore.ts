@@ -34,7 +34,7 @@ export class IssueDescriptionStore {
     return data.descriptions?.[issueId]
   }
 
-  async setDescription(issueId: string, description: string): Promise<void> {
+  async setDescription(issueId: string, description: string, originalName?: string): Promise<void> {
     const trimmed = description.trim()
     const data = await this.readData()
 
@@ -42,7 +42,7 @@ export class IssueDescriptionStore {
       data.descriptions = {}
     }
 
-    if (trimmed === "") {
+    if (trimmed === "" || trimmed === originalName) {
       delete data.descriptions[issueId]
     } else {
       data.descriptions[issueId] = trimmed

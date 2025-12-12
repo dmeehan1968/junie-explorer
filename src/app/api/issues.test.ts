@@ -83,6 +83,44 @@ describe("Issues API", () => {
       expect(result.description).toBeUndefined()
     })
 
+    test("removes description when it matches originalName", async () => {
+      const originalName = "Original Issue Name"
+
+      // First set a custom description
+      await fetch(`${baseUrl}/api/issues/test-issue-123/description`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "Custom description", originalName })
+      })
+
+      // Then set it back to the original name
+      const response = await fetch(`${baseUrl}/api/issues/test-issue-123/description`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: originalName, originalName })
+      })
+
+      expect(response.status).toBe(200)
+      const result = await response.json()
+      expect(result.success).toBe(true)
+      expect(result.description).toBeUndefined()
+    })
+
+    test("keeps description when it differs from originalName", async () => {
+      const originalName = "Original Issue Name"
+
+      const response = await fetch(`${baseUrl}/api/issues/test-issue-123/description`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "Custom description", originalName })
+      })
+
+      expect(response.status).toBe(200)
+      const result = await response.json()
+      expect(result.success).toBe(true)
+      expect(result.description).toBe("Custom description")
+    })
+
     test("returns 400 when description is missing", async () => {
       const response = await fetch(`${baseUrl}/api/issues/test-issue-123/description`, {
         method: "PUT",
