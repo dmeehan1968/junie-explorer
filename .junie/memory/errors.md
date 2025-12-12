@@ -158,3 +158,13 @@
     "NEW INSTRUCTION": "WHEN adding a new LLM schema THEN register it in LLM union and LLMTransformer"
 }
 
+[2025-12-12 09:24] - Updated by Junie - Error analysis
+{
+    "TYPE": "logic bug",
+    "TOOL": "-",
+    "ERROR": "createServer still reads PORT from process.env",
+    "ROOT CAUSE": "createServer defaults are sourced from process.env instead of explicit options-only defaults.",
+    "PROJECT NOTE": "In src/createServer.ts, remove process.env.PORT and process.env.JETBRAINS_LOG_PATH usage; default port to 3000 and pass JetBrains logPath via options.",
+    "NEW INSTRUCTION": "WHEN createServer is called without port option THEN default to 3000 and ignore process.env"
+}
+

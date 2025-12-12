@@ -246,3 +246,11 @@
     "NEW INSTRUCTION": "WHEN Search button is disabled THEN add disabled attribute and btn-disabled class"
 }
 
+[2025-12-11 19:52] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "tests environment",
+    "EXPECTATION": "Setting CONCURRENCY in search.test.ts should be visible to the server and it should log 'Concurrency is 10. Set environment CONCURRENCY to configure'.",
+    "NEW INSTRUCTION": "WHEN starting server from tests THEN pass CONCURRENCY in env and assert startup log"
+}
+

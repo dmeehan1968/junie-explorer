@@ -1,9 +1,13 @@
-export function getMaxConcurrency() {
+export function getMaxConcurrency(configuredConcurrency?: number) {
   const { hardwareConcurrency } = navigator
-  if (process.env.CONCURRENCY === undefined) {
+  if (configuredConcurrency === undefined) {
     return 0
   }
-  const env = parseInt(process.env.CONCURRENCY)
-  const configured = Number.isFinite(env) && env >= 0 ? env : hardwareConcurrency
+
+  const configured =
+    Number.isFinite(configuredConcurrency) && configuredConcurrency >= 0
+      ? configuredConcurrency
+      : hardwareConcurrency
+
   return Math.min(hardwareConcurrency, configured)
 }

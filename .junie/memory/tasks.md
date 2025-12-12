@@ -618,3 +618,23 @@
     "NEW INSTRUCTION": "WHEN unrelated test failures appear after scoped changes THEN avoid out-of-scope edits and proceed"
 }
 
+[2025-12-11 20:04] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "seek confirmation",
+    "MISSING STEPS": "add tests, implement changes, run tests, run typecheck",
+    "BOTTLENECK": "Paused for confirmation instead of implementing requested changes immediately.",
+    "PROJECT NOTE": "Thread a concurrency option to replace process.env in getMaxConcurrency while preserving browser navigator usage.",
+    "NEW INSTRUCTION": "WHEN mapping process.env usages is complete THEN implement config options and update tests before confirmation"
+}
+
+[2025-12-12 09:28] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "add tests, refactor concurrency, update tests, run tests",
+    "BOTTLENECK": "Concurrency still reads process.env and lacks option plumbing and tests.",
+    "PROJECT NOTE": "Refactor getMaxConcurrency to accept an optional numeric override and update its call sites (e.g., Task) to pass it from createServer options.",
+    "NEW INSTRUCTION": "WHEN removing multiple env variables THEN write one failing test per variable first"
+}
+

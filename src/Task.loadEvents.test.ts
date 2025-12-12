@@ -4,9 +4,6 @@ import os from 'node:os'
 import path from 'node:path'
 import { Task } from './Task'
 
-// Ensure no worker pool is used during this test
-process.env.CONCURRENCY = '0'
-
 const tmpRoot = path.join(os.tmpdir(), `junie-explorer-task-tests-${Date.now()}`)
 const projectDir = path.join(tmpRoot, 'project')
 const cacheDir = path.join(projectDir, 'Library', 'Caches', 'JetBrains')
@@ -24,12 +21,14 @@ const junieTaskJson = {
 
 describe('Task.loadEvents logging', () => {
   beforeAll(async () => {
+    Task.setConfiguredConcurrency(0)
     await fs.mkdirp(taskLogDir)
     await fs.writeJson(path.join(taskLogDir, 'task.json'), junieTaskJson, { spaces: 2 })
   })
 
   afterAll(async () => {
     await fs.remove(tmpRoot)
+    Task.setConfiguredConcurrency(undefined)
   })
 
   it('logs EventParserError entries and returns only valid events', async () => {

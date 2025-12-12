@@ -1,19 +1,26 @@
-import process from "node:process"
 import { JunieExplorer } from "./app/junieExplorer"
 import { JetBrains } from "./jetbrains"
+import { Task } from "./Task"
 
 export interface ServerOptions {
   jetBrainsInstance?: JetBrains
+  jetBrainsLogPath?: string
+  concurrency?: number
   port?: number
   preload?: boolean
 }
 
 export async function createServer(options: ServerOptions = {}) {
   const {
-    jetBrainsInstance = new JetBrains({ logPath: process.env.JETBRAINS_LOG_PATH }),
-    port = process.env.PORT || 3000,
+    jetBrainsInstance = new JetBrains({ logPath: options.jetBrainsLogPath }),
+    concurrency,
+    port: configuredPort,
     preload = true,
   } = options
+
+  const port = configuredPort ?? 3000
+
+  Task.setConfiguredConcurrency(concurrency)
 
   const app = new JunieExplorer(jetBrainsInstance)
 

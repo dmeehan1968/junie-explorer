@@ -54,6 +54,13 @@ export class Task {
   // Static worker pool for loading events
   private static _workerPool: WorkerPool<{ eventsFilePath: string }, LoadEventsOutput> | null | undefined = undefined
   private static _statsCollector: StatsCollector | null = null
+  private static _configuredConcurrency: number | undefined = undefined
+
+  public static setConfiguredConcurrency(configuredConcurrency: number | undefined) {
+    this._configuredConcurrency = configuredConcurrency
+    // Worker pool concurrency is set at creation time; reset so it can be re-created with new config
+    this._workerPool = undefined
+  }
 
   public static setStatsCollector(statsCollector: StatsCollector) {
     this._statsCollector = statsCollector
@@ -68,7 +75,7 @@ export class Task {
       return this._workerPool
     }
 
-    const maxConcurrency = getMaxConcurrency()
+    const maxConcurrency = getMaxConcurrency(this._configuredConcurrency)
 
     if (this._workerPool === undefined) {
       if (maxConcurrency > 0) {
@@ -79,7 +86,7 @@ export class Task {
         const blob = new Blob([bundledWorker], { type: 'application/javascript' })
         const workerPath = URL.createObjectURL(blob)
 
-        console.log(`Concurrency is ${maxConcurrency}. Set environment CONCURRENCY to configure`)
+        console.log(`Concurrency is ${maxConcurrency}. Use server configuration to configure`)
         this._workerPool = new WorkerPool<LoadEventsInput, LoadEventsOutput>({
           minConcurrency: 0,
           maxConcurrency: maxConcurrency,

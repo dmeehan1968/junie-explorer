@@ -50,8 +50,10 @@ Single File Executables are available from Junie Explorer 2.3+.  You can downloa
 
 ### Port Conflicts
 
-Junie Explorer uses port 3000 by default.  If this conflicts with other apps on your system, you can set the desired
-port via an environment variable, which can be added to the command line, e.g.:
+Junie Explorer uses port 3000 by default.
+
+If you are running via the provided entrypoint (`bun run dev`, `bun start`, or the compiled executable), you can set
+the desired port via an environment variable, e.g.:
 
 ```bash
 PORT=4000 bun run dev
@@ -69,13 +71,15 @@ From: <pathname>
 Server is running on http://localhost:60123
 ```
 
+In unit tests prefer passing `port` into `createServer({ port })` instead of relying on `process.env.PORT`.
+
 ### Max Workers/Concurrency
 
-By default, the application will use the main thread to load the logs.  This is sufficient for most use cases, but
+By default, the application will use the main thread to load the logs. This is sufficient for most use cases, but
 if you have a large number of logs, you can enable worker threads to improve performance, up to the maximum number
-of CPU cores on your system. 
+of CPU cores on your system.
 
-Bash:
+Bash (entrypoint reads env once at startup):
 ```shell
 CONCURRENCY=4 junie-explorer-apple-arm64
 ```
@@ -86,12 +90,22 @@ $Env:CONCURRENCY = 4
 .\junie-explorer-windows-x64.exe
 ```
 
+In unit tests prefer passing `concurrency` into `createServer({ concurrency })` instead of relying on `process.env.CONCURRENCY`.
+
 - Setting CONCURRENCY to 0 will disable concurrency, all work is done on the main thread.
 - Setting CONCURRENCY to 1 will enable a single worker, which has a slight performance penalty.
 - You cannot set CONCURRENCY to a value greater than the number of CPU cores on your system, it will be adjusted down
   to match the number of cores.
 - The more workers you use, the more memory you are likely to need.  If memory is an issue, constrain
   the maximum number of workers
+
+### Log path
+
+By default, Junie Explorer discovers JetBrains logs using its normal platform-specific defaults.
+
+If you are running via the entrypoint, you can override the log root via `JETBRAINS_LOG_PATH`.
+
+In unit tests prefer passing `jetBrainsLogPath` into `createServer({ jetBrainsLogPath })`.
 
 ##  Development
 

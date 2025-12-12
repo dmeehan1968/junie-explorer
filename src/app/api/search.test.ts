@@ -8,8 +8,7 @@ describe("Search API", () => {
   let baseUrl: string
 
   beforeAll(async () => {
-    process.env.CONCURRENCY = '10'
-    const { app } = await createServer({ port: 0 })
+    const { app } = await createServer({ port: 0, concurrency: 10, jetBrainsLogPath: "./fixtures" })
     server = app.listen(0)
     const address = server.address() as AddressInfo
     baseUrl = `http://localhost:${address.port}`
