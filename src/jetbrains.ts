@@ -170,10 +170,9 @@ export class JetBrains {
 
     switch (os.platform()) {
       case 'win32': // Windows
-        return path.join(process.env.APPDATA || '', '..', 'Local', 'JetBrains')
+        return path.join(os.homedir(), 'Local', 'JetBrains')
       case 'darwin': // macOS
-        const root = process.env.HOME || path.join('/Users', this.username)
-        return path.resolve(root, 'Library', 'Caches', 'JetBrains')
+        return path.join(os.homedir(), 'Library', 'Caches', 'JetBrains')
       default: // Linux and others
         return path.join(os.homedir(), '.cache', 'JetBrains')
 
