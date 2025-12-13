@@ -330,7 +330,7 @@ Requirements for this project are documented using Gherkin feature files located
 - Colocate the test suite with the component
 - To run Playwright tests locally use `bun run test`.  Use the argument `--grep <pattern>` to run focussed tests
 - To run Playwright tests interactively, use `bun run test:ui`
-- To run Bun native tests, use `bun test`
+- To run Bun native tests, use `bun test --only-failures <test_pattern>`
 - Add the @jsxImportSource directive to the top of the test, DSL and component files.
 
 **Naming Conventions:**
