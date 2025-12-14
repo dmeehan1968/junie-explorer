@@ -326,3 +326,11 @@
     "NEW INSTRUCTION": "WHEN merge buttons move into description cell THEN update listeners to trigger merge workflow"
 }
 
+[2025-12-14 13:57] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "UI icons",
+    "EXPECTATION": "The unmerge icon should be distinct from merge up/down and convey splitting into multiple pieces.",
+    "NEW INSTRUCTION": "WHEN rendering unmerge icon THEN use single-left path splitting to two-right paths with one dotted"
+}
+

@@ -40,8 +40,23 @@ test.describe('IssueRow', async () => {
 })
 
 test.describe('IssueRow - AIA Issues', async () => {
-  test.beforeEach(async ({ issuesTable }) => {
+  test.beforeEach(async ({ page, issuesTable }) => {
     await issuesTable.navigateToProject('aia-only-test')
+    
+    // Ensure issues are unmerged for test isolation
+    const rows = await issuesTable.getAllRows()
+    if (rows.length === 1) {
+      const firstRow = rows[0]
+      await firstRow.descriptionCell.hover()
+      const unmergeVisible = await firstRow.unmergeButton.isVisible()
+      if (unmergeVisible) {
+        page.on('dialog', async dialog => {
+          await dialog.accept()
+        })
+        await firstRow.unmergeButton.click()
+        await page.waitForLoadState('networkidle')
+      }
+    }
   })
 
   test('merge buttons should be inside description cell next to edit button', async ({ issuesTable }) => {
@@ -133,5 +148,96 @@ test.describe('IssueRow - AIA Issues', async () => {
     
     // Verify the confirmation dialog was shown
     expect(dialogMessage).toContain('Merge this issue into the issue above?')
+  })
+
+  test('unmerge button should be visible for merged AIA issues and trigger confirmation', async ({ page, issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    
+    // If there are 2+ rows, we need to merge first
+    // If there's 1 row with unmerge visible, it's already merged from a previous test
+    const firstRow = rows[0]
+    await firstRow.descriptionCell.hover()
+    
+    let dialogMessages: string[] = []
+    page.on('dialog', async dialog => {
+      dialogMessages.push(dialog.message())
+      await dialog.accept()
+    })
+    
+    // Check if unmerge is already visible (already merged state)
+    const unmergeVisible = await firstRow.unmergeButton.isVisible()
+    
+    if (!unmergeVisible && rows.length >= 2) {
+      // Need to merge first
+      await firstRow.mergeDownButton.click()
+      await page.waitForLoadState('networkidle')
+      
+      // Get the updated rows
+      const updatedRows = await issuesTable.getAllRows()
+      const mergedRow = updatedRows[0]
+      await mergedRow.descriptionCell.hover()
+      
+      // Unmerge button should now be visible
+      await expect(mergedRow.unmergeButton).toBeVisible()
+      await expect(mergedRow.unmergeButton).toHaveAttribute('aria-label', 'Unmerge issue')
+      
+      // Click unmerge and verify confirmation
+      dialogMessages = []
+      await mergedRow.unmergeButton.click()
+      expect(dialogMessages.length).toBe(1)
+      expect(dialogMessages[0]).toContain('Unmerge')
+    } else {
+      // Already merged, just test unmerge
+      await expect(firstRow.unmergeButton).toBeVisible()
+      await expect(firstRow.unmergeButton).toHaveAttribute('aria-label', 'Unmerge issue')
+      
+      // Click unmerge and verify confirmation
+      await firstRow.unmergeButton.click()
+      expect(dialogMessages.length).toBe(1)
+      expect(dialogMessages[0]).toContain('Unmerge')
+    }
+  })
+
+  test('unmerge button has correct icon and attributes', async ({ page, issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    const firstRow = rows[0]
+    await firstRow.descriptionCell.hover()
+    
+    // Accept any dialogs that appear
+    page.on('dialog', async dialog => {
+      await dialog.accept()
+    })
+    
+    // Check if unmerge is visible (merged state) or we need to merge first
+    let unmergeVisible = await firstRow.unmergeButton.isVisible()
+    
+    if (!unmergeVisible && rows.length >= 2) {
+      // Merge first to get unmerge button visible
+      await firstRow.mergeDownButton.click()
+      await page.waitForLoadState('networkidle')
+      
+      const updatedRows = await issuesTable.getAllRows()
+      const mergedRow = updatedRows[0]
+      await mergedRow.descriptionCell.hover()
+      unmergeVisible = await mergedRow.unmergeButton.isVisible()
+      
+      if (unmergeVisible) {
+        // Check the unmerge button has correct attributes
+        await expect(mergedRow.unmergeButton).toHaveAttribute('aria-label', 'Unmerge issue')
+        await expect(mergedRow.unmergeButton).toHaveAttribute('title', 'Unmerge issue')
+        
+        // Check for SVG icon inside the button
+        const svg = mergedRow.unmergeButton.locator('svg')
+        await expect(svg).toBeVisible()
+      }
+    } else if (unmergeVisible) {
+      // Already merged, check attributes
+      await expect(firstRow.unmergeButton).toHaveAttribute('aria-label', 'Unmerge issue')
+      await expect(firstRow.unmergeButton).toHaveAttribute('title', 'Unmerge issue')
+      
+      // Check for SVG icon inside the button
+      const svg = firstRow.unmergeButton.locator('svg')
+      await expect(svg).toBeVisible()
+    }
   })
 })

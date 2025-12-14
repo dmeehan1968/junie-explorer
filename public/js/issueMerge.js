@@ -42,10 +42,32 @@ document.addEventListener('DOMContentLoaded', () => {
       alert(`Failed to merge issues: ${error.message}`)
     }
   }
+
+  const handleUnmerge = async (issueId, projectName) => {
+    try {
+      const response = await fetch(`/api/projects/${encodeURIComponent(projectName)}/issues/${encodeURIComponent(issueId)}/unmerge`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to unmerge issue')
+      }
+      
+      window.location.reload()
+    } catch (error) {
+      console.error('Unmerge failed:', error)
+      alert(`Failed to unmerge issue: ${error.message}`)
+    }
+  }
   
   document.addEventListener('click', (event) => {
     const mergeUpBtn = event.target.closest('.merge-up-btn')
     const mergeDownBtn = event.target.closest('.merge-down-btn')
+    const unmergeBtn = event.target.closest('.unmerge-btn')
     
     if (mergeUpBtn) {
       event.stopPropagation()
@@ -83,6 +105,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm(`Merge the issue below into this issue?`)) {
           handleMerge(targetIssueId, sourceIssueId, projectName)
         }
+      }
+      return
+    }
+
+    if (unmergeBtn) {
+      event.stopPropagation()
+      event.preventDefault()
+      const row = unmergeBtn.closest('tr[data-issue-id]')
+      const issueId = row.dataset.issueId
+      const projectName = unmergeBtn.dataset.projectName
+      
+      if (confirm(`Unmerge this issue? All tasks will be split into individual issues.`)) {
+        handleUnmerge(issueId, projectName)
       }
       return
     }

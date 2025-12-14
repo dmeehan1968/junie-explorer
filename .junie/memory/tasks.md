@@ -738,3 +738,23 @@
     "NEW INSTRUCTION": "WHEN UI change is approved to move buttons THEN edit issueRow.tsx and issuesTable.tsx before tests"
 }
 
+[2025-12-14 13:55] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "invalidate metrics, add UI button, add client handler, add tests, run tests, update docs",
+    "BOTTLENECK": "Focused on backend only and skipped metrics invalidation and UI wiring.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN planning API that changes issue grouping THEN add metrics invalidation, UI button, handler, tests"
+}
+
+[2025-12-14 13:58] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project",
+    "BOTTLENECK": "SVG design was done without visual preview or broader consistency check.",
+    "PROJECT NOTE": "Playwright tests exist for issueRow icons; leverage them when changing SVG paths.",
+    "NEW INSTRUCTION": "WHEN updating an icon in one component THEN search_project for similar icons for consistency"
+}
+

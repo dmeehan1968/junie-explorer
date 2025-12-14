@@ -17,6 +17,10 @@ export class IssueRowDSL {
     return this.descriptionCell.getByTestId('merge-down-btn')
   }
 
+  get unmergeButton() {
+    return this.descriptionCell.getByTestId('unmerge-btn')
+  }
+
   get editDescriptionButton() {
     return this.descriptionCell.getByTestId('edit-description-btn')
   }

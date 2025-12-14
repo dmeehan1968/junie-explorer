@@ -168,4 +168,66 @@ describe("Issues API", () => {
       expect(result.description).toBeUndefined()
     })
   })
+
+  describe("POST /api/projects/:projectName/issues/:issueId/unmerge", () => {
+    const projectName = "aia-only-test"
+    const issueId1 = "aaaaaaaa-1111-4111-8111-111111111111 0"
+    const issueId2 = "bbbbbbbb-2222-4222-8222-222222222222 0"
+
+    test("returns 404 when project not found", async () => {
+      const response = await fetch(`${baseUrl}/api/projects/non-existent-project/issues/${issueId1}/unmerge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      expect(response.status).toBe(404)
+      const result = await response.json()
+      expect(result.error).toBe("Project not found")
+    })
+
+    test("returns 404 when issue not found", async () => {
+      const response = await fetch(`${baseUrl}/api/projects/${projectName}/issues/non-existent-issue/unmerge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      expect(response.status).toBe(404)
+      const result = await response.json()
+      expect(result.error).toBe("Issue not found")
+    })
+
+    test("returns 400 when issue has only one task", async () => {
+      const response = await fetch(`${baseUrl}/api/projects/${projectName}/issues/${issueId1}/unmerge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      expect(response.status).toBe(400)
+      const result = await response.json()
+      expect(result.error).toBe("Issue has only one task and cannot be unmerged")
+    })
+
+    test("unmerges a merged issue into individual issues", async () => {
+      // First merge the two issues
+      const mergeResponse = await fetch(`${baseUrl}/api/projects/${projectName}/issues/${issueId1}/merge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sourceIssueId: issueId2 })
+      })
+      expect(mergeResponse.status).toBe(200)
+      const mergeResult = await mergeResponse.json()
+      expect(mergeResult.mergedTaskCount).toBe(2)
+
+      // Now unmerge
+      const unmergeResponse = await fetch(`${baseUrl}/api/projects/${projectName}/issues/${issueId1}/unmerge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      expect(unmergeResponse.status).toBe(200)
+      const unmergeResult = await unmergeResponse.json()
+      expect(unmergeResult.success).toBe(true)
+      expect(unmergeResult.unmergedTaskIds.length).toBe(2)
+    })
+  })
 })

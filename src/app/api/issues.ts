@@ -77,4 +77,44 @@ router.post("/api/projects/:projectName/issues/:issueId/merge", async (req: AppR
   })
 })
 
+router.post("/api/projects/:projectName/issues/:issueId/unmerge", async (req: AppRequest, res: AppResponse) => {
+  const { projectName, issueId } = req.params
+
+  if (!req.jetBrains) {
+    return res.status(500).json({ error: "JetBrains instance not available" })
+  }
+
+  const project = await req.jetBrains.getProjectByName(projectName!)
+  if (!project) {
+    return res.status(404).json({ error: "Project not found" })
+  }
+
+  const issue = await project.getIssueById(issueId!)
+  if (!issue) {
+    return res.status(404).json({ error: "Issue not found" })
+  }
+
+  if (!issue.isAIA) {
+    return res.status(400).json({ error: "Only AIA issues can be unmerged" })
+  }
+
+  const tasks = await issue.tasks
+  if (tasks.size <= 1) {
+    return res.status(400).json({ error: "Issue has only one task and cannot be unmerged" })
+  }
+
+  const taskIds = [...tasks.keys()]
+
+  for (const taskId of taskIds) {
+    await req.jetBrains.taskIssueMapStore.removeMapping(taskId)
+  }
+
+  project.reload()
+
+  res.json({
+    success: true,
+    unmergedTaskIds: taskIds
+  })
+})
+
 export default router
