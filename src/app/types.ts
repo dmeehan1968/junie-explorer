@@ -12,6 +12,7 @@ interface AppLocals {
 
 export const AppParams = z.looseObject({
   projectId: z.string().min(1).optional(),
+  projectName: z.string().min(1).optional(),
   issueId: z.string().min(1).optional(),
   taskId: z.string().min(1).optional(),
 })

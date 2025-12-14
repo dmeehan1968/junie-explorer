@@ -25,6 +25,8 @@ export class Project {
 
       const issues = new Map<string, Issue>()
 
+      // First locate non-AI Assistant (AIA) issues
+
       for (const logPath of this.logPaths) {
         const root = path.join(logPath, 'issues')
 
@@ -38,11 +40,14 @@ export class Project {
           .sort((a, b) => a.name.localeCompare(b.name))
           .forEach(issue => issues.set(issue.id, issue))
 
+        // Second, locate AIA tasks and create a placeholder issue using the same UUID
+
         const eventsPath = path.join(logPath, 'events')
 
         if (!fs.existsSync(eventsPath)) {
           continue
         }
+
         const eventsRegex = /(?<id>[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})-events\.jsonl$/i
 
         fs.globSync(path.join(eventsPath, '*-events.jsonl'))
@@ -121,6 +126,35 @@ export class Project {
       )
       return new Set(unique.values())
     })()
+  }
+
+  invalidateMetrics(): void {
+    this._metrics = undefined
+  }
+
+  async mergeIssues(targetIssueId: string, sourceIssueId: string): Promise<Issue | undefined> {
+    const issues = await this.issues
+    const targetIssue = issues.get(targetIssueId)
+    const sourceIssue = issues.get(sourceIssueId)
+
+    if (!targetIssue || !sourceIssue) {
+      return undefined
+    }
+
+    if (!targetIssue.isAIA || !sourceIssue.isAIA) {
+      return undefined
+    }
+
+    const sourceTasks = await sourceIssue.tasks
+    for (const [_, task] of sourceTasks) {
+      targetIssue.addTask(task)
+    }
+
+    issues.delete(sourceIssueId)
+
+    this.invalidateMetrics()
+
+    return targetIssue
   }
 
 }

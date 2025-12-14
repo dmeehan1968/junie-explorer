@@ -668,3 +668,23 @@
     "NEW INSTRUCTION": "WHEN adding a new API request field THEN update client to send it and test"
 }
 
+[2025-12-14 10:26] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "run tests,wire store into constructors,update Project loading,add API endpoint,update UI",
+    "BOTTLENECK": "No test execution after creating tests and store implementation.",
+    "PROJECT NOTE": "Follow IssueDescriptionStore patterns and Bun test workflow; JetBrains class holds stores.",
+    "NEW INSTRUCTION": "WHEN creating or modifying tests or core modules THEN run the test suite immediately"
+}
+
+[2025-12-14 10:35] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "wire UI,run app,manual test,refresh UI",
+    "BOTTLENECK": "Merge buttons lack client-side handlers to call the merge API.",
+    "PROJECT NOTE": "Ensure IssueRow merge buttons trigger POST /api/projects/:projectName/issues/:issueId/merge and refresh the issues list.",
+    "NEW INSTRUCTION": "WHEN merge buttons render without network activity on click THEN add click handlers to call merge API and reload issues"
+}
+

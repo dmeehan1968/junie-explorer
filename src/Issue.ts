@@ -129,6 +129,23 @@ export class Issue {
     return (await this.tasks).get(`${this.id} ${id}`)
   }
 
+  addTask(task: Task): void {
+    if (this._tasks) {
+      this._tasks = this._tasks.then(tasks => {
+        tasks.set(task.id, task)
+        return tasks
+      })
+    } else {
+      this._tasks = Promise.resolve(new Map([[task.id, task]]))
+    }
+    this.invalidateMetrics()
+  }
+
+  invalidateMetrics(): void {
+    this._metrics = undefined
+    this._metricsByModel = undefined
+  }
+
   // Recalculate assistant providers across all tasks each time accessed
   get assistantProviders(): Promise<Set<{ provider: string; name?: string; jbai?: string }>> {
     return (async () => {

@@ -202,6 +202,46 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
           )
         })()}
       </td>
+      <Conditional condition={issue.isAIA}>
+        <td
+          class="text-center whitespace-nowrap align-middle py-3 px-2"
+          data-testid="issue-merge"
+        >
+          <div class="flex items-center justify-center gap-1">
+            <button
+              type="button"
+              class="btn btn-ghost btn-xs merge-up-btn"
+              data-testid="merge-up-btn"
+              data-issue-id={issue.id}
+              data-project-name={project.name}
+              data-is-aia="true"
+              aria-label="Merge with issue above"
+              title="Merge with issue above"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-xs merge-down-btn"
+              data-testid="merge-down-btn"
+              data-issue-id={issue.id}
+              data-project-name={project.name}
+              data-is-aia="true"
+              aria-label="Merge with issue below"
+              title="Merge with issue below"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+        </td>
+      </Conditional>
+      <Conditional condition={!issue.isAIA}>
+        <td class="text-center whitespace-nowrap align-middle py-3 px-2" data-testid="issue-merge-placeholder"></td>
+      </Conditional>
     </tr>
   )
 }

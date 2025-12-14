@@ -8,6 +8,7 @@ import publicFiles from "./bun/public"
 import { Project } from "./Project"
 import { addSummaryMetrics, initialisedSummaryMetrics, SummaryMetrics } from "./schema"
 import { IssueDescriptionStore } from "./services/IssueDescriptionStore"
+import { TaskIssueMapStore } from "./services/TaskIssueMapStore"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Task } from "./Task"
 
@@ -39,6 +40,7 @@ export class JetBrains {
   private _version?: Version
   public readonly statsCollector: StatsCollector
   public readonly issueDescriptionStore: IssueDescriptionStore
+  public readonly taskIssueMapStore: TaskIssueMapStore
 
   public hasMetrics: boolean = false
 
@@ -54,6 +56,7 @@ export class JetBrains {
     this.logger = options.logger ?? console
     this.statsCollector = new StatsCollector()
     this.issueDescriptionStore = new IssueDescriptionStore(options.homeDir ?? os.homedir())
+    this.taskIssueMapStore = new TaskIssueMapStore(options.homeDir ?? os.homedir())
     
     // Register stats collector with Task class for WorkerPool monitoring
     Task.setStatsCollector(this.statsCollector)

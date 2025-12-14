@@ -278,3 +278,11 @@
     "NEW INSTRUCTION": "WHEN using issueDescriptionStore THEN access it via JetBrains and avoid req attribute"
 }
 
+[2025-12-14 10:32] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI merge button",
+    "EXPECTATION": "Clicking a merge button should trigger a merge API request and update the Issue Table to reflect the merged AIA issues.",
+    "NEW INSTRUCTION": "WHEN merge button is clicked THEN POST to merge endpoint and refresh issues view"
+}
+

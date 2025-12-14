@@ -72,6 +72,7 @@ export const IssuesTable = async ({ project, locale, customDescriptions = {} }: 
             <th class="text-right whitespace-nowrap">Status</th>
             <th class="text-center whitespace-nowrap">LLM</th>
             <th class="text-center whitespace-nowrap">Mode</th>
+            <th class="text-center whitespace-nowrap">Merge</th>
           </tr>
           <tr class="bg-base-200! font-bold text-base-content">
             <Conditional condition={project.hasMetrics}>
@@ -91,6 +92,7 @@ export const IssuesTable = async ({ project, locale, customDescriptions = {} }: 
             <td class="text-right whitespace-nowrap"
                 data-testid="header-summary-total-time">{formatSeconds(metrics.time / 1000)}</td>
             <td class="text-right whitespace-nowrap"></td>
+            <td class="text-left whitespace-nowrap"></td>
             <td class="text-left whitespace-nowrap"></td>
             <td class="text-left whitespace-nowrap"></td>
           </tr>
@@ -124,6 +126,7 @@ export const IssuesTable = async ({ project, locale, customDescriptions = {} }: 
             <td class="text-right whitespace-nowrap"
                 data-testid="summary-total-time">{formatSeconds(metrics.time / 1000)}</td>
             <td class="text-right whitespace-nowrap"></td>
+            <td class="text-left whitespace-nowrap"></td>
             <td class="text-left whitespace-nowrap"></td>
             <td class="text-left whitespace-nowrap"></td>
           </tr>
@@ -164,6 +167,7 @@ export const IssuesTable = async ({ project, locale, customDescriptions = {} }: 
       </div>
       <script src="/js/issueSearch.js"></script>
       <script src="/js/issueDescriptionEdit.js"></script>
+      <script src="/js/issueMerge.js"></script>
     </div>
   )
 }
