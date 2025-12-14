@@ -342,3 +342,19 @@
     "NEW INSTRUCTION": "WHEN rendering AIA Issues in TaskSwitcher THEN sort by createdAt timestamp chronologically"
 }
 
+[2025-12-14 16:35] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI icons",
+    "EXPECTATION": "The unmerge icon should depict a single branch splitting into three separate paths.",
+    "NEW INSTRUCTION": "WHEN rendering unmerge icon THEN show single path splitting into three separate right paths"
+}
+
+[2025-12-14 16:40] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "UI icons",
+    "EXPECTATION": "In the issue row, the unmerge action should use the specified SVG icon file.",
+    "NEW INSTRUCTION": "WHEN rendering unmerge in issue row THEN use public/icons/split-turn-down-right-svgrepo-com.svg"
+}
+

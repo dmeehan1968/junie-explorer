@@ -768,3 +768,23 @@
     "NEW INSTRUCTION": "WHEN list order depends on filesystem or map iteration THEN add explicit sort by created timestamp"
 }
 
+[2025-12-14 16:36] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "clarify requirements",
+    "BOTTLENECK": "Conflicting spec about number/style of split paths was not resolved.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN requirements conflict across task and notes THEN ask_user to clarify expected icon spec"
+}
+
+[2025-12-14 16:40] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "verify asset path, run build",
+    "BOTTLENECK": "No verification that the public SVG exists at the referenced path.",
+    "PROJECT NOTE": "Assets under public/ are typically served from root; confirm /icons/ path resolves.",
+    "NEW INSTRUCTION": "WHEN referencing a public icon THEN verify file exists and path resolves before submit"
+}
+

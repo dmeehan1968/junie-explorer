@@ -116,16 +116,11 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
                   aria-label="Unmerge issue"
                   title="Unmerge issue"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    {/* Single solid path on left */}
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12H12" />
-                    {/* Two dotted paths on right indicating split */}
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke-dasharray="2 2" d="M12 12L20 6" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke-dasharray="2 2" d="M12 12L20 18" />
-                    {/* Arrow heads on the dotted paths */}
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 4L20 6L17 8" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16L20 18L17 20" />
-                  </svg>
+                  <img
+                    class="h-4 w-4"
+                    src="/icons/split-turn-down-right-svgrepo-com.svg"
+                    alt="Unmerge"
+                  />
                 </button>
               </Conditional>
             </Conditional>
