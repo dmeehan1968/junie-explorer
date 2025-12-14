@@ -97,26 +97,28 @@ test.describe('Issue Search', () => {
     await issueSearch.waitForSearchComplete()
     await expect(issueSearch.resultCount).toBeVisible()
     
+    // Intercept the search API to delay the response, giving us time to check the hidden state
+    let resolveRequest: () => void
+    const requestPending = new Promise<void>(resolve => { resolveRequest = resolve })
+    
+    await page.route('**/api/projects/*/search**', async route => {
+      // Wait until we've verified the hidden state before continuing
+      await requestPending
+      await route.continue()
+    })
+    
     // Now start another search and check that result count is hidden during search
     await issueSearch.searchInput.fill('another')
-    
-    // Set up to capture whether result count was hidden during search
-    await page.evaluate(() => {
-      const resultCount = document.getElementById('searchResultCount')
-      if (resultCount) {
-        (window as any).__resultCountWasHiddenDuringSearch = resultCount.classList.contains('hidden')
-      }
-    })
-    
     await issueSearch.submitButton.click()
     
-    // Check immediately after click that result count is hidden
-    const wasHiddenDuringSearch = await page.evaluate(() => {
-      const resultCount = document.getElementById('searchResultCount')
-      return resultCount?.classList.contains('hidden')
-    })
+    // Wait for loading spinner to appear (indicates search has started)
+    await expect(issueSearch.loadingSpinner).toBeVisible()
     
-    expect(wasHiddenDuringSearch).toBe(true)
+    // While search is in progress, result count should be hidden
+    await expect(issueSearch.resultCount).toBeHidden()
+    
+    // Allow the request to complete
+    resolveRequest!()
     
     await issueSearch.waitForSearchComplete()
     

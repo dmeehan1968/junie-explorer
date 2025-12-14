@@ -708,3 +708,23 @@
     "NEW INSTRUCTION": "WHEN loading AIA tasks with mappings THEN group by mapped issue id before creating issues"
 }
 
+[2025-12-14 12:32] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "run tests",
+    "BOTTLENECK": "Immediate assertion before async search start caused a flaky check.",
+    "PROJECT NOTE": "Use the loading spinner (#searchLoading) as the start signal for in-progress search.",
+    "NEW INSTRUCTION": "WHEN test asserts DOM after async trigger THEN await locator start signal before asserting"
+}
+
+[2025-12-14 12:32] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "open DSL,open component",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Race condition between UI assertion and fast search API response.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN assertion depends on in-flight request state THEN intercept network route to delay response"
+}
+
