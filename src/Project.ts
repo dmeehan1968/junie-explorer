@@ -3,6 +3,7 @@ import path from "node:path"
 import { Issue } from "./Issue"
 import { Logger } from "./jetbrains"
 import { addSummaryMetrics, initialisedSummaryMetrics, SummaryMetrics } from "./schema"
+import { TaskIssueMapStore } from "./services/TaskIssueMapStore"
 import { Task } from "./Task"
 
 export class Project {
@@ -10,13 +11,15 @@ export class Project {
   private _metrics: Promise<SummaryMetrics> | undefined
   private _ideNames: Set<string> = new Set()
   private readonly logger: Logger
+  private readonly taskIssueMapStore?: TaskIssueMapStore
   public lastUpdated?: Date
   public hasMetrics: boolean = false
 
-  constructor(public readonly name: string, logPath: string, ideName: string, logger?: Logger ) {
+  constructor(public readonly name: string, logPath: string, ideName: string, logger?: Logger, taskIssueMapStore?: TaskIssueMapStore) {
     this.logPaths.push(logPath)
     this._ideNames.add(ideName)
     this.logger = logger ?? console
+    this.taskIssueMapStore = taskIssueMapStore
   }
 
   private _issues: Promise<Map<string, Issue>> | undefined = undefined
@@ -50,14 +53,45 @@ export class Project {
 
         const eventsRegex = /(?<id>[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})-events\.jsonl$/i
 
-        fs.globSync(path.join(eventsPath, '*-events.jsonl'))
-          .filter(path => eventsRegex.test(path))
-          .map(path => {
-            const created = fs.statSync(path).mtime
-            const id = path.match(eventsRegex)?.groups?.id ?? ''
-            return new Issue(id, created, new Task(id, created, path))
+        // Get all persisted task-issue mappings
+        const taskIssueMappings = this.taskIssueMapStore
+          ? await this.taskIssueMapStore.getAllMappings()
+          : {}
+
+        // Collect all AIA tasks first
+        const aiaTasks = fs.globSync(path.join(eventsPath, '*-events.jsonl'))
+          .filter(filePath => eventsRegex.test(filePath))
+          .map(filePath => {
+            const created = fs.statSync(filePath).mtime
+            const id = (filePath.match(eventsRegex)?.groups?.id ?? '')
+            const task = new Task(id, created, filePath)
+            return { id: task.id, created, task }
           })
-          .forEach(issue => issues.set(issue.id, issue))
+
+        // Separate tasks into unmapped (create new issues) and mapped (add to existing)
+        const unmappedTasks = aiaTasks.filter(({ id }) => !taskIssueMappings[id])
+        const mappedTasks = aiaTasks.filter(({ id }) => taskIssueMappings[id])
+
+        // First pass: create issues for unmapped tasks (only if not already loaded from chain files)
+        for (const { id, created, task } of unmappedTasks) {
+          if (!issues.has(id)) {
+            issues.set(id, new Issue(id, created, task))
+          }
+        }
+
+        // Second pass: add mapped tasks to their target issues
+        for (const { id, task } of mappedTasks) {
+          const targetIssueId = taskIssueMappings[id]
+          const targetIssue = issues.get(targetIssueId)
+          if (targetIssue && targetIssue.isAIA) {
+            targetIssue.addTask(task)
+          } else {
+            // Target issue doesn't exist or isn't AIA, create standalone issue (only if not already exists)
+            if (!issues.has(id)) {
+              issues.set(id, new Issue(id, task.created, task))
+            }
+          }
+        }
       }
 
       const sortedIssues = [...issues.entries()].sort((a, b) =>

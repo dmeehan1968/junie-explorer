@@ -134,7 +134,7 @@ export class JetBrains {
             const existing = projects.get(entry.name)
             const ideName = ideDir.name.replace(/\d+(\.\d+)?/, '')
             if (!existing) {
-              projects.set(entry.name, new Project(entry.name, entry.logPath, ideName, this.logger))
+              projects.set(entry.name, new Project(entry.name, entry.logPath, ideName, this.logger, this.taskIssueMapStore))
               return
             }
             existing.addLogPath(entry.logPath, ideName)

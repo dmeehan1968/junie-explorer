@@ -294,3 +294,19 @@
     "NEW INSTRUCTION": "WHEN clicking a task link in trajectories THEN route to the target task detail without 404"
 }
 
+[2025-12-14 10:51] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "issue grouping persistence",
+    "EXPECTATION": "Task-to-Issue grouping should be restored when AIA tasks are loaded, including after server restarts.",
+    "NEW INSTRUCTION": "WHEN loading AIA tasks in Project.issues THEN hydrate task-to-issue grouping from persistent store"
+}
+
+[2025-12-14 11:00] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "issue grouping persistence",
+    "EXPECTATION": "Task-to-Issue grouping should be restored when AIA tasks are loaded, including after server restarts.",
+    "NEW INSTRUCTION": "WHEN Project.issues resolves AIA tasks THEN hydrate task-to-issue mapping from persistent store"
+}
+

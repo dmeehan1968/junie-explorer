@@ -698,3 +698,13 @@
     "NEW INSTRUCTION": "WHEN URLs use task.index for task selection THEN implement getTaskByIndex and use it in middleware"
 }
 
+[2025-12-14 11:01] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "add debug logging,repeat analysis",
+    "MISSING STEPS": "update project creators,run tests,validation,refactor",
+    "BOTTLENECK": "Grouping assumed target issues exist; needed mapped-ID grouping before instantiation.",
+    "PROJECT NOTE": "AIA event files use “uuid 0-events.jsonl”; mappings should use task.id (UUID).",
+    "NEW INSTRUCTION": "WHEN loading AIA tasks with mappings THEN group by mapped issue id before creating issues"
+}
+
