@@ -15,11 +15,13 @@ test.describe('Project Selection Storage', () => {
     // Get first row
     const rows = await projectTable.getAllRows();
     if (rows.length === 0) throw new Error('No projects found to test');
-    const firstRow = rows[0];
+    const firstRow = await projectTable.getRowForProject('default.999999')
+
+    expect(firstRow).toBeDefined();
 
     // Select the first project
     // The DSL selectRow takes 1-based index
-    await projectTable.selectRow(1);
+    await projectTable.selectRow('default.999999');
 
     // Verify Cookie is set
     const cookies = await page.context().cookies();
@@ -28,7 +30,7 @@ test.describe('Project Selection Storage', () => {
     
     // Verify cookie content
     const cookieValue = JSON.parse(decodeURIComponent(selectionCookie?.value || '{}'));
-    const projectName = await firstRow.getNameText();
+    const projectName = await firstRow!.getNameText();
     expect(cookieValue[projectName]).toBe(true);
 
     // Verify LocalStorage is NOT set
@@ -43,8 +45,11 @@ test.describe('Project Selection Storage', () => {
     
     const rows = await projectTable.getAllRows();
     if (rows.length === 0) throw new Error('No projects found to test');
-    const firstRow = rows[0];
-    const projectName = await firstRow.getNameText();
+    const firstRow = await projectTable.getRowForProject('default.999999')
+
+    expect(firstRow).toBeDefined();
+
+    const projectName = await firstRow!.getNameText();
     
     // Inject legacy setting into LocalStorage
     const legacyState = { [projectName]: true };
@@ -58,8 +63,9 @@ test.describe('Project Selection Storage', () => {
     // Assert checkbox is checked
     // Need to re-fetch rows after reload
     const rowsAfterReload = await projectTable.getAllRows();
-    const firstRowAfterReload = rowsAfterReload[0];
-    await expect(firstRowAfterReload.checkbox).toBeChecked();
+    const firstRowAfterReload = await projectTable.getRowForProject('default.999999');
+    expect(firstRowAfterReload).toBeDefined();
+    await expect(firstRowAfterReload!.checkbox).toBeChecked();
   });
 
   test('should only save active selections to cookies', async ({ projectTable, page }) => {
@@ -71,13 +77,18 @@ test.describe('Project Selection Storage', () => {
     const rows = await projectTable.getAllRows();
     if (rows.length < 2) throw new Error('Need at least 2 projects to test unselected state');
 
-    const firstRow = rows[0];
-    const secondRow = rows[1];
+    const firstRow = await projectTable.getRowForProject('default.999999')
+
+    expect(firstRow).toBeDefined();
+
+    const secondRow = await projectTable.getRowForProject('explorer-test-project')
+
+    expect(secondRow).toBeDefined();
 
     // Select the first project
-    await projectTable.selectRow(1);
+    await projectTable.selectRow('default.999999');
     // Ensure second project is not selected
-    await expect(secondRow.checkbox).not.toBeChecked();
+    await expect(secondRow!.checkbox).not.toBeChecked();
 
     // Verify Cookie content
     const cookies = await page.context().cookies();
@@ -85,8 +96,8 @@ test.describe('Project Selection Storage', () => {
     expect(selectionCookie, 'Cookie should be set').toBeDefined();
 
     const cookieValue = JSON.parse(decodeURIComponent(selectionCookie?.value || '{}'));
-    const firstProjectName = await firstRow.getNameText();
-    const secondProjectName = await secondRow.getNameText();
+    const firstProjectName = await firstRow!.getNameText();
+    const secondProjectName = await secondRow!.getNameText();
 
     expect(cookieValue[firstProjectName]).toBe(true);
     expect(cookieValue[secondProjectName]).toBeUndefined();
@@ -95,7 +106,7 @@ test.describe('Project Selection Storage', () => {
     expect(Object.keys(cookieValue).length).toBe(1);
 
     // Select the second project
-    await projectTable.selectRow(2);
+    await projectTable.selectRow('explorer-test-project');
 
     const cookies2 = await page.context().cookies();
     const selectionCookie2 = cookies2.find(c => c.name === 'junie-explorer-selectedProjects');
@@ -106,7 +117,7 @@ test.describe('Project Selection Storage', () => {
     expect(Object.keys(cookieValue2).length).toBe(2);
 
     // Unselect the first project
-    await projectTable.selectRow(1);
+    await projectTable.selectRow('default.999999');
 
     const cookies3 = await page.context().cookies();
     const selectionCookie3 = cookies3.find(c => c.name === 'junie-explorer-selectedProjects');

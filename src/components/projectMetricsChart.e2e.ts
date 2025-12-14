@@ -16,7 +16,7 @@ test.describe('ProjectMetricsChart', () => {
   test.describe('one selected project', () => {
 
     test.beforeEach(async ({ projectTable }) => {
-      await projectTable.selectRow(1)
+      await projectTable.selectRow('default.999999')
     })
 
     test('should show chart with one project selected', async ({ projectMetricsChart, projectTable }) => {
@@ -137,7 +137,7 @@ test.describe('ProjectMetricsChart', () => {
     });
 
     // Select a project to trigger load
-    await projectTable.selectRow(1);
+    await projectTable.selectRow('default.999999');
 
     // Check if loader is visible. It should appear after 200ms.
     const loader = page.locator('#chart-loader');

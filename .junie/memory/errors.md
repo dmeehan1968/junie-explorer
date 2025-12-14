@@ -208,3 +208,13 @@
     "NEW INSTRUCTION": "WHEN setDescription receives originalName and trimmed equals originalName THEN delete the stored description"
 }
 
+[2025-12-14 11:48] - Updated by Junie - Error analysis
+{
+    "TYPE": "invalid args",
+    "TOOL": "bash",
+    "ERROR": "Multi-line bash command rejected; newlines are prohibited",
+    "ROOT CAUSE": "The bash tool forbids newline-separated commands and requires a single-line grouped command.",
+    "PROJECT NOTE": "When manually starting the app (bun src/index.ts on port 3000), issue a single-line grouped command and wait for readiness if querying endpoints.",
+    "NEW INSTRUCTION": "WHEN executing multiple shell steps THEN chain with && or use a subshell without newlines"
+}
+

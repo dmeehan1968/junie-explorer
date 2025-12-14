@@ -7,7 +7,7 @@ export default defineConfig({
     headless: true,
   },
   webServer: {
-    command: 'JETBRAINS_LOG_PATH=./fixtures bun run dev',
+    command: 'JETBRAINS_LOG_PATH=./fixtures CONCURRENCY=10 bun run dev',
     port: 3000,
     reuseExistingServer: !process.env.CI, // Don’t restart locally if running dev server
     timeout: 5_000,
