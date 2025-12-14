@@ -119,6 +119,16 @@ export class Task {
       this.id = logPathOrId + ' 0'
       this.created = created
       this.eventsFile = eventsFile
+      void new Promise(async resolve => {
+        const records = await this.loadEvents()
+        for (const record of records) {
+          if (record.event.type === 'AgentStateUpdatedEvent') {
+            this.context = { description: record.event.state.issue.description ?? 'Unknown' }
+            break
+          }
+        }
+        return resolve(undefined)
+      })
     } else {
       this.logPath = logPathOrId
       this.init()
