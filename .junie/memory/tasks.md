@@ -758,3 +758,13 @@
     "NEW INSTRUCTION": "WHEN updating an icon in one component THEN search_project for similar icons for consistency"
 }
 
+[2025-12-14 16:29] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "open Issue.ts,update documentation",
+    "MISSING STEPS": "implement fix,run tests",
+    "BOTTLENECK": "Assumed filesystem/iteration order equaled chronological order.",
+    "PROJECT NOTE": "Sort AIA issues from fs.globSync by mtime (newest-first) and sort merged tasks by created (oldest-first) in Project.ts.",
+    "NEW INSTRUCTION": "WHEN list order depends on filesystem or map iteration THEN add explicit sort by created timestamp"
+}
+

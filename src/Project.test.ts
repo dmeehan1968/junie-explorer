@@ -20,6 +20,111 @@ describe("Project", () => {
     await fs.remove(tempDir)
   })
 
+  describe("AIA issues chronological ordering", () => {
+    test("AIA issues should be sorted by creation date (newest first)", async () => {
+      // Create a temp directory structure for AIA events
+      const logPath = path.join(tempDir, "test-project", ".matterhorn")
+      const eventsPath = path.join(logPath, "events")
+      const issuesPath = path.join(logPath, "issues")
+      await fs.ensureDir(eventsPath)
+      await fs.ensureDir(issuesPath)
+
+      // Create 3 AIA event files with different timestamps
+      // File names are UUIDs that would sort alphabetically as: aaa < bbb < ccc
+      // But we want them sorted by mtime: oldest (ccc) -> middle (aaa) -> newest (bbb)
+      const eventContent = JSON.stringify({ timestampMs: Date.now(), event: { type: "TaskSummaryCreatedEvent", taskSummary: "Test" } }) + "\n"
+
+      const file1 = path.join(eventsPath, "aaaaaaaa-1111-4111-8111-111111111111-events.jsonl")
+      const file2 = path.join(eventsPath, "bbbbbbbb-2222-4222-8222-222222222222-events.jsonl")
+      const file3 = path.join(eventsPath, "cccccccc-3333-4333-8333-333333333333-events.jsonl")
+
+      await fs.writeFile(file1, eventContent)
+      await fs.writeFile(file2, eventContent)
+      await fs.writeFile(file3, eventContent)
+
+      // Set different modification times (mtime determines creation date for AIA issues)
+      const now = Date.now()
+      const oldest = new Date(now - 3000)  // 3 seconds ago - ccc
+      const middle = new Date(now - 2000)  // 2 seconds ago - aaa
+      const newest = new Date(now - 1000)  // 1 second ago - bbb
+
+      await fs.utimes(file3, oldest, oldest)  // ccc is oldest
+      await fs.utimes(file1, middle, middle)  // aaa is middle
+      await fs.utimes(file2, newest, newest)  // bbb is newest
+
+      const project = new Project("test-project", logPath, "TestIDE", console, taskIssueMapStore)
+      const issues = await project.issues
+
+      // Convert to array to check order
+      const issueIds = [...issues.keys()]
+
+      // Issues should be sorted newest first (descending by created date)
+      // Expected order: bbb (newest), aaa (middle), ccc (oldest)
+      expect(issueIds.length).toBe(3)
+      expect(issueIds[0]).toContain("bbbbbbbb")  // newest first
+      expect(issueIds[1]).toContain("aaaaaaaa")  // middle
+      expect(issueIds[2]).toContain("cccccccc")  // oldest last
+    })
+
+    test("tasks within an AIA issue should be sorted chronologically (oldest first)", async () => {
+      // Create a temp directory structure for AIA events
+      const logPath = path.join(tempDir, "test-project2", ".matterhorn")
+      const eventsPath = path.join(logPath, "events")
+      const issuesPath = path.join(logPath, "issues")
+      await fs.ensureDir(eventsPath)
+      await fs.ensureDir(issuesPath)
+
+      // Create 3 AIA event files that will be merged into one issue
+      const eventContent = JSON.stringify({ timestampMs: Date.now(), event: { type: "TaskSummaryCreatedEvent", taskSummary: "Test" } }) + "\n"
+
+      const targetUuid = "aaaaaaaa-1111-4111-8111-111111111111"
+      const source1Uuid = "bbbbbbbb-2222-4222-8222-222222222222"
+      const source2Uuid = "cccccccc-3333-4333-8333-333333333333"
+
+      const file1 = path.join(eventsPath, `${targetUuid}-events.jsonl`)
+      const file2 = path.join(eventsPath, `${source1Uuid}-events.jsonl`)
+      const file3 = path.join(eventsPath, `${source2Uuid}-events.jsonl`)
+
+      await fs.writeFile(file1, eventContent)
+      await fs.writeFile(file2, eventContent)
+      await fs.writeFile(file3, eventContent)
+
+      // Set different modification times
+      const now = Date.now()
+      const oldest = new Date(now - 3000)  // target is oldest
+      const middle = new Date(now - 2000)  // source2 (ccc) is middle
+      const newest = new Date(now - 1000)  // source1 (bbb) is newest
+
+      await fs.utimes(file1, oldest, oldest)
+      await fs.utimes(file3, middle, middle)
+      await fs.utimes(file2, newest, newest)
+
+      // Set up mappings to merge source tasks into target issue
+      const targetIssueId = `${targetUuid} 0`
+      await taskIssueMapStore.setTaskIssueMapping(`${source1Uuid} 0`, targetIssueId)
+      await taskIssueMapStore.setTaskIssueMapping(`${source2Uuid} 0`, targetIssueId)
+
+      const project = new Project("test-project2", logPath, "TestIDE", console, taskIssueMapStore)
+      const issues = await project.issues
+
+      // Should have only 1 issue (all merged)
+      expect(issues.size).toBe(1)
+
+      const issue = issues.get(targetIssueId)
+      expect(issue).toBeDefined()
+
+      const tasks = await issue!.tasks
+      const taskIds = [...tasks.keys()]
+
+      // Tasks should be sorted oldest first (ascending by created date)
+      // Expected order: target (oldest), source2/ccc (middle), source1/bbb (newest)
+      expect(taskIds.length).toBe(3)
+      expect(taskIds[0]).toContain(targetUuid)   // oldest first
+      expect(taskIds[1]).toContain(source2Uuid)  // middle
+      expect(taskIds[2]).toContain(source1Uuid)  // newest last
+    })
+  })
+
   describe("issues getter with TaskIssueMapStore", () => {
     test("groups AIA tasks into existing issues based on persisted mappings", async () => {
       // Use the aia-only-test fixture which has pure AIA event files (no chain files)

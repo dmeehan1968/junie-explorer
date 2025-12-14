@@ -141,9 +141,16 @@ export class Issue {
   addTask(task: Task): void {
     if (this._tasks) {
       this._tasks = this._tasks.then(tasks => {
-        task.index = tasks.size
         tasks.set(task.id, task)
-        return tasks
+        // Sort tasks by creation date and reassign indices
+        const sortedTasks = [...tasks.values()]
+          .sort((a, b) => a.created.getTime() - b.created.getTime())
+        const sortedMap = new Map<string, Task>()
+        sortedTasks.forEach((t, index) => {
+          t.index = index
+          sortedMap.set(t.id, t)
+        })
+        return sortedMap
       })
     } else {
       task.index = 0

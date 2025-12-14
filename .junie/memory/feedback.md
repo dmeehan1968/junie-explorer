@@ -334,3 +334,11 @@
     "NEW INSTRUCTION": "WHEN rendering unmerge icon THEN use single-left path splitting to two-right paths with one dotted"
 }
 
+[2025-12-14 16:26] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "TaskSwitcher ordering",
+    "EXPECTATION": "AIA Issues shown in the TaskSwitcher should be in chronological order.",
+    "NEW INSTRUCTION": "WHEN rendering AIA Issues in TaskSwitcher THEN sort by createdAt timestamp chronologically"
+}
+

@@ -36,10 +36,10 @@ describe("Issue", () => {
       issue.addTask(task2)
 
       // Verify both tasks are present
-      // Initial task key uses issue.id + ' 0', added tasks use task.id (which already has ' 0')
+      // After sorting, tasks are keyed by task.id (which includes ' 0' suffix from Task constructor)
       const tasks = await issue.tasks
       expect(tasks.size).toBe(2)
-      expect(tasks.has("issue-1 0")).toBe(true)
+      expect(tasks.has("task-1 0")).toBe(true)
       expect(tasks.has("task-2 0")).toBe(true)
     })
 
