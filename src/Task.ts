@@ -122,8 +122,8 @@ export class Task {
       void new Promise(async resolve => {
         const records = await this.loadEvents()
         for (const record of records) {
-          if (record.event.type === 'AgentStateUpdatedEvent') {
-            this.context = { description: record.event.state.issue.description ?? 'Unknown' }
+          if (record.event.type === 'TaskSummaryCreatedEvent') {
+            this.context = { description: record.event.taskSummary }
             break
           }
         }
