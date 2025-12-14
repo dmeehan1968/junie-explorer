@@ -8,6 +8,19 @@ export class IssueRowDSL {
     return this.element.getByTestId('issue-description')
   }
 
+  // Merge buttons (inside description cell for AIA issues)
+  get mergeUpButton() {
+    return this.descriptionCell.getByTestId('merge-up-btn')
+  }
+
+  get mergeDownButton() {
+    return this.descriptionCell.getByTestId('merge-down-btn')
+  }
+
+  get editDescriptionButton() {
+    return this.descriptionCell.getByTestId('edit-description-btn')
+  }
+
   get timestampCell() {
     return this.element.getByTestId('issue-timestamp')
   }

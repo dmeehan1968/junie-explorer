@@ -123,5 +123,10 @@ test.describe('IssuesTable', async () => {
         expect(timestamps[i]).toBeLessThanOrEqual(timestamps[i - 1])
       }
     })
+
+    test('should not have a Merge column header', async ({ issuesTable }) => {
+      const headers = await issuesTable.getColumnHeaderTexts()
+      expect(headers).not.toContain('Merge')
+    })
   })
 })

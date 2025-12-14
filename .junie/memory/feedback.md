@@ -310,3 +310,19 @@
     "NEW INSTRUCTION": "WHEN Project.issues resolves AIA tasks THEN hydrate task-to-issue mapping from persistent store"
 }
 
+[2025-12-14 12:49] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI icons",
+    "EXPECTATION": "Merge buttons must use distinct icons showing two paths merging into one; the resulting single path points up for merge up and down for merge down.",
+    "NEW INSTRUCTION": "WHEN rendering merge buttons THEN use two-path merge icons with final arrow up/down"
+}
+
+[2025-12-14 12:52] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "UI merge button",
+    "EXPECTATION": "Clicking the merge buttons should trigger the merge API and refresh the issues table.",
+    "NEW INSTRUCTION": "WHEN merge buttons move into description cell THEN update listeners to trigger merge workflow"
+}
+

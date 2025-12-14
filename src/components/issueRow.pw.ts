@@ -38,3 +38,100 @@ test.describe('IssueRow', async () => {
     await expect(icon).toHaveAttribute('aria-label', 'Junie icon')
   })
 })
+
+test.describe('IssueRow - AIA Issues', async () => {
+  test.beforeEach(async ({ issuesTable }) => {
+    await issuesTable.navigateToProject('aia-only-test')
+  })
+
+  test('merge buttons should be inside description cell next to edit button', async ({ issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    expect(rows.length).toBeGreaterThanOrEqual(2)
+    
+    // First row: merge-down visible (has next AIA row), merge-up hidden (no prev)
+    const firstRow = rows[0]
+    await firstRow.descriptionCell.hover()
+    await expect(firstRow.editDescriptionButton).toBeVisible()
+    await expect(firstRow.mergeDownButton).toBeVisible()
+    
+    // Second row: merge-up visible (has prev AIA row), merge-down hidden (no next)
+    const secondRow = rows[1]
+    await secondRow.descriptionCell.hover()
+    await expect(secondRow.editDescriptionButton).toBeVisible()
+    await expect(secondRow.mergeUpButton).toBeVisible()
+  })
+
+  test('merge up button should have git-style merge icon', async ({ issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    expect(rows.length).toBeGreaterThanOrEqual(2)
+    
+    // Use second row which has merge-up visible
+    const secondRow = rows[1]
+    await secondRow.descriptionCell.hover()
+
+    // Check that merge up button has the correct aria-label
+    await expect(secondRow.mergeUpButton).toHaveAttribute('aria-label', 'Merge with issue above')
+    
+    // Check for SVG icon inside the button
+    const svg = secondRow.mergeUpButton.locator('svg')
+    await expect(svg).toBeVisible()
+  })
+
+  test('merge down button should have git-style merge icon', async ({ issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    expect(rows.length).toBeGreaterThanOrEqual(2)
+    
+    // Use first row which has merge-down visible
+    const firstRow = rows[0]
+    await firstRow.descriptionCell.hover()
+
+    // Check that merge down button has the correct aria-label
+    await expect(firstRow.mergeDownButton).toHaveAttribute('aria-label', 'Merge with issue below')
+    
+    // Check for SVG icon inside the button
+    const svg = firstRow.mergeDownButton.locator('svg')
+    await expect(svg).toBeVisible()
+  })
+
+  test('clicking merge down button should trigger confirmation dialog', async ({ page, issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    expect(rows.length).toBeGreaterThanOrEqual(2)
+    
+    const firstRow = rows[0]
+    await firstRow.descriptionCell.hover()
+    
+    // Set up dialog handler to capture the confirmation
+    let dialogMessage = ''
+    page.on('dialog', async dialog => {
+      dialogMessage = dialog.message()
+      await dialog.dismiss()
+    })
+    
+    // Click the merge down button
+    await firstRow.mergeDownButton.click()
+    
+    // Verify the confirmation dialog was shown
+    expect(dialogMessage).toContain('Merge the issue below into this issue?')
+  })
+
+  test('clicking merge up button should trigger confirmation dialog', async ({ page, issuesTable }) => {
+    const rows = await issuesTable.getAllRows()
+    expect(rows.length).toBeGreaterThanOrEqual(2)
+    
+    const secondRow = rows[1]
+    await secondRow.descriptionCell.hover()
+    
+    // Set up dialog handler to capture the confirmation
+    let dialogMessage = ''
+    page.on('dialog', async dialog => {
+      dialogMessage = dialog.message()
+      await dialog.dismiss()
+    })
+    
+    // Click the merge up button
+    await secondRow.mergeUpButton.click()
+    
+    // Verify the confirmation dialog was shown
+    expect(dialogMessage).toContain('Merge this issue into the issue above?')
+  })
+})

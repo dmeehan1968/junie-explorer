@@ -728,3 +728,13 @@
     "NEW INSTRUCTION": "WHEN assertion depends on in-flight request state THEN intercept network route to delay response"
 }
 
+[2025-12-14 12:46] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "explore fixtures,inspect Issue.ts for isAIA,plan documentation",
+    "MISSING STEPS": "implement UI change,update icons,remove merge column,wire merge buttons click,update tests,run tests",
+    "BOTTLENECK": "Time spent on AIA fixture discovery instead of implementing component changes.",
+    "PROJECT NOTE": "issueRow.tsx already gates AIA content via Conditional; move merge buttons into the description cell there and remove the merge column from issuesTable.tsx.",
+    "NEW INSTRUCTION": "WHEN UI change is approved to move buttons THEN edit issueRow.tsx and issuesTable.tsx before tests"
+}
+

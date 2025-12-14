@@ -64,17 +64,49 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
             </a>
             <span class="text-neutral/50">{tasks.size > 1 ? ` (${tasks.size})` : ''}</span>
           </div>
-          <button
-            type="button"
-            class="btn btn-ghost btn-xs opacity-0 group-hover/desc:opacity-100 transition-opacity"
-            data-testid="edit-description-btn"
-            aria-label="Edit description"
-            onclick="event.stopPropagation()"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </button>
+          <div class="flex items-center gap-1 opacity-0 group-hover/desc:opacity-100 transition-opacity">
+            <button
+              type="button"
+              class="btn btn-ghost btn-xs"
+              data-testid="edit-description-btn"
+              aria-label="Edit description"
+              onclick="event.stopPropagation()"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <Conditional condition={issue.isAIA}>
+              <button
+                type="button"
+                class="btn btn-ghost btn-xs merge-up-btn"
+                data-testid="merge-up-btn"
+                data-issue-id={issue.id}
+                data-project-name={project.name}
+                data-is-aia="true"
+                aria-label="Merge with issue above"
+                title="Merge with issue above"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18V15C6 12 9 10 12 10M18 18V15C18 12 15 10 12 10M12 10V3M12 3L9 6M12 3L15 6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="btn btn-ghost btn-xs merge-down-btn"
+                data-testid="merge-down-btn"
+                data-issue-id={issue.id}
+                data-project-name={project.name}
+                data-is-aia="true"
+                aria-label="Merge with issue below"
+                title="Merge with issue below"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6V9C6 12 9 14 12 14M18 6V9C18 12 15 14 12 14M12 14V21M12 21L9 18M12 21L15 18" />
+                </svg>
+              </button>
+            </Conditional>
+          </div>
         </div>
       </td>
       <td
@@ -202,46 +234,6 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
           )
         })()}
       </td>
-      <Conditional condition={issue.isAIA}>
-        <td
-          class="text-center whitespace-nowrap align-middle py-3 px-2"
-          data-testid="issue-merge"
-        >
-          <div class="flex items-center justify-center gap-1">
-            <button
-              type="button"
-              class="btn btn-ghost btn-xs merge-up-btn"
-              data-testid="merge-up-btn"
-              data-issue-id={issue.id}
-              data-project-name={project.name}
-              data-is-aia="true"
-              aria-label="Merge with issue above"
-              title="Merge with issue above"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              class="btn btn-ghost btn-xs merge-down-btn"
-              data-testid="merge-down-btn"
-              data-issue-id={issue.id}
-              data-project-name={project.name}
-              data-is-aia="true"
-              aria-label="Merge with issue below"
-              title="Merge with issue below"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          </div>
-        </td>
-      </Conditional>
-      <Conditional condition={!issue.isAIA}>
-        <td class="text-center whitespace-nowrap align-middle py-3 px-2" data-testid="issue-merge-placeholder"></td>
-      </Conditional>
     </tr>
   )
 }

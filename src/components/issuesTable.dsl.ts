@@ -55,6 +55,22 @@ export class IssuesTableDSL {
     return this.page.getByTestId('header-summary-total-time')
   }
 
+  // Column headers (first row of thead)
+  get columnHeaders() {
+    return this.table.locator('thead tr').first().locator('th')
+  }
+
+  async getColumnHeaderTexts(): Promise<string[]> {
+    const headers = this.columnHeaders
+    const count = await headers.count()
+    const texts: string[] = []
+    for (let i = 0; i < count; i++) {
+      const text = await headers.nth(i).textContent()
+      texts.push((text || '').trim())
+    }
+    return texts
+  }
+
   // Footer summary (tfoot)
   get footerSummaryLabel() {
     return this.page.getByTestId('summary-label')
