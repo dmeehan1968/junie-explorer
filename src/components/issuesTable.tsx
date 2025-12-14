@@ -22,10 +22,10 @@ export const IssuesTable = async ({ project, locale, customDescriptions = {} }: 
     return <NoIssuesMessage/>
   }
 
-  const sortedIssues = [...(await project.issues).values()].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+  const sortedIssues = [...(await project.issues).values()].sort((a, b) => b.created.getTime() - a.created.getTime())
   const oldestIssue = sortedIssues[sortedIssues.length - 1]
   const newestIssue = sortedIssues[0]
-  const elapsedTimeMs = new Date(newestIssue.created).getTime() - new Date(oldestIssue.created).getTime()
+  const elapsedTimeMs = newestIssue.created.getTime() - oldestIssue.created.getTime()
   const elapsedTimeSec = elapsedTimeMs / 1000
   const metrics = await project.metrics
 
