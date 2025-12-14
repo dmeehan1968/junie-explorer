@@ -688,3 +688,13 @@
     "NEW INSTRUCTION": "WHEN merge buttons render without network activity on click THEN add click handlers to call merge API and reload issues"
 }
 
+[2025-12-14 10:47] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "implement fix, run tests, run app to verify",
+    "BOTTLENECK": "Mismatch between URL task index and task lookup by UUID/composite key.",
+    "PROJECT NOTE": "Issue.getTaskById uses `${issueId} ${id}` but tasks are stored by task.id; routes and links pass task.index.",
+    "NEW INSTRUCTION": "WHEN URLs use task.index for task selection THEN implement getTaskByIndex and use it in middleware"
+}
+

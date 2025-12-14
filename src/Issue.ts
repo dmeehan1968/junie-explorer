@@ -126,16 +126,27 @@ export class Issue {
   }
 
   async getTaskById(id: string) {
-    return (await this.tasks).get(`${this.id} ${id}`)
+    const tasks = await this.tasks
+    const index = parseInt(id, 10)
+    if (!isNaN(index)) {
+      for (const task of tasks.values()) {
+        if (task.index === index) {
+          return task
+        }
+      }
+    }
+    return tasks.get(id)
   }
 
   addTask(task: Task): void {
     if (this._tasks) {
       this._tasks = this._tasks.then(tasks => {
+        task.index = tasks.size
         tasks.set(task.id, task)
         return tasks
       })
     } else {
+      task.index = 0
       this._tasks = Promise.resolve(new Map([[task.id, task]]))
     }
     this.invalidateMetrics()

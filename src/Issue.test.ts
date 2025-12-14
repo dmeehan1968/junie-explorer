@@ -99,5 +99,28 @@ describe("Issue", () => {
       expect(tasks1).toBe(tasks2)
       expect(tasks1.size).toBe(1)
     })
+
+    test("getTaskById retrieves task by index for AIA issue with multiple tasks", async () => {
+      // Create an AIA issue with initial task
+      const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
+      await fs.writeFile(eventFile1, "")
+      const task1 = new Task("task-1", new Date(), eventFile1)
+      const issue = new Issue("issue-1", new Date(), task1)
+
+      // Create and add a second task
+      const eventFile2 = path.join(eventsPath, "task-2-events.jsonl")
+      await fs.writeFile(eventFile2, "")
+      const task2 = new Task("task-2", new Date(), eventFile2)
+      issue.addTask(task2)
+
+      // Verify we can retrieve tasks by index (0, 1, 2...)
+      const retrievedTask0 = await issue.getTaskById("0")
+      const retrievedTask1 = await issue.getTaskById("1")
+
+      expect(retrievedTask0).toBeDefined()
+      expect(retrievedTask1).toBeDefined()
+      expect(retrievedTask0?.id).toContain("task-1")
+      expect(retrievedTask1?.id).toContain("task-2")
+    })
   })
 })

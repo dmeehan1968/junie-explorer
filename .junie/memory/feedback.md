@@ -286,3 +286,11 @@
     "NEW INSTRUCTION": "WHEN merge button is clicked THEN POST to merge endpoint and refresh issues view"
 }
 
+[2025-12-14 10:44] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "routing/navigation",
+    "EXPECTATION": "From a merged AIA issue’s trajectories page, clicking any other task link should open that task’s detail instead of returning 'not found'.",
+    "NEW INSTRUCTION": "WHEN clicking a task link in trajectories THEN route to the target task detail without 404"
+}
+
