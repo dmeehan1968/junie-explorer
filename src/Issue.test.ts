@@ -24,13 +24,13 @@ describe("Issue", () => {
       // Create an AIA issue with initial task
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
-      const task1 = new Task("task-1", new Date(), eventFile1)
+      const task1 = Task.fromAiaTask("task-1", new Date(), eventFile1)
       const issue = Issue.fromAia("issue-1", new Date(), task1)
 
       // Create a second task
       const eventFile2 = path.join(eventsPath, "task-2-events.jsonl")
       await fs.writeFile(eventFile2, "")
-      const task2 = new Task("task-2", new Date(), eventFile2)
+      const task2 = Task.fromAiaTask("task-2", new Date(), eventFile2)
 
       // Add the second task
       issue.addTask(task2)
@@ -47,7 +47,7 @@ describe("Issue", () => {
       // Create an AIA issue with initial task
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
-      const task1 = new Task("task-1", new Date(), eventFile1)
+      const task1 = Task.fromAiaTask("task-1", new Date(), eventFile1)
       const issue = Issue.fromAia("task-1", new Date(), task1)
 
       // Access tasks to ensure they're loaded
@@ -57,7 +57,7 @@ describe("Issue", () => {
       // Create and add a second task
       const eventFile2 = path.join(eventsPath, "task-2-events.jsonl")
       await fs.writeFile(eventFile2, "")
-      const task2 = new Task("task-2", new Date(), eventFile2)
+      const task2 = Task.fromAiaTask("task-2", new Date(), eventFile2)
       issue.addTask(task2)
 
       // Verify tasks are still in memory (not reloaded from disk)
@@ -69,7 +69,7 @@ describe("Issue", () => {
       // Create an AIA issue with initial task
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
-      const task1 = new Task("task-1", new Date(), eventFile1)
+      const task1 = Task.fromAiaTask("task-1", new Date(), eventFile1)
       const issue = Issue.fromAia("task-1", new Date(), task1)
 
       // Access metrics to cache them
@@ -88,7 +88,7 @@ describe("Issue", () => {
       // Create an AIA issue with initial task
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
-      const task1 = new Task("task-1", new Date(), eventFile1)
+      const task1 = Task.fromAiaTask("task-1", new Date(), eventFile1)
       const issue = Issue.fromAia("task-1", new Date(), task1)
 
       // Access tasks multiple times
@@ -104,13 +104,13 @@ describe("Issue", () => {
       // Create an AIA issue with initial task
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
-      const task1 = new Task("task-1", new Date(), eventFile1)
+      const task1 = Task.fromAiaTask("task-1", new Date(), eventFile1)
       const issue = Issue.fromAia("issue-1", new Date(), task1)
 
       // Create and add a second task
       const eventFile2 = path.join(eventsPath, "task-2-events.jsonl")
       await fs.writeFile(eventFile2, "")
-      const task2 = new Task("task-2", new Date(), eventFile2)
+      const task2 = Task.fromAiaTask("task-2", new Date(), eventFile2)
       issue.addTask(task2)
 
       // Verify we can retrieve tasks by index (0, 1, 2...)

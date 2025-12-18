@@ -206,7 +206,7 @@ export class ChainIssue extends Issue {
 
     if (fs.existsSync(this.taskPath)) {
       fs.globSync(path.join(this.taskPath, "task-*.json"))
-        .map((path) => new Task(path))
+        .map((path) => Task.fromJunieTask(path))
         .sort((a, b) => a.created.getTime() - b.created.getTime())
         .forEach((task) => tasks.set(task.id, task))
     }

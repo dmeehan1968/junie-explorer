@@ -278,3 +278,33 @@
     "NEW INSTRUCTION": "WHEN Playwright test fails on icon filename mismatch THEN update expectations to current public/icons asset and attributes"
 }
 
+[2025-12-18 12:55] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "Export 'ChainTask' not found in Task.ts",
+    "ROOT CAUSE": "Tests import ChainTask and AiaTask but Task.ts does not export them yet.",
+    "PROJECT NOTE": "src/Task.ts currently exports only Task; add abstract/base and concrete classes (AIA/Chain) and export them with static factories fromAiaTask/fromJunieTask.",
+    "NEW INSTRUCTION": "WHEN bash shows \"Export named 'ChainTask' not found\" THEN export ChainTask, AiaTask, and factories in Task.ts"
+}
+
+[2025-12-18 13:21] - Updated by Junie - Error analysis
+{
+    "TYPE": "logic bug",
+    "TOOL": "-",
+    "ERROR": "Circular import causes 'Task' before initialization",
+    "ROOT CAUSE": "Task.ts imports AiaTask/ChainTask while those import Task, creating a module cycle that breaks class initialization order.",
+    "PROJECT NOTE": "In src/Task.ts, remove top-level imports of ./AiaTask and ./ChainTask. Move factory logic (fromAiaTask/fromJunieTask) to a separate module (e.g., src/TaskFactories.ts) or use dynamic imports inside factories to break the cycle.",
+    "NEW INSTRUCTION": "WHEN circular import between Task and subclasses THEN move factories to a separate module"
+}
+
+[2025-12-18 13:22] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "ENOENT: dummy/path file not found during test",
+    "ROOT CAUSE": "The test passed a non-existent path to fromJunieTask, which synchronously reads the file.",
+    "PROJECT NOTE": "Task.fromJunieTask reads a chain file from disk; use a real fixture under issues/ conforming to JunieChainSchema or mock fs.",
+    "NEW INSTRUCTION": "WHEN tests call fromJunieTask with a path THEN create a valid temp file or mock fs to avoid ENOENT"
+}
+

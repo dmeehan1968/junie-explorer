@@ -1,13 +1,3 @@
-[2025-12-02 14:19] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "edit code, update tests",
-    "MISSING STEPS": "run tests, triage failures, report findings",
-    "BOTTLENECK": "Did not honor diagnosis-only task and skipped running tests before changes.",
-    "PROJECT NOTE": "DSL requestEvent override can clobber computed chat.agentType; exclude chat from overrides.",
-    "NEW INSTRUCTION": "WHEN task or issue says do not make changes THEN run tests, analyze failures, and report findings"
-}
-
 [2025-12-02 14:29] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
@@ -877,3 +867,24 @@
     "PROJECT NOTE": "Multiple tests in issueRow.pw.ts register page.on('dialog'), leading to conflicts; unmerge button uses an <img> with a fixed src.",
     "NEW INSTRUCTION": "WHEN adding a dialog handler THEN use page.once and avoid global page.on handlers"
 }
+
+[2025-12-18 12:56] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "update README.md",
+    "MISSING STEPS": "create subclasses, update exports, update callers, scan project",
+    "BOTTLENECK": "Concrete subclasses were not created before wiring factories and tests.",
+    "PROJECT NOTE": "Issue.ts already separates AIA and Chain; mirror its structure for Task.",
+    "NEW INSTRUCTION": "WHEN introducing factory subclasses THEN first create ChainTask and AiaTask and export them"
+}
+
+[2025-12-18 13:25] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "add tests",
+    "MISSING STEPS": "scan project, run typecheck",
+    "BOTTLENECK": "Circular dependency from base class importing its subclasses at top level.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN error shows \"Cannot access '<name>' before initialization\" THEN move subclass imports into factory with dynamic import and type-only types"
+}
+

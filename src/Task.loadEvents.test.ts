@@ -32,7 +32,7 @@ describe('Task.loadEvents logging', () => {
   })
 
   it('logs EventParserError entries and returns only valid events', async () => {
-    const t = new Task(path.join(taskLogDir, 'task.json'))
+    const t = Task.fromJunieTask(path.join(taskLogDir, 'task.json'))
     // Write events to the exact file path Task expects
     const eventsFile = (t as any).eventsFile as string
     await fs.mkdirp(path.dirname(eventsFile))

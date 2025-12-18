@@ -3,6 +3,8 @@ import path from "node:path"
 import * as util from "node:util"
 import publicFiles from "./bun/public"
 import { getMaxConcurrency } from "./getMaxConcurrency"
+import type { AiaTask } from "./AiaTask"
+import type { ChainTask } from "./ChainTask"
 import {
   addSummaryMetrics,
   AgentState,
@@ -21,8 +23,8 @@ import { isRequestEvent, LlmRequestEvent } from "./schema/llmRequestEvent"
 import { isResponseEvent, LlmResponseEvent } from "./schema/llmResponseEvent"
 import { OpenAI5 } from "./schema/openAI5"
 import { OpenAI51 } from "./schema/openAI51"
-import { OpenAI52 } from "./schema/openAI52"
 import { OpenAI51CodexMax } from "./schema/openAI51CodexMax"
+import { OpenAI52 } from "./schema/openAI52"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
@@ -31,9 +33,7 @@ import { LoadEventsOutput } from "./workers/loadEventsOutput"
 import { WorkerExecutionError } from "./workers/WorkerExecutionError"
 import { WorkerPool } from "./workers/WorkerPool"
 
-export class Task {
-  public readonly logPath: string | undefined
-  public readonly eventsFile: string
+export abstract class Task {
   public id: string = ''
   public index: number = 0
   public created: Date = new Date()
@@ -42,14 +42,14 @@ export class Task {
   public plan: JuniePlan[] = []
   public assistantProviders: Set<{ provider: string; name?: string; jbai?: string }> = new Set()
   readonly _steps: Map<number, Step> = new Map()
-  private _metrics: Promise<SummaryMetrics> | undefined = undefined
-  private _metricsByModel: Promise<Record<string, SummaryMetrics>> | undefined = undefined
-  private _previousTasksInfo?: PreviousTasksInfo | null
-  private _finalAgentState?: AgentState | null
-  private _sessionHistory?: SessionHistory | null
-  private _patch?: string | null
-  private _events: Promise<EventRecord[]> | undefined = undefined
-  private _eventTypes: Promise<string[]> | undefined = undefined
+  protected _metrics: Promise<SummaryMetrics> | undefined = undefined
+  protected _metricsByModel: Promise<Record<string, SummaryMetrics>> | undefined = undefined
+  protected _previousTasksInfo?: PreviousTasksInfo | null
+  protected _finalAgentState?: AgentState | null
+  protected _sessionHistory?: SessionHistory | null
+  protected _patch?: string | null
+  protected _events: Promise<EventRecord[]> | undefined = undefined
+  protected _eventTypes: Promise<string[]> | undefined = undefined
 
   // Static worker pool for loading events
   private static _workerPool: WorkerPool<{ eventsFilePath: string }, LoadEventsOutput> | null | undefined = undefined
@@ -112,42 +112,29 @@ export class Task {
     return this._workerPool
   }
 
-  constructor(logPath: string)
-  constructor(id: string, created: Date, eventsFile: string)
-  constructor(logPathOrId: string, created?: Date, eventsFile?: string) {
-    if (created && eventsFile) {
-      this.id = logPathOrId + ' 0'
-      this.created = created
-      this.eventsFile = eventsFile
-      void new Promise(async resolve => {
-        const records = await this.loadEvents()
-        for (const record of records) {
-          if (record.event.type === 'TaskSummaryCreatedEvent') {
-            this.context = { description: record.event.taskSummary }
-            break
-          }
-        }
-        return resolve(undefined)
-      })
-    } else {
-      this.logPath = logPathOrId
-      this.init()
-      this.eventsFile = path.join(this.logPath, '../../../events', `${this.id}-events.jsonl`)
+  public abstract get logPath(): string | undefined
+
+  public abstract get eventsFile(): string
+
+  protected constructor(state?: Partial<Task>) {
+    if (state) {
+      Object.assign(this, state)
     }
   }
 
-  private init() {
-    const task = this.load()
-    if (!task) return
-    this.id = task.id
-    this.index = task.index
-    this.created = task.created
-    this.context = task.context
-    this.isDeclined = task.isDeclined
-    this.plan = task.plan
+  public static fromJunieTask(logPath: string): ChainTask {
+    const { ChainTask } = require("./ChainTask")
+    return new ChainTask(logPath)
   }
 
-  reload() {
+  public static fromAiaTask(id: string, created: Date, eventsFile: string): AiaTask {
+    const { AiaTask } = require("./AiaTask")
+    return new AiaTask(id, created, eventsFile)
+  }
+
+  abstract reload(): void
+
+  protected reloadBase() {
     this._metrics = undefined
     this._metricsByModel = undefined
     this._previousTasksInfo = undefined
@@ -158,7 +145,6 @@ export class Task {
     this._eventTypes = undefined
     this.assistantProviders.clear()
     this._steps.clear()
-    this.init()
   }
 
   get metrics(): Promise<SummaryMetrics> {
@@ -275,18 +261,18 @@ export class Task {
     return this.steps.get(id)
   }
 
-  private load() {
+  protected load() {
     if (!this.logPath) {
       return
     }
 
-    const task = JunieTaskSchema.safeParse(fs.readJsonSync(this.logPath))
+    const taskData = JunieTaskSchema.safeParse(fs.readJsonSync(this.logPath))
 
-    if (!task.success) {
-      throw new Error(`Error parsing JunieTask at ${this.logPath}: ${task.error.message}`)
+    if (!taskData.success) {
+      throw new Error(`Error parsing JunieTask at ${this.logPath}: ${taskData.error.message}`)
     }
 
-    return task.data
+    return taskData.data
   }
 
   private lazyload() {
@@ -319,7 +305,13 @@ export class Task {
 
   async loadEvents() {
     let events: EventRecord[] = []
-    let errors: { eventsFile: string; lineNumber: number; message: string; path: (string | number)[]; json: unknown }[] = []
+    let errors: {
+      eventsFile: string;
+      lineNumber: number;
+      message: string;
+      path: (string | number)[];
+      json: unknown
+    }[] = []
 
     try {
       if (Task.workerPool) {
@@ -350,17 +342,17 @@ export class Task {
     }
 
     // match LlmResponseEvent to their LlmRequestEvents
-    for (let index=0 ; index < events.length ; index++) {
+    for (let index = 0 ; index < events.length ; index++) {
       const event = events[index].event
       if (event.type === 'LlmResponseEvent') {
         event.requestEvent = events.slice(0, index).reverse().find(previous =>
           isRequestEvent(previous.event)
-          && previous.event.id === event.id
+          && previous.event.id === event.id,
         )?.event as LlmRequestEvent
       } else if (event.type === 'LlmRequestEvent') {
         event.previousRequest = events.slice(0, index).reverse().find(previous =>
           isRequestEvent(previous.event)
-          && previous.event.modelParameters.model.jbai === event.modelParameters.model.jbai
+          && previous.event.modelParameters.model.jbai === event.modelParameters.model.jbai,
         )?.event as LlmRequestEvent
       }
     }
@@ -371,7 +363,7 @@ export class Task {
         ...OpenAI5.shape.jbai.options,
         OpenAI51.shape.jbai.value,
         OpenAI52.shape.jbai.value,
-        OpenAI51CodexMax.shape.jbai.value
+        OpenAI51CodexMax.shape.jbai.value,
       ].includes(event.answer.llm.jbai as never)
 
     const adjustedEvents = events.map((record, index) => {
@@ -454,3 +446,4 @@ export class Task {
   }
 
 }
+

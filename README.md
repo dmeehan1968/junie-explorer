@@ -25,6 +25,7 @@ all projects across IDE's found on the system.
 - **Model Support**: Comprehensive schema support for the latest LLM models (OpenAI, Gemini, Grok).
 - Task cards provide top-attached tabs for switching between **Trajectories** and **Events**, visually connected to the card header and covered by Playwright tests
 - Task descriptions are constrained to a readable height (around 200px) with an expand/collapse toggle for long content, with tests ensuring the max-height and toggle behavior remain consistent
+- **Task Refactoring**: The `Task` class has been refactored into an abstract base class with concrete implementations for AIA (`AiaTask`) and Chain (`ChainTask`) modes, using static factory functions (`fromAiaTask`, `fromJunieTask`) for better maintainability. To avoid circular dependency issues, the base class uses dynamic `require()` for these subclasses.
 - Trajectories view includes a **Show All Diffs** toggle that controls whether message diffs include all messages or respect the model-specific `rewind` trimming
 - LLM model parsing recognizes OpenAI GPT-5.2 (`openai-gpt-5-2`) in addition to existing supported models
 - Includes a refresh button to update the data

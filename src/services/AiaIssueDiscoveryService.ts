@@ -30,7 +30,7 @@ export class AiaIssueDiscoveryService implements IssueDiscoveryService {
         .map(filePath => {
           const created = fs.statSync(filePath).mtime
           const id = (filePath.match(eventsRegex)?.groups?.id ?? '')
-          const task = new Task(id, created, filePath)
+          const task = Task.fromAiaTask(id, created, filePath)
           return { id: task.id, created, task }
         })
 
