@@ -1,23 +1,3 @@
-[2025-12-01 17:16] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan schema for isSummarizer definition,verify worker usage,validate claims before answer",
-    "BOTTLENECK": "Answer included unverified assertions without opening defining schema files.",
-    "PROJECT NOTE": "Prefer inspecting src/* over public/* as public contains built artifacts.",
-    "NEW INSTRUCTION": "WHEN asserting defaults or model flags THEN open defining schema file to verify"
-}
-
-[2025-12-01 18:46] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project, refactor Task.ts, update components, update api routes, update charts, update tests, run build, add response-to-request lookup",
-    "BOTTLENECK": "Edits began without a full-reference scan and impact analysis across consumers.",
-    "PROJECT NOTE": "Your regex alternations need grouping and anchoring (e.g., use /^(A|B)$/ to avoid ^ and $ applying to only one side).",
-    "NEW INSTRUCTION": "WHEN changing schema fields or moving properties THEN search project for all references and list impacts"
-}
-
 [2025-12-01 19:39] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
@@ -788,3 +768,122 @@
     "NEW INSTRUCTION": "WHEN referencing a public icon THEN verify file exists and path resolves before submit"
 }
 
+[2025-12-18 09:08] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "add tests, implement refactor, update usages, run tests, update docs",
+    "MISSING STEPS": "analyze Issue.ts, outline factory API, map callsite changes, decide async semantics",
+    "BOTTLENECK": "Plan pursued implementation steps when the task asked for brainstorming only.",
+    "PROJECT NOTE": "Project.ts has both log-path and virtual creations; constructor should become private with two factories.",
+    "NEW INSTRUCTION": "WHEN task specifies brainstorming or design THEN propose refactor options and migration plan without coding"
+}
+
+[2025-12-18 09:11] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "add tests, update docs",
+    "MISSING STEPS": "run tests, type-check, rescan usages, design constructor",
+    "BOTTLENECK": "Used ts-ignore to mutate readonly isAIA, revealing a flawed constructor design.",
+    "PROJECT NOTE": "Issue.has readonly isAIA; prefer initializing via a private constructor with options.",
+    "NEW INSTRUCTION": "WHEN adding factories for variants THEN create private constructor with discriminated options"
+}
+
+[2025-12-18 09:17] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "update usages, run all tests, type-check",
+    "BOTTLENECK": "Fixture not aligned with JunieChain schema caused failing test parse.",
+    "PROJECT NOTE": "Replace remaining constructor calls in src/Issue.test.ts and src/Project.ts with factory methods; then run full test suite.",
+    "NEW INSTRUCTION": "WHEN search finds \"new Issue(\" THEN replace with factory methods and run all tests"
+}
+
+[2025-12-18 09:21] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "ask for confirmation,update README,refactor tests for best practices",
+    "MISSING STEPS": "run tests,open Issue.ts,implement static factories,make constructor private,update call sites,run type check",
+    "BOTTLENECK": "Stayed in planning/confirmation instead of executing code and running tests.",
+    "PROJECT NOTE": "Replace new Issue(...) usages in Project.ts and Issue.test.ts with fromLogPath/fromVirtual.",
+    "NEW INSTRUCTION": "WHEN tests mention missing Issue factories THEN implement factories, privatize constructor, update usages"
+}
+
+[2025-12-18 09:23] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "scan project, run tests",
+    "BOTTLENECK": "Ensuring all constructor call sites are updated and verified by tests.",
+    "PROJECT NOTE": "Use bun test after refactor to catch 'fromLogPath is not a function' issues.",
+    "NEW INSTRUCTION": "WHEN adding static factories for Issue THEN search project for 'new Issue(' and update"
+}
+
+[2025-12-18 10:32] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "confirm readiness, restate plan",
+    "MISSING STEPS": "set mode",
+    "BOTTLENECK": "Too many Q&A cycles before delivering the consolidated proposal and spec.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN task mentions [BRAINSTORM] mode THEN set modeId to [BRAINSTORM] immediately"
+}
+
+[2025-12-18 10:38] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "install dependencies",
+    "MISSING STEPS": "run tests,push changes,push tags,set release date",
+    "BOTTLENECK": "Release plan omitted pushing and testing, delaying completion.",
+    "PROJECT NOTE": "Keep a Changelog requires the new version header with the current date.",
+    "NEW INSTRUCTION": "WHEN finalizing a release after version/changelog edits THEN run tests, commit changes, create tag, and push to origin"
+}
+
+[2025-12-18 10:39] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "check date, inspect docs, install deps",
+    "MISSING STEPS": "push changes, run tests",
+    "BOTTLENECK": "Changes and tag were not pushed to remote.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN release changes committed and git tag created THEN run git push origin HEAD && git push --tags"
+}
+
+[2025-12-18 11:51] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "create services,refactor,add tests,update README,run type checking,validate changes",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Plan expanded into implementation beyond analysis-only task scope.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN task requests analysis or recommendations only THEN omit implementation and testing steps from plan"
+}
+
+[2025-12-18 11:52] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "implement IssueDiscoveryService, implement IssueLoader, refactor Project.ts, verify changes with tests, update documentation",
+    "MISSING STEPS": "open entire file, scan project",
+    "BOTTLENECK": "Plan drifted into implementation beyond an analysis-only task.",
+    "PROJECT NOTE": "The issues getter appears to hide heavy I/O and mapping logic.",
+    "NEW INSTRUCTION": "WHEN task scope says analyze or recommend THEN plan only analysis steps; omit implementation"
+}
+
+[2025-12-18 11:59] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "add tests,implement service,run tests",
+    "MISSING STEPS": "scan project,open Project.ts,review Project tests,propose refactor plan,summarize impacts",
+    "BOTTLENECK": "Implemented code without first analyzing the Project class per task scope.",
+    "PROJECT NOTE": "Leverage existing Project.test.ts to understand current responsibilities before proposing refactors.",
+    "NEW INSTRUCTION": "WHEN task requests analysis-only recommendations THEN scan project and open Project.ts before proposing refactors"
+}
+
+[2025-12-18 12:19] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "premature rename,ask_user clarification twice,add unit test before implementation",
+    "MISSING STEPS": "implement chain service,implement AIA service,implement composite,add adapter for backward compatibility,update imports/usages,run full test suite",
+    "BOTTLENECK": "Premature renaming and interface creation broke references before implementations existed.",
+    "PROJECT NOTE": "Some tests/mocks still call discoverIssues; update them to discover.",
+    "NEW INSTRUCTION": "WHEN replacing an existing service with a new interface THEN implement providers and composite, add adapter, update imports, then rename."
+}

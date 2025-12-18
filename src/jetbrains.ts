@@ -11,6 +11,8 @@ import { IssueDescriptionStore } from "./services/IssueDescriptionStore"
 import { TaskIssueMapStore } from "./services/TaskIssueMapStore"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Task } from "./Task"
+import { IssueDiscoveryService } from "./services/IssueDiscoveryService"
+import { CompositeIssueDiscoveryService } from "./services/CompositeIssueDiscoveryService"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -41,6 +43,7 @@ export class JetBrains {
   public readonly statsCollector: StatsCollector
   public readonly issueDescriptionStore: IssueDescriptionStore
   public readonly taskIssueMapStore: TaskIssueMapStore
+  private readonly discoveryService: IssueDiscoveryService
 
   public hasMetrics: boolean = false
 
@@ -57,6 +60,7 @@ export class JetBrains {
     this.statsCollector = new StatsCollector()
     this.issueDescriptionStore = new IssueDescriptionStore(options.homeDir ?? os.homedir())
     this.taskIssueMapStore = new TaskIssueMapStore(options.homeDir ?? os.homedir())
+    this.discoveryService = new CompositeIssueDiscoveryService(this.taskIssueMapStore)
     
     // Register stats collector with Task class for WorkerPool monitoring
     Task.setStatsCollector(this.statsCollector)
@@ -134,7 +138,7 @@ export class JetBrains {
             const existing = projects.get(entry.name)
             const ideName = ideDir.name.replace(/\d+(\.\d+)?/, '')
             if (!existing) {
-              projects.set(entry.name, new Project(entry.name, entry.logPath, ideName, this.logger, this.taskIssueMapStore))
+              projects.set(entry.name, new Project(entry.name, entry.logPath, ideName, this.taskIssueMapStore, this.discoveryService))
               return
             }
             existing.addLogPath(entry.logPath, ideName)

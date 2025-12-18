@@ -1,6 +1,8 @@
-import { describe, test, expect, beforeEach, afterEach } from "bun:test"
+import { describe, test, expect, beforeEach, afterEach, mock } from "bun:test"
 import { Project } from "./Project"
 import { TaskIssueMapStore } from "./services/TaskIssueMapStore"
+import { CompositeIssueDiscoveryService } from "./services/CompositeIssueDiscoveryService"
+import { Issue } from "./Issue"
 import fs from "fs-extra"
 import path from "node:path"
 import os from "node:os"
@@ -52,7 +54,7 @@ describe("Project", () => {
       await fs.utimes(file1, middle, middle)  // aaa is middle
       await fs.utimes(file2, newest, newest)  // bbb is newest
 
-      const project = new Project("test-project", logPath, "TestIDE", console, taskIssueMapStore)
+      const project = new Project("test-project", logPath, "TestIDE", taskIssueMapStore)
       const issues = await project.issues
 
       // Convert to array to check order
@@ -104,7 +106,7 @@ describe("Project", () => {
       await taskIssueMapStore.setTaskIssueMapping(`${source1Uuid} 0`, targetIssueId)
       await taskIssueMapStore.setTaskIssueMapping(`${source2Uuid} 0`, targetIssueId)
 
-      const project = new Project("test-project2", logPath, "TestIDE", console, taskIssueMapStore)
+      const project = new Project("test-project2", logPath, "TestIDE", taskIssueMapStore)
       const issues = await project.issues
 
       // Should have only 1 issue (all merged)
@@ -144,7 +146,7 @@ describe("Project", () => {
       const sourceTaskId = sourceUuid + " 0"
 
       // Create a project with the TaskIssueMapStore
-      const project = new Project("aia-only-test", logPath, "WebStorm", console, taskIssueMapStore)
+      const project = new Project("aia-only-test", logPath, "WebStorm", taskIssueMapStore)
 
       // Get all issues first to see what AIA tasks exist
       const issuesBefore = await project.issues
@@ -175,6 +177,50 @@ describe("Project", () => {
 
       const targetTasksAfter = await targetIssueAfter!.tasks
       expect(targetTasksAfter.size).toBe(2)
+    })
+  })
+
+  describe("Project (Isolated)", () => {
+    test("should use CompositeIssueDiscoveryService to load issues", async () => {
+      const mockIssue = {
+        id: "issue-1",
+        created: new Date(),
+        metrics: Promise.resolve({ metricCount: 0 })
+      } as unknown as Issue
+
+      const mockDiscoveryService = {
+        discover: mock(async () => new Map([["issue-1", mockIssue]]))
+      } as unknown as CompositeIssueDiscoveryService
+
+      const project = new Project("test-project", "log/path", "TestIDE", undefined, mockDiscoveryService)
+      const issues = await project.issues
+
+      expect(mockDiscoveryService.discover).toHaveBeenCalledWith(["log/path"])
+      expect(issues.size).toBe(1)
+      expect(issues.get("issue-1")).toBe(mockIssue)
+    })
+
+    test("should sort issues by creation date descending", async () => {
+      const olderDate = new Date("2023-01-01")
+      const newerDate = new Date("2023-01-02")
+
+      const olderIssue = { id: "older", created: olderDate } as Issue
+      const newerIssue = { id: "newer", created: newerDate } as Issue
+
+      const mockDiscoveryService = {
+        discover: mock(async () => new Map([
+          ["older", olderIssue],
+          ["newer", newerIssue]
+        ]))
+      } as unknown as CompositeIssueDiscoveryService
+
+      const project = new Project("test-project", "log/path", "TestIDE", undefined, mockDiscoveryService)
+      const issues = await project.issues
+
+      const keys = [...issues.keys()]
+      expect(keys[0]).toBe("newer")
+      expect(keys[1]).toBe("older")
+      expect(project.lastUpdated).toEqual(newerDate)
     })
   })
 })

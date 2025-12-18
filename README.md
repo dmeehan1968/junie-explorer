@@ -19,6 +19,10 @@ all projects across IDE's found on the system.
   - Case-insensitive matching by default
   - Invalid regex patterns display a helpful error message
   - Search preferences are persisted in session storage
+- **Issue Merging**: Merge related issues across different IDE instances or timeframes into a single view for better tracking.
+  - Quick merge/unmerge actions directly from the issue list.
+- **Inline Editing**: Edit issue descriptions inline to provide better context or titles for your logs.
+- **Model Support**: Comprehensive schema support for the latest LLM models (OpenAI, Gemini, Grok).
 - Task cards provide top-attached tabs for switching between **Trajectories** and **Events**, visually connected to the card header and covered by Playwright tests
 - Task descriptions are constrained to a readable height (around 200px) with an expand/collapse toggle for long content, with tests ensuring the max-height and toggle behavior remain consistent
 - Trajectories view includes a **Show All Diffs** toggle that controls whether message diffs include all messages or respect the model-specific `rewind` trimming
@@ -363,7 +367,11 @@ junie-explorer/
 
 The new class-based data model with enhanced functionality:
 - `JetBrains`: Main class that manages IDE installations and projects
-- `Project`: Enhanced project class with multiple IDE support
+- `Project`: Enhanced project class with multiple IDE support, refactored to use `IssueDiscoveryService` for improved separation of concerns
+- `IssueDiscoveryService`: Interface for scanning the file system and discovering issues and tasks, enabling better testability of the `Project` class
+- `ChainIssueDiscoveryService`: Implementation of `IssueDiscoveryService` for standard issues from `chain-*.json` files
+- `AiaIssueDiscoveryService`: Implementation of `IssueDiscoveryService` for AIA tasks from `*-events.jsonl` files
+- `CompositeIssueDiscoveryService`: Composite implementation of `IssueDiscoveryService` that combines results from multiple sources
 - `Issue`: Issue class with comprehensive metadata handling
 - `Task`: Task class with agent state and session history
 - `Step`: Step class with detailed content and statistics

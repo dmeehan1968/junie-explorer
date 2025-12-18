@@ -218,3 +218,43 @@
     "NEW INSTRUCTION": "WHEN executing multiple shell steps THEN chain with && or use a subshell without newlines"
 }
 
+[2025-12-18 09:15] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "Issue.fromLogPath/fromVirtual is not a function",
+    "ROOT CAUSE": "Tests were added for new factory methods before implementing them in Issue.ts.",
+    "PROJECT NOTE": "Implement static fromLogPath and fromVirtual in src/Issue.ts, make the constructor private, and update usages in src/Project.ts and existing tests.",
+    "NEW INSTRUCTION": "WHEN bun test fails: Issue.fromLogPath is not a function THEN implement fromLogPath and fromVirtual in src/Issue.ts"
+}
+
+[2025-12-18 11:56] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Chain file JSON violated JunieChainSchema; Issue parse threw",
+    "ROOT CAUSE": "The test wrote a minimal chain-*.json missing required fields expected by JunieChainSchema.",
+    "PROJECT NOTE": "Chain files in issues/ must validate against src/schema JunieChainSchema; create fixtures that conform or reuse real samples.",
+    "NEW INSTRUCTION": "WHEN creating chain-*.json fixtures in tests THEN generate data conforming to JunieChainSchema"
+}
+
+[2025-12-18 11:57] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "AIA task discovery test failed; issue key mismatch",
+    "ROOT CAUSE": "AIA tasks use task.id (e.g., \"uuid 0\") instead of bare UUID from filename, so issues map keys don't match expected UUID.",
+    "PROJECT NOTE": "Task.id may include an attempt suffix (e.g., \"<uuid> 0\"); prefer the UUID extracted via regex for identifiers when discovering tasks.",
+    "NEW INSTRUCTION": "WHEN building AIA task identifiers from events THEN key issues by regex-extracted UUID, not task.id"
+}
+
+[2025-12-18 12:16] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "Cannot find module './ChainIssueDiscoveryService'",
+    "ROOT CAUSE": "The test references ChainIssueDiscoveryService but the implementation file was not created/exported.",
+    "PROJECT NOTE": "Add src/services/ChainIssueDiscoveryService.ts exporting class ChainIssueDiscoveryService that implements IssueDiscoveryService.discover.",
+    "NEW INSTRUCTION": "WHEN tests import a non-existent service file THEN create the implementation exporting the expected class"
+}
+
