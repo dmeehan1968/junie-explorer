@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.0] - 2025-12-18
+### Added
+- Add inline issue description editing and persistence (4a4050b, 006f39b, 47d4eea)
+- Add issue merging and unmerging functionality (b49f7b6, 036460f, 5763dd0, 5a0b8cd)
+- Add support for new models in schema: Gemini 3 Flash, Grok 4.1 Fast, OpenAI GPT-5.2 (d61dc34, fce948d, 90bf173)
+- Add `XAI.svg` icon (5f20236)
+- Add support for task retrieval by index in `Issue` (7496667)
+### Fixed
+- Fix date handling in `IssuesTable` sorting and calculations (90c8fc7)
+- Fix flaky DOM assertion in search test (fbafb0b)
+- Fix failing tests due to new aia-only fixture (811a4f2)
+### Changed
+- Sort AIA issues and tasks explicitly by creation date (c5e8c93)
+- Update `Task` to load and assign context from event records (27c1667, 60e29a9)
+- Refactor `IssueDescriptionStore` dependency handling (1752a9b)
+- Refactor concurrency configuration (859a87d)
+- Update JetBrains cache directory resolution logic (66e34b4)
+- Update Bun test instructions in guidelines (c009823)
+
 ## [3.7.0] - 2025-12-11
 
 ### Added
