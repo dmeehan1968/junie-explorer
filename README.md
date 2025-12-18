@@ -196,6 +196,10 @@ bun run test
 This will run the Playwright test suite.  You can add Playwright CLI arguments to the end of this, for example
 `bun run test --grep <pattern>` to run tests that match the specified pattern. 
 
+**Recent Fixes**:
+- Resolved an issue in `IssueRow` Playwright tests where multiple `dialog` event listeners were conflicting, causing "already handled" errors. Tests now use `page.once('dialog')` for more reliable interaction with confirmation dialogs.
+- Updated `IssueRow` tests to align with the implementation of the unmerge button, which uses an `img` tag instead of an `svg` element for its icon.
+
 To run native Bun unit tests:
 ```bash
 bun test

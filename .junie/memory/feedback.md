@@ -358,3 +358,11 @@
     "NEW INSTRUCTION": "WHEN rendering unmerge in issue row THEN use public/icons/split-turn-down-right-svgrepo-com.svg"
 }
 
+[2025-12-18 12:47] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "tests update",
+    "EXPECTATION": "Modify the failing unmerge button test to match the implemented icon and attributes; do not change component code.",
+    "NEW INSTRUCTION": "WHEN unmerge button test fails on icon/attributes THEN update test to implemented icon file and attrs"
+}
+

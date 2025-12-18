@@ -268,3 +268,13 @@
     "NEW INSTRUCTION": "WHEN tests reference Issue.fromChainFile or Issue.fromAia THEN implement these static factories in src/Issue.ts"
 }
 
+[2025-12-18 12:48] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Playwright test failed on unmerge icon mismatch",
+    "ROOT CAUSE": "The test expects a different unmerge icon/attributes than the implementation currently uses.",
+    "PROJECT NOTE": "IssueRow uses public/icons/split-turn-down-right-svgrepo-com.svg for the unmerge button; update the Playwright assertion in src/components/issueRow.pw.ts to this asset and current aria/alt attributes.",
+    "NEW INSTRUCTION": "WHEN Playwright test fails on icon filename mismatch THEN update expectations to current public/icons asset and attributes"
+}
+

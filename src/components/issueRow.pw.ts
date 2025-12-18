@@ -50,7 +50,7 @@ test.describe('IssueRow - AIA Issues', async () => {
       await firstRow.descriptionCell.hover()
       const unmergeVisible = await firstRow.unmergeButton.isVisible()
       if (unmergeVisible) {
-        page.on('dialog', async dialog => {
+        page.once('dialog', async dialog => {
           await dialog.accept()
         })
         await firstRow.unmergeButton.click()
@@ -159,16 +159,16 @@ test.describe('IssueRow - AIA Issues', async () => {
     await firstRow.descriptionCell.hover()
     
     let dialogMessages: string[] = []
-    page.on('dialog', async dialog => {
-      dialogMessages.push(dialog.message())
-      await dialog.accept()
-    })
     
     // Check if unmerge is already visible (already merged state)
     const unmergeVisible = await firstRow.unmergeButton.isVisible()
     
     if (!unmergeVisible && rows.length >= 2) {
       // Need to merge first
+      page.once('dialog', async dialog => {
+        dialogMessages.push(dialog.message())
+        await dialog.accept()
+      })
       await firstRow.mergeDownButton.click()
       await page.waitForLoadState('networkidle')
       
@@ -183,6 +183,10 @@ test.describe('IssueRow - AIA Issues', async () => {
       
       // Click unmerge and verify confirmation
       dialogMessages = []
+      page.once('dialog', async dialog => {
+        dialogMessages.push(dialog.message())
+        await dialog.accept()
+      })
       await mergedRow.unmergeButton.click()
       expect(dialogMessages.length).toBe(1)
       expect(dialogMessages[0]).toContain('Unmerge')
@@ -192,6 +196,10 @@ test.describe('IssueRow - AIA Issues', async () => {
       await expect(firstRow.unmergeButton).toHaveAttribute('aria-label', 'Unmerge issue')
       
       // Click unmerge and verify confirmation
+      page.once('dialog', async dialog => {
+        dialogMessages.push(dialog.message())
+        await dialog.accept()
+      })
       await firstRow.unmergeButton.click()
       expect(dialogMessages.length).toBe(1)
       expect(dialogMessages[0]).toContain('Unmerge')
@@ -199,22 +207,24 @@ test.describe('IssueRow - AIA Issues', async () => {
   })
 
   test('unmerge button has correct icon and attributes', async ({ page, issuesTable }) => {
+    // Check if unmerge is visible (merged state) or we need to merge first
     const rows = await issuesTable.getAllRows()
     const firstRow = rows[0]
     await firstRow.descriptionCell.hover()
     
-    // Accept any dialogs that appear
-    page.on('dialog', async dialog => {
-      await dialog.accept()
-    })
-    
-    // Check if unmerge is visible (merged state) or we need to merge first
     let unmergeVisible = await firstRow.unmergeButton.isVisible()
     
     if (!unmergeVisible && rows.length >= 2) {
+      // Set up dialog handler for THIS specific click
+      page.once('dialog', async dialog => {
+        await dialog.accept()
+      })
+
       // Merge first to get unmerge button visible
       await firstRow.mergeDownButton.click()
       await page.waitForLoadState('networkidle')
+      // Small delay to ensure DOM is updated
+      await page.waitForTimeout(500)
       
       const updatedRows = await issuesTable.getAllRows()
       const mergedRow = updatedRows[0]
@@ -226,18 +236,20 @@ test.describe('IssueRow - AIA Issues', async () => {
         await expect(mergedRow.unmergeButton).toHaveAttribute('aria-label', 'Unmerge issue')
         await expect(mergedRow.unmergeButton).toHaveAttribute('title', 'Unmerge issue')
         
-        // Check for SVG icon inside the button
-        const svg = mergedRow.unmergeButton.locator('svg')
-        await expect(svg).toBeVisible()
+        // Check for img icon inside the button (implementation uses img)
+        const img = mergedRow.unmergeButton.locator('img')
+        await expect(img).toBeVisible()
+        await expect(img).toHaveAttribute('src', '/icons/split-turn-down-right-svgrepo-com.svg')
       }
     } else if (unmergeVisible) {
       // Already merged, check attributes
       await expect(firstRow.unmergeButton).toHaveAttribute('aria-label', 'Unmerge issue')
       await expect(firstRow.unmergeButton).toHaveAttribute('title', 'Unmerge issue')
       
-      // Check for SVG icon inside the button
-      const svg = firstRow.unmergeButton.locator('svg')
-      await expect(svg).toBeVisible()
+      // Check for img icon inside the button (implementation uses img)
+      const img = firstRow.unmergeButton.locator('img')
+      await expect(img).toBeVisible()
+      await expect(img).toHaveAttribute('src', '/icons/split-turn-down-right-svgrepo-com.svg')
     }
   })
 })

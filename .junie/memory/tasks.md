@@ -1,13 +1,3 @@
-[2025-12-02 14:10] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "open MessageTrajectoriesSection,open getTrajectoryEventRecords,inspect TrajectoriesView early",
-    "MISSING STEPS": "group failures by error,enumerate failing test titles,narrow tests with precise grep",
-    "BOTTLENECK": "Dove into multiple components before triaging and grouping failures by shared error.",
-    "PROJECT NOTE": "KitaJSX requires string/element children; getMessageDiffs can return objects causing child errors.",
-    "NEW INSTRUCTION": "WHEN multiple failures share identical error text THEN group them and inspect shared code path"
-}
-
 [2025-12-02 14:19] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
@@ -876,4 +866,14 @@
     "BOTTLENECK": "Factories and polymorphic refactor were not implemented before adding tests and usages.",
     "PROJECT NOTE": "UI components and API endpoints rely on isAIA; replace with polymorphic getters (agentName, agentIcon, canMerge) and adjust data attributes accordingly.",
     "NEW INSTRUCTION": "WHEN tests reference missing factory methods THEN implement factory methods in Issue.ts before adding tests"
+}
+
+[2025-12-18 12:50] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "update README",
+    "MISSING STEPS": "search project, run test",
+    "BOTTLENECK": "Conflicting dialog listeners caused double-handling of dialogs.",
+    "PROJECT NOTE": "Multiple tests in issueRow.pw.ts register page.on('dialog'), leading to conflicts; unmerge button uses an <img> with a fixed src.",
+    "NEW INSTRUCTION": "WHEN adding a dialog handler THEN use page.once and avoid global page.on handlers"
 }
