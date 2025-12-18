@@ -258,3 +258,13 @@
     "NEW INSTRUCTION": "WHEN tests import a non-existent service file THEN create the implementation exporting the expected class"
 }
 
+[2025-12-18 12:37] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "Issue.fromChainFile is undefined; factory methods not implemented",
+    "ROOT CAUSE": "A new test asserts factory constructors, but Issue.ts lacks fromChainFile/fromAia implementations.",
+    "PROJECT NOTE": "Implement static factories in src/Issue.ts as fromChainFile(logPath) and fromAia(id, created, task), aligning with the refactor to an abstract Issue and concrete AIA/Chain classes.",
+    "NEW INSTRUCTION": "WHEN tests reference Issue.fromChainFile or Issue.fromAia THEN implement these static factories in src/Issue.ts"
+}
+

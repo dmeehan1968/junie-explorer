@@ -372,7 +372,7 @@ The new class-based data model with enhanced functionality:
 - `ChainIssueDiscoveryService`: Implementation of `IssueDiscoveryService` for standard issues from `chain-*.json` files
 - `AiaIssueDiscoveryService`: Implementation of `IssueDiscoveryService` for AIA tasks from `*-events.jsonl` files
 - `CompositeIssueDiscoveryService`: Composite implementation of `IssueDiscoveryService` that combines results from multiple sources
-- `Issue`: Issue class with comprehensive metadata handling
+- `Issue`: Abstract base class for issue management, with concrete implementations `ChainIssue` (file-based) and `AiaIssue` (memory-based from events)
 - `Task`: Task class with agent state and session history
 - `Step`: Step class with detailed content and statistics
 - `Schema definitions` (schema.ts): Comprehensive Zod schemas including:

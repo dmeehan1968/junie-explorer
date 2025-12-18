@@ -1,4 +1,4 @@
-import { Issue } from "./Issue"
+import { Issue, AiaIssue } from "./Issue"
 import { addSummaryMetrics, initialisedSummaryMetrics, SummaryMetrics } from "./schema"
 import { IssueDiscoveryService } from "./services/IssueDiscoveryService"
 import { CompositeIssueDiscoveryService } from "./services/CompositeIssueDiscoveryService"
@@ -110,7 +110,7 @@ export class Project {
       return undefined
     }
 
-    if (!targetIssue.isAIA || !sourceIssue.isAIA) {
+    if (!(targetIssue instanceof AiaIssue) || !(sourceIssue instanceof AiaIssue)) {
       return undefined
     }
 

@@ -25,7 +25,7 @@ describe("Issue", () => {
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
       const task1 = new Task("task-1", new Date(), eventFile1)
-      const issue = new Issue("issue-1", new Date(), task1)
+      const issue = Issue.fromAia("issue-1", new Date(), task1)
 
       // Create a second task
       const eventFile2 = path.join(eventsPath, "task-2-events.jsonl")
@@ -48,7 +48,7 @@ describe("Issue", () => {
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
       const task1 = new Task("task-1", new Date(), eventFile1)
-      const issue = new Issue("task-1", new Date(), task1)
+      const issue = Issue.fromAia("task-1", new Date(), task1)
 
       // Access tasks to ensure they're loaded
       const initialTasks = await issue.tasks
@@ -70,7 +70,7 @@ describe("Issue", () => {
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
       const task1 = new Task("task-1", new Date(), eventFile1)
-      const issue = new Issue("task-1", new Date(), task1)
+      const issue = Issue.fromAia("task-1", new Date(), task1)
 
       // Access metrics to cache them
       const metrics1 = await issue.metrics
@@ -89,7 +89,7 @@ describe("Issue", () => {
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
       const task1 = new Task("task-1", new Date(), eventFile1)
-      const issue = new Issue("task-1", new Date(), task1)
+      const issue = Issue.fromAia("task-1", new Date(), task1)
 
       // Access tasks multiple times
       const tasks1 = await issue.tasks
@@ -105,7 +105,7 @@ describe("Issue", () => {
       const eventFile1 = path.join(eventsPath, "task-1-events.jsonl")
       await fs.writeFile(eventFile1, "")
       const task1 = new Task("task-1", new Date(), eventFile1)
-      const issue = new Issue("issue-1", new Date(), task1)
+      const issue = Issue.fromAia("issue-1", new Date(), task1)
 
       // Create and add a second task
       const eventFile2 = path.join(eventsPath, "task-2-events.jsonl")

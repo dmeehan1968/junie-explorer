@@ -1,6 +1,6 @@
 import fs from "fs-extra"
 import path from "node:path"
-import { Issue } from "../Issue"
+import { Issue, AiaIssue } from "../Issue"
 import { Task } from "../Task"
 import { TaskIssueMapStore } from "./TaskIssueMapStore"
 import { IssueDiscoveryService } from "./IssueDiscoveryService"
@@ -39,18 +39,18 @@ export class AiaIssueDiscoveryService implements IssueDiscoveryService {
 
       for (const { id, created, task } of unmappedTasks) {
         if (!issues.has(id)) {
-          issues.set(id, new Issue(id, created, task))
+          issues.set(id, Issue.fromAia(id, created, task))
         }
       }
 
       for (const { id, task } of mappedTasks) {
         const targetIssueId = taskIssueMappings[id]
         const targetIssue = issues.get(targetIssueId)
-        if (targetIssue && targetIssue.isAIA) {
+        if (targetIssue && targetIssue instanceof AiaIssue) {
           targetIssue.addTask(task)
         } else {
           if (!issues.has(id)) {
-            issues.set(id, new Issue(id, task.created, task))
+            issues.set(id, Issue.fromAia(id, task.created, task))
           }
         }
       }

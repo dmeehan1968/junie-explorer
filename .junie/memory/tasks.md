@@ -1,23 +1,3 @@
-[2025-12-01 19:39] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project, get file structure, open package manifest, cross-check features",
-    "BOTTLENECK": "Relied solely on README without validating claims against repository structure/code.",
-    "PROJECT NOTE": "-",
-    "NEW INSTRUCTION": "WHEN README exists for project overview THEN get file structure, open README and package manifest, then summarize"
-}
-
-[2025-12-02 14:01] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project",
-    "BOTTLENECK": "Inconsistent sentinel values ('both' vs 'all') across files risk lingering mismatches.",
-    "PROJECT NOTE": "-",
-    "NEW INSTRUCTION": "WHEN renaming a UI selection token THEN search repository for old token and update defaults, comparisons, and labels"
-}
-
 [2025-12-02 14:10] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "near-optimal",
@@ -886,4 +866,14 @@
     "BOTTLENECK": "Premature renaming and interface creation broke references before implementations existed.",
     "PROJECT NOTE": "Some tests/mocks still call discoverIssues; update them to discover.",
     "NEW INSTRUCTION": "WHEN replacing an existing service with a new interface THEN implement providers and composite, add adapter, update imports, then rename."
+}
+
+[2025-12-18 12:41] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "confirm plan to user,create probe tests,update docs",
+    "MISSING STEPS": "scan project for isAIA usages,update UI/API to polymorphism,run full test suite",
+    "BOTTLENECK": "Factories and polymorphic refactor were not implemented before adding tests and usages.",
+    "PROJECT NOTE": "UI components and API endpoints rely on isAIA; replace with polymorphic getters (agentName, agentIcon, canMerge) and adjust data attributes accordingly.",
+    "NEW INSTRUCTION": "WHEN tests reference missing factory methods THEN implement factory methods in Issue.ts before adding tests"
 }

@@ -12,7 +12,7 @@ export class ChainIssueDiscoveryService implements IssueDiscoveryService {
 
       if (fs.existsSync(root)) {
         fs.globSync(path.join(root, 'chain-*.json'))
-          .map(path => new Issue(path))
+          .map(path => Issue.fromChainFile(path))
           .sort((a, b) => a.name.localeCompare(b.name))
           .forEach(issue => issues.set(issue.id, issue))
       }

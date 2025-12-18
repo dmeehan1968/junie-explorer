@@ -1,5 +1,6 @@
 import { Router } from "express"
 import { AppRequest, AppResponse } from "../types"
+import { AiaIssue } from "../../Issue"
 
 const router = Router()
 
@@ -52,7 +53,7 @@ router.post("/api/projects/:projectName/issues/:issueId/merge", async (req: AppR
   }
 
   const sourceIssue = await project.getIssueById(sourceIssueId)
-  if (!sourceIssue || !sourceIssue.isAIA) {
+  if (!sourceIssue || !(sourceIssue instanceof AiaIssue)) {
     return res.status(400).json({ error: "Source issue not found or is not an AIA issue" })
   }
 
@@ -93,8 +94,7 @@ router.post("/api/projects/:projectName/issues/:issueId/unmerge", async (req: Ap
   if (!issue) {
     return res.status(404).json({ error: "Issue not found" })
   }
-
-  if (!issue.isAIA) {
+  if (!(issue instanceof AiaIssue)) {
     return res.status(400).json({ error: "Only AIA issues can be unmerged" })
   }
 

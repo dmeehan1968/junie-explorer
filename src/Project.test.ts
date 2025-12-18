@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, mock } from "bun:test"
 import { Project } from "./Project"
 import { TaskIssueMapStore } from "./services/TaskIssueMapStore"
 import { CompositeIssueDiscoveryService } from "./services/CompositeIssueDiscoveryService"
-import { Issue } from "./Issue"
+import { Issue, AiaIssue } from "./Issue"
 import fs from "fs-extra"
 import path from "node:path"
 import os from "node:os"
@@ -150,7 +150,7 @@ describe("Project", () => {
 
       // Get all issues first to see what AIA tasks exist
       const issuesBefore = await project.issues
-      const aiaIssues = [...issuesBefore.values()].filter(issue => issue.isAIA)
+      const aiaIssues = [...issuesBefore.values()].filter(issue => issue instanceof AiaIssue)
 
       // We need at least 2 AIA issues to test merging
       expect(aiaIssues.length).toBeGreaterThanOrEqual(2)

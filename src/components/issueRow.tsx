@@ -76,7 +76,7 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
-            <Conditional condition={issue.isAIA}>
+            <Conditional condition={issue.canMerge}>
               <button
                 type="button"
                 class="btn btn-ghost btn-xs merge-up-btn"
@@ -236,10 +236,8 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
         onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         {(() => {
-          const agentIcon = issue.isAIA
-            ? 'https://resources.jetbrains.com/storage/products/company/brand/logos/AI_icon.svg'
-            : 'https://resources.jetbrains.com/storage/products/company/brand/logos/Junie_icon.svg'
-          const agentName = issue.isAIA ? 'AI Assistant' : 'Junie'
+          const agentIcon = issue.agentIcon
+          const agentName = issue.agentName
           return (
             <div class="tooltip tooltip-left" data-tip={agentName}>
               <img

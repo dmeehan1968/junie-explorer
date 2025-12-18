@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sort AIA issues and tasks explicitly by creation date (c5e8c93)
 - Update `Task` to load and assign context from event records (27c1667, 60e29a9)
 - Refactor `IssueDescriptionStore` dependency handling (1752a9b)
+- Refactor `Issue` class into abstract base with `ChainIssue` and `AiaIssue` concrete implementations, using static factory methods and a single state-based constructor
 - Refactor concurrency configuration (859a87d)
 - Update JetBrains cache directory resolution logic (66e34b4)
 - Update Bun test instructions in guidelines (c009823)
