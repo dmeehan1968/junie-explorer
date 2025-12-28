@@ -1,6 +1,6 @@
 import * as z from "zod"
 
-export const AgentType = z.enum(['Assistant', 'TaskSummarizer', 'Memorizer', 'ErrorAnalyzer', 'LanguageIdentifier', 'MemoryCompactor'])
+export const AgentType = z.enum(['Assistant', 'TaskSummarizer', 'Memorizer', 'ErrorAnalyzer', 'LanguageIdentifier', 'MemoryCompactor', 'SystemAdmin'])
 export type AgentType = z.infer<typeof AgentType>
 
 const AGENT_TYPE_PATTERNS: Record<AgentType, RegExp[]> = {
@@ -32,6 +32,9 @@ const AGENT_TYPE_PATTERNS: Record<AgentType, RegExp[]> = {
   ],
   [AgentType.enum.MemoryCompactor]: [
     /^You are a memory compaction utility/,
+  ],
+  [AgentType.enum.SystemAdmin]: [
+    /^You are a system administration expert./,
   ],
 } as const
 
