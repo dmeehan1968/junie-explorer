@@ -4,7 +4,7 @@ import { ToolParams } from "./toolParams"
 export const ToolUse = z.looseObject({
   id: z.string(),
   name: z.string(),
-  input: ToolParams,
+  input: ToolParams.optional(),
 })
 export type ToolUse = z.infer<typeof ToolUse>
 
