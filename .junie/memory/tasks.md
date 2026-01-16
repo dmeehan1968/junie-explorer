@@ -1,23 +1,3 @@
-[2025-12-02 14:29] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "sanitize events, run tests",
-    "BOTTLENECK": "Wrong field pruned in JSON replacer left circular references intact.",
-    "PROJECT NOTE": "In eventsTable.tsx replacer, replace previousEvent with previousRequest when pruning.",
-    "NEW INSTRUCTION": "WHEN preparing JSON for event rendering THEN omit requestEvent and previousRequest fields"
-}
-
-[2025-12-02 14:48] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "create utility,modify API,start server",
-    "MISSING STEPS": "run tests,analyze failure logs,inspect client toggle logic,verify API payload size,reproduce endpoint response",
-    "BOTTLENECK": "Speculative server-side changes were made before reproducing and diagnosing the failing tests.",
-    "PROJECT NOTE": "If pruning is needed, ensure both events and trajectories payloads are pruned in the task API response.",
-    "NEW INSTRUCTION": "WHEN task requests investigating failing tests THEN run failing tests before editing code"
-}
-
 [2025-12-02 15:22] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "near-optimal",
@@ -888,3 +868,12 @@
     "NEW INSTRUCTION": "WHEN error shows \"Cannot access '<name>' before initialization\" THEN move subclass imports into factory with dynamic import and type-only types"
 }
 
+[2026-01-03 13:09] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "update status, get file structure",
+    "MISSING STEPS": "create blog post file",
+    "BOTTLENECK": "No persistent artifact was created for the blog post.",
+    "PROJECT NOTE": "Consider committing the post as docs/release-notes/<version>.md or updating CHANGELOG.md.",
+    "NEW INSTRUCTION": "WHEN task requires a written deliverable for the repo THEN create a markdown file with the draft and request review in comments"
+}

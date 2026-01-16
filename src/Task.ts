@@ -25,6 +25,7 @@ import { OpenAI5 } from "./schema/openAI5"
 import { OpenAI51 } from "./schema/openAI51"
 import { OpenAI51CodexMax } from "./schema/openAI51CodexMax"
 import { OpenAI52 } from "./schema/openAI52"
+import { OpenAI52Codex } from "./schema/openAI52Codex"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
@@ -364,6 +365,7 @@ export abstract class Task {
         OpenAI51.shape.jbai.value,
         OpenAI52.shape.jbai.value,
         OpenAI51CodexMax.shape.jbai.value,
+        OpenAI52Codex.shape.jbai.value,
       ].includes(event.answer.llm.jbai as never)
 
     const adjustedEvents = events.map((record, index) => {
