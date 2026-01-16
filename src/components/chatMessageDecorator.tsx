@@ -50,7 +50,7 @@ export const ChatMessageDecorator: Component<{ klass: string; message: Matterhor
             testId="assistant-tool-use"
             tool={{
               name: toolUse.name,
-              params: toolUse.input.rawJsonObject,
+              params: toolUse.input?.rawJsonObject ?? {},
               label: 'Tool Use',
             }}
           />
