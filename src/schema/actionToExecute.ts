@@ -10,8 +10,14 @@ export const ActionToExecute = z.looseObject({
   description: z.string().optional(),
   thought: z.string().optional(),
   content: z.string().optional(),
+  toolCallId: z.looseObject({
+    id: z.string(),
+    callId: z.string(),
+    name: z.string(),
+  }).optional(),
 }).transform(({ arguments: args, inputParams, ...rest }) => ({
   ...rest,
   inputParams: args || inputParams || {},
+  name: rest.name ?? rest.toolCallId?.name ?? 'Unnamed',
 }))
 export type ActionToExecute = z.infer<typeof ActionToExecute>
