@@ -3,7 +3,7 @@ import { ToolParams } from "./toolParams"
 
 export const ActionToExecute = z.looseObject({
   type: z.string(),
-  name: z.string(),
+  name: z.string().optional(),
   id: z.string().optional(),
   arguments: z.any().optional(),
   inputParams: ToolParams.optional(),
