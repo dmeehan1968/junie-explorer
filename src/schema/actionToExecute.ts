@@ -1,6 +1,12 @@
 import { z } from "zod"
 import { ToolParams } from "./toolParams"
 
+export const ToolCallId = z.looseObject({
+  id: z.string(),
+  callId: z.string(),
+  name: z.string(),
+})
+
 export const ActionToExecute = z.looseObject({
   type: z.string(),
   name: z.string().optional(),
@@ -10,11 +16,7 @@ export const ActionToExecute = z.looseObject({
   description: z.string().optional(),
   thought: z.string().optional(),
   content: z.string().optional(),
-  toolCallId: z.looseObject({
-    id: z.string(),
-    callId: z.string(),
-    name: z.string(),
-  }).optional(),
+  toolCallId: ToolCallId.optional(),
 }).transform(({ arguments: args, inputParams, ...rest }) => ({
   ...rest,
   inputParams: args || inputParams || {},
