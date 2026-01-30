@@ -34,10 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chartCanvas && !window.taskEvents) {
           // Fetch event timeline data when the event timeline is expanded
           const pathParts = window.location.pathname.split('/');
-          const projectName = pathParts[2];
-          const issueId = pathParts[4];
-          const taskId = pathParts[6];
-          
+          const projectName = decodeURIComponent(pathParts[2]);
+          const issueId = decodeURIComponent(pathParts[4]);
+          const taskId = decodeURIComponent(pathParts[6]);
+
           fetch(`/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/events/timeline`)
             .then(response => response.json())
             .then(data => {
@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (actionChartCanvas && !window.taskActionEvents) {
           // Fetch action events data when the action timeline is expanded
           const pathParts = window.location.pathname.split('/');
-          const projectName = pathParts[2];
-          const issueId = pathParts[4];
-          const taskId = pathParts[6];
-          
+          const projectName = decodeURIComponent(pathParts[2]);
+          const issueId = decodeURIComponent(pathParts[4]);
+          const taskId = decodeURIComponent(pathParts[6]);
+
           fetch(`/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/timeline`)
             .then(response => response.json())
             .then(data => {

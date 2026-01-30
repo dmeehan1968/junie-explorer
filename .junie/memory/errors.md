@@ -308,3 +308,13 @@
     "NEW INSTRUCTION": "WHEN tests call fromJunieTask with a path THEN create a valid temp file or mock fs to avoid ENOENT"
 }
 
+[2026-01-30 20:29] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Dev process terminated by SIGTERM during restart",
+    "ROOT CAUSE": "pkill killed the running dev server, producing SIGTERM messages before the new server started.",
+    "PROJECT NOTE": "Setting JETBRAINS_CACHE_PATH has no effect; the app uses JetBrains({ logPath }) via server options. Start the server with the fixtures path passed into createServer/JetBrains, not via env.",
+    "NEW INSTRUCTION": "WHEN server logs show SIGTERM after pkill THEN start server anew and wait for readiness before curl"
+}
+

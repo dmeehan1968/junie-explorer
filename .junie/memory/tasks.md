@@ -1,33 +1,3 @@
-[2025-12-02 15:22] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "get approval",
-    "MISSING STEPS": "remove dsl locators,delete client script file,remove orphan utility,run type check",
-    "BOTTLENECK": "Orphaned references and tests were not fully removed after code deletion.",
-    "PROJECT NOTE": "taskCard.dsl.ts still references jsonButton/jsonViewer; pruneEventLinks may be unused after task.ts removal.",
-    "NEW INSTRUCTION": "WHEN removing a feature across routes THEN search repo and delete related UI, routes, scripts, DSL, and tests"
-}
-
-[2025-12-02 15:57] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "install dependencies",
-    "MISSING STEPS": "push changes, push tags",
-    "BOTTLENECK": "Release was not pushed to remote.",
-    "PROJECT NOTE": "-",
-    "NEW INSTRUCTION": "WHEN release commit and tag exist locally THEN push branch and tags to origin"
-}
-
-[2025-12-02 17:30] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "summary and confirmation, documentation",
-    "MISSING STEPS": "implement toggle UI, update datasets, update chart logic, run tests, manual verify",
-    "BOTTLENECK": "Work stalled after adding tests without implementing the feature or running tests.",
-    "PROJECT NOTE": "Datasets are built in prepareLlmEventGraphData; chart logic is in public/js/taskEventLlmChart.js; add cost breakdown and webSearch metrics, exclude overall cost.",
-    "NEW INSTRUCTION": "WHEN adding a cost/tokens toggle THEN implement UI, update datasets and chart logic, then run the test suite"
-}
-
 [2025-12-03 09:10] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
@@ -888,3 +858,22 @@
     "NEW INSTRUCTION": "WHEN task requests narrowing EventParserError logging THEN implement inline path extractor and log element plus context"
 }
 
+[2026-01-30 20:30] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "restart server repeatedly, speculative code reading without reproduction, search for unused env var",
+    "MISSING STEPS": "reproduce bug, call API endpoints, isolate taskId lookup, implement fix, verify with fixtures, add test",
+    "BOTTLENECK": "No direct reproduction or API inspection to confirm taskId resolution for AIA tasks.",
+    "PROJECT NOTE": "Verify AIA task id/index handling: AiaTask mutates id with ' 0' and Issue.getTaskById numeric branch; ensure initial AIA task index and map keys align.",
+    "NEW INSTRUCTION": "WHEN UI charts for AIA tasks are blank THEN call timeline/context/metrics APIs directly and compare with Chain tasks"
+}
+
+[2026-01-30 21:06] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "run app, inspect browser console, inspect network requests, verify API payload shape, validate script includes",
+    "BOTTLENECK": "No end-to-end browser verification to reconcile API responses with chart code.",
+    "PROJECT NOTE": "Trajectories page includes taskActionChart.js but not taskEventChart.js referenced by collapsibleSections.",
+    "NEW INSTRUCTION": "WHEN charts are blank on trajectories page THEN open DevTools, verify API responses match chart code and script includes"
+}

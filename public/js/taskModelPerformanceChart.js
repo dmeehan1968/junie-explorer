@@ -350,9 +350,9 @@ document.addEventListener('DOMContentLoaded', function() {
       // Initialize chart when first expanded
       setTimeout(() => {
         const pathParts = window.location.pathname.split('/');
-        const projectName = pathParts[2];
-        const issueId = pathParts[4];
-        const taskId = pathParts[6];
+        const projectName = decodeURIComponent(pathParts[2]);
+        const issueId = decodeURIComponent(pathParts[4]);
+        const taskId = decodeURIComponent(pathParts[6]);
         
         const apiUrl = `/api/project/${encodeURIComponent(projectName)}/issue/${encodeURIComponent(issueId)}/task/${encodeURIComponent(taskId)}/trajectories/model-performance`;
         

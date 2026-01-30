@@ -154,9 +154,9 @@
       if (isExpanded && !initialized){
         setTimeout(function(){
           var parts = window.location.pathname.split('/')
-          var projectName = parts[2]
-          var issueId = parts[4]
-          var taskId = parts[6]
+          var projectName = decodeURIComponent(parts[2])
+          var issueId = decodeURIComponent(parts[4])
+          var taskId = decodeURIComponent(parts[6])
           var checkbox = document.getElementById('context-size-all-tasks-toggle')
           function buildApiUrl(){
             var base = '/api/project/' + encodeURIComponent(projectName) + '/issue/' + encodeURIComponent(issueId) + '/task/' + encodeURIComponent(taskId) + '/trajectories/context-size'

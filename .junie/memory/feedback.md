@@ -366,3 +366,11 @@
     "NEW INSTRUCTION": "WHEN unmerge button test fails on icon/attributes THEN update test to implemented icon file and attrs"
 }
 
+[2026-01-30 20:56] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "charts rendering",
+    "EXPECTATION": "The identified taskId/index issue was not the cause; trajectory charts still don't render and data endpoints fail. The user expects deeper debugging to find the real cause.",
+    "NEW INSTRUCTION": "WHEN charts remain blank after a proposed fix THEN inspect network requests and server logs and report exact failing endpoints and errors"
+}
+
