@@ -16,7 +16,7 @@ export const ToolUse = z.union([
     }),
     input: z.object({
       rawJsonObject: z.record(z.string(), z.any()),
-    }),
+    }).nullable(),
   }),
 ]).transform(toolUse => {
   if ('toolCallId' in toolUse) {

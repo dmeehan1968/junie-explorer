@@ -338,8 +338,25 @@ export abstract class Task {
     }
 
     // Log any parse errors using the standard format
+    const getAtPath = (obj: unknown, path: (string | number)[]): unknown => {
+      let current: unknown = obj
+      for (const key of path) {
+        if (current === null || current === undefined) return undefined
+        current = (current as Record<string | number, unknown>)[key]
+      }
+      return current
+    }
+
     for (const err of errors) {
-      console.log('EventParserError', util.inspect(err, { depth: null, colors: true }))
+      const element = getAtPath(err.json, err.path)
+      console.log('EventParserError', util.inspect({
+        eventsFile: err.eventsFile,
+        lineNumber: err.lineNumber,
+        message: err.message,
+        path: err.path,
+        invalidElement: element,
+        context: err.json,
+      }, { depth: null, colors: true }))
     }
 
     // match LlmResponseEvent to their LlmRequestEvents

@@ -877,3 +877,14 @@
     "PROJECT NOTE": "Consider committing the post as docs/release-notes/<version>.md or updating CHANGELOG.md.",
     "NEW INSTRUCTION": "WHEN task requires a written deliverable for the repo THEN create a markdown file with the draft and request review in comments"
 }
+
+[2026-01-30 16:43] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "ask_user, propose tests",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Unnecessary approval step before a simple localized logging change.",
+    "PROJECT NOTE": "EventParserError shape is defined in src/workers/loadEventsOutput.ts.",
+    "NEW INSTRUCTION": "WHEN task requests narrowing EventParserError logging THEN implement inline path extractor and log element plus context"
+}
+
