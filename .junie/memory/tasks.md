@@ -1,73 +1,3 @@
-[2025-12-03 09:10] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project,locate aggregation logic,update data prep,run tests,manually verify chart",
-    "BOTTLENECK": "Aggregation logic for cumulative tokens was not targeted or adjusted.",
-    "PROJECT NOTE": "prepareLlmEventGraphData likely computes cumulative series; exclude cacheInputTokens there while keeping cacheCreateInputTokens.",
-    "NEW INSTRUCTION": "WHEN cumulative token aggregation includes cacheInputTokens THEN modify prepareLlmEventGraphData to omit it"
-}
-
-[2025-12-03 11:22] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "summary and confirmation",
-    "MISSING STEPS": "add tests",
-    "BOTTLENECK": "Client-side provider default selection lacks automated tests.",
-    "PROJECT NOTE": "Cumulative Tokens was already hidden; only Cumulative Cost needed hiding.",
-    "NEW INSTRUCTION": "WHEN modifying provider default selection THEN add a test for Agent-first and all fallback"
-}
-
-[2025-12-03 11:34] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project, update chart logic, run app, verify behavior",
-    "BOTTLENECK": "Metric toggle logic overwrote series default hidden state.",
-    "PROJECT NOTE": "updateDatasetVisibility should respect originalChartData.datasets[i].hidden so cumulative cost stays hidden.",
-    "NEW INSTRUCTION": "WHEN metric toggle updates dataset visibility THEN Preserve each dataset's initial hidden state unless user toggles legend."
-}
-
-[2025-12-03 11:37] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project, update toggle logic, add tests, run app",
-    "BOTTLENECK": "Treated all originally hidden datasets as permanently hidden, including non-cumulative tokens.",
-    "PROJECT NOTE": "Token datasets are hidden by default in prepareLlmEventGraphData.tsx; mark cumulative explicitly and override hidden on toggle.",
-    "NEW INSTRUCTION": "WHEN toggling metric type THEN unhide selected-group datasets except those marked cumulative"
-}
-
-[2025-12-03 12:00] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "verify findings, open file fully, broaden search, cross-check identifiers",
-    "BOTTLENECK": "Claimed usages without confirming any references beyond the schema file.",
-    "PROJECT NOTE": "Search found only the schema file; actual cross-references were not evidenced.",
-    "NEW INSTRUCTION": "WHEN search returns only defining file THEN broaden queries and confirm usages before summarizing"
-}
-
-[2025-12-03 13:02] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "apply code changes,add tests,update documentation,run build",
-    "MISSING STEPS": "confirm requirements,design data contract,design toggle UX,plan filtering by selection,consider performance,cite file touchpoints",
-    "BOTTLENECK": "Misread an explanatory request as an implementation task.",
-    "PROJECT NOTE": "Graph data comes from /api/projects/graph; jbai in LlmResponseEvent.answer.llm.jbai.",
-    "NEW INSTRUCTION": "WHEN request is to explain or design, not implement THEN propose high-level plan, API shape, and UI changes only"
-}
-
-[2025-12-03 13:47] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "update docs",
-    "MISSING STEPS": "-",
-    "BOTTLENECK": "Snapshot updates were required after visual changes to the chart.",
-    "PROJECT NOTE": "-",
-    "NEW INSTRUCTION": "WHEN chart visuals change THEN run E2E with --update-snapshots after verifying diffs"
-}
-
 [2025-12-03 18:21] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "near-optimal",
@@ -876,4 +806,74 @@
     "BOTTLENECK": "No end-to-end browser verification to reconcile API responses with chart code.",
     "PROJECT NOTE": "Trajectories page includes taskActionChart.js but not taskEventChart.js referenced by collapsibleSections.",
     "NEW INSTRUCTION": "WHEN charts are blank on trajectories page THEN open DevTools, verify API responses match chart code and script includes"
+}
+
+[2026-01-31 18:07] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "update README, add scripts",
+    "MISSING STEPS": "run tests, run build",
+    "BOTTLENECK": "Waiting for user confirmation delayed starting implementation.",
+    "PROJECT NOTE": "Use bun from repository root; ensure tests/build pass before tagging.",
+    "NEW INSTRUCTION": "WHEN planning to create a git tag THEN run tests and build from repository root"
+}
+
+[2026-01-31 18:24] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "repeat status updates,repeat confirmation,duplicate file open/search",
+    "MISSING STEPS": "add scripts,edit SKILL.md,validate skill,package skill,include test/build step in instructions",
+    "BOTTLENECK": "Excess confirmation stalled implementation after requirements were clear.",
+    "PROJECT NOTE": "Ensure release workflow runs tests and build from repo root before tagging (bun).",
+    "NEW INSTRUCTION": "WHEN user confirms skill scope or requests scripts THEN create scripts, edit SKILL.md, validate and package"
+}
+
+[2026-01-31 18:28] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "-",
+    "MISSING STEPS": "run tests, run build, verify clean working tree",
+    "BOTTLENECK": "Skipped tests/build and committed unintended files due to dirty working tree.",
+    "PROJECT NOTE": "From repo root, run bun test and bun run build before tagging.",
+    "NEW INSTRUCTION": "WHEN prepare_release script finishes THEN run tests and build, verify clean git status, then commit and tag"
+}
+
+[2026-01-31 18:31] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "seek confirmation,write tests,documentation update,extended TDD,long summary",
+    "MISSING STEPS": "create typescript file,implement conversion,add bun shebang,set executable permission,run bun validation,replace python script",
+    "BOTTLENECK": "Waiting for confirmation stalled implementation.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN task is single-file conversion with clear requirements THEN implement conversion and run bun"
+}
+
+[2026-01-31 18:33] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "ask confirmation,update docs",
+    "MISSING STEPS": "read full script,implement CLI,add shebang,update package.json,update changelog,get git data,run bun install,replace python script,end-to-end test",
+    "BOTTLENECK": "Did not review full Python script, leading to missing end-to-end features.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN file viewer indicates truncated content THEN scroll down to read entire file"
+}
+
+[2026-01-31 18:35] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "scan project",
+    "MISSING STEPS": "run tests, run build, verify clean working tree",
+    "BOTTLENECK": "Skipped running tests and build before tagging the release.",
+    "PROJECT NOTE": "Run tests and build from the repository root before tagging; ensure bun.lock and unrelated changes are handled and the working tree is clean.",
+    "NEW INSTRUCTION": "WHEN about to create a release tag THEN run tests and build from repo root and abort on failure"
+}
+
+[2026-01-31 19:11] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "present summary, ask approval, run tests, update README",
+    "MISSING STEPS": "update package.json, update changelog, run bun install, commit changes, add tag",
+    "BOTTLENECK": "Waiting for user approval instead of executing release steps.",
+    "PROJECT NOTE": "Use bun install to update bun.lock and create tag with v prefix.",
+    "NEW INSTRUCTION": "WHEN release plan matches documented workflow THEN update versions, edit changelog, run bun install, commit and tag"
 }

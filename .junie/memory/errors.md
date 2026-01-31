@@ -318,3 +318,13 @@
     "NEW INSTRUCTION": "WHEN server logs show SIGTERM after pkill THEN start server anew and wait for readiness before curl"
 }
 
+[2026-01-31 18:41] - Updated by Junie - Error analysis
+{
+    "TYPE": "invalid args",
+    "TOOL": "agent_skill_read_doc",
+    "ERROR": "Skill 'release-version' not found; documentation path null",
+    "ROOT CAUSE": "The agent requested documentation for a skill name that is not registered.",
+    "PROJECT NOTE": "Skills are project-registered; list available skills in this repo before selecting one.",
+    "NEW INSTRUCTION": "WHEN agent_skill_read_doc reports skill not found THEN list available skills and choose a valid name"
+}
+
