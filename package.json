@@ -1,6 +1,6 @@
 {
   "name": "junie-explorer",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "author": "Dave Meehan <dave_meehan@replicated.co.uk>",
   "license": "SEE LICENSE IN LICENCE",
   "description": "Utility App for drilling into log files for JetBrains Junie",

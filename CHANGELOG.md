@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.1] - 2026-01-31
+### Fixed
+- Fix AIA trajectory charts by decoding path segments in API requests and ensure consistent task initialization (1cefea1)
+
+### Changed
+- Refactor `Task` into abstract base with `ChainTask` and `AiaTask` implementations (db6e90e)
+- Refactor `Issue` class into abstract base and create `ChainIssue`/`AiaIssue` implementations (a6f8469)
+- Introduce issue discovery service architecture (a0d06a5)
+- Improve `EventParserError` logging and update schema nullability (fac1fcb)
+- Enhance schema support for `toolCallId` and streamline transformations (7d1ef97)
+- Add `toolCallId` and enhanced `name` handling in `ActionToExecute` schema (ba15c3d)
+- Add `ToolParams` optional support and enhanced `name` handling in schema (ab07f4b, 086dac2)
+- Update `llmRequestEvent` schema to support fallback for `reasoning_effort` (da6dad6)
+- Update Playwright tests for unmerge button and dialog handling (d7748d1)
+
+### Added
+- Add `OpenAI52Codex` support to schema and transformer (cb5cae7)
+- Add `SystemAdmin` to `AgentType` and update detection logic (d335ba9)
+- Add IntelliJ IDEA project configuration file (76a1d1e)
+- Default `rawJsonObject` to empty object in `toolUse.input` (a028c6f)
+
+### Removed
+- Remove search feature specification for issues table (5ffef8b)
+
 ## [3.8.0] - 2025-12-18
 ### Added
 - Add inline issue description editing and persistence (4a4050b, 006f39b, 47d4eea)
