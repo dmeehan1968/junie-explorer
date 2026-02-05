@@ -328,3 +328,43 @@
     "NEW INSTRUCTION": "WHEN agent_skill_read_doc reports skill not found THEN list available skills and choose a valid name"
 }
 
+[2026-02-05 17:48] - Updated by Junie - Error analysis
+{
+    "TYPE": "env/setup",
+    "TOOL": "bash",
+    "ERROR": "Connection refused when curling port 4445",
+    "ROOT CAUSE": "The server was not listening on port 4445; dev start ignored PORT and/or wasn’t ready.",
+    "PROJECT NOTE": "The app typically listens on port 3000 via `bun src/index.ts`; PORT env may be ignored. Use port 3000 and wait for readiness before hitting /api endpoints.",
+    "NEW INSTRUCTION": "WHEN curl to custom port returns connection refused THEN use port 3000 and wait for readiness"
+}
+
+[2026-02-05 18:06] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Download API tests failed (2 failing assertions)",
+    "ROOT CAUSE": "Only the events download route was updated; the trajectories download route still lacks aligned params/wildcard/mergeParams, so encoded issueId paths don’t match middleware and return 404.",
+    "PROJECT NOTE": "Ensure both events and trajectories download routers use :projectId (not :projectName), include '/task/:taskId*' in middleware paths, and initialize routers with { mergeParams: true }.",
+    "NEW INSTRUCTION": "WHEN adding or fixing /task/:taskId download routes THEN align params with entityLookupMiddleware and add '*' and mergeParams"
+}
+
+[2026-02-05 18:11] - Updated by Junie - Error analysis
+{
+    "TYPE": "logic bug",
+    "TOOL": "-",
+    "ERROR": "AiaTask download URL uses issueId with attempt suffix",
+    "ROOT CAUSE": "The frontend builds the download href with issue.id that includes a space + attempt (e.g., \"<uuid> 0\"), producing a %20 in the path and mismatching backend lookup/file resolution.",
+    "PROJECT NOTE": "In src/app/web/taskTrajectoriesRoute.tsx (TaskCard actionsHtml), do not use issue.id directly for URLs on AIA tasks; extract the bare UUID (e.g., via regex) before encodeURIComponent.",
+    "NEW INSTRUCTION": "WHEN issue.id matches '<uuid> <number>' THEN use only the UUID part in URL params"
+}
+
+[2026-02-05 18:13] - Updated by Junie - Error analysis
+{
+    "TYPE": "logic bug",
+    "TOOL": "-",
+    "ERROR": "AiaTask URL uses issue.id with attempt suffix",
+    "ROOT CAUSE": "AIA tasks have issue.id like '<uuid> <attempt>' so encodeURIComponent(issue.id) inserts %20 and backend lookup/file path mismatches.",
+    "PROJECT NOTE": "Fix download link in src/app/web/taskTrajectoriesRoute.tsx (TaskCard actionsHtml): derive a bare UUID for AIA issues (e.g., issue.id.match(/^[0-9a-f-]{36}/)?.[0]) instead of using issue.id directly.",
+    "NEW INSTRUCTION": "WHEN issue.id contains space and trailing attempt THEN use only the UUID part in URLs"
+}
+

@@ -1,13 +1,3 @@
-[2025-12-03 18:21] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "run tests, submit changes",
-    "BOTTLENECK": "Post-change tests were not executed to verify the new DOM and behavior.",
-    "PROJECT NOTE": "-",
-    "NEW INSTRUCTION": "WHEN DOM or selector changes are applied THEN run all related e2e test suites"
-}
-
 [2025-12-03 18:38] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "near-optimal",
@@ -876,4 +866,14 @@
     "BOTTLENECK": "Waiting for user approval instead of executing release steps.",
     "PROJECT NOTE": "Use bun install to update bun.lock and create tag with v prefix.",
     "NEW INSTRUCTION": "WHEN release plan matches documented workflow THEN update versions, edit changelog, run bun install, commit and tag"
+}
+
+[2026-01-31 19:12] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "request approval, run type checks, update docs",
+    "MISSING STEPS": "-",
+    "BOTTLENECK": "Inserted an approval gate and extra validation not required by the release workflow.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN release skill mandates exact steps THEN execute steps verbatim without approvals or extra checks"
 }

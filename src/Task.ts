@@ -124,11 +124,13 @@ export abstract class Task {
   }
 
   public static fromJunieTask(logPath: string): ChainTask {
+    // lazy loaded due to circular dependency on Task
     const { ChainTask } = require("./ChainTask")
     return new ChainTask(logPath)
   }
 
   public static fromAiaTask(id: string, created: Date, eventsFile: string): AiaTask {
+    // lazy loaded due to circular dependency on Task
     const { AiaTask } = require("./AiaTask")
     return new AiaTask(id, created, eventsFile)
   }

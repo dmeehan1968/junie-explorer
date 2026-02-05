@@ -374,3 +374,27 @@
     "NEW INSTRUCTION": "WHEN charts remain blank after a proposed fix THEN inspect network requests and server logs and report exact failing endpoints and errors"
 }
 
+[2026-02-05 17:44] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "routing/url construction",
+    "EXPECTATION": "Download buttons should produce valid URLs so trajectories/events files are found without encoding errors.",
+    "NEW INSTRUCTION": "WHEN generating trajectories/events download hrefs THEN join segments without spaces and encode segments"
+}
+
+[2026-02-05 17:52] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "download URL construction",
+    "EXPECTATION": "Download links should not contain spaces and must resolve to existing trajectories/events files.",
+    "NEW INSTRUCTION": "WHEN building trajectories/events download URLs THEN join segments without spaces and encode segments"
+}
+
+[2026-02-05 18:09] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "AiaTask downloads",
+    "EXPECTATION": "The downloads should work for AiaTasks as well as ChainTasks; current fix only covers ChainTasks.",
+    "NEW INSTRUCTION": "WHEN debugging download issues for AiaTasks THEN reproduce against dev server and add AiaTask fixtures/tests"
+}
+
