@@ -3,6 +3,7 @@
 // and then use a discriminated union to parse them so that the output type narrows correctly.
 import * as z from "zod"
 import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
+import { AnthropicClaude46Opus } from "./anthropicClaude46Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
@@ -139,6 +140,9 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   }
   if (AnthropicClaude45Opus.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(AnthropicClaude45Opus, data, ctx)
+  }
+  if (AnthropicClaude46Opus.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return safeParseOrAddIssues(AnthropicClaude46Opus, data, ctx)
   }
   if (OpenAI5.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI5, {

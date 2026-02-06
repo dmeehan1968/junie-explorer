@@ -1,5 +1,6 @@
 import * as z from "zod"
 import { AnthropicClaude45Opus } from "./anthropicClaude45Opus"
+import { AnthropicClaude46Opus } from "./anthropicClaude46Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
@@ -33,6 +34,7 @@ const LLMDiscriminatedUnion = z.discriminatedUnion('jbai', [
   AnthropicSonnet4,
   AnthropicSonnet45,
   AnthropicClaude45Opus,
+  AnthropicClaude46Opus,
   Gemini3Flash,
   Gemini3Pro,
   Grok41Fast,
