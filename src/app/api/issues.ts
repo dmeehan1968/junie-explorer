@@ -109,10 +109,23 @@ router.post("/api/projects/:projectName/issues/:issueId/unmerge", async (req: Ap
 
   const taskIds = [...tasks.keys()]
 
+  if (req.jetBrains.issueDescriptionStore) {
+    // Clear custom description for the merged issue itself
+    await req.jetBrains.issueDescriptionStore.setDescription(issueId!, "", issue.name)
+    
+    // Clear custom descriptions for all constituent tasks
+    for (const taskId of taskIds) {
+      // Each taskId represents what was/will be an individual issue
+      // We don't have the individual issue objects yet, but we know their IDs match taskIds
+      await req.jetBrains.issueDescriptionStore.setDescription(taskId, "", "")
+    }
+  }
+
   for (const taskId of taskIds) {
     await req.jetBrains.taskIssueMapStore.removeMapping(taskId)
   }
 
+  // Reload the project to restore the original issues
   project.reload()
 
   res.json({
