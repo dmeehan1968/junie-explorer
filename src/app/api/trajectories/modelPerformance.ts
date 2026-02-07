@@ -57,7 +57,7 @@ router.get('/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/mod
             return choice.content.length <= maxLabelLength ? choice.content : choice.content.substring(0, (maxLabelLength/2)-2) + ' ... ' + choice.content.substring(choice.content.length - (maxLabelLength/2)-2);
           } else if (choice.type === AIToolUseAnswerChoice.shape.type.value) {
             return choice.usages.map(usage => {
-              const params = JSON.stringify(usage.toolParams?.rawJsonObject)
+              const params = JSON.stringify(usage.toolParams?.rawJsonObject) ?? 'undefined'
               const trimmedParams = params.length <= maxLabelLength ? params : params.substring(0, (maxLabelLength/2)-2) + ' ... ' + params.substring(params.length - (maxLabelLength/2)-2);
               return usage.toolName + ' ' + trimmedParams
             }).join(', ')
