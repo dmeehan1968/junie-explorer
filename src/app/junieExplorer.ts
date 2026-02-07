@@ -31,6 +31,7 @@ export class JunieExplorer {
     // middleware
     this.app.use(cookieParser())
     this.app.use(express.json())
+    // this.app.use(express.static('public'))
     this.app.use(async (req: AppRequest, res: AppResponse, next: NextFunction) => {
       req.jetBrains = jetBrains
       next()

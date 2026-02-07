@@ -408,3 +408,43 @@
     "NEW INSTRUCTION": "WHEN Playwright shows all tests passed but wrapper exits 1 THEN run bunx playwright test directly"
 }
 
+[2026-02-07 19:17] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Playwright timed out reading description text",
+    "ROOT CAUSE": "The test queried description elements before the issues table finished rendering.",
+    "PROJECT NOTE": "After navigateToProject, the issues table populates asynchronously; wait for 'tr[data-issue-id]' or 'span.description-text' to appear before accessing rows/cells.",
+    "NEW INSTRUCTION": "WHEN navigating to a project in Playwright THEN wait for 'tr[data-issue-id]' to be visible before querying"
+}
+
+[2026-02-07 19:17] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Playwright timed out on missing selector",
+    "ROOT CAUSE": "The test looked for 'span.description-text' which doesn't exist; the title is rendered as an anchor.",
+    "PROJECT NOTE": "IssueRow renders the title as <a data-testid=\"issue-description-link\">…</a> (see src/components/issueRow.tsx), not a span.description-text.",
+    "NEW INSTRUCTION": "WHEN selecting issue title in Playwright THEN use a[data-testid=\"issue-description-link\"]"
+}
+
+[2026-02-07 19:17] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Playwright timed out locating description selector",
+    "ROOT CAUSE": "The test queried 'span.description-text' which doesn't exist in the DOM, causing a timeout.",
+    "PROJECT NOTE": "In src/components/issueRow.tsx the title is rendered as <a data-testid=\"issue-description-link\">; prefer data-testid selectors over ad-hoc classes.",
+    "NEW INSTRUCTION": "WHEN a locator times out for a selector THEN inspect component markup and use existing data-testids"
+}
+
+[2026-02-07 19:19] - Updated by Junie - Error analysis
+{
+    "TYPE": "invalid args",
+    "TOOL": "multi_edit",
+    "ERROR": "Truncated multi_edit request caused invalid edits payload",
+    "ROOT CAUSE": "The third search/replace block was cut off, producing an incomplete edits array that the tool could not apply.",
+    "PROJECT NOTE": "Before editing public/js/issueMerge.js, open the full file to copy exact search strings and apply smaller, verifiable replacements.",
+    "NEW INSTRUCTION": "WHEN making multiple changes with multi_edit THEN split into small search_replace steps and verify"
+}
+

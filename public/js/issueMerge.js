@@ -21,14 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
   
   updateMergeButtonVisibility()
   
-  const handleMerge = async (targetIssueId, sourceIssueId, projectName) => {
+  const handleMerge = async (targetIssueId, sourceIssueId, projectName, targetTitle) => {
     try {
       const response = await fetch(`/api/projects/${encodeURIComponent(projectName)}/issues/${encodeURIComponent(targetIssueId)}/merge`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ sourceIssueId })
+        body: JSON.stringify({ sourceIssueId, targetTitle })
       })
       
       if (!response.ok) {
@@ -81,9 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const sourceIssueId = row.dataset.issueId
         const targetIssueId = prevRow.dataset.issueId
         const projectName = mergeUpBtn.dataset.projectName
+        const targetTitle = row.querySelector('[data-testid="issue-description-link"]')?.textContent?.trim()
         
         if (confirm(`Merge this issue into the issue above?`)) {
-          handleMerge(targetIssueId, sourceIssueId, projectName)
+          handleMerge(targetIssueId, sourceIssueId, projectName, targetTitle)
         }
       }
       return
@@ -101,9 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const sourceIssueId = nextRow.dataset.issueId
         const targetIssueId = row.dataset.issueId
         const projectName = mergeDownBtn.dataset.projectName
+        const targetTitle = row.querySelector('[data-testid="issue-description-link"]')?.textContent?.trim()
         
         if (confirm(`Merge the issue below into this issue?`)) {
-          handleMerge(targetIssueId, sourceIssueId, projectName)
+          handleMerge(targetIssueId, sourceIssueId, projectName, targetTitle)
         }
       }
       return

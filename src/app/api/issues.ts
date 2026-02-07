@@ -37,7 +37,7 @@ router.put("/api/issues/:issueId/description", async (req: AppRequest, res: AppR
 
 router.post("/api/projects/:projectName/issues/:issueId/merge", async (req: AppRequest, res: AppResponse) => {
   const { projectName, issueId } = req.params
-  const { sourceIssueId } = req.body as { sourceIssueId?: string }
+  const { sourceIssueId, targetTitle } = req.body as { sourceIssueId?: string; targetTitle?: string }
 
   if (!req.jetBrains) {
     return res.status(500).json({ error: "JetBrains instance not available" })
@@ -65,6 +65,10 @@ router.post("/api/projects/:projectName/issues/:issueId/merge", async (req: AppR
   const targetIssue = await project.mergeIssues(issueId!, sourceIssueId)
   if (!targetIssue) {
     return res.status(400).json({ error: "Could not merge issues. Both issues must be AIA issues." })
+  }
+
+  if (targetTitle && req.jetBrains.issueDescriptionStore) {
+    await req.jetBrains.issueDescriptionStore.setDescription(issueId!, targetTitle, targetIssue.name)
   }
 
   const tasks = await targetIssue.tasks

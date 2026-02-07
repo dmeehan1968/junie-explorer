@@ -1,23 +1,3 @@
-[2025-12-03 19:27] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "ask_user, update docs",
-    "MISSING STEPS": "open entire file, implement feature, update test dsl, run tests",
-    "BOTTLENECK": "Tests were authored before inspecting the full TaskCard source to align selectors and structure.",
-    "PROJECT NOTE": "Expose stable data-testids for the tabs header and description toggle to match DSL/tests.",
-    "NEW INSTRUCTION": "WHEN starting TaskCard UI change THEN open_entire_file taskCard.tsx and related components"
-}
-
-[2025-12-03 19:33] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "adjust tabs styling, position toggle overlay, manual verify UI",
-    "BOTTLENECK": "Insufficient visual styling details for tab states and toggle placement.",
-    "PROJECT NOTE": "ToggleComponent needs explicit top-right positioning; tabs need per-item borders and contrasting backgrounds beyond tabs-boxed.",
-    "NEW INSTRUCTION": "WHEN tabs render as a single full-width block THEN apply per-tab borders, distinct active/inactive backgrounds, and top-right toggle positioning"
-}
-
 [2025-12-03 19:36] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
@@ -878,3 +858,12 @@
     "NEW INSTRUCTION": "WHEN document-level click delegation handles merge or unmerge THEN remove button stopPropagation; guard parent onclick to ignore buttons and inputs"
 }
 
+[2026-02-07 19:21] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "modify API,update backend merge logic,update documentation",
+    "MISSING STEPS": "scan project,update merge down handler,reuse existing setDescription endpoint,add test for merge down",
+    "BOTTLENECK": "Expanded scope by altering API instead of using existing description update.",
+    "PROJECT NOTE": "There is already an endpoint to set an issue description; use it post-merge.",
+    "NEW INSTRUCTION": "WHEN merge action completes THEN set target description to clicked title via existing endpoint"
+}

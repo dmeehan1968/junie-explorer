@@ -430,3 +430,19 @@
     "NEW INSTRUCTION": "WHEN row has click-to-navigate THEN add control click handlers to stop propagation and run action"
 }
 
+[2026-02-07 19:15] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "merge title source",
+    "EXPECTATION": "When merging from an issue row, the merged issue's title should use the clicked issue's title, not the most recent issue's title.",
+    "NEW INSTRUCTION": "WHEN merging issues from an issue row click THEN set merged title to clicked issue's title"
+}
+
+[2026-02-07 19:25] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "unmerge title restoration",
+    "EXPECTATION": "On unmerging, each resulting issue should regain its original title, not retain the merged title.",
+    "NEW INSTRUCTION": "WHEN unmerging issues THEN restore each split issue's original stored title"
+}
+

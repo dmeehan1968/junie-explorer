@@ -17,6 +17,7 @@ all projects across IDE's found on the system.
 - Task descriptions are constrained to a readable height (around 200px) with an expand/collapse toggle for long content, with tests ensuring the max-height and toggle behavior remain consistent
 - Trajectories view includes a **Show All Diffs** toggle that controls whether message diffs include all messages or respect the model-specific `rewind` trimming
 - LLM model parsing recognizes OpenAI GPT-5.2 (`openai-gpt-5-2`) in addition to existing supported models
+- Merging issues preserves the title of the issue that was clicked (the "acting" issue) instead of defaulting to the most recent issue's title
 - Includes a refresh button to update the data
 - Responsive web interface
 - Persists selected projects via cookies (migrated from local storage)
