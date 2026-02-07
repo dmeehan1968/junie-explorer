@@ -1,23 +1,3 @@
-[2025-12-03 18:38] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "run tests, manual verify UI",
-    "BOTTLENECK": "Changes were not validated after refactor.",
-    "PROJECT NOTE": "Ensure tabs-lifted visually connects with bg-base-200; adjust borders if needed.",
-    "NEW INSTRUCTION": "WHEN modifying UI layout or moving components THEN run affected E2E tests and fix regressions"
-}
-
-[2025-12-03 18:45] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project, review code",
-    "BOTTLENECK": "Jumped to search-replace without validating current class structure.",
-    "PROJECT NOTE": "Use DaisyUI --tab-border-color and Tailwind text-lg in TaskCard tabs; avoid editing public/app.css.",
-    "NEW INSTRUCTION": "WHEN modifying TaskCard tab appearance THEN inspect taskCard.tsx, then adjust classes and CSS variables only"
-}
-
 [2025-12-03 19:19] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
@@ -876,4 +856,14 @@
     "BOTTLENECK": "Inserted an approval gate and extra validation not required by the release workflow.",
     "PROJECT NOTE": "-",
     "NEW INSTRUCTION": "WHEN release skill mandates exact steps THEN execute steps verbatim without approvals or extra checks"
+}
+
+[2026-02-07 18:28] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "create new e2e test file,rename test to .spec and run bun test,repeat test runs after SIGKILL,attempt typecheck after repeated SIGKILL,plan README update",
+    "MISSING STEPS": "extend existing IssueRow test suite,ask user to run tests locally,validate behavior with manual browser check",
+    "BOTTLENECK": "Playwright and TypeScript commands were repeatedly killed, blocking verification.",
+    "PROJECT NOTE": "Add navigation test to src/components/issueRow.pw.ts instead of introducing a new spec to match existing runner setup.",
+    "NEW INSTRUCTION": "WHEN Playwright tests fail twice due to SIGKILL THEN ask_user to run the suite locally"
 }

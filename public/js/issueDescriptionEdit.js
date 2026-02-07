@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       input.addEventListener('keydown', async (e) => {
         if (e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
           cancelEditing(originalContent)
         } else if (e.key === 'Enter') {
           e.preventDefault()

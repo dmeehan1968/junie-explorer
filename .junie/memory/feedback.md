@@ -398,3 +398,19 @@
     "NEW INSTRUCTION": "WHEN debugging download issues for AiaTasks THEN reproduce against dev server and add AiaTask fixtures/tests"
 }
 
+[2026-02-07 18:48] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "keyboard handling",
+    "EXPECTATION": "While editing an issue description, pressing Escape should only cancel the edit and must not exit fullscreen or trigger global handlers.",
+    "NEW INSTRUCTION": "WHEN Escape pressed while editing description THEN prevent default and stop propagation; cancel edit only"
+}
+
+[2026-02-07 18:52] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "keyboard handling",
+    "EXPECTATION": "While editing an issue description, pressing Escape should only cancel the edit and must not exit fullscreen or trigger global handlers.",
+    "NEW INSTRUCTION": "WHEN Escape pressed in description edit input THEN prevent default and stop propagation"
+}
+

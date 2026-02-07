@@ -51,6 +51,10 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
         data-issue-description-editable="true"
         data-issue-id={issue.id}
         data-original-description={escapeHtml(issue.name)}
+        role="link"
+        tabindex="0"
+        onclick={`window.location.href='${href}'`}
+        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         <div class="flex items-start gap-2">
           <div class="flex-1">
@@ -58,7 +62,6 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
               class="font-bold text-primary"
               href={href}
               data-testid="issue-description-link"
-              onclick="event.stopPropagation()"
             >
               {escapeHtml(displayName)}
             </a>

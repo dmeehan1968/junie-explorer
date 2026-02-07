@@ -198,6 +198,7 @@ This will run the Playwright test suite.  You can add Playwright CLI arguments t
 `bun run test --grep <pattern>` to run tests that match the specified pattern. 
 
 **Recent Fixes**:
+- Prevented the browser from exiting full-screen mode when pressing the `Escape` key to cancel an inline issue description edit.
 - Resolved an issue in `IssueRow` Playwright tests where multiple `dialog` event listeners were conflicting, causing "already handled" errors. Tests now use `page.once('dialog')` for more reliable interaction with confirmation dialogs.
 - Updated `IssueRow` tests to align with the implementation of the unmerge button, which uses an `img` tag instead of an `svg` element for its icon.
 

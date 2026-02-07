@@ -368,3 +368,23 @@
     "NEW INSTRUCTION": "WHEN issue.id contains space and trailing attempt THEN use only the UUID part in URLs"
 }
 
+[2026-02-07 18:27] - Updated by Junie - Error analysis
+{
+    "TYPE": "env/setup",
+    "TOOL": "bash",
+    "ERROR": "Playwright run was killed by SIGKILL",
+    "ROOT CAUSE": "Launching Playwright browsers exceeded environment resource limits, triggering a forced kill.",
+    "PROJECT NOTE": "When running Playwright locally/CI, limit workers and narrow scope to a file or test title to reduce resource usage.",
+    "NEW INSTRUCTION": "WHEN invoking Playwright via bash THEN add --workers=1 and run a single test file"
+}
+
+[2026-02-07 18:28] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Used Bun test runner for Playwright tests",
+    "ROOT CAUSE": "The test file was executed with `bun test`, which conflicts with Playwright's test runner and caused a suite initialization error.",
+    "PROJECT NOTE": "Playwright E2E tests in this repo run via `bunx playwright test` (files often end with .pw.ts); Bun's test runner is for unit tests only.",
+    "NEW INSTRUCTION": "WHEN running a .pw.ts Playwright file THEN use bunx playwright test --workers=1 <file>"
+}
+
