@@ -19,6 +19,8 @@ all projects across IDE's found on the system.
 - LLM model parsing recognizes OpenAI GPT-5.2 (`openai-gpt-5-2`) in addition to existing supported models
 - Merging issues preserves the title of the issue that was clicked (the "acting" issue) instead of defaulting to the most recent issue's title
 - Unmerging issues restores their original titles by clearing custom descriptions
+- Displays a loading indicator during merge and unmerge operations to provide feedback during long-running background tasks
+- Optimized backend unmerge performance by batching database operations
 - Includes a refresh button to update the data
 - Responsive web interface
 - Persists selected projects via cookies (migrated from local storage)

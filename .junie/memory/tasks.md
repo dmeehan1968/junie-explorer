@@ -867,3 +867,14 @@
     "PROJECT NOTE": "There is already an endpoint to set an issue description; use it post-merge.",
     "NEW INSTRUCTION": "WHEN merge action completes THEN set target description to clicked title via existing endpoint"
 }
+
+[2026-02-07 19:34] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "near-optimal",
+    "REDUNDANT STEPS": "create benchmark",
+    "MISSING STEPS": "verify in browser,update docs",
+    "BOTTLENECK": "Full project reload after unmerge causes 2–3s delay.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN user-visible behavior is changed THEN run app and verify workflow end-to-end"
+}
+

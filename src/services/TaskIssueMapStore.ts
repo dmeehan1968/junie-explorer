@@ -55,12 +55,20 @@ export class TaskIssueMapStore {
       .map(([taskId]) => taskId)
   }
 
-  async removeMapping(taskId: string): Promise<void> {
+  async removeMappings(taskIds: string[]): Promise<void> {
     const data = await this.readData()
 
-    if (data.mappings && taskId in data.mappings) {
-      delete data.mappings[taskId]
-      await this.writeData(data)
+    if (data.mappings) {
+      let changed = false
+      for (const taskId of taskIds) {
+        if (taskId in data.mappings) {
+          delete data.mappings[taskId]
+          changed = true
+        }
+      }
+      if (changed) {
+        await this.writeData(data)
+      }
     }
   }
 

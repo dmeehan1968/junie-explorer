@@ -121,9 +121,7 @@ router.post("/api/projects/:projectName/issues/:issueId/unmerge", async (req: Ap
     }
   }
 
-  for (const taskId of taskIds) {
-    await req.jetBrains.taskIssueMapStore.removeMapping(taskId)
-  }
+  await req.jetBrains.taskIssueMapStore.removeMappings(taskIds)
 
   // Reload the project to restore the original issues
   project.reload()

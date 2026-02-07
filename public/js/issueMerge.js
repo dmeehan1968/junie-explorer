@@ -21,8 +21,19 @@ document.addEventListener('DOMContentLoaded', () => {
   
   updateMergeButtonVisibility()
   
+  const showLoading = () => {
+    const overlay = document.getElementById('loadingOverlay')
+    if (overlay) overlay.classList.remove('hidden')
+  }
+
+  const hideLoading = () => {
+    const overlay = document.getElementById('loadingOverlay')
+    if (overlay) overlay.classList.add('hidden')
+  }
+
   const handleMerge = async (targetIssueId, sourceIssueId, projectName, targetTitle) => {
     try {
+      showLoading()
       const response = await fetch(`/api/projects/${encodeURIComponent(projectName)}/issues/${encodeURIComponent(targetIssueId)}/merge`, {
         method: 'POST',
         headers: {
@@ -38,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       window.location.reload()
     } catch (error) {
+      hideLoading()
       console.error('Merge failed:', error)
       alert(`Failed to merge issues: ${error.message}`)
     }
@@ -45,13 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const handleUnmerge = async (issueId, projectName) => {
     try {
+      showLoading()
       const response = await fetch(`/api/projects/${encodeURIComponent(projectName)}/issues/${encodeURIComponent(issueId)}/unmerge`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         }
       })
-      
+
       if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || 'Failed to unmerge issue')
@@ -59,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       window.location.reload()
     } catch (error) {
+      hideLoading()
       console.error('Unmerge failed:', error)
       alert(`Failed to unmerge issue: ${error.message}`)
     }
