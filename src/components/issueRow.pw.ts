@@ -206,6 +206,7 @@ test.describe('IssueRow - AIA Issues', async () => {
     }
   })
 
+
   test('unmerge button has correct icon and attributes', async ({ page, issuesTable }) => {
     // Check if unmerge is visible (merged state) or we need to merge first
     const rows = await issuesTable.getAllRows()

@@ -1,13 +1,3 @@
-[2025-12-03 19:19] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "clarify requirements,add tests,update README,present summary,refactor",
-    "MISSING STEPS": "open file,implement UI changes,wire tab state,run app,verify visually,submit",
-    "BOTTLENECK": "Excessive planning and questions delayed straightforward UI implementation.",
-    "PROJECT NOTE": "Reuse ToggleComponent pattern from MessageDecorator and DaisyUI tabs connected to the card header in TaskCard.",
-    "NEW INSTRUCTION": "WHEN UI change is fully specified THEN edit target component immediately and verify visually"
-}
-
 [2025-12-03 19:27] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
@@ -867,3 +857,24 @@
     "PROJECT NOTE": "Add navigation test to src/components/issueRow.pw.ts instead of introducing a new spec to match existing runner setup.",
     "NEW INSTRUCTION": "WHEN Playwright tests fail twice due to SIGKILL THEN ask_user to run the suite locally"
 }
+
+[2026-02-07 19:06] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "inspect fixtures, run dev server, curl project page, probe jetbrains.ts",
+    "MISSING STEPS": "implement fix, run all tests, submit",
+    "BOTTLENECK": "Did not implement the actual fix in issueRow.tsx.",
+    "PROJECT NOTE": "Add onClick={e => e.stopPropagation()} to merge/unmerge (and similar) buttons inside clickable cells.",
+    "NEW INSTRUCTION": "WHEN buttons are inside a clickable row cell THEN add onClick to stopPropagation on buttons"
+}
+
+[2026-02-07 19:12] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "add stopPropagation to buttons",
+    "MISSING STEPS": "analyze event delegation, gate parent navigation, manual verify",
+    "BOTTLENECK": "Stopping propagation on buttons prevented document-level delegated handlers from firing.",
+    "PROJECT NOTE": "issueMerge.js uses document-level click delegation for merge/unmerge/edit controls.",
+    "NEW INSTRUCTION": "WHEN document-level click delegation handles merge or unmerge THEN remove button stopPropagation; guard parent onclick to ignore buttons and inputs"
+}
+

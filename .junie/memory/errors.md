@@ -388,3 +388,23 @@
     "NEW INSTRUCTION": "WHEN running a .pw.ts Playwright file THEN use bunx playwright test --workers=1 <file>"
 }
 
+[2026-02-07 19:03] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Playwright test failed: no issue rows found",
+    "ROOT CAUSE": "The new test assumes rows exist immediately after navigation without awaiting table render.",
+    "PROJECT NOTE": "Issues table renders asynchronously; after navigateToProject('default.999999'), wait for 'tr[data-issue-id]' to appear before querying rows.",
+    "NEW INSTRUCTION": "WHEN reading issuesTable rows in tests THEN wait for 'tr[data-issue-id]' to be visible first"
+}
+
+[2026-02-07 19:05] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Bun test script exited 1 though Playwright passed",
+    "ROOT CAUSE": "Using the repo's \"bun run test\" wrapper returned a non-zero code despite 7 passed, likely due to the wrapper/webserver lifecycle rather than test failures.",
+    "PROJECT NOTE": "Playwright E2E (.pw.ts) should be run via `bunx playwright test` directly; the test wrapper may return non-zero due to its server process handling.",
+    "NEW INSTRUCTION": "WHEN Playwright shows all tests passed but wrapper exits 1 THEN run bunx playwright test directly"
+}
+

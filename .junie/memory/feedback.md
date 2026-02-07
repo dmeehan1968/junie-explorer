@@ -414,3 +414,19 @@
     "NEW INSTRUCTION": "WHEN Escape pressed in description edit input THEN prevent default and stop propagation"
 }
 
+[2026-02-07 19:02] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "merge/unmerge navigation",
+    "EXPECTATION": "After confirming merge or unmerge, the app should not navigate to the issue; it should perform the action and keep the user on the current list.",
+    "NEW INSTRUCTION": "WHEN merge/unmerge is confirmed THEN preventDefault and stopPropagation; refresh issues without navigation"
+}
+
+[2026-02-07 19:10] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "click handling/navigation",
+    "EXPECTATION": "The whole issue row should navigate on click, except the selection checkbox and the edit/merge/unmerge buttons which must perform their actions without triggering navigation.",
+    "NEW INSTRUCTION": "WHEN row has click-to-navigate THEN add control click handlers to stop propagation and run action"
+}
+

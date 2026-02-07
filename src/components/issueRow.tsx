@@ -27,7 +27,12 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
   return (
     <tr
       data-issue-id={issue.id}
-      class="cursor-pointer hover:bg-accent! transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md">
+      class="cursor-pointer hover:bg-accent! transition-all duration-200 hover:translate-x-1 border-transparent hover:shadow-md"
+      role="link"
+      tabindex="0"
+      onclick={`if (!event.target.closest('button, input, a')) window.location.href='${href}'`}
+      onkeydown={`if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('button, input, a')) { event.preventDefault(); window.location.href='${href}'; }`}
+    >
       <Conditional condition={project.hasMetrics}>
         <td class="text-center align-top py-3 px-2">
           <input
@@ -41,7 +46,6 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
             data-cache-tokens={metrics.cacheTokens}
             data-cost={metrics.cost}
             data-time-ms={metrics.time}
-            onclick="event.stopPropagation()"
           />
         </td>
       </Conditional>
@@ -51,10 +55,6 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
         data-issue-description-editable="true"
         data-issue-id={issue.id}
         data-original-description={escapeHtml(issue.name)}
-        role="link"
-        tabindex="0"
-        onclick={`window.location.href='${href}'`}
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         <div class="flex items-start gap-2">
           <div class="flex-1">
@@ -73,7 +73,6 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
               class="btn btn-ghost btn-xs"
               data-testid="edit-description-btn"
               aria-label="Edit description"
-              onclick="event.stopPropagation()"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -133,10 +132,6 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
       <td
         class="text-left whitespace-nowrap"
         data-testid="issue-timestamp"
-        role="link"
-        tabindex="0"
-        onclick={`window.location.href='${href}'`}
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         {new Date(issue.created).toLocaleString(locale)}
       </td>
@@ -144,40 +139,24 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
         <td
           class="text-right whitespace-nowrap"
           data-testid="issue-input-tokens"
-          role="link"
-          tabindex="0"
-          onclick={`window.location.href='${href}'`}
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
         >
           {formatNumber(metrics.inputTokens)}
         </td>
         <td
           class="text-right whitespace-nowrap"
           data-testid="issue-output-tokens"
-          role="link"
-          tabindex="0"
-          onclick={`window.location.href='${href}'`}
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
         >
           {formatNumber(metrics.outputTokens)}
         </td>
         <td
           class="text-right whitespace-nowrap"
           data-testid="issue-cache-tokens"
-          role="link"
-          tabindex="0"
-          onclick={`window.location.href='${href}'`}
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
         >
           {formatNumber(metrics.cacheTokens)}
         </td>
         <td
           class="text-right whitespace-nowrap"
           data-testid="issue-cost"
-          role="link"
-          tabindex="0"
-          onclick={`window.location.href='${href}'`}
-          onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
         >
           {metrics.cost.toFixed(4)}
         </td>
@@ -185,30 +164,18 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
       <td
         class="text-right whitespace-nowrap"
         data-testid="issue-total-time"
-        role="link"
-        tabindex="0"
-        onclick={`window.location.href='${href}'`}
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         {formatSeconds(metrics.time / 1000)}
       </td>
       <td
         class="text-right whitespace-nowrap"
         data-testid="issue-status"
-        role="link"
-        tabindex="0"
-        onclick={`window.location.href='${href}'`}
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         <StatusBadge state={issue.state}/>
       </td>
       <td
         class="text-center whitespace-normal wrap-break-word align-middle py-3 px-2"
         data-testid="issue-assistant-providers"
-        role="link"
-        tabindex="0"
-        onclick={`window.location.href='${href}'`}
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         {assistantProviders.length ? (
           <div class="flex items-center justify-center gap-2">
@@ -233,10 +200,6 @@ export const IssueRow = async ({ issue, project, locale, customDescription }: {
       <td
         class="text-center whitespace-normal wrap-break-word align-middle py-3 px-2"
         data-testid="issue-agent"
-        role="link"
-        tabindex="0"
-        onclick={`window.location.href='${href}'`}
-        onkeydown={`if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${href}'}`}
       >
         {(() => {
           const agentIcon = issue.agentIcon
