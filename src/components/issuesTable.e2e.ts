@@ -83,9 +83,7 @@ test.describe('IssuesTable', async () => {
           await expect((row[cell] as Locator)).toBeVisible()
         }
         // Check that non-description cells have onclick handlers to navigate to trajectories
-        for(const cell of ["timestampCell", "inputTokensCell", "outputTokensCell", "cacheTokensCell", "costCell", "totalTimeCell", "statusCell", "assistantProvidersCell"] as (keyof IssueRowDSL)[]) {
-          await expect((row[cell] as Locator).getAttribute('onclick')).resolves.toMatch(/task\/0\/trajectories/)
-        }
+        await expect(row.element.getAttribute('onclick')).resolves.toMatch(/task\/0\/trajectories/)
 
         // Description cell should contain a link to the trajectories route and non-empty text
         const link = row.descriptionCell.locator('a')

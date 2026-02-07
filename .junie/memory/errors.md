@@ -448,3 +448,13 @@
     "NEW INSTRUCTION": "WHEN making multiple changes with multi_edit THEN split into small search_replace steps and verify"
 }
 
+[2026-02-07 19:47] - Updated by Junie - Error analysis
+{
+    "TYPE": "invalid args",
+    "TOOL": "bash",
+    "ERROR": "Wrong --grep pattern for Playwright tests",
+    "ROOT CAUSE": "Used file:line patterns with --grep, which matches test titles, not file paths.",
+    "PROJECT NOTE": "Target Playwright tests by passing file paths directly or by exact test titles; avoid file:line in --grep.",
+    "NEW INSTRUCTION": "WHEN selecting Playwright tests to run THEN pass file paths or exact titles, not file:line"
+}
+

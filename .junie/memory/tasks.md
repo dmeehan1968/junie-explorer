@@ -1,23 +1,3 @@
-[2025-12-03 19:36] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "adjust tab styling, separate tab containers, overlay toggle icon, verify toggle visibility",
-    "BOTTLENECK": "Visual requirements were not translated into specific per-tab styling and toggle positioning.",
-    "PROJECT NOTE": "Reuse ToggleComponent placement from MessageDecorator (absolute top-right) and use Expand/Collapse icons; render tabs as individual bordered buttons with distinct active/inactive backgrounds.",
-    "NEW INSTRUCTION": "WHEN rendering Trajectories/Events tabs above card THEN style each as separate bordered tabs with active/inactive backgrounds"
-}
-
-[2025-12-03 19:40] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "adjust description toggle, update README, run type checker",
-    "MISSING STEPS": "align tab borders with card, remove active tab bottom border, add tests",
-    "BOTTLENECK": "Tab style choice didn’t enforce active-tab bottom border removal.",
-    "PROJECT NOTE": "DaisyUI tabs-lifted supports attached tabs with no bottom border for active.",
-    "NEW INSTRUCTION": "WHEN tabs must blend into card THEN switch to tabs-lifted; sync tab rounded/border classes with card."
-}
-
 [2025-12-05 15:41] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "near-optimal",
@@ -878,3 +858,22 @@
     "NEW INSTRUCTION": "WHEN user-visible behavior is changed THEN run app and verify workflow end-to-end"
 }
 
+[2026-02-07 19:52] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "update docs",
+    "MISSING STEPS": "run tests, open failing test, validate fixes",
+    "BOTTLENECK": "No targeted test runs to reproduce and verify failures.",
+    "PROJECT NOTE": "Unmerge title likely requires applying IssueDescriptionStore during issue discovery or after unmerge.",
+    "NEW INSTRUCTION": "WHEN failing tests are reported THEN run related tests to reproduce locally, and re-run after each change"
+}
+
+[2026-02-07 19:57] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "scan api routes, investigate backend merge/unmerge, change implementation",
+    "MISSING STEPS": "run tests, limit scope to tests-only, verify fixes",
+    "BOTTLENECK": "Over-investigation of backend without running related Playwright tests to validate fixes.",
+    "PROJECT NOTE": "onclick is on the <tr>, not individual <td>; adjust tests to check the row.",
+    "NEW INSTRUCTION": "WHEN task states functionality correct and fix tests THEN open failing tests, update assertions, run related Playwright tests"
+}

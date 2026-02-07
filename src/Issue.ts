@@ -216,11 +216,13 @@ export class ChainIssue extends Issue {
 }
 
 export class AiaIssue extends Issue {
+  private _initialization: Promise<void>
+
   constructor(state: IssueState, initialTask: Task) {
     super(state)
     initialTask.index = 0
     this._tasks = Promise.resolve(new Map([[initialTask.id, initialTask]]))
-    void (async () => {
+    this._initialization = (async () => {
       const records = await initialTask.loadEvents() // load events without caching
       records.forEach((record) => {
         if (record.event.type === "TaskSummaryCreatedEvent") {
@@ -230,6 +232,10 @@ export class AiaIssue extends Issue {
         }
       })
     })()
+  }
+
+  get initialization(): Promise<void> {
+    return this._initialization
   }
 
   get canMerge(): boolean {

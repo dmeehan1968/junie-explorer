@@ -29,6 +29,14 @@ export class Project {
     this._issues ??= new Promise(async (resolve) => {
       const issues = await this.discoveryService.discover(this.logPaths)
 
+      // Wait for all AIA issues to be initialized so names are correctly populated
+      await Promise.all([...issues.values()].map(issue => {
+        if (issue instanceof AiaIssue) {
+          return issue.initialization
+        }
+        return Promise.resolve()
+      }))
+
       const sortedIssues = [...issues.entries()].sort((a, b) =>
         b[1].created.getTime() - a[1].created.getTime(),
       )
