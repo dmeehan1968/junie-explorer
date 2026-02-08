@@ -325,6 +325,7 @@ Requirements for this project are documented using Gherkin feature files located
 ## Unit Testing
 
 - Uses Playwright as the end-to-end test runner
+- Use `--workers=1` to prevent race conditions between tests 
 - Test suites are organized according to feature/UI Component
 - Test suites a per-feature domain-specific language (DSL) to abstract the Playwright API and make the tests more human readable
 - Colocate the test suite with the component

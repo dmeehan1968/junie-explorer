@@ -9,7 +9,7 @@
   "scripts": {
     "start": "bun run dev",
     "dev": "bun install && bun run build:css && bun run build:static && bun src/index.ts",
-    "test": "bunx playwright test",
+    "test": "bunx playwright test --workers=1",
     "test:ui": "bunx playwright test --ui",
     "playwright:install": "bunx playwright install",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/css/app.css",
