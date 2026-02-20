@@ -1,14 +1,18 @@
 /** @jsxImportSource @kitajs/html */
 
 import { Component } from "@kitajs/html"
-import { MatterhornMessage } from "../schema/llmRequestEvent"
+import { AssistantChatMessageWithToolUses } from "../schema/assistantChatMessageWithToolUses"
+import { ChatMessage } from "../schema/chatMessage"
+import { AssistantSimpleMessage, MatterhornMessage } from "../schema/llmRequestEvent"
+import { MultiPartChatMessage } from "../schema/multiPartChatMessage"
+import { UserChatMessage, UserChatMessageWithToolResults } from "../schema/userChatMessageWithToolResults"
 import { escapeHtml } from "../utils/escapeHtml"
 import { MessageDecorator } from "./messageDecorator"
 import { MultiPartMessage } from "./multiPartMessage"
 import { ToolCallDecorator } from "./toolCallDecorator"
 
 export const ChatMessageDecorator: Component<{ klass: string; message: MatterhornMessage }> = ({ klass, message }) => {
-  if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornChatMessage') {
+  if (message.type === ChatMessage.shape.type.value) {
     return (
       <MessageDecorator
         klass={klass}
@@ -18,7 +22,7 @@ export const ChatMessageDecorator: Component<{ klass: string; message: Matterhor
         content={escapeHtml(message.content)}
       />
     )
-  } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornMultiPartChatMessage') {
+  } else if (message.type === MultiPartChatMessage.shape.type.value) {
     return (
       <>
         {message.parts.map((part) => (
@@ -32,7 +36,7 @@ export const ChatMessageDecorator: Component<{ klass: string; message: Matterhor
         ))}
       </>
     )
-  } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantChatMessageWithToolUses') {
+  } else if (message.type === AssistantChatMessageWithToolUses.shape.type.value) {
     return (
       <>
         {message.content && (
@@ -57,10 +61,47 @@ export const ChatMessageDecorator: Component<{ klass: string; message: Matterhor
         ))}
       </>
     )
-  } else if (message.type === 'com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessageWithToolResults') {
+  } else if (message.type === UserChatMessageWithToolResults.shape.type.value) {
     return (
       <>
         {message.toolResults.map((toolResult, resultIndex) => (
+          <MessageDecorator
+            klass={klass}
+            testId="user-tool-result"
+            left={true}
+            label={toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
+            content={escapeHtml(toolResult.content)}
+          />
+        ))}
+      </>
+    )
+  } else if (message.type === UserChatMessage.shape.type.value) {
+    return (
+      <>
+        {message.parts.map((part) => {
+          if (part.type === 'text') {
+            return <MessageDecorator
+              klass={klass}
+              testId={'user-chat-message'}
+              left={true}
+              label={'Message'}
+              content={escapeHtml(part.text)}
+            />
+          }
+          return <MessageDecorator
+            klass={klass}
+            testId="user-tool-result"
+            left={true}
+            label={part.toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
+            content={escapeHtml(part.toolResult.content)}
+          />
+        })}
+      </>
+    )
+  } else if (message.type === AssistantSimpleMessage.shape.type.value) {
+    return (
+      <>
+        {message.toolResults.map((toolResult) => (
           <MessageDecorator
             klass={klass}
             testId="user-tool-result"

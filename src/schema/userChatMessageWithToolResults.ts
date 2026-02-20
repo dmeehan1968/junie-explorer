@@ -18,6 +18,7 @@ export const ToolResult = z.object({
   isError: z.boolean(),
   images: z.any().array(),
 })
+export type ToolResult = z.infer<typeof ToolResult>
 
 const ToolResults = z.union([
   LegacyToolResult,
@@ -42,11 +43,13 @@ export const TextMessagePart = z.looseObject({
   type: z.literal('text'),
   text: z.string(),
 })
+export type TextMessagePart = z.infer<typeof TextMessagePart>
 
 export const ToolResultPart = z.looseObject({
   type: z.literal('toolResult'),
   toolResult: ToolResult,
 })
+export type ToolResultPart = z.infer<typeof ToolResultPart>
 
 export const MessagePart = z.union([
   TextMessagePart,
@@ -57,3 +60,4 @@ export const UserChatMessage = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornUserChatMessage'),
   parts: MessagePart.array(),
 })
+export type UserChatMessage = z.infer<typeof UserChatMessage>

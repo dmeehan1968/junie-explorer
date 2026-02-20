@@ -5,12 +5,18 @@ import { ChatMessage } from "./chatMessage"
 import { LLM } from "./LLM"
 import { MultiPartChatMessage } from "./multiPartChatMessage"
 import { Tools } from "./tools"
-import { UserChatMessage, UserChatMessageWithToolResults } from "./userChatMessageWithToolResults"
+import {
+  MessagePart, ToolResult,
+  ToolResultPart,
+  UserChatMessage,
+  UserChatMessageWithToolResults,
+} from "./userChatMessageWithToolResults"
 
 export const AssistantSimpleMessage = z.looseObject({
   type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantSimpleMessage'),
   content: z.string(),
 })
+export type AssistantSimpleMessage = z.infer<typeof AssistantSimpleMessage>
 
 export const MatterhornMessage = z.discriminatedUnion('type', [
   ChatMessage,
@@ -30,9 +36,66 @@ export const LlmRequestEvent = z.looseObject({
     tools: Tools,
     cacheUserGroupID: z.string().optional(),
   }).transform(chat => {
+    const agentType = detectAgentType(chat.system)
     return {
       ...chat,
-      agentType: detectAgentType(chat.system),
+      agentType,
+      messages: chat.messages.map(message => {
+        if (message.type === ChatMessage.shape.type.value) {
+          switch (message.kind) {
+            case 'Assistant':
+              return {
+                type: AssistantSimpleMessage.shape.type.value,
+                content: message.content,
+              } satisfies AssistantSimpleMessage
+            case 'User':
+              return {
+                type: UserChatMessage.shape.type.value,
+                parts: [{
+                  type: 'text',
+                  text: message.content,
+                }],
+              } satisfies UserChatMessage
+          }
+        }
+        if (message.type === MultiPartChatMessage.shape.type.value) {
+          switch (message.kind) {
+            case 'Assistant':
+              return message
+            case 'User':
+              return {
+                type: UserChatMessage.shape.type.value,
+                parts: message.parts.filter(part => part.type === 'text'),
+              } satisfies UserChatMessage
+          }
+        }
+        if (message.type === AssistantChatMessageWithToolUses.shape.type.value) {
+          return message
+        }
+        if (message.type === UserChatMessageWithToolResults.shape.type.value) {
+          return {
+            type: UserChatMessage.shape.type.value,
+            parts: message.toolResults.map(result => ({
+              type: 'toolResult',
+              toolResult: {
+                toolCallId: {
+                  id: 'unknown',
+                  callId: 'unknown',
+                  name: 'unknown',
+                  provider: 'unknown',
+                },
+                content: result.content,
+                isError: result.isError,
+                images: [],
+              } satisfies ToolResult,
+            } satisfies ToolResultPart)),
+          } satisfies UserChatMessage
+        }
+        if (message.type === UserChatMessage.shape.type.value || message.type === AssistantSimpleMessage.shape.type.value) {
+          return message
+        }
+        throw new Error(`Unexpected message type: ${message.type}, ${message.kind}`)
+      }),
     }
   }),
   modelParameters: z.looseObject({
