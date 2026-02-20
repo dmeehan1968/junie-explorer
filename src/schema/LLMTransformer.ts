@@ -7,6 +7,7 @@ import { AnthropicClaude46Opus } from "./anthropicClaude46Opus"
 import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
+import { AnthropicSonnet46 } from "./anthropicSonnet46"
 import { Gemini3Flash } from "./Gemini3Flash"
 import { Grok41Fast } from "./grok41fast"
 import { OpenAI4o } from "./openAI4o"
@@ -137,6 +138,9 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   }
   if (AnthropicSonnet45.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(AnthropicSonnet45, data, ctx)
+  }
+  if (AnthropicSonnet46.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return safeParseOrAddIssues(AnthropicSonnet46, data, ctx)
   }
   if (AnthropicClaude45Opus.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(AnthropicClaude45Opus, data, ctx)
