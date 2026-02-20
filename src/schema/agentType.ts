@@ -17,6 +17,7 @@ const AGENT_TYPE_PATTERNS: Record<AgentType, RegExp[]> = {
     /^You are a task summarizer/,
     /^You are a chat response title creator/,
     /^Your task is to summarize/,
+    /^Read the following text and extract its key idea/,
   ],
   [AgentType.enum.Memorizer]: [
     /^You are Memory Extractor/,

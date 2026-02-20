@@ -5,13 +5,20 @@ import { ChatMessage } from "./chatMessage"
 import { LLM } from "./LLM"
 import { MultiPartChatMessage } from "./multiPartChatMessage"
 import { Tools } from "./tools"
-import { UserChatMessageWithToolResults } from "./userChatMessageWithToolResults"
+import { UserChatMessage, UserChatMessageWithToolResults } from "./userChatMessageWithToolResults"
+
+export const AssistantSimpleMessage = z.looseObject({
+  type: z.literal('com.intellij.ml.llm.matterhorn.llm.MatterhornAssistantSimpleMessage'),
+  content: z.string(),
+})
 
 export const MatterhornMessage = z.discriminatedUnion('type', [
   ChatMessage,
   MultiPartChatMessage,
   AssistantChatMessageWithToolUses,
   UserChatMessageWithToolResults,
+  UserChatMessage,
+  AssistantSimpleMessage,
 ])
 export type MatterhornMessage = z.infer<typeof MatterhornMessage>
 
