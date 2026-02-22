@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { UserChatMessage } from "./schema/userChatMessageWithToolResults"
 
 export const JunieChainSchema = z.looseObject({
   id: z.looseObject({
@@ -59,10 +60,14 @@ export type AgentObservation = z.infer<typeof AgentObservation>
 export const AgentState = z.looseObject({
   issue: AgentIssue,
   observations: AgentObservation.nullish().array().nullish(),
-  ideInitialState: z.looseObject({
-    content: z.string(),
-    kind: z.enum(['User']),
-  }).nullish(),
+  ideInitialState: z.union([
+    UserChatMessage,
+    z.looseObject({
+      content: z.string(),
+      kind: z.enum(['User']),
+    }).nullish(),
+    // z.any(),
+  ]),
 })
 export type AgentState = z.infer<typeof AgentState>
 
@@ -156,7 +161,7 @@ export type JunieStatistics = z.infer<typeof JunieStatistics>
 
 export const JunieException = z.looseObject({
   type: z.string(),
-  message: z.string().nullish()
+  message: z.string().nullish(),
 })
 export type JunieException = z.infer<typeof JunieException>
 
