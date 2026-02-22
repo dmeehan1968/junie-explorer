@@ -99,19 +99,13 @@ export const ChatMessageDecorator: Component<{ klass: string; message: Matterhor
       </>
     )
   } else if (message.type === AssistantSimpleMessage.shape.type.value) {
-    return (
-      <>
-        {message.toolResults.map((toolResult) => (
-          <MessageDecorator
-            klass={klass}
-            testId="user-tool-result"
-            left={true}
-            label={toolResult.isError ? 'Tool Result (Error)' : 'Tool Result'}
-            content={escapeHtml(toolResult.content)}
-          />
-        ))}
-      </>
-    )
+    return <MessageDecorator
+      klass={klass}
+      testId={'assistant-message'}
+      left={false}
+      label={'Assistant Response'}
+      content={escapeHtml(message.content)}
+    />
   }
   return <></>
 }
