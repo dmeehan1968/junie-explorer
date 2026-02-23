@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { UserChatMessage } from "./userChatMessageWithToolResults"
+import { IdeInitialState } from "./IdeInitialState"
 
 export const AgentStateUpdatedEvent = z.looseObject({
   type: z.literal('AgentStateUpdatedEvent'),
@@ -14,12 +14,7 @@ export const AgentStateUpdatedEvent = z.looseObject({
     observations: z.looseObject({
       // TODO
     }).array().optional(),
-    ideInitialState: z.union([
-      UserChatMessage,
-      z.looseObject({
-        content: z.string(),
-        kind: z.enum(['User', 'Assistant']),
-      }).optional(),
-    ]),
+    ideInitialState: IdeInitialState,
   }),
 })
+
