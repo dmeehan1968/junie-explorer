@@ -1,10 +1,10 @@
 import fs from "fs-extra"
 import path from "node:path"
 import * as util from "node:util"
-import publicFiles from "./bun/public"
-import { getMaxConcurrency } from "./getMaxConcurrency"
 import type { AiaTask } from "./AiaTask"
+import publicFiles from "./bun/public"
 import type { ChainTask } from "./ChainTask"
+import { getMaxConcurrency } from "./getMaxConcurrency"
 import {
   addSummaryMetrics,
   AgentState,
@@ -26,6 +26,7 @@ import { OpenAI51 } from "./schema/openAI51"
 import { OpenAI51CodexMax } from "./schema/openAI51CodexMax"
 import { OpenAI52 } from "./schema/openAI52"
 import { OpenAI52Codex } from "./schema/openAI52Codex"
+import { OpenAI53Codex } from "./schema/openAI53Codex"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
@@ -81,7 +82,7 @@ export abstract class Task {
     if (this._workerPool === undefined) {
       if (maxConcurrency > 0) {
         const bundledWorker = publicFiles['loadEventsWorker.js']
-        if (!bundledWorker) {
+        if ( ! bundledWorker) {
           throw new Error('Failed to load bundled loadEventsWorker.js from public folder')
         }
         const blob = new Blob([bundledWorker], { type: 'application/javascript' })
@@ -179,7 +180,7 @@ export abstract class Task {
         }
       }
 
-      if (!this._events) {
+      if ( ! this._events) {
         events.splice(0)
       }
 
@@ -204,7 +205,7 @@ export abstract class Task {
       for (const event of events) {
         if (event.event.type === 'LlmResponseEvent') {
           const model = event.event.answer.llm.jbai ?? 'Unknown'
-          if (!metricsByModel[model]) {
+          if ( ! metricsByModel[model]) {
             metricsByModel[model] = initialisedSummaryMetrics()
           }
           addSummaryMetrics(metricsByModel[model], {
@@ -223,7 +224,7 @@ export abstract class Task {
         }
       }
 
-      if (!this._events) {
+      if ( ! this._events) {
         events.splice(0)
       }
 
@@ -239,12 +240,12 @@ export abstract class Task {
       return this._steps
     }
 
-    if (!this.logPath) {
+    if ( ! this.logPath) {
       return this._steps
     }
 
     const stepPath = path.resolve(this.logPath, '../../..', this.id)
-    if (!fs.existsSync(stepPath)) {
+    if ( ! fs.existsSync(stepPath)) {
       return this._steps
     }
 
@@ -265,13 +266,13 @@ export abstract class Task {
   }
 
   protected load() {
-    if (!this.logPath) {
+    if ( ! this.logPath) {
       return
     }
 
     const taskData = JunieTaskSchema.safeParse(fs.readJsonSync(this.logPath))
 
-    if (!taskData.success) {
+    if ( ! taskData.success) {
       throw new Error(`Error parsing JunieTask at ${this.logPath}: ${taskData.error.message}`)
     }
 
@@ -281,7 +282,7 @@ export abstract class Task {
   private lazyload() {
     if (this._previousTasksInfo === undefined || this._finalAgentState === undefined && this._sessionHistory === undefined && this._patch === undefined) {
       const task = this.load()
-      if (!task) return this
+      if ( ! task) return this
       this._previousTasksInfo = task.previousTasksInfo
       this._finalAgentState = task.finalAgentState
       this._sessionHistory = task.sessionHistory
@@ -385,6 +386,7 @@ export abstract class Task {
         OpenAI52.shape.jbai.value,
         OpenAI51CodexMax.shape.jbai.value,
         OpenAI52Codex.shape.jbai.value,
+        OpenAI53Codex.shape.jbai.value,
       ].includes(event.answer.llm.jbai as never)
 
     const adjustedEvents = events.map((record, index) => {
@@ -436,7 +438,7 @@ export abstract class Task {
           const jbai = (e.modelParameters?.model as any)?.jbai as string | undefined
           if (provider) {
             const key = `${provider}|${name ?? ''}|${jbai ?? ''}`
-            if (!unique.has(key)) {
+            if ( ! unique.has(key)) {
               unique.set(key, { provider, name, jbai })
             }
           }
@@ -462,7 +464,7 @@ export abstract class Task {
   }
 
   get trajectoriesFile() {
-    if (!this.logPath) return undefined
+    if ( ! this.logPath) return undefined
     return path.join(this.logPath, '../../../trajectory', `${this.id}.jsonl`)
   }
 

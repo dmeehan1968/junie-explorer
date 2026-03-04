@@ -21,6 +21,7 @@ import { OpenAI51 } from "./openAI51"
 import { OpenAI52 } from "./openAI52"
 import { OpenAI51CodexMax } from "./openAI51CodexMax"
 import { OpenAI52Codex } from "./openAI52Codex"
+import { OpenAI53Codex } from "./openAI53Codex"
 import { OpenAIo3 } from "./openAIo3"
 
 function safeParseOrAddIssues<T extends z.ZodTypeAny>(
@@ -106,6 +107,9 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   }
   if (OpenAI52Codex.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI52Codex, data, ctx)
+  }
+  if (OpenAI53Codex.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return safeParseOrAddIssues(OpenAI53Codex, data, ctx)
   }
   if (Gemini3Flash.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(Gemini3Flash, data, ctx)
