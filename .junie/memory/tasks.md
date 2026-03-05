@@ -868,12 +868,12 @@
     "NEW INSTRUCTION": "WHEN modifying existing component behavior THEN search project for existing tests and DSL, update them"
 }
 
-[2026-03-05 11:34] - Updated by Junie - Trajectory analysis
+[2026-03-05 11:39] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "assume API flow, answer without reading files",
-    "MISSING STEPS": "open route, open client initializer, open component, verify selectors",
-    "BOTTLENECK": "The agent answered without inspecting the actual files that load data.",
-    "PROJECT NOTE": "Inspect src/components/eventMetricsSection.tsx and public/js/taskEventLlmChart.js; locate the route embedding the chart JSON.",
-    "NEW INSTRUCTION": "WHEN data flow for chart is asked THEN open route and client initializer before answering"
+    "REDUNDANT STEPS": "answer without reading files",
+    "MISSING STEPS": "open files, verify data flow",
+    "BOTTLENECK": "Answered before inspecting files, causing an incorrect explanation.",
+    "PROJECT NOTE": "-",
+    "NEW INSTRUCTION": "WHEN chart data flow is requested THEN open route embedding JSON and client chart initializer before components"
 }

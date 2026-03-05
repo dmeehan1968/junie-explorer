@@ -440,33 +440,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('No LLM chart element found - chart will not be initialized');
         return;
       }
-
-      // Get the config from the embedded JSON
+      
+      // Get the config from the embedded JSON - store globally for lazy loading
       const configEl = document.getElementById('chartDataConfig');
-      const config = configEl ? JSON.parse(configEl.textContent) : null;
-      
-      if (!config) {
-        console.log('No chart config available - chart will not be initialized');
-        return;
-      }
-      
-      // Check if there are metrics to display
-      if (!config.hasMetrics) {
-        console.log('No metrics available - chart will not be initialized');
-        return;
-      }
-      
-      // Fetch chart data from the API
-      if (config.apiUrl) {
-        fetchChartData(config.apiUrl);
-      } else {
-        console.log('No API URL configured - chart will not be initialized');
-        showError('Chart configuration error');
-      }
+      window.llmMetricsConfig = configEl ? JSON.parse(configEl.textContent) : null;
       
     } catch (error) {
-      console.error('Error initializing LLM chart:', error);
-      showError('Failed to initialize chart');
+      console.error('Error initializing LLM chart configuration:', error);
     }
   }, 100); // 100ms delay
 });

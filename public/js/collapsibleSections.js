@@ -29,7 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update header to have top border radius only when expanded
         header.className = header.className.replace('rounded-lg', 'rounded-t-lg');
         
-        // Check if this section contains the event timeline chart
+                // Check if this section contains the event metrics chart
+                const llmChartCanvas = section.querySelector('#llmMetricsChart');
+                if (llmChartCanvas && window.llmMetricsConfig && !window.llmMetricsFetched) {
+                  window.llmMetricsFetched = true;
+                  if (window.llmMetricsConfig.apiUrl) {
+                    window.fetchChartData(window.llmMetricsConfig.apiUrl);
+                  } else {
+                    console.log('No API URL configured - chart will not be initialized');
+                  }
+                }
+
+                // Check if this section contains the event timeline chart
         const chartCanvas = section.querySelector('#event-timeline-chart');
         if (chartCanvas && !window.taskEvents) {
           // Fetch event timeline data when the event timeline is expanded
