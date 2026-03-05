@@ -15,33 +15,18 @@ test.describe('EventMetricsSection', () => {
       await eventMetrics.setHasMetrics(true)
     })
 
-    test('renders section and header with title and toggle', async ({ eventMetrics, page }) => {
+    test('renders section and header with title and toggle', async ({ eventMetrics }) => {
       await expect(eventMetrics.container).toBeVisible()
       await expect(eventMetrics.header).toBeVisible()
 
       await expect(eventMetrics.title).toHaveText('Event Metrics')
-      await expect(eventMetrics.toggleHint).toHaveText(/Click to collapse/i)
+      await expect(eventMetrics.toggleHint).toHaveText(/Click to expand/i)
     })
 
-    test('renders provider filters container with expected attributes', async ({ eventMetrics }) => {
-      const container = eventMetrics.providerFilters
-      await expect(container).toHaveCount(1)
-      await expect(container).toContainClass('join flex flex-wrap')
-    })
-
-    test('renders chart canvas element with correct id', async ({ eventMetrics }) => {
-      await expect(eventMetrics.canvas).toHaveCount(1)
-    })
-
-    test('renders metric type toggle with Cost and Tokens buttons', async ({ eventMetrics }) => {
-      await expect(eventMetrics.metricTypeToggle).toBeVisible()
-      await expect(eventMetrics.costButton).toBeVisible()
-      await expect(eventMetrics.tokensButton).toBeVisible()
-    })
-
-    test('Cost button is active by default', async ({ eventMetrics }) => {
-      await expect(eventMetrics.costButton).toHaveAttribute('aria-pressed', 'true')
-      await expect(eventMetrics.tokensButton).toHaveAttribute('aria-pressed', 'false')
+    test('is collapsed by default', async ({ eventMetrics }) => {
+      await expect(eventMetrics.container).toHaveClass(/collapsed/)
+      await expect(eventMetrics.content).toHaveClass(/hidden/)
+      await expect(eventMetrics.toggleHint).toHaveText(/Click to expand/i)
     })
   })
 })

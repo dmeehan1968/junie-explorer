@@ -1,33 +1,3 @@
-[2025-12-05 15:41] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "update README",
-    "MISSING STEPS": "add tests, run tests, update worker",
-    "BOTTLENECK": "Tests were not added before implementation, risking regressions.",
-    "PROJECT NOTE": "Worker pool result must include errors; ensure loadEventsWorker forwards them.",
-    "NEW INSTRUCTION": "WHEN changing loadEvents output used by worker THEN update worker to forward errors first"
-}
-
-[2025-12-05 16:13] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "near-optimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "search project",
-    "BOTTLENECK": "Internal `.parse()` calls inside `.transform()` cause exceptions during safe parsing.",
-    "PROJECT NOTE": "LLM.ts also calls discriminatedUnion(...).parse inside a transform; prefer pipe or safeParse with ctx.addIssue.",
-    "NEW INSTRUCTION": "WHEN investigating safeParse throwing in schema parsing THEN search project for '.transform' containing '.parse' and inspect offending schemas"
-}
-
-[2025-12-05 16:19] - Updated by Junie - Trajectory analysis
-{
-    "PLAN QUALITY": "suboptimal",
-    "REDUNDANT STEPS": "-",
-    "MISSING STEPS": "scan project, refactor LLM.ts, add tests, run tests, update loadEvents, run build",
-    "BOTTLENECK": "Only partially refactored schemas; other parse-in-transform sites left unchanged.",
-    "PROJECT NOTE": "LLM.ts still calls discriminatedUnion(...).parse inside a transform; refactor to pipe or safeParse with ctx.addIssue.",
-    "NEW INSTRUCTION": "WHEN a Zod transform calls .parse internally THEN use safeParse and propagate issues via ctx.addIssue"
-}
-
 [2025-12-05 16:34] - Updated by Junie - Trajectory analysis
 {
     "PLAN QUALITY": "optimal",
@@ -876,4 +846,34 @@
     "BOTTLENECK": "Over-investigation of backend without running related Playwright tests to validate fixes.",
     "PROJECT NOTE": "onclick is on the <tr>, not individual <td>; adjust tests to check the row.",
     "NEW INSTRUCTION": "WHEN task states functionality correct and fix tests THEN open failing tests, update assertions, run related Playwright tests"
+}
+
+[2026-03-05 11:28] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "restate issue, ask approval, add tests, update documentation, adjust header radius, change toggle text",
+    "MISSING STEPS": "find target file, open file, modify code, run build, verify in UI, submit",
+    "BOTTLENECK": "Approval-gated planning replaced direct edit of the specified file.",
+    "PROJECT NOTE": "Collapsible behavior is handled in public/js/collapsibleSections.js; adding 'collapsed' may be sufficient.",
+    "NEW INSTRUCTION": "WHEN @thisFile is referenced in task THEN open that file, implement minimal change, run build, and submit"
+}
+
+[2026-03-05 11:31] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "request approval,run nonexistent test,add new test",
+    "MISSING STEPS": "scan project,update dsl",
+    "BOTTLENECK": "Approval request and incorrect test targeting delayed implementation and validation.",
+    "PROJECT NOTE": "Existing .pw.tsx tests and a DSL exist for EventMetrics; expand before inner assertions when default is collapsed.",
+    "NEW INSTRUCTION": "WHEN modifying existing component behavior THEN search project for existing tests and DSL, update them"
+}
+
+[2026-03-05 11:34] - Updated by Junie - Trajectory analysis
+{
+    "PLAN QUALITY": "suboptimal",
+    "REDUNDANT STEPS": "assume API flow, answer without reading files",
+    "MISSING STEPS": "open route, open client initializer, open component, verify selectors",
+    "BOTTLENECK": "The agent answered without inspecting the actual files that load data.",
+    "PROJECT NOTE": "Inspect src/components/eventMetricsSection.tsx and public/js/taskEventLlmChart.js; locate the route embedding the chart JSON.",
+    "NEW INSTRUCTION": "WHEN data flow for chart is asked THEN open route and client initializer before answering"
 }

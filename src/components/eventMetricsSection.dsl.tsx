@@ -22,6 +22,7 @@ export class EventMetricsSectionDSL {
     const body = await <EventMetricsSection {...merged} />
     await page.setContent(wrapHtml(body))
     await page.addStyleTag({ url: 'http://localhost:3000/css/app.css' })
+    await page.addScriptTag({ url: 'http://localhost:3000/js/collapsibleSections.js' })
     return new EventMetricsSectionDSL(page, merged)
   }
 
@@ -73,8 +74,8 @@ export class EventMetricsSectionDSL {
     return this.metricTypeToggle.getByRole('button', { name: 'Tokens' })
   }
 
-  get canvas() {
-    return this.page.locator('#llmMetricsChart')
+  get content() {
+    return this.container.locator('.collapsible-content')
   }
 }
 

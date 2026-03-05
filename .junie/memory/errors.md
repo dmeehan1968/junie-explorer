@@ -458,3 +458,33 @@
     "NEW INSTRUCTION": "WHEN selecting Playwright tests to run THEN pass file paths or exact titles, not file:line"
 }
 
+[2026-03-05 11:29] - Updated by Junie - Error analysis
+{
+    "TYPE": "missing implementation",
+    "TOOL": "bash",
+    "ERROR": "Playwright test failed: not collapsed by default",
+    "ROOT CAUSE": "The component still renders expanded state; collapsed classes and toggle text were not implemented.",
+    "PROJECT NOTE": "Update src/components/eventMetricsSection.tsx so the outer container includes class 'collapsed', the content has class 'hidden' on initial render, and the toggle hint reads 'Click to expand'. This aligns with public/js/collapsibleSections.js expectations.",
+    "NEW INSTRUCTION": "WHEN EventMetricsSection should load collapsed by default THEN add 'collapsed' to container, 'hidden' to content, set toggle hint"
+}
+
+[2026-03-05 11:30] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Playwright toHaveClass used on non-Locator",
+    "ROOT CAUSE": "The test called toHaveClass on eventMetrics.content, which was not a Locator in the DSL.",
+    "PROJECT NOTE": "Component DSL files under src/components/*.dsl.tsx should expose Locators (page.locator or container.locator) for elements used with Playwright expect APIs.",
+    "NEW INSTRUCTION": "WHEN adding DSL getters for elements THEN return Playwright Locator objects, not nodes"
+}
+
+[2026-03-05 11:30] - Updated by Junie - Error analysis
+{
+    "TYPE": "tool failure",
+    "TOOL": "bash",
+    "ERROR": "Playwright assertion used non-Locator subject",
+    "ROOT CAUSE": "The test asserted toHaveClass on eventMetrics.content before defining it as a Locator in the DSL.",
+    "PROJECT NOTE": "DSL files under src/components/*.dsl.tsx centralize Playwright Locators; add getters there (e.g., .collapsible-content) and expand collapsed sections before asserting inner elements.",
+    "NEW INSTRUCTION": "WHEN asserting DOM classes in Playwright THEN ensure the subject is a Locator from the DSL"
+}
+
