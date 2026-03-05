@@ -8,6 +8,7 @@ import { AnthropicSonnet37 } from "./anthropicSonnet37"
 import { AnthropicSonnet4 } from "./anthropicSonnet4"
 import { AnthropicSonnet45 } from "./anthropicSonnet45"
 import { AnthropicSonnet46 } from "./anthropicSonnet46"
+import { Gemini31FlashLite } from "./Gemini31FlashLite"
 import { Gemini31Pro } from "./Gemini31Pro"
 import { Gemini3Flash } from "./Gemini3Flash"
 import { Grok41Fast } from "./grok41fast"
@@ -110,6 +111,9 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   }
   if (OpenAI53Codex.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI53Codex, data, ctx)
+  }
+  if (Gemini31FlashLite.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return safeParseOrAddIssues(Gemini31FlashLite, data, ctx)
   }
   if (Gemini3Flash.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(Gemini3Flash, data, ctx)
