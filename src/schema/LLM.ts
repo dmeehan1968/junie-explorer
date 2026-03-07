@@ -21,6 +21,7 @@ import { OpenAI52 } from "./openAI52"
 import { OpenAI51CodexMax } from "./openAI51CodexMax"
 import { OpenAI52Codex } from "./openAI52Codex"
 import { OpenAI53Codex } from "./openAI53Codex"
+import { OpenAI54 } from "./openAI54"
 import { OpenAIo3 } from "./openAIo3"
 
 const LLMDiscriminatedUnion = z.discriminatedUnion('jbai', [
@@ -32,6 +33,7 @@ const LLMDiscriminatedUnion = z.discriminatedUnion('jbai', [
   OpenAI5,
   OpenAI51,
   OpenAI52,
+  OpenAI54,
   OpenAI51CodexMax,
   OpenAI52Codex,
   OpenAI53Codex,

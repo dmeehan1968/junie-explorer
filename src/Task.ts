@@ -27,6 +27,7 @@ import { OpenAI51CodexMax } from "./schema/openAI51CodexMax"
 import { OpenAI52 } from "./schema/openAI52"
 import { OpenAI52Codex } from "./schema/openAI52Codex"
 import { OpenAI53Codex } from "./schema/openAI53Codex"
+import { OpenAI54 } from "./schema/openAI54"
 import { StatsCollector } from "./stats/StatsCollector"
 import { Step } from "./Step"
 import { loadEvents } from "./workers/loadEvents"
@@ -384,6 +385,7 @@ export abstract class Task {
         ...OpenAI5.shape.jbai.options,
         OpenAI51.shape.jbai.value,
         OpenAI52.shape.jbai.value,
+        OpenAI54.shape.jbai.value,
         OpenAI51CodexMax.shape.jbai.value,
         OpenAI52Codex.shape.jbai.value,
         OpenAI53Codex.shape.jbai.value,

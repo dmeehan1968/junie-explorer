@@ -23,6 +23,7 @@ import { OpenAI52 } from "./openAI52"
 import { OpenAI51CodexMax } from "./openAI51CodexMax"
 import { OpenAI52Codex } from "./openAI52Codex"
 import { OpenAI53Codex } from "./openAI53Codex"
+import { OpenAI54 } from "./openAI54"
 import { OpenAIo3 } from "./openAIo3"
 
 function safeParseOrAddIssues<T extends z.ZodTypeAny>(
@@ -97,11 +98,26 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   if (OpenAI41.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI41, data, ctx)
   }
+  if (OpenAI5.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
+    return safeParseOrAddIssues(OpenAI5, {
+      name: data.name,
+      provider: data.provider,
+      jbai: data.jbai,
+      capabilities: {
+        inputPrice: data.capabilities.inputPrice ?? 0,
+        outputPrice: data.capabilities.outputPrice ?? 0,
+        cacheInputPrice: data.capabilities.cacheInputPrice ?? 0,
+      }
+    }, ctx)
+  }
   if (OpenAI51.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI51, data, ctx)
   }
   if (OpenAI52.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI52, data, ctx)
+  }
+  if (OpenAI54.shape.jbai.value === data.jbai && 'capabilities' in data) {
+    return safeParseOrAddIssues(OpenAI54, data, ctx)
   }
   if (OpenAI51CodexMax.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(OpenAI51CodexMax, data, ctx)
@@ -159,18 +175,6 @@ export const LLMTransformer = z.any().transform((data, ctx) => {
   }
   if (AnthropicClaude46Opus.shape.jbai.value === data.jbai && 'capabilities' in data) {
     return safeParseOrAddIssues(AnthropicClaude46Opus, data, ctx)
-  }
-  if (OpenAI5.shape.jbai.options.includes(data.jbai) && 'capabilities' in data) {
-    return safeParseOrAddIssues(OpenAI5, {
-      name: data.name,
-      provider: data.provider,
-      jbai: data.jbai,
-      capabilities: {
-        inputPrice: data.capabilities.inputPrice ?? 0,
-        outputPrice: data.capabilities.outputPrice ?? 0,
-        cacheInputPrice: data.capabilities.cacheInputPrice ?? 0,
-      }
-    }, ctx)
   }
   ctx.addIssue({
     code: 'custom',
