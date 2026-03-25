@@ -109,8 +109,9 @@ class TaskActionChart {
     const start = new Date(Math.min(...allTimes));
     const end = new Date(Math.max(...allTimes));
     
-    // Add some padding
-    const padding = (end.getTime() - start.getTime()) * 0.05;
+    // Add some padding; ensure a minimum span so single-point events render correctly
+    const span = end.getTime() - start.getTime();
+    const padding = span > 0 ? span * 0.05 : 500;
     return {
       start: new Date(start.getTime() - padding),
       end: new Date(end.getTime() + padding)
