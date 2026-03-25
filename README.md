@@ -138,6 +138,15 @@ The Project Metrics Chart on the home page has been enhanced to support:
 - **Loading State**: A loading indicator is displayed during data fetches (with 200ms delay).
 - **Improved Visualization**: Better rendering of 'week' based groupings and ensures legends are visible for model-based and agent type views even for single projects.
 
+### Action Timeline Chart
+
+The Action Timeline Chart visualises agent actions over time for a given task. It supports two sources of action events:
+
+- **`AgentActionExecutionStarted` / `AgentActionExecutionFinished`**: Paired events that define the start and end of an action, rendered as a bar whose width represents the duration. Actions with a very short duration are rendered as a point (circle).
+- **`BackwardCompatibleActionRequestBuildingFinished`**: A single event that represents both the start and end of one or more actions (duration cannot be determined). Each action in the `actionRequests` array is rendered as a point (circle) at the event timestamp.
+
+The `/api/project/:projectId/issue/:issueId/task/:taskId/trajectories/timeline` endpoint returns all three event types. The transformation logic is implemented in `buildActionEvents` (exported from `src/app/api/trajectories/timeline.ts`) and is covered by unit tests in `timeline.test.ts`.
+
 ### Worker Bundling
 
 For the application to work correctly as a single-file executable, web workers must be bundled and embedded into the application.

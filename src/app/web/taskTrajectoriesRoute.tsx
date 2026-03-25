@@ -17,6 +17,7 @@ import { ThemeSwitcher } from '../../components/themeSwitcher.js'
 import { VersionBanner } from '../../components/versionBanner.js'
 import { getLocaleFromRequest } from "../../utils/getLocaleFromRequest"
 import { entityLookupMiddleware } from "../middleware/entityLookupMiddleware"
+import { buildActionEvents } from "../api/trajectories/timeline"
 import { AppRequest, AppResponse } from "../types"
 
 const router = express.Router({ mergeParams: true })
@@ -36,8 +37,9 @@ router.get('/project/:projectId/issue/:issueId/task/:taskId/trajectories', async
     const events = await task.events
 
     // Check if there are action events for conditional rendering
-    const hasActionEvents = events.some(e => e.event.type === 'AgentActionExecutionStarted')
-    const actionCount = events.filter(e => e.event.type === 'AgentActionExecutionStarted').length
+    const actionEvents = buildActionEvents(events as any)
+    const hasActionEvents = actionEvents.length > 0
+    const actionCount = actionEvents.filter(e => e.eventType !== 'AgentActionExecutionFinished').length
     const hasMetrics = project.hasMetrics
     
     const tasksCount = (await issue.tasks).size

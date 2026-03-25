@@ -32,7 +32,17 @@ class TaskActionChart {
     sortedEvents.forEach(event => {
       const eventType = event.eventType;
       
-      if (eventType === 'AgentActionExecutionStarted') {
+      if (eventType === 'BackwardCompatibleActionRequestBuildingFinished') {
+        if (event.actionName) {
+          pairs.push({
+            actionName: event.actionName,
+            inputParamValue: event.inputParamValue,
+            startTime: event.timestamp,
+            endTime: event.timestamp,
+            duration: 0
+          });
+        }
+      } else if (eventType === 'AgentActionExecutionStarted') {
         const actionName = event.actionName;
         const inputParamValue = event.inputParamValue;
         if (actionName) {
