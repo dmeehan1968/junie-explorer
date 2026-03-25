@@ -11,6 +11,9 @@ import { AgentInteractionFinished } from "./agentInteractionFinished"
 import { AgentInteractionStarted } from "./agentInteractionStarted"
 import { AgentSessionUpdatedEvent } from "./agentSessionUpdatedEvent"
 import { AgentStateUpdatedEvent } from "./agentStateUpdatedEvent"
+import {
+  BackwardCompatibleActionRequestBuildingFinishedSerializer
+} from "./backwardCompatibleActionRequestBuildingFinishedSerializer"
 import { BeforeArtifactBuildingStarted } from "./beforeArtifactBuildingStarted"
 import { BeforeStepStartedEvent } from "./beforeStepStartedEvent"
 import { EditEvent } from "./editEvent"
@@ -77,5 +80,6 @@ export const Event = z.discriminatedUnion('type', [
   MemoryReflectionCompletedEvent,
   MemoryExtractedEvent,
   MemoryCompactedEvent,
+  BackwardCompatibleActionRequestBuildingFinishedSerializer,
 ])
 export type Event = z.infer<typeof Event>
